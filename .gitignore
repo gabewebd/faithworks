@@ -1,0 +1,28 @@
+# Dependencies / build output
+node_modules/
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+
+# Claude Code downloaded/local skills
+.claude/skills/
+
+# Temporary files
+*.tmp
+*.temp
+*.log

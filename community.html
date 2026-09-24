@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community · Faith Works</title>
+  <meta name="description" content="Upcoming Faith Works workshops and events, past sessions, and ways to stay connected.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Faith Works">
+  <meta property="og:title" content="Community · Faith Works">
+  <meta property="og:description" content="Upcoming Faith Works workshops and events, past sessions, and ways to stay connected.">
+  <meta property="og:image" content="assets/images/masterclass-room-1345.jpg">
+  <meta name="theme-color" content="#FAF8F4">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+
+  <!-- Fonts: Poppins (display) + Inter (body), DESIGN §4 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:ital,wght@0,600;0,700;0,800;1,500&display=swap">
+
+  <!-- All site CSS and JS. In GHL, swap these two paths for the CDN URLs. -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="fw-skip" href="#main">Skip to content</a>
+
+  <!-- =====================================================================
+       HEADER (DESIGN §10)
+       Six items + Join. Sub-items open in panels on hover/focus (CSS only).
+       data-fw-chapter-link marks the journey indicator items.
+       ===================================================================== -->
+  <header class="fw-header" data-fw-header data-fw-surface="white">
+    <div class="fw-container fw-header__bar">
+      <a class="fw-header__brand" href="index.html" aria-label="Faith Works, home">
+        <span class="fw-wordmark">
+          <img class="fw-wordmark__default" src="assets/icons/wordmark.svg" alt="" width="1906" height="385">
+          <img class="fw-wordmark__reversed" src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385">
+        </span>
+      </a>
+
+      <nav class="fw-nav" aria-label="Primary">
+        <ul class="fw-nav__list" role="list">
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="index.html">Home</a>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="learn">
+            <a class="fw-nav__link" href="learn.html">Learn<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Learn</p>
+                  <p class="fw-voice">I want to understand this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#ai"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#business"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Business<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#leadership"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#workshops"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#events"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#resources"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Resources<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="implement">
+            <a class="fw-nav__link" href="implement.html">Implement<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Implement</p>
+                  <p class="fw-voice">I want to apply this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#frameworks"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Frameworks<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#templates"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Templates<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#workflows"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Workflows<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#ai-tools"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">AI tools<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#programs"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Programs<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#faith-ai"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Faith AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="scale">
+            <a class="fw-nav__link" href="scale.html">Scale<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Scale</p>
+                  <p class="fw-voice">I want this to last.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#systems"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Systems<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#transformation"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Transformation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#growth"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Growth<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#leadership"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#business-development"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Business development<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel">
+            <a class="fw-nav__link" href="community.html" aria-current="page">Community</a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Community</p>
+                  <p class="fw-voice">Events · Connection · Participation</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#events"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#connection"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Connection<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#participation"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Participation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="about.html">About</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="fw-header__actions">
+        <a class="fw-btn fw-btn--primary fw-header__join" href="#join">Join</a>
+        <!-- Without JavaScript "Menu" jumps to the footer navigation -->
+        <a class="fw-header__menu fw-header__menu--nojs" href="#fw-footer-nav">Menu</a>
+        <button class="fw-header__menu fw-header__menu--js" type="button" aria-expanded="false" aria-controls="fw-menu" data-fw-menu-toggle>
+          <span class="fw-header__menu-open">Menu</span><span class="fw-header__menu-close">Close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile / tablet menu (below 1100px). Sub-items use native <details>. -->
+    <div class="fw-menu" id="fw-menu" data-fw-surface="white" hidden>
+      <nav class="fw-container" aria-label="Primary (mobile)">
+        <ul class="fw-menu__list" role="list">
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="index.html"><span class="fw-menu__num" aria-hidden="true">01</span><span>Home</span></a>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">02</span><span>Learn</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="learn.html">All of Learn</a></li>
+                <li><a href="learn.html#ai">AI</a></li>
+                <li><a href="learn.html#business">Business</a></li>
+                <li><a href="learn.html#leadership">Leadership</a></li>
+                <li><a href="learn.html#workshops">Workshops</a></li>
+                <li><a href="learn.html#events">Events</a></li>
+                <li><a href="learn.html#resources">Resources</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">03</span><span>Implement</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="implement.html">All of Implement</a></li>
+                <li><a href="implement.html#frameworks">Frameworks</a></li>
+                <li><a href="implement.html#templates">Templates</a></li>
+                <li><a href="implement.html#workflows">Workflows</a></li>
+                <li><a href="implement.html#ai-tools">AI tools</a></li>
+                <li><a href="implement.html#programs">Programs</a></li>
+                <li><a href="implement.html#faith-ai">Faith AI</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">04</span><span>Scale</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="scale.html">All of Scale</a></li>
+                <li><a href="scale.html#systems">Systems</a></li>
+                <li><a href="scale.html#transformation">Transformation</a></li>
+                <li><a href="scale.html#growth">Growth</a></li>
+                <li><a href="scale.html#leadership">Leadership</a></li>
+                <li><a href="scale.html#business-development">Business development</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row fw-menu__row--current">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">05</span><span>Community</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="community.html" aria-current="page">All of Community</a></li>
+                <li><a href="community.html#events">Events</a></li>
+                <li><a href="community.html#connection">Connection</a></li>
+                <li><a href="community.html#participation">Participation</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="about.html"><span class="fw-menu__num" aria-hidden="true">06</span><span>About</span></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+
+
+  <main id="main">
+
+    <!-- =====================================================================
+         01 · COMMUNITY HERO: Works White, Pink Ink accent — real photos first
+         ===================================================================== -->
+    <section class="fw-page-hero fw-comm-hero" id="top" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-comm-title">
+      <div class="fw-container">
+        <div class="fw-page-hero__top">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Events · Workshops · Connect</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <a class="fw-label fw-comm-hero__next" href="#events">Next up: AI for Business · 25 Sep 2026 · Pampanga →</a>
+        </div>
+        <h1 class="fw-display-xl fw-page-hero__title fw-comm-hero__title" id="fw-comm-title" data-fw-reveal="lines">
+          <span class="fw-line"><span class="fw-line__in">Community.</span></span>
+        </h1>
+        <p class="fw-page-hero__lede" data-fw-reveal="fade" style="--fw-delay:200ms">Workshops, masterclasses, forums and gatherings where professionals, founders and teams learn AI and business alongside each other.</p>
+      </div>
+
+      <div class="fw-comm-hero__strip">
+        <div class="fw-media" data-fw-reveal="clip">
+          <picture>
+            <source type="image/webp" srcset="assets/images/workshop-qa-480.webp 480w, assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 768px) 25vw, 100vw">
+            <img src="assets/images/workshop-qa-672.jpg" srcset="assets/images/workshop-qa-480.jpg 480w, assets/images/workshop-qa-672.jpg 672w" sizes="(min-width: 768px) 25vw, 100vw"
+                 width="672" height="549" loading="lazy" decoding="async" style="object-position:100% 50%"
+                 alt="A participant asks a question while a facilitator holds a microphone during a Faith Works workshop">
+          </picture>
+        </div>
+        <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:90ms">
+          <picture>
+            <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w, assets/images/masterclass-room-1345.webp 1345w" sizes="(min-width: 768px) 42vw, 100vw">
+            <img src="assets/images/masterclass-room-960.jpg" srcset="assets/images/masterclass-room-480.jpg 480w, assets/images/masterclass-room-960.jpg 960w, assets/images/masterclass-room-1345.jpg 1345w" sizes="(min-width: 768px) 42vw, 100vw"
+                 width="1345" height="777" loading="lazy" decoding="async" style="object-position:100% 55%"
+                 alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1">
+          </picture>
+        </div>
+        <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:180ms">
+          <picture>
+            <source type="image/webp" srcset="assets/images/participants-laptop-480.webp 480w, assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 768px) 33vw, 100vw">
+            <img src="assets/images/participants-laptop-508.jpg" srcset="assets/images/participants-laptop-480.jpg 480w, assets/images/participants-laptop-508.jpg 508w" sizes="(min-width: 768px) 33vw, 100vw"
+                 width="508" height="499" loading="lazy" decoding="async" style="object-position:50% 40%"
+                 alt="Workshop participants working on their laptops during a hands-on session">
+          </picture>
+        </div>
+      </div>
+      <div class="fw-container fw-comm-hero__caption">
+        <p class="fw-h1" data-fw-reveal="fade">Real people. Real work. <span class="fw-hl">Real learning.</span></p>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         02 · UPCOMING EVENTS: Soft Charcoal, AI Yellow accent
+         The workshop is confirmed (Faith Works). Future masterclasses/forums have
+         no dates yet, so they offer "Get notified" rather than invented dates.
+         Agenda bullets: confirm before launch.
+         ===================================================================== -->
+    <section class="fw-section fw-comm-events" id="events" data-fw-surface="charcoal" data-fw-accent="yellow" aria-labelledby="fw-comm-events-title">
+      <div class="fw-container">
+        <div class="fw-sechead">
+          <div class="fw-page-intro">
+            <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Upcoming events</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+            <h2 class="fw-h1" id="fw-comm-events-title">What's <span class="fw-hl">coming up.</span></h2>
+          </div>
+        </div>
+
+        <article class="fw-listing" aria-labelledby="fw-ev1-title">
+          <div class="fw-listing__date">
+            <p class="fw-label">Workshop</p>
+            <p class="fw-listing__day" aria-hidden="true">25</p>
+            <p class="fw-label"><time datetime="2026-09-25">Friday · September 2026</time></p>
+          </div>
+          <div class="fw-listing__main">
+            <h3 class="fw-h1" id="fw-ev1-title">AI for Business: Hands-On Workshop</h3>
+            <p class="fw-body-l">Practical AI workflows for marketing, sales, and operations.</p>
+            <ul class="fw-ticks">
+              <li>Find where AI fits in the work your team already does.</li>
+              <li>Build and test a practical workflow with guidance.</li>
+              <li>Leave with prompts and steps you can reuse.</li>
+            </ul>
+            <dl class="fw-listing__facts">
+              <div><dt class="fw-label">When</dt><dd><time datetime="2026-09-25">25 September 2026</time></dd></div>
+              <div><dt class="fw-label">Where</dt><dd>Pampanga</dd></div>
+              <div><dt class="fw-label">For</dt><dd>Business owners, marketing, sales &amp; operations teams</dd></div>
+            </dl>
+            <div class="fw-listing__actions">
+              <a class="fw-btn fw-btn--primary fw-btn--lg" href="#register" data-fw-select="fw-register-event:ai-for-business">Register</a>
+              <a class="fw-link" href="learn.html#workshops">Workshop details <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </article>
+
+        <ul class="fw-index fw-comm-events__soon" role="list" aria-label="Also coming">
+          <li class="fw-index__row">
+            <a class="fw-index__link" href="#register" data-fw-select="fw-register-event:notify-masterclass">
+              <span class="fw-label">Masterclass</span>
+              <span class="fw-scale-paths__item"><span class="fw-index__title fw-h3">AI &amp; Claude Masterclass: next batch<span class="fw-index__arrow" aria-hidden="true">→</span></span><span class="fw-body-s">Dates to be announced.</span></span>
+              <span class="fw-label fw-index__meta">Get notified</span>
+            </a>
+          </li>
+          <li class="fw-index__row">
+            <a class="fw-index__link" href="#register" data-fw-select="fw-register-event:notify-forums">
+              <span class="fw-label">Forums</span>
+              <span class="fw-scale-paths__item"><span class="fw-index__title fw-h3">Forums &amp; community gatherings<span class="fw-index__arrow" aria-hidden="true">→</span></span><span class="fw-body-s">Dates to be announced.</span></span>
+              <span class="fw-label fw-index__meta">Get notified</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         03 · PAST EVENT: Works White, Pink Ink accent — real Faith Works photos
+         ===================================================================== -->
+    <section class="fw-section fw-comm-past" id="past" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-past-title">
+      <div class="fw-container">
+        <div class="fw-sechead">
+          <div class="fw-page-intro">
+            <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Past events</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+            <h2 class="fw-h1" id="fw-past-title">From past Faith Works <span class="fw-hl">sessions.</span></h2>
+          </div>
+          <a class="fw-link" href="#register" data-fw-select="fw-register-event:notify-masterclass">Get notified about the next masterclass <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+        </div>
+        <div class="fw-gallery">
+          <div class="fw-media fw-gallery__wide" data-fw-reveal="clip">
+            <picture>
+              <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w, assets/images/masterclass-room-1345.webp 1345w" sizes="(min-width: 1024px) 50vw, 100vw">
+              <img src="assets/images/masterclass-room-960.jpg" srcset="assets/images/masterclass-room-480.jpg 480w, assets/images/masterclass-room-960.jpg 960w, assets/images/masterclass-room-1345.jpg 1345w" sizes="(min-width: 1024px) 50vw, 100vw"
+                   width="1345" height="777" loading="lazy" decoding="async" style="object-position:100% 55%"
+                   alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1">
+            </picture>
+          </div>
+          <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:70ms">
+            <picture>
+              <source type="image/webp" srcset="assets/images/workshop-qa-480.webp 480w, assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 1024px) 25vw, 50vw">
+              <img src="assets/images/workshop-qa-672.jpg" srcset="assets/images/workshop-qa-480.jpg 480w, assets/images/workshop-qa-672.jpg 672w" sizes="(min-width: 1024px) 25vw, 50vw"
+                   width="672" height="549" loading="lazy" decoding="async" style="object-position:100% 50%"
+                   alt="A participant asks a question while a facilitator holds a microphone during a Faith Works workshop">
+            </picture>
+          </div>
+          <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:140ms">
+            <picture>
+              <source type="image/webp" srcset="assets/images/participants-laptop-480.webp 480w, assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 1024px) 25vw, 50vw">
+              <img src="assets/images/participants-laptop-508.jpg" srcset="assets/images/participants-laptop-480.jpg 480w, assets/images/participants-laptop-508.jpg 508w" sizes="(min-width: 1024px) 25vw, 50vw"
+                   width="508" height="499" loading="lazy" decoding="async" style="object-position:50% 40%"
+                   alt="Workshop participants working on their laptops during a hands-on session">
+            </picture>
+          </div>
+          <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:210ms">
+            <picture>
+              <source type="image/webp" srcset="assets/images/workshop-slides-480.webp 480w, assets/images/workshop-slides-960.webp 960w, assets/images/workshop-slides-1280.webp 1280w" sizes="(min-width: 1024px) 25vw, 50vw">
+              <img src="assets/images/workshop-slides-960.jpg" srcset="assets/images/workshop-slides-480.jpg 480w, assets/images/workshop-slides-960.jpg 960w, assets/images/workshop-slides-1280.jpg 1280w" sizes="(min-width: 1024px) 25vw, 50vw"
+                   width="1280" height="573" loading="lazy" decoding="async" style="object-position:50% 50%"
+                   alt="A facilitator presenting slides to a seated workshop group">
+            </picture>
+          </div>
+          <div class="fw-media" data-fw-reveal="clip" style="--fw-delay:280ms">
+            <picture>
+              <source type="image/webp" srcset="assets/images/speaker-pink-blazer-453.webp 453w" sizes="(min-width: 1024px) 25vw, 50vw">
+              <img src="assets/images/speaker-pink-blazer-453.jpg" srcset="assets/images/speaker-pink-blazer-453.jpg 453w" sizes="(min-width: 1024px) 25vw, 50vw"
+                   width="453" height="670" loading="lazy" decoding="async" style="object-position:50% 25%"
+                   alt="A Faith Works speaker in a pink blazer presenting to a workshop audience with a microphone">
+            </picture>
+          </div>
+        </div>
+        <div class="fw-grid fw-comm-past__notes">
+          <div class="fw-comm-past__summary"><p class="fw-label">Pictured, largest</p><p class="fw-h3">AI &amp; Claude Masterclass, Batch 1</p><p class="fw-body-l" style="margin-top:var(--fw-space-3)">Sessions are hands-on: people work on real tasks at their laptops, with open Q&amp;A with the facilitator.</p></div>
+          <ul class="fw-ticks fw-comm-past__ticks">
+            <li>Hands-on work at laptops, not slides alone</li>
+            <li>Questions answered in the room</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         04 · WAYS TO TAKE PART: Faith Pink, Charcoal accent. Format descriptions: draft copy.
+         ===================================================================== -->
+    <section class="fw-section fw-comm-formats" id="participation" data-fw-surface="pink" data-fw-accent="charcoal" aria-labelledby="fw-formats-title">
+      <div class="fw-container">
+        <div class="fw-page-intro fw-comm-formats__head">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Ways to take part</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <h2 class="fw-h1" id="fw-formats-title">Find the format that fits.</h2>
+        </div>
+        <ul class="fw-comm-events__formats" role="list">
+          <li class="fw-comm-events__format">
+            <div><h3 class="fw-comm-events__word">Workshops</h3><p class="fw-body">Focused, practical learning sessions. For professionals and teams who want to practise on real work.</p></div>
+            <p class="fw-label">Next: 25 Sep 2026</p>
+            <a class="fw-btn fw-btn--dark" href="#register" data-fw-select="fw-register-event:ai-for-business">Register</a>
+          </li>
+          <li class="fw-comm-events__format">
+            <div><h3 class="fw-comm-events__word">Masterclasses</h3><p class="fw-body">Deeper sessions on a single tool or topic. For people ready to go past the basics.</p></div>
+            <p class="fw-label">Dates TBA</p>
+            <a class="fw-btn fw-btn--secondary" href="#register" data-fw-select="fw-register-event:notify-masterclass">Get notified</a>
+          </li>
+          <li class="fw-comm-events__format">
+            <div><h3 class="fw-comm-events__word">Forums &amp; gatherings</h3><p class="fw-body">Conversations on AI, business and the future of work, and a chance to meet others learning the same things.</p></div>
+            <p class="fw-label">Dates TBA</p>
+            <a class="fw-btn fw-btn--secondary" href="#register" data-fw-select="fw-register-event:notify-forums">Get notified</a>
+          </li>
+          <li class="fw-comm-events__format">
+            <div><h3 class="fw-comm-events__word">For your team</h3><p class="fw-body">A session built around your organization's work, from a single workshop to the AI Workforce Accelerator.</p></div>
+            <p class="fw-label">On request</p>
+            <a class="fw-btn fw-btn--secondary" href="scale.html#enquire">Enquire</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         05 · REGISTER: the page's one AI Yellow room, Charcoal accent
+         GHL: replace this <form> with a native GHL form/calendar; keep the wrapper.
+         Links pre-select the event (?event=… or data-fw-select).
+         ===================================================================== -->
+    <section class="fw-section fw-comm-register" id="register" data-fw-surface="yellow" data-fw-accent="charcoal" aria-labelledby="fw-register-title">
+      <div class="fw-container fw-grid fw-split">
+        <div class="fw-split__a fw-page-intro">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Register</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <h2 class="fw-display-l" id="fw-register-title">Save your seat.</h2>
+          <p class="fw-body-l" style="color:var(--fw-charcoal)">Register for the next workshop, or ask to be told first when new masterclasses and forums are announced.</p>
+        </div>
+        <form class="fw-split__b fw-form" action="#" method="post" data-fw-demo aria-labelledby="fw-register-title">
+          <div class="fw-form__field">
+            <label class="fw-label" for="fw-register-event">Event</label>
+            <div class="fw-form__select">
+              <select id="fw-register-event" name="event" data-fw-param="event">
+                <option value="ai-for-business">AI for Business: Hands-On Workshop · 25 Sep 2026 · Pampanga</option>
+                <option value="notify-masterclass">Notify me: next AI &amp; Claude Masterclass</option>
+                <option value="notify-forums">Notify me: forums &amp; community gatherings</option>
+              </select>
+            </div>
+          </div>
+          <div class="fw-form__row">
+            <div class="fw-form__field"><label class="fw-label" for="fw-register-name">Name</label><input id="fw-register-name" name="name" autocomplete="name" required></div>
+            <div class="fw-form__field"><label class="fw-label" for="fw-register-email">Email</label><input id="fw-register-email" name="email" type="email" autocomplete="email" required></div>
+          </div>
+          <div class="fw-form__row">
+            <div class="fw-form__field"><label class="fw-label" for="fw-register-phone">Mobile <span class="fw-form__note">(optional)</span></label><input id="fw-register-phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="fw-form__field"><label class="fw-label" for="fw-register-org">Company or role <span class="fw-form__note">(optional)</span></label><input id="fw-register-org" name="organization" autocomplete="organization"></div>
+          </div>
+          <button class="fw-btn fw-btn--dark fw-btn--lg" type="submit">Register</button>
+          <p class="fw-form__status" role="status" data-fw-form-status></p>
+        </form>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         06 · CONNECT: Works White, Pink Ink accent
+         PLACEHOLDER: social channel URLs.
+         ===================================================================== -->
+    <section class="fw-section fw-comm-connect" id="connection" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-connect-title">
+      <div class="fw-container fw-grid fw-feature fw-feature--reverse">
+        <div class="fw-media fw-feature__media" data-fw-reveal="clip">
+          <!-- Temporary image source: https://unsplash.com/photos/a-woman-standing-on-a-stage-with-a-microphone-9zutjaUEN3Q
+               Replace with final Faith Works asset before launch. -->
+          <picture data-image-source="https://unsplash.com/photos/a-woman-standing-on-a-stage-with-a-microphone-9zutjaUEN3Q">
+            <source type="image/webp" srcset="assets/images/temp-speaker-480.webp 480w, assets/images/temp-speaker-960.webp 960w, assets/images/temp-speaker-1440.webp 1440w, assets/images/temp-speaker-1800.webp 1800w" sizes="(min-width: 1280px) 55vw, 100vw">
+            <img src="assets/images/temp-speaker-960.jpg" srcset="assets/images/temp-speaker-480.jpg 480w, assets/images/temp-speaker-960.jpg 960w, assets/images/temp-speaker-1440.jpg 1440w, assets/images/temp-speaker-1800.jpg 1800w" sizes="(min-width: 1280px) 55vw, 100vw"
+                 width="1800" height="1011" loading="lazy" decoding="async" style="object-position:60% 50%"
+                 alt="A woman speaking on stage to an audience">
+          </picture>
+        </div>
+        <div class="fw-feature__body">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Stay connected</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <h2 class="fw-h1 fw-feature__title" id="fw-connect-title">Between events, <span class="fw-hl">keep going.</span></h2>
+          <ul class="fw-index fw-learn-talks__list" role="list">
+            <li class="fw-index__row"><a class="fw-index__link" href="#join"><span class="fw-label">Email</span><span class="fw-index__title fw-h4">Updates on workshops, events and new resources<span class="fw-index__arrow" aria-hidden="true">→</span></span><span class="fw-label fw-index__meta">Join</span></a></li>
+            <li class="fw-index__row"><a class="fw-index__link" href="about.html#founder"><span class="fw-label">Founder</span><span class="fw-index__title fw-h4">Founder notes &amp; behind-the-scenes<span class="fw-index__arrow" aria-hidden="true">→</span></span><span class="fw-label fw-index__meta">Follow</span></a></li>
+            <li class="fw-index__row"><a class="fw-index__link" href="learn.html#insights"><span class="fw-label">Read</span><span class="fw-index__title fw-h4">Latest insights on AI, business &amp; leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span><span class="fw-label fw-index__meta">Read</span></a></li>
+          </ul>
+          <p class="fw-label">Follow &amp; watch</p>
+          <ul class="fw-comm-join__channels" role="list">
+            <li><a href="#" data-fw-placeholder>Facebook <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a href="#" data-fw-placeholder>Instagram <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a href="#" data-fw-placeholder>YouTube <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a href="#" data-fw-placeholder>LinkedIn <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         07 · NEXT → ABOUT, with related content
+         ===================================================================== -->
+    <section class="fw-bridge" data-fw-surface="pinkTint" data-fw-accent="yellow" aria-labelledby="fw-comm-next">
+      <div class="fw-container fw-bridge__inner">
+        <p class="fw-label">Keep exploring</p>
+        <h2 class="fw-display-l fw-bridge__line" id="fw-comm-next" data-fw-reveal="lines">
+          <span class="fw-line" style="--i:0"><span class="fw-line__in">Who's behind</span></span>
+          <span class="fw-line" style="--i:1"><span class="fw-line__in">Faith Works?</span></span>
+        </h2>
+        <a class="fw-bridge__link" href="about.html">About <span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+        <ul class="fw-related fw-bridge__related" role="list">
+          <li><a class="fw-related__link" href="learn.html#ai"><span class="fw-label">Insight · AI</span><span class="fw-h4 fw-related__title">AI Is Not Another Niche Skill</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          <li><a class="fw-related__link" href="learn.html#resources"><span class="fw-label">Resource</span><span class="fw-h4 fw-related__title">Prompt Starter Kit &amp; Tools Guide</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          <li><a class="fw-related__link" href="implement.html#program"><span class="fw-label">Program</span><span class="fw-h4 fw-related__title">AI Workforce Accelerator</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================================
+       FOOTER: Soft Charcoal, AI Yellow accent
+       PLACEHOLDER: the Join form is plain HTML. Replace it with a GHL form and
+       keep the .fw-footer__join wrapper. Social URLs are placeholders.
+       ===================================================================== -->
+  <footer class="fw-footer" id="join" data-fw-surface="charcoal" data-fw-accent="yellow">
+    <div class="fw-container fw-grid fw-footer__grid">
+      <div class="fw-footer__brand">
+        <a href="index.html" aria-label="Faith Works, home">
+          <span class="fw-wordmark"><img src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385"></span>
+        </a>
+        <p class="fw-body-s">A clearer digital home for practical education, business transformation, and purposeful growth.</p>
+      </div>
+
+      <form class="fw-footer__join" action="#" method="post" data-fw-placeholder data-fw-demo aria-labelledby="fw-join-title">
+        <h2 class="fw-h3" id="fw-join-title">Join Faith Works</h2>
+        <p class="fw-body-s">Updates on workshops, events and new resources.</p>
+        <div class="fw-footer__field">
+          <label class="fw-label" for="fw-join-email">Email address</label>
+          <div class="fw-footer__row">
+            <input class="fw-footer__input" id="fw-join-email" name="email" type="email" autocomplete="email" required>
+            <button class="fw-btn fw-btn--primary" type="submit">Join</button>
+          </div>
+        </div>
+        <p class="fw-body-s fw-form__status" role="status" data-fw-form-status></p>
+      </form>
+
+      <nav class="fw-footer__nav" id="fw-footer-nav" aria-label="Footer">
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="learn.html">Learn</a></p>
+          <ul role="list">
+            <li><a href="learn.html#ai">AI</a></li>
+            <li><a href="learn.html#business">Business</a></li>
+            <li><a href="learn.html#leadership">Leadership</a></li>
+            <li><a href="learn.html#workshops">Workshops</a></li>
+            <li><a href="learn.html#events">Events</a></li>
+            <li><a href="learn.html#resources">Resources</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="implement.html">Implement</a></p>
+          <ul role="list">
+            <li><a href="implement.html#frameworks">Frameworks</a></li>
+            <li><a href="implement.html#templates">Templates</a></li>
+            <li><a href="implement.html#workflows">Workflows</a></li>
+            <li><a href="implement.html#ai-tools">AI tools</a></li>
+            <li><a href="implement.html#programs">Programs</a></li>
+            <li><a href="implement.html#faith-ai">Faith AI</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="scale.html">Scale</a></p>
+          <ul role="list">
+            <li><a href="scale.html#systems">Systems</a></li>
+            <li><a href="scale.html#transformation">Transformation</a></li>
+            <li><a href="scale.html#growth">Growth</a></li>
+            <li><a href="scale.html#leadership">Leadership</a></li>
+            <li><a href="scale.html#business-development">Business development</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="community.html">Community</a></p>
+          <ul role="list">
+            <li><a href="community.html#events">Events</a></li>
+            <li><a href="community.html#connection">Connection</a></li>
+            <li><a href="community.html#participation">Participation</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label">Follow</p>
+          <ul role="list">
+            <li><a href="#" data-fw-placeholder>Facebook</a></li>
+            <li><a href="#" data-fw-placeholder>Instagram</a></li>
+            <li><a href="#" data-fw-placeholder>YouTube</a></li>
+            <li><a href="#" data-fw-placeholder>LinkedIn</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="fw-footer__legal">
+        <p class="fw-body-s">© 2026 Faith Works · part of the Faith Works PH ecosystem.</p>
+        <p class="fw-body-s"><a href="about.html">About</a></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

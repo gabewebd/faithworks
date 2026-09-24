@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn · Faith Works</title>
+  <meta name="description" content="Insights, hands-on workshops and practical resources on AI, business and leadership from Faith Works.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Faith Works">
+  <meta property="og:title" content="Learn · Faith Works">
+  <meta property="og:description" content="Insights, hands-on workshops and practical resources on AI, business and leadership from Faith Works.">
+  <meta property="og:image" content="assets/images/temp-ai-everyday-work-1440.jpg">
+  <meta name="theme-color" content="#FAF8F4">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+
+  <!-- Fonts: Poppins (display) + Inter (body), DESIGN §4 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:ital,wght@0,600;0,700;0,800;1,500&display=swap">
+
+  <!-- All site CSS and JS. In GHL, swap these two paths for the CDN URLs. -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="fw-skip" href="#main">Skip to content</a>
+
+  <!-- =====================================================================
+       HEADER (DESIGN §10)
+       Six items + Join. Sub-items open in panels on hover/focus (CSS only).
+       data-fw-chapter-link marks the journey indicator items.
+       ===================================================================== -->
+  <header class="fw-header" data-fw-header data-fw-surface="white">
+    <div class="fw-container fw-header__bar">
+      <a class="fw-header__brand" href="index.html" aria-label="Faith Works, home">
+        <span class="fw-wordmark">
+          <img class="fw-wordmark__default" src="assets/icons/wordmark.svg" alt="" width="1906" height="385">
+          <img class="fw-wordmark__reversed" src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385">
+        </span>
+      </a>
+
+      <nav class="fw-nav" aria-label="Primary">
+        <ul class="fw-nav__list" role="list">
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="index.html">Home</a>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="learn">
+            <a class="fw-nav__link" href="learn.html" aria-current="page">Learn<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Learn</p>
+                  <p class="fw-voice">I want to understand this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#ai"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#business"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Business<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#leadership"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#workshops"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#events"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#resources"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Resources<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="implement">
+            <a class="fw-nav__link" href="implement.html">Implement<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Implement</p>
+                  <p class="fw-voice">I want to apply this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#frameworks"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Frameworks<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#templates"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Templates<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#workflows"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Workflows<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#ai-tools"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">AI tools<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#programs"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Programs<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#faith-ai"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Faith AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="scale">
+            <a class="fw-nav__link" href="scale.html">Scale<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Scale</p>
+                  <p class="fw-voice">I want this to last.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#systems"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Systems<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#transformation"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Transformation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#growth"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Growth<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#leadership"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#business-development"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Business development<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel">
+            <a class="fw-nav__link" href="community.html">Community</a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Community</p>
+                  <p class="fw-voice">Events · Connection · Participation</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#events"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#connection"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Connection<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#participation"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Participation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="about.html">About</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="fw-header__actions">
+        <a class="fw-btn fw-btn--primary fw-header__join" href="#join">Join</a>
+        <!-- Without JavaScript "Menu" jumps to the footer navigation -->
+        <a class="fw-header__menu fw-header__menu--nojs" href="#fw-footer-nav">Menu</a>
+        <button class="fw-header__menu fw-header__menu--js" type="button" aria-expanded="false" aria-controls="fw-menu" data-fw-menu-toggle>
+          <span class="fw-header__menu-open">Menu</span><span class="fw-header__menu-close">Close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile / tablet menu (below 1100px). Sub-items use native <details>. -->
+    <div class="fw-menu" id="fw-menu" data-fw-surface="white" hidden>
+      <nav class="fw-container" aria-label="Primary (mobile)">
+        <ul class="fw-menu__list" role="list">
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="index.html"><span class="fw-menu__num" aria-hidden="true">01</span><span>Home</span></a>
+          </li>
+          <li class="fw-menu__row fw-menu__row--current">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">02</span><span>Learn</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="learn.html" aria-current="page">All of Learn</a></li>
+                <li><a href="learn.html#ai">AI</a></li>
+                <li><a href="learn.html#business">Business</a></li>
+                <li><a href="learn.html#leadership">Leadership</a></li>
+                <li><a href="learn.html#workshops">Workshops</a></li>
+                <li><a href="learn.html#events">Events</a></li>
+                <li><a href="learn.html#resources">Resources</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">03</span><span>Implement</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="implement.html">All of Implement</a></li>
+                <li><a href="implement.html#frameworks">Frameworks</a></li>
+                <li><a href="implement.html#templates">Templates</a></li>
+                <li><a href="implement.html#workflows">Workflows</a></li>
+                <li><a href="implement.html#ai-tools">AI tools</a></li>
+                <li><a href="implement.html#programs">Programs</a></li>
+                <li><a href="implement.html#faith-ai">Faith AI</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">04</span><span>Scale</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="scale.html">All of Scale</a></li>
+                <li><a href="scale.html#systems">Systems</a></li>
+                <li><a href="scale.html#transformation">Transformation</a></li>
+                <li><a href="scale.html#growth">Growth</a></li>
+                <li><a href="scale.html#leadership">Leadership</a></li>
+                <li><a href="scale.html#business-development">Business development</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">05</span><span>Community</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="community.html">All of Community</a></li>
+                <li><a href="community.html#events">Events</a></li>
+                <li><a href="community.html#connection">Connection</a></li>
+                <li><a href="community.html#participation">Participation</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="about.html"><span class="fw-menu__num" aria-hidden="true">06</span><span>About</span></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+
+
+  <main id="main">
+
+    <!-- =====================================================================
+         01 · LEARN HERO: Works White, Pink Ink accent
+         Quick links jump straight to the newest things on the page.
+         ===================================================================== -->
+    <section class="fw-page-hero fw-learn-hero" id="top" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-learn-title">
+      <div class="fw-container">
+        <div class="fw-page-hero__top">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Insights · Workshops · Resources</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <p class="fw-label fw-page-hero__journey">
+            <a href="learn.html" aria-current="step">Learn</a> <span aria-hidden="true">→</span>
+            <a href="implement.html">Implement</a> <span aria-hidden="true">→</span>
+            <a href="scale.html">Scale</a>
+          </p>
+        </div>
+
+        <div class="fw-grid fw-learn-hero__grid">
+          <h1 class="fw-display-xl fw-page-hero__title fw-learn-hero__title" id="fw-learn-title" data-fw-reveal="lines">
+            <span class="fw-line"><span class="fw-line__in">Learn.</span></span>
+          </h1>
+          <p class="fw-page-hero__lede fw-learn-hero__voice" data-fw-reveal="fade" style="--fw-delay:200ms">Insights, hands-on workshops and practical resources on AI, business and leadership, for people who want to understand what's changing and what to do about it.</p>
+          <div class="fw-learn-hero__motif">
+            <svg class="fw-motif fw-motif--circuit" viewBox="0 0 560 300" aria-hidden="true" focusable="false" data-fw-draw>
+              <path d="M0 44 H176 Q192 44 192 60 V148 Q192 164 208 164 H336"/>
+              <path d="M64 0 V88 Q64 104 80 104 H264 Q280 104 280 120 V244"/>
+              <path d="M128 300 V236 Q128 220 144 220 H420 Q436 220 436 204 V64 Q436 48 452 48 H560"/>
+              <path d="M232 300 V276 Q232 260 248 260 H352"/>
+              <circle class="fw-motif__node" cx="336" cy="164" r="4.5"/>
+              <circle class="fw-motif__node" cx="280" cy="244" r="4.5"/>
+              <circle class="fw-motif__node" cx="352" cy="260" r="4.5"/>
+              <circle class="fw-motif__node" cx="560" cy="48" r="4.5"/>
+              <circle class="fw-motif__node fw-motif__node--open" cx="64" cy="4" r="4.5"/>
+              <circle class="fw-motif__node fw-motif__node--open" cx="4" cy="44" r="4.5"/>
+            </svg>
+          </div>
+        </div>
+
+        <ul class="fw-quick" role="list" aria-label="On this page">
+          <li><a class="fw-quick__link" href="#ai"><span class="fw-label">Featured insight</span><span class="fw-quick__title">AI is not another niche skill</span></a></li>
+          <li><a class="fw-quick__link" href="#workshops"><span class="fw-label">Next workshop · 25 Sep 2026</span><span class="fw-quick__title">AI for Business: Hands-On Workshop</span></a></li>
+          <li><a class="fw-quick__link" href="#resources"><span class="fw-label">Resource</span><span class="fw-quick__title">Prompt Starter Kit &amp; Tools Guide</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         02 · FEATURED INSIGHT: Faith Pink, Charcoal accent
+         The full article opens in place ("Read insight"). Draft editorial copy:
+         review before launch.
+         ===================================================================== -->
+    <section class="fw-section fw-learn-featured" id="featured" data-fw-surface="pink" data-fw-accent="charcoal" aria-labelledby="fw-feat-title">
+      <article class="fw-container fw-grid fw-feature" id="ai">
+        <div class="fw-media fw-feature__media" data-fw-reveal="clip">
+          <!-- Temporary image source: https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488
+               Replace with final Faith Works asset before launch. -->
+          <picture data-image-source="https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488">
+            <source type="image/webp" srcset="assets/images/temp-ai-everyday-work-480.webp 480w, assets/images/temp-ai-everyday-work-960.webp 960w, assets/images/temp-ai-everyday-work-1440.webp 1440w, assets/images/temp-ai-everyday-work-1800.webp 1800w" sizes="(min-width: 1280px) 55vw, 100vw">
+            <img src="assets/images/temp-ai-everyday-work-960.jpg" srcset="assets/images/temp-ai-everyday-work-480.jpg 480w, assets/images/temp-ai-everyday-work-960.jpg 960w, assets/images/temp-ai-everyday-work-1440.jpg 1440w, assets/images/temp-ai-everyday-work-1800.jpg 1800w" sizes="(min-width: 1280px) 55vw, 100vw"
+                 width="1800" height="1200" loading="lazy" decoding="async" style="object-position:50% 40%"
+                 alt="A professional working on a laptop at a café table">
+          </picture>
+        </div>
+        <div class="fw-feature__body">
+          <p class="fw-label fw-meta"><span class="fw-meta__cat">Featured insight · AI</span><span class="fw-meta__sep">·</span><span>3 min read</span></p>
+          <h2 class="fw-h1 fw-feature__title" id="fw-feat-title">AI Is Not Another Niche Skill. It Is Becoming a Foundational One.</h2>
+          <p class="fw-body-l fw-feature__excerpt">AI is becoming part of everyday professional work. The opportunity is not to replace expertise, but to combine existing skills with better tools, workflows, and judgment.</p>
+          <details class="fw-read">
+            <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+            <div class="fw-read__body">
+              <p class="fw-label fw-read__byline">Faith Works</p>
+              <p>For a long time, "AI skills" sounded like something for engineers and data teams. That is changing. The tools now sit inside the software most professionals already use: email, documents, spreadsheets, chat. Using them well is starting to look less like a specialty and more like basic literacy, the way spreadsheets and search once did.</p>
+              <h3>What doesn't change</h3>
+              <p>Your expertise. AI can draft, summarize, sort and suggest, but it doesn't know your clients, your market or your standards. The people who get the most from it bring that judgment to every output: they know what good looks like, so they can direct the tool and check its work.</p>
+              <h3>What does change</h3>
+              <p>The shape of the working day. Work that used to take an afternoon, like first drafts, research summaries, meeting notes and reformatting, can shrink to minutes. That leaves more time for the parts of the job that need a person.</p>
+              <h3>Where to start</h3>
+              <ul>
+                <li>Pick one task you repeat every week and do it with AI assistance, start to finish.</li>
+                <li>Keep the prompts that work, and reuse them.</li>
+                <li>Review every output before it goes anywhere. That step is yours.</li>
+              </ul>
+              <p>For a structured first step, the <a href="implement.html?resource=prompt-starter-kit#access">Prompt Starter Kit &amp; Tools Guide</a> walks you through it, and the <a href="#workshops">hands-on workshop</a> lets you practise with guidance.</p>
+            </div>
+          </details>
+        </div>
+      </article>
+    </section>
+
+
+    <!-- =====================================================================
+         03 · LATEST INSIGHTS: Works White, Pink Ink accent
+         Category chips filter the list (main.js). Draft editorial copy: review before launch.
+         ===================================================================== -->
+    <section class="fw-section fw-learn-latest" id="insights" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-latest-title">
+      <div class="fw-container">
+        <div class="fw-sechead">
+          <div class="fw-page-intro">
+            <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Latest insights</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+            <h2 class="fw-h1" id="fw-latest-title">Read something useful today.</h2>
+          </div>
+          <div class="fw-chips" role="group" aria-label="Filter insights by topic" data-fw-filter="fw-insights-list" data-fw-filter-noun="insight">
+            <button type="button" class="fw-chip" aria-pressed="true" data-fw-filter-value="all">All</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="ai">AI</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="business">Business</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="leadership">Leadership</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="faith-purpose">Faith &amp; Purpose</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="lifestyle">Lifestyle</button>
+          </div>
+        </div>
+
+        <div>
+          <ul class="fw-posts" id="fw-insights-list" role="list">
+
+            <li class="fw-post" id="insight-full-day" data-fw-category="ai lifestyle">
+              <div class="fw-media fw-post__thumb">
+                <!-- Temporary image source: https://unsplash.com/photos/a-couple-of-men-sitting-at-a-table-with-laptops-A9qQ8vE1Bmw
+                     Replace with final Faith Works asset before launch. -->
+                <picture data-image-source="https://unsplash.com/photos/a-couple-of-men-sitting-at-a-table-with-laptops-A9qQ8vE1Bmw">
+                  <source type="image/webp" srcset="assets/images/temp-full-day-480.webp 480w, assets/images/temp-full-day-960.webp 960w, assets/images/temp-full-day-1440.webp 1440w, assets/images/temp-full-day-1800.webp 1800w" sizes="(min-width: 1024px) 28vw, 100vw">
+                  <img src="assets/images/temp-full-day-960.jpg" srcset="assets/images/temp-full-day-480.jpg 480w, assets/images/temp-full-day-960.jpg 960w, assets/images/temp-full-day-1440.jpg 1440w, assets/images/temp-full-day-1800.jpg 1800w" sizes="(min-width: 1024px) 28vw, 100vw"
+                       width="1800" height="2700" loading="lazy" decoding="async" style="object-position:50% 60%"
+                       alt="Two professionals working side by side at laptops in an office">
+                </picture>
+              </div>
+              <article class="fw-post__body">
+                <p class="fw-label fw-meta"><span class="fw-meta__cat">AI · Productivity</span><span class="fw-meta__sep">·</span><span>2 min read</span></p>
+                <h3 class="fw-h2 fw-post__title">Your Day Is Already Full. AI Keeps Getting Bookmarked.</h3>
+                <p class="fw-body fw-post__excerpt">Most professionals aren't short on interest in AI. They're short on time to try it. The fix isn't a free afternoon; it's attaching AI to work you're already doing.</p>
+                <details class="fw-read">
+                  <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+                  <div class="fw-read__body">
+                    <p>You've saved the tutorials. You've bookmarked the tools. Then Monday happens.</p>
+                    <h3>Start inside a task, not beside it</h3>
+                    <p>Instead of setting aside time to "learn AI", use it on something already on today's list: the report you have to write, the inbox you have to clear, the notes you need to turn into actions.</p>
+                    <h3>A simple first week</h3>
+                    <ul>
+                      <li>Monday: turn meeting notes into a follow-up email.</li>
+                      <li>Wednesday: summarize a long document before you read it in full.</li>
+                      <li>Friday: draft next week's plan, then edit it into shape.</li>
+                    </ul>
+                    <p>Small, repeated uses build the habit faster than one long session. When you're ready for more structure, the <a href="implement.html#program">AI-Powered Daily Work</a> track builds this into a portfolio of workflows.</p>
+                  </div>
+                </details>
+              </article>
+            </li>
+
+            <li class="fw-post" id="business" data-fw-category="business leadership">
+              <div class="fw-media fw-post__thumb">
+                <!-- Temporary image source: https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI
+                     Replace with final Faith Works asset before launch. -->
+                <picture data-image-source="https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI">
+                  <source type="image/webp" srcset="assets/images/temp-learning-to-doing-480.webp 480w, assets/images/temp-learning-to-doing-960.webp 960w, assets/images/temp-learning-to-doing-1440.webp 1440w, assets/images/temp-learning-to-doing-1800.webp 1800w" sizes="(min-width: 1024px) 28vw, 100vw">
+                  <img src="assets/images/temp-learning-to-doing-960.jpg" srcset="assets/images/temp-learning-to-doing-480.jpg 480w, assets/images/temp-learning-to-doing-960.jpg 960w, assets/images/temp-learning-to-doing-1440.jpg 1440w, assets/images/temp-learning-to-doing-1800.jpg 1800w" sizes="(min-width: 1024px) 28vw, 100vw"
+                       width="1800" height="1013" loading="lazy" decoding="async" style="object-position:50% 40%"
+                       alt="Two colleagues working through a task together on a laptop">
+                </picture>
+              </div>
+              <article class="fw-post__body">
+                <p class="fw-label fw-meta"><span class="fw-meta__cat">Business · Leadership</span><span class="fw-meta__sep">·</span><span>2 min read</span></p>
+                <h3 class="fw-h2 fw-post__title">From Learning to Doing: Why Applied Practice Matters</h3>
+                <p class="fw-body fw-post__excerpt">Watching a demo is not the same as using a tool on your own work. Skill shows up when you apply it, get stuck, and work it out.</p>
+                <details class="fw-read">
+                  <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+                  <div class="fw-read__body">
+                    <p>Most of us have left a good session inspired and gone back to our desks unchanged. The gap usually isn't knowledge. It's practice.</p>
+                    <h3>Why practice beats information</h3>
+                    <p>When you apply a tool to your own work, you meet the real problems: messy inputs, unclear instructions, outputs that almost work. Working through those is where skill is built.</p>
+                    <h3>How to make learning stick</h3>
+                    <ul>
+                      <li>Bring a real task, not a hypothetical one.</li>
+                      <li>Leave with something you've built, not just notes.</li>
+                      <li>Come back to it a week later and improve it.</li>
+                    </ul>
+                    <p>That's the idea behind Faith Works programs: each track ends in something concrete, like a 30-day action plan or a workflow portfolio. <a href="implement.html">Explore practical resources</a>.</p>
+                  </div>
+                </details>
+              </article>
+            </li>
+
+            <li class="fw-post fw-post--text" id="leadership" data-fw-category="leadership">
+              <article class="fw-post__body">
+                <p class="fw-label fw-meta"><span class="fw-meta__cat">Leadership</span><span class="fw-meta__sep">·</span><span>2 min read</span></p>
+                <h3 class="fw-h2 fw-post__title">Where Human Judgment Still Matters</h3>
+                <p class="fw-body fw-post__excerpt">AI can produce an answer quickly. Leaders still decide whether it's the right one, and whether it's right for their people.</p>
+                <details class="fw-read">
+                  <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+                  <div class="fw-read__body">
+                    <p>As AI takes on more of the drafting and sorting, three decisions stay firmly with people.</p>
+                    <h3>What to hand over</h3>
+                    <p>Not every task should be automated. Leaders choose where AI saves time and where a person's attention is the point.</p>
+                    <h3>What goes out the door</h3>
+                    <p>Anything that reaches a client, a partner or the public needs a human review step. Build it into the workflow rather than hoping someone remembers.</p>
+                    <h3>How the change feels</h3>
+                    <p>When tools change how work is done, people need clarity and support. That part isn't technical, and it matters most.</p>
+                    <p>More on this in <a href="scale.html#leadership">Scale: Leadership</a>.</p>
+                  </div>
+                </details>
+              </article>
+            </li>
+
+            <li class="fw-post fw-post--text" id="insight-purpose" data-fw-category="faith-purpose">
+              <article class="fw-post__body">
+                <p class="fw-label fw-meta"><span class="fw-meta__cat">Faith &amp; Purpose</span><span class="fw-meta__sep">·</span><span>1 min read</span></p>
+                <h3 class="fw-h2 fw-post__title">Purpose Before Productivity</h3>
+                <p class="fw-body fw-post__excerpt">Better tools make it easier to do more. Purpose is what helps you decide what's worth doing.</p>
+                <details class="fw-read">
+                  <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+                  <div class="fw-read__body">
+                    <p>Every new tool promises more output. It's worth pausing before chasing it. What is the work for? Who is it serving? What would you do with the time you save?</p>
+                    <p>Answering those questions first turns efficiency into something meaningful: more time for the people, the craft and the calling behind the work.</p>
+                  </div>
+                </details>
+              </article>
+            </li>
+
+            <li class="fw-post fw-post--text" id="insight-rhythm" data-fw-category="lifestyle">
+              <article class="fw-post__body">
+                <p class="fw-label fw-meta"><span class="fw-meta__cat">Lifestyle</span><span class="fw-meta__sep">·</span><span>1 min read</span></p>
+                <h3 class="fw-h2 fw-post__title">A Learning Rhythm That Fits Real Life</h3>
+                <p class="fw-body fw-post__excerpt">You don't need whole days. Short, regular sessions tied to real work add up.</p>
+                <details class="fw-read">
+                  <summary><span class="fw-read__open">Read insight</span><span class="fw-read__close">Close</span> <span class="fw-link__arrow" aria-hidden="true">→</span></summary>
+                  <div class="fw-read__body">
+                    <p>Pick a regular slot, like the first fifteen minutes after lunch, and use it to try one thing on a real task. Note what worked. Next time, build on it.</p>
+                    <p>Pair that rhythm with the occasional deeper session, like a workshop, and learning becomes part of the week instead of a project you never start.</p>
+                  </div>
+                </details>
+              </article>
+            </li>
+          </ul>
+          <p class="fw-body fw-resources__empty" data-fw-filter-empty hidden>New insights in this topic are on the way.</p>
+          <p class="fw-visually-hidden" aria-live="polite" data-fw-filter-status></p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         04 · WORKSHOPS: Soft Charcoal, AI Yellow accent
+         Real workshop (details from Faith Works). Agenda bullets: confirm before launch.
+         Register goes to the Community registration form, event pre-selected.
+         ===================================================================== -->
+    <section class="fw-section fw-learn-workshops" id="workshops" data-fw-surface="charcoal" data-fw-accent="yellow" aria-labelledby="fw-learn-workshops-title">
+      <div class="fw-container">
+        <div class="fw-sechead">
+          <div class="fw-page-intro">
+            <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Workshops</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+            <h2 class="fw-h1" id="fw-learn-workshops-title">Learn it hands-on, <span class="fw-hl">in the room.</span></h2>
+          </div>
+          <a class="fw-link" href="community.html#events">All events <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+        </div>
+
+        <article class="fw-listing" aria-labelledby="fw-w1-title">
+          <div class="fw-listing__date">
+            <p class="fw-label">Next workshop</p>
+            <p class="fw-listing__day" aria-hidden="true">25</p>
+            <p class="fw-label"><time datetime="2026-09-25">Friday · September 2026</time></p>
+          </div>
+          <div class="fw-listing__main">
+            <p class="fw-label fw-meta"><span class="fw-meta__cat">Workshop · AI · Business</span></p>
+            <h3 class="fw-h1" id="fw-w1-title">AI for Business: Hands-On Workshop</h3>
+            <p class="fw-body-l">Practical AI workflows for marketing, sales, and operations.</p>
+            <ul class="fw-ticks">
+              <li>Find where AI fits in the marketing, sales and operations work you already do.</li>
+              <li>Build and test a practical workflow with guidance, on your own laptop.</li>
+              <li>Leave with prompts and steps you can reuse the next working day.</li>
+            </ul>
+            <dl class="fw-listing__facts">
+              <div><dt class="fw-label">When</dt><dd><time datetime="2026-09-25">25 September 2026</time></dd></div>
+              <div><dt class="fw-label">Where</dt><dd>Pampanga</dd></div>
+              <div><dt class="fw-label">For</dt><dd>Business owners, marketing, sales &amp; operations teams</dd></div>
+            </dl>
+            <p class="fw-body-s">No technical background required. Venue and schedule are confirmed on registration.</p>
+            <div class="fw-listing__actions">
+              <a class="fw-btn fw-btn--primary fw-btn--lg" href="community.html?event=ai-for-business#register">Register</a>
+              <a class="fw-link" href="implement.html?resource=prompt-starter-kit#access">Prepare with the Prompt Starter Kit <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fw-listing" id="events" aria-labelledby="fw-w2-title">
+          <div class="fw-listing__date">
+            <p class="fw-label">Past session</p>
+            <div class="fw-media fw-listing__photo" data-fw-reveal="clip">
+              <picture>
+                <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w, assets/images/masterclass-room-1345.webp 1345w" sizes="(min-width: 1024px) 22vw, 100vw">
+                <img src="assets/images/masterclass-room-960.jpg" srcset="assets/images/masterclass-room-480.jpg 480w, assets/images/masterclass-room-960.jpg 960w, assets/images/masterclass-room-1345.jpg 1345w" sizes="(min-width: 1024px) 22vw, 100vw"
+                     width="1345" height="777" loading="lazy" decoding="async" style="object-position:100% 55%"
+                     alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1">
+              </picture>
+            </div>
+          </div>
+          <div class="fw-listing__main">
+            <p class="fw-label fw-meta"><span class="fw-meta__cat">Masterclass · AI</span></p>
+            <h3 class="fw-h2" id="fw-w2-title">AI &amp; Claude Masterclass, Batch 1</h3>
+            <p class="fw-body">A full room of professionals working hands-on at their laptops. See photos and hear about upcoming batches in Community.</p>
+            <div class="fw-listing__actions">
+              <a class="fw-link" href="community.html#past">See the highlights <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+              <a class="fw-link" href="community.html?event=notify-masterclass#register">Get notified about the next batch <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         05 · RESOURCES: Works White, Pink Ink accent
+         Each resource is requested through the form on implement.html (pre-selected).
+         ===================================================================== -->
+    <section class="fw-section fw-learn-resources" id="resources" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-learn-res-title">
+      <div class="fw-container">
+        <div class="fw-grid fw-feature fw-feature--reverse">
+          <div class="fw-media fw-feature__media" data-fw-reveal="clip">
+            <!-- Temporary image source: https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0
+                 Replace with final Faith Works asset before launch. -->
+            <picture data-image-source="https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0">
+              <source type="image/webp" srcset="assets/images/temp-starter-kit-480.webp 480w, assets/images/temp-starter-kit-960.webp 960w, assets/images/temp-starter-kit-1440.webp 1440w, assets/images/temp-starter-kit-1800.webp 1800w" sizes="(min-width: 1280px) 50vw, 100vw">
+              <img src="assets/images/temp-starter-kit-960.jpg" srcset="assets/images/temp-starter-kit-480.jpg 480w, assets/images/temp-starter-kit-960.jpg 960w, assets/images/temp-starter-kit-1440.jpg 1440w, assets/images/temp-starter-kit-1800.jpg 1800w" sizes="(min-width: 1280px) 50vw, 100vw"
+                   width="1800" height="2718" loading="lazy" decoding="async" style="object-position:50% 40%"
+                   alt="A laptop beside printed checklists and planning sheets">
+            </picture>
+          </div>
+          <div class="fw-feature__body">
+            <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Practical resources</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+            <h2 class="fw-h1 fw-feature__title" id="fw-learn-res-title">Prompt Starter Kit &amp; Tools Guide</h2>
+            <p class="fw-body-l fw-feature__excerpt">A practical starting point for professionals building their first AI-assisted workflow: prompts to adapt, a short guide to choosing tools, and the habits that make results reliable.</p>
+            <div class="fw-feature__actions">
+              <a class="fw-btn fw-btn--dark fw-btn--lg" href="implement.html?resource=prompt-starter-kit#access">Get the resource</a>
+            </div>
+          </div>
+        </div>
+
+        <ul class="fw-dl fw-learn-resources__list" role="list">
+          <li class="fw-dl__item">
+            <p class="fw-label fw-meta"><span class="fw-meta__cat">Framework</span></p>
+            <div><h3 class="fw-h3">AI Opportunity Map</h3><p class="fw-body">Identify repetitive work, high-friction processes, and practical areas where AI can create leverage.</p></div>
+            <a class="fw-btn fw-btn--secondary" href="implement.html#framework">Explore framework</a>
+          </li>
+          <li class="fw-dl__item">
+            <p class="fw-label fw-meta"><span class="fw-meta__cat">Checklist</span></p>
+            <div><h3 class="fw-h3">AI-Assisted Research Workflow</h3><p class="fw-body">Research, organize, analyze, draft, review: the five steps, with the human review built in.</p></div>
+            <a class="fw-btn fw-btn--secondary" href="implement.html#workflows">See the workflow</a>
+          </li>
+          <li class="fw-dl__item">
+            <p class="fw-label fw-meta"><span class="fw-meta__cat">Program</span></p>
+            <div><h3 class="fw-h3">AI Workforce Accelerator</h3><p class="fw-body">Structured tracks for professionals, business owners, leaders and teams, each ending in something you can use.</p></div>
+            <a class="fw-btn fw-btn--secondary" href="implement.html#program">View program</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         06 · TALKS & PERSPECTIVES: Faith Pink, Charcoal accent
+         PLACEHOLDER: video channel URL for the talk.
+         ===================================================================== -->
+    <section class="fw-section fw-learn-talks" id="talks" data-fw-surface="pink" data-fw-accent="charcoal" aria-labelledby="fw-talks-title">
+      <div class="fw-container fw-grid fw-feature">
+        <div class="fw-media fw-feature__media" data-fw-reveal="clip">
+          <!-- Temporary image source: https://unsplash.com/photos/black-condenser-microphone-UUPpu2sYV6E
+               Replace with final Faith Works asset before launch. -->
+          <picture data-image-source="https://unsplash.com/photos/black-condenser-microphone-UUPpu2sYV6E">
+            <source type="image/webp" srcset="assets/images/temp-talks-480.webp 480w, assets/images/temp-talks-960.webp 960w, assets/images/temp-talks-1440.webp 1440w, assets/images/temp-talks-1800.webp 1800w" sizes="(min-width: 1280px) 55vw, 100vw">
+            <img src="assets/images/temp-talks-960.jpg" srcset="assets/images/temp-talks-480.jpg 480w, assets/images/temp-talks-960.jpg 960w, assets/images/temp-talks-1440.jpg 1440w, assets/images/temp-talks-1800.jpg 1800w" sizes="(min-width: 1280px) 55vw, 100vw"
+                 width="1800" height="1200" loading="lazy" decoding="async" style="object-position:50% 50%"
+                 alt="Two people in conversation at a desk with a microphone">
+          </picture>
+        </div>
+        <div class="fw-feature__body">
+          <p class="fw-eyebrow"><span class="fw-eyebrow__bracket" aria-hidden="true">[</span> <span>Talks &amp; perspectives</span> <span class="fw-eyebrow__bracket" aria-hidden="true">]</span></p>
+          <h2 class="fw-h1 fw-feature__title" id="fw-talks-title">Listen, watch, and follow along.</h2>
+          <ul class="fw-index fw-learn-talks__list" role="list">
+            <li class="fw-index__row">
+              <a class="fw-index__link" href="#" data-fw-placeholder>
+                <span class="fw-label">Talk</span>
+                <span class="fw-index__title fw-h4">A conversation on purpose &amp; work<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+                <span class="fw-label fw-index__meta">Watch</span>
+              </a>
+            </li>
+            <li class="fw-index__row">
+              <a class="fw-index__link" href="about.html#founder">
+                <span class="fw-label">Founder</span>
+                <span class="fw-index__title fw-h4">Founder notes &amp; behind-the-scenes<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+                <span class="fw-label fw-index__meta">Follow</span>
+              </a>
+            </li>
+            <li class="fw-index__row">
+              <a class="fw-index__link" href="community.html#past">
+                <span class="fw-label">Event</span>
+                <span class="fw-index__title fw-h4">Masterclass highlights<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+                <span class="fw-label fw-index__meta">See photos</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         07 · NEXT STEP → IMPLEMENT, with related content
+         ===================================================================== -->
+    <section class="fw-bridge" data-fw-surface="white" data-fw-accent="pink" aria-labelledby="fw-learn-next">
+      <div class="fw-container fw-bridge__inner">
+        <p class="fw-label">Next step</p>
+        <h2 class="fw-display-l fw-bridge__line" id="fw-learn-next" data-fw-reveal="lines">
+          <span class="fw-line" style="--i:0"><span class="fw-line__in">Ready to</span></span>
+          <span class="fw-line" style="--i:1"><span class="fw-line__in">apply this?</span></span>
+        </h2>
+        <a class="fw-bridge__link" href="implement.html">Implement <span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+        <ul class="fw-related fw-bridge__related" role="list">
+          <li><a class="fw-related__link" href="implement.html#framework"><span class="fw-label">Framework</span><span class="fw-h4 fw-related__title">AI Opportunity Map</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          <li><a class="fw-related__link" href="implement.html#workflows"><span class="fw-label">Workflow</span><span class="fw-h4 fw-related__title">From manual research to an AI-assisted workflow</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          <li><a class="fw-related__link" href="implement.html#program"><span class="fw-label">Program</span><span class="fw-h4 fw-related__title">AI Workforce Accelerator</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================================
+       FOOTER: Soft Charcoal, AI Yellow accent
+       PLACEHOLDER: the Join form is plain HTML. Replace it with a GHL form and
+       keep the .fw-footer__join wrapper. Social URLs are placeholders.
+       ===================================================================== -->
+  <footer class="fw-footer" id="join" data-fw-surface="charcoal" data-fw-accent="yellow">
+    <div class="fw-container fw-grid fw-footer__grid">
+      <div class="fw-footer__brand">
+        <a href="index.html" aria-label="Faith Works, home">
+          <span class="fw-wordmark"><img src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385"></span>
+        </a>
+        <p class="fw-body-s">A clearer digital home for practical education, business transformation, and purposeful growth.</p>
+      </div>
+
+      <form class="fw-footer__join" action="#" method="post" data-fw-placeholder data-fw-demo aria-labelledby="fw-join-title">
+        <h2 class="fw-h3" id="fw-join-title">Join Faith Works</h2>
+        <p class="fw-body-s">Updates on workshops, events and new resources.</p>
+        <div class="fw-footer__field">
+          <label class="fw-label" for="fw-join-email">Email address</label>
+          <div class="fw-footer__row">
+            <input class="fw-footer__input" id="fw-join-email" name="email" type="email" autocomplete="email" required>
+            <button class="fw-btn fw-btn--primary" type="submit">Join</button>
+          </div>
+        </div>
+        <p class="fw-body-s fw-form__status" role="status" data-fw-form-status></p>
+      </form>
+
+      <nav class="fw-footer__nav" id="fw-footer-nav" aria-label="Footer">
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="learn.html">Learn</a></p>
+          <ul role="list">
+            <li><a href="learn.html#ai">AI</a></li>
+            <li><a href="learn.html#business">Business</a></li>
+            <li><a href="learn.html#leadership">Leadership</a></li>
+            <li><a href="learn.html#workshops">Workshops</a></li>
+            <li><a href="learn.html#events">Events</a></li>
+            <li><a href="learn.html#resources">Resources</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="implement.html">Implement</a></p>
+          <ul role="list">
+            <li><a href="implement.html#frameworks">Frameworks</a></li>
+            <li><a href="implement.html#templates">Templates</a></li>
+            <li><a href="implement.html#workflows">Workflows</a></li>
+            <li><a href="implement.html#ai-tools">AI tools</a></li>
+            <li><a href="implement.html#programs">Programs</a></li>
+            <li><a href="implement.html#faith-ai">Faith AI</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="scale.html">Scale</a></p>
+          <ul role="list">
+            <li><a href="scale.html#systems">Systems</a></li>
+            <li><a href="scale.html#transformation">Transformation</a></li>
+            <li><a href="scale.html#growth">Growth</a></li>
+            <li><a href="scale.html#leadership">Leadership</a></li>
+            <li><a href="scale.html#business-development">Business development</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="community.html">Community</a></p>
+          <ul role="list">
+            <li><a href="community.html#events">Events</a></li>
+            <li><a href="community.html#connection">Connection</a></li>
+            <li><a href="community.html#participation">Participation</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label">Follow</p>
+          <ul role="list">
+            <li><a href="#" data-fw-placeholder>Facebook</a></li>
+            <li><a href="#" data-fw-placeholder>Instagram</a></li>
+            <li><a href="#" data-fw-placeholder>YouTube</a></li>
+            <li><a href="#" data-fw-placeholder>LinkedIn</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="fw-footer__legal">
+        <p class="fw-body-s">© 2026 Faith Works · part of the Faith Works PH ecosystem.</p>
+        <p class="fw-body-s"><a href="about.html">About</a></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

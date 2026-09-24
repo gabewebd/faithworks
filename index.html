@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faith Works · Learn. Implement. Scale.</title>
+  <meta name="description" content="A clearer digital home for practical education, business transformation, and purposeful growth.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Faith Works">
+  <meta property="og:title" content="Faith Works · Learn. Implement. Scale.">
+  <meta property="og:description" content="A clearer digital home for practical education, business transformation, and purposeful growth.">
+  <meta property="og:image" content="assets/images/masterclass-room-1345.jpg">
+  <meta name="theme-color" content="#FAF8F4">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+
+  <!-- Fonts: Poppins (display) + Inter (body), DESIGN §4 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:ital,wght@0,600;0,700;0,800;1,500&display=swap">
+
+  <!-- All site CSS and JS. In GHL, swap these two paths for the CDN URLs. -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="fw-skip" href="#main">Skip to content</a>
+
+  <!-- =====================================================================
+       HEADER (DESIGN §10)
+       Six items + Join. Sub-items open in panels on hover/focus (CSS only).
+       data-fw-chapter-link marks the journey indicator items.
+       ===================================================================== -->
+  <header class="fw-header" data-fw-header data-fw-surface="white">
+    <div class="fw-container fw-header__bar">
+      <a class="fw-header__brand" href="index.html" aria-label="Faith Works, home">
+        <span class="fw-wordmark">
+          <img class="fw-wordmark__default" src="assets/icons/wordmark.svg" alt="" width="1906" height="385">
+          <img class="fw-wordmark__reversed" src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385">
+        </span>
+      </a>
+
+      <nav class="fw-nav" aria-label="Primary">
+        <ul class="fw-nav__list" role="list">
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="index.html" aria-current="page">Home</a>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="learn">
+            <a class="fw-nav__link" href="learn.html">Learn<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Learn</p>
+                  <p class="fw-voice">I want to understand this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#ai"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#business"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Business<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#leadership"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#workshops"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#events"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#resources"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Resources<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="implement">
+            <a class="fw-nav__link" href="implement.html">Implement<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Implement</p>
+                  <p class="fw-voice">I want to apply this.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#frameworks"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Frameworks<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#templates"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Templates<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#workflows"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Workflows<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#ai-tools"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">AI tools<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#programs"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Programs<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#faith-ai"><span class="fw-index__num" aria-hidden="true">06</span><span class="fw-index__title fw-h4">Faith AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="scale">
+            <a class="fw-nav__link" href="scale.html">Scale<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Scale</p>
+                  <p class="fw-voice">I want this to last.</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#systems"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Systems<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#transformation"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Transformation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#growth"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Growth<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#leadership"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#business-development"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h4">Business development<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item fw-nav__item--panel">
+            <a class="fw-nav__link" href="community.html">Community</a>
+            <div class="fw-nav__panel">
+              <div class="fw-container fw-nav__panel-inner">
+                <div class="fw-nav__panel-intro">
+                  <p class="fw-h2">Community</p>
+                  <p class="fw-voice">Events · Connection · Participation</p>
+                </div>
+                <ul class="fw-index fw-nav__panel-list" role="list">
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#events"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#connection"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Connection<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#participation"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Participation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="about.html">About</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="fw-header__actions">
+        <a class="fw-btn fw-btn--primary fw-header__join" href="#join">Join</a>
+        <!-- Without JavaScript "Menu" jumps to the footer navigation -->
+        <a class="fw-header__menu fw-header__menu--nojs" href="#fw-footer-nav">Menu</a>
+        <button class="fw-header__menu fw-header__menu--js" type="button" aria-expanded="false" aria-controls="fw-menu" data-fw-menu-toggle>
+          <span class="fw-header__menu-open">Menu</span><span class="fw-header__menu-close">Close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile / tablet menu (below 1100px). Sub-items use native <details>. -->
+    <div class="fw-menu" id="fw-menu" data-fw-surface="white" hidden>
+      <nav class="fw-container" aria-label="Primary (mobile)">
+        <ul class="fw-menu__list" role="list">
+          <li class="fw-menu__row fw-menu__row--current">
+            <a class="fw-menu__link" href="index.html" aria-current="page"><span class="fw-menu__num" aria-hidden="true">01</span><span>Home</span></a>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">02</span><span>Learn</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="learn.html">All of Learn</a></li>
+                <li><a href="learn.html#ai">AI</a></li>
+                <li><a href="learn.html#business">Business</a></li>
+                <li><a href="learn.html#leadership">Leadership</a></li>
+                <li><a href="learn.html#workshops">Workshops</a></li>
+                <li><a href="learn.html#events">Events</a></li>
+                <li><a href="learn.html#resources">Resources</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">03</span><span>Implement</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="implement.html">All of Implement</a></li>
+                <li><a href="implement.html#frameworks">Frameworks</a></li>
+                <li><a href="implement.html#templates">Templates</a></li>
+                <li><a href="implement.html#workflows">Workflows</a></li>
+                <li><a href="implement.html#ai-tools">AI tools</a></li>
+                <li><a href="implement.html#programs">Programs</a></li>
+                <li><a href="implement.html#faith-ai">Faith AI</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">04</span><span>Scale</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="scale.html">All of Scale</a></li>
+                <li><a href="scale.html#systems">Systems</a></li>
+                <li><a href="scale.html#transformation">Transformation</a></li>
+                <li><a href="scale.html#growth">Growth</a></li>
+                <li><a href="scale.html#leadership">Leadership</a></li>
+                <li><a href="scale.html#business-development">Business development</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <details class="fw-menu__details">
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">05</span><span>Community</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <ul class="fw-menu__sub" role="list">
+                <li><a href="community.html">All of Community</a></li>
+                <li><a href="community.html#events">Events</a></li>
+                <li><a href="community.html#connection">Connection</a></li>
+                <li><a href="community.html#participation">Participation</a></li>
+              </ul>
+            </details>
+          </li>
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="about.html"><span class="fw-menu__num" aria-hidden="true">06</span><span>About</span></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+
+  <main id="main">
+
+    <!-- =====================================================================
+         01 · HERO: Works White, AI Yellow accent (DESIGN §18.01, C-13)
+         The three words climb left → right. js/main.js draws the
+         circuit line through them; without JS the line is simply absent.
+         ===================================================================== -->
+    <section class="fw-section fw-hero" id="top" data-fw-surface="white" data-fw-accent="yellow" aria-labelledby="fw-hero-title">
+      <div class="fw-container fw-hero__grid" data-fw-circuit="hero">
+        <p class="fw-eyebrow fw-hero__eyebrow">
+          <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+          <span>Practical education &amp; business transformation</span>
+          <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+        </p>
+
+        <div class="fw-hero__media fw-media" data-fw-reveal="clip" style="--fw-delay:400ms">
+          <picture>
+            <source type="image/webp" srcset="assets/images/speaker-pink-blazer-453.webp 453w" sizes="(min-width: 1280px) 30vw, (min-width: 768px) 36vw, 100vw">
+            <img src="assets/images/speaker-pink-blazer-453.jpg" width="453" height="670" fetchpriority="high" decoding="async" style="object-position:50% 22%"
+                 alt="A Faith Works speaker in a pink blazer presenting to a workshop audience with a microphone">
+          </picture>
+        </div>
+
+        <h1 class="fw-display-xl fw-hero__title" id="fw-hero-title" data-fw-reveal="lines" style="--fw-delay:100ms">
+          <span class="fw-hero__word fw-hero__word--1" data-fw-anchor="1">
+            <span class="fw-line" style="--i:0"><span class="fw-line__in">Learn.</span></span>
+            <span class="fw-hero__num fw-label" aria-hidden="true">01</span>
+          </span>
+          <span class="fw-hero__word fw-hero__word--2" data-fw-anchor="2">
+            <span class="fw-line" style="--i:1"><span class="fw-line__in">Implement.</span></span>
+            <span class="fw-hero__num fw-label" aria-hidden="true">02</span>
+          </span>
+          <span class="fw-hero__word fw-hero__word--3" data-fw-anchor="3">
+            <span class="fw-line" style="--i:2"><span class="fw-line__in">Scale.</span></span>
+            <span class="fw-hero__num fw-label" aria-hidden="true">03</span>
+          </span>
+        </h1>
+
+        <div class="fw-hero__body" data-fw-reveal="fade" style="--fw-delay:600ms">
+          <p class="fw-body-l">Practical education, business transformation, AI, leadership and purposeful growth, in one clear place.</p>
+          <div class="fw-btn-row">
+            <a class="fw-btn fw-btn--primary fw-btn--lg" href="learn.html">Explore Learning</a>
+            <a class="fw-btn fw-btn--secondary fw-btn--lg" href="#events">See upcoming events</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         02 · WHAT IS FAITH WORKS?: Faith Pink, Charcoal accent (DESIGN §18.02, C-03, C-07)
+         ===================================================================== -->
+    <section class="fw-section fw-about" id="about" data-fw-surface="pink" data-fw-accent="charcoal" data-fw-chapter="learn" aria-labelledby="fw-about-title">
+      <div class="fw-container">
+        <div class="fw-grid fw-about__top">
+          <div class="fw-about__eyebrow">
+            <p class="fw-eyebrow">
+              <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+              <span class="fw-eyebrow__num">02</span> <span aria-hidden="true">·</span>
+              <span>What is Faith Works?</span>
+              <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+            </p>
+          </div>
+          <span class="fw-about__quote" aria-hidden="true">“</span>
+          <h2 class="fw-h1 fw-about__title" id="fw-about-title" data-fw-reveal="fade">
+            Faith Works is the education and business transformation arm of the Faith Works PH ecosystem.
+          </h2>
+          <div class="fw-about__lead" data-fw-reveal="fade" style="--fw-delay:120ms">
+            <p class="fw-body-l">It helps founders, professionals and organizations learn practical skills, put them into practice, and build from there.</p>
+            <a class="fw-link fw-about__follow" href="#journey">Follow the journey <span class="fw-link__arrow fw-about__down" aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+
+        <div class="fw-grid fw-about__audience">
+          <h3 class="fw-h2 fw-about__who" data-fw-reveal="lines">
+            <span class="fw-visually-hidden">Who it's for: </span>
+            <span class="fw-line" style="--i:0"><span class="fw-line__in">Individuals.</span></span>
+            <span class="fw-line" style="--i:1"><span class="fw-line__in">Professionals.</span></span>
+            <span class="fw-line" style="--i:2"><span class="fw-line__in">Entrepreneurs.</span></span>
+          </h3>
+
+          <!-- Roles from past workshops (C-07): not invented personas -->
+          <ul class="fw-about__roles" role="list">
+            <li class="fw-about__role" data-fw-reveal="fade"><p class="fw-h4">Founders &amp; owners</p><p class="fw-body-s">Systems the business can run on</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade" style="--fw-delay:70ms"><p class="fw-h4">CEOs &amp; executives</p><p class="fw-body-s">Lead with AI they understand</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade" style="--fw-delay:140ms"><p class="fw-h4">HR &amp; talent leaders</p><p class="fw-body-s">Specific functional gains</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade"><p class="fw-h4">Marketing pros</p><p class="fw-body-s">More output, same team</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade" style="--fw-delay:70ms"><p class="fw-h4">Operations leaders</p><p class="fw-body-s">Process that holds at scale</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade" style="--fw-delay:140ms"><p class="fw-h4">Consultants &amp; coaches</p><p class="fw-body-s">Deliver more without more hours</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade"><p class="fw-h4">Freelancers</p><p class="fw-body-s">Punch above their size</p></li>
+            <li class="fw-about__role" data-fw-reveal="fade" style="--fw-delay:70ms"><p class="fw-h4">Event suppliers &amp; SMEs</p><p class="fw-body-s">Stop losing leads in an inbox</p></li>
+          </ul>
+
+          <div class="fw-about__notech">
+            <span class="fw-about__bar" aria-hidden="true"></span>
+            <div>
+              <p class="fw-h3">No technical background required.</p>
+              <p class="fw-body-s">Every role here comes straight from past Faith Works workshops.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         03 · THE JOURNEY: Learn / Implement / Scale (DESIGN §13, §18.03, C-04)
+         Three stages with the same structure; each is its own coloured room:
+           Learn     White + circuit lines (Pink Ink accent)
+           Implement Faith Pink + real photo (Charcoal accent)
+           Scale     White + ascending line (AI Yellow accent)
+         With JS the whole section eases between those colours as you scroll.
+         ===================================================================== -->
+    <section class="fw-journey" id="journey" data-fw-surface="white" data-fw-chapter="learn" data-fw-journey aria-labelledby="fw-journey-title">
+      <div class="fw-container fw-journey__intro">
+        <p class="fw-eyebrow">
+          <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+          <span class="fw-eyebrow__num">03</span> <span aria-hidden="true">·</span>
+          <span>The Journey</span>
+          <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+        </p>
+        <h2 class="fw-h1" id="fw-journey-title">What each stage actually means.</h2>
+      </div>
+
+      <ol class="fw-journey__stages" role="list">
+
+        <!-- Stage 01 · Learn -->
+        <li class="fw-journey__stage fw-journey__stage--learn" id="journey-learn" data-fw-surface="white" data-fw-accent="pink" data-fw-chapter="learn" data-fw-stage>
+          <div class="fw-container fw-grid fw-journey__inner">
+            <header class="fw-journey__head">
+              <span class="fw-numeral fw-journey__num" aria-hidden="true">01</span>
+              <h3 class="fw-display-l fw-journey__word" data-fw-reveal="lines">
+                <span class="fw-visually-hidden">Stage 01: </span><span class="fw-line"><span class="fw-line__in">Learn</span></span>
+              </h3>
+              <p class="fw-voice" data-fw-reveal="fade" style="--fw-delay:120ms">“I want to understand this.”</p>
+              <p class="fw-body-s fw-journey__keywords" data-fw-reveal="fade" style="--fw-delay:200ms">AI insights · business · leadership · workshops · talks · resources · purpose</p>
+            </header>
+            <div class="fw-journey__body" data-fw-reveal="forward">
+              <div class="fw-journey__motif">
+                <svg class="fw-motif fw-motif--circuit" viewBox="0 0 560 300" aria-hidden="true" focusable="false" data-fw-draw>
+                  <path d="M0 44 H176 Q192 44 192 60 V148 Q192 164 208 164 H336"/>
+                  <path d="M64 0 V88 Q64 104 80 104 H264 Q280 104 280 120 V244"/>
+                  <path d="M128 300 V236 Q128 220 144 220 H420 Q436 220 436 204 V64 Q436 48 452 48 H560"/>
+                  <path d="M232 300 V276 Q232 260 248 260 H352"/>
+                  <circle class="fw-motif__node" cx="336" cy="164" r="4.5"/>
+                  <circle class="fw-motif__node" cx="280" cy="244" r="4.5"/>
+                  <circle class="fw-motif__node" cx="352" cy="260" r="4.5"/>
+                  <circle class="fw-motif__node" cx="560" cy="48" r="4.5"/>
+                  <circle class="fw-motif__node fw-motif__node--open" cx="64" cy="4" r="4.5"/>
+                  <circle class="fw-motif__node fw-motif__node--open" cx="4" cy="44" r="4.5"/>
+                </svg>
+              </div>
+              <ul class="fw-index fw-journey__topics" role="list" aria-label="Learn topics">
+                <li class="fw-index__row"><a class="fw-index__link" href="learn.html#ai"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h3">AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="learn.html#business"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h3">Business<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="learn.html#leadership"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h3">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="learn.html#workshops"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h3">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="learn.html#resources"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h3">Resources<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+              </ul>
+              <a class="fw-link fw-journey__link" href="learn.html">Explore Learn <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Stage 02 · Implement -->
+        <li class="fw-journey__stage fw-journey__stage--implement" id="journey-implement" data-fw-surface="pink" data-fw-accent="charcoal" data-fw-chapter="implement" data-fw-stage>
+          <div class="fw-container fw-grid fw-journey__inner">
+            <header class="fw-journey__head">
+              <span class="fw-numeral fw-journey__num" aria-hidden="true">02</span>
+              <h3 class="fw-display-l fw-journey__word" data-fw-reveal="lines">
+                <span class="fw-visually-hidden">Stage 02: </span><span class="fw-line"><span class="fw-line__in">Implement</span></span>
+              </h3>
+              <p class="fw-voice" data-fw-reveal="fade" style="--fw-delay:120ms">“I want to apply this.”</p>
+              <p class="fw-body-s fw-journey__keywords" data-fw-reveal="fade" style="--fw-delay:200ms">Frameworks · AI tools · automation · templates · programs · Faith AI</p>
+            </header>
+            <div class="fw-journey__body" data-fw-reveal="forward">
+              <div class="fw-journey__motif">
+                <div class="fw-media fw-journey__photo" data-fw-reveal="clip">
+                  <picture>
+                    <source type="image/webp" srcset="assets/images/participants-laptop-480.webp 480w, assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 1280px) 40vw, 100vw">
+                    <img src="assets/images/participants-laptop-508.jpg" srcset="assets/images/participants-laptop-480.jpg 480w, assets/images/participants-laptop-508.jpg 508w" sizes="(min-width: 1280px) 40vw, 100vw"
+                         width="508" height="499" loading="lazy" decoding="async" style="object-position:50% 40%"
+                         alt="Workshop participants working on their laptops during a hands-on session">
+                  </picture>
+                </div>
+              </div>
+              <ul class="fw-index fw-journey__topics" role="list" aria-label="Implement topics">
+                <li class="fw-index__row"><a class="fw-index__link" href="implement.html#frameworks"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h3">Frameworks<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="implement.html#templates"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h3">Templates<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="implement.html#workflows"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h3">Workflows<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="implement.html#ai-tools"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h3">AI tools<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="implement.html#programs"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h3">Programs<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+              </ul>
+              <a class="fw-link fw-journey__link" href="implement.html">Explore Implement <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Stage 03 · Scale -->
+        <li class="fw-journey__stage fw-journey__stage--scale" id="journey-scale" data-fw-surface="white" data-fw-accent="yellow" data-fw-chapter="scale" data-fw-stage>
+          <div class="fw-container fw-grid fw-journey__inner">
+            <header class="fw-journey__head">
+              <span class="fw-numeral fw-journey__num" aria-hidden="true">03</span>
+              <h3 class="fw-display-l fw-journey__word" data-fw-reveal="lines">
+                <span class="fw-visually-hidden">Stage 03: </span><span class="fw-line"><span class="fw-line__in">Scale</span></span>
+              </h3>
+              <p class="fw-voice" data-fw-reveal="fade" style="--fw-delay:120ms">“I want this to last.”</p>
+              <p class="fw-body-s fw-journey__keywords" data-fw-reveal="fade" style="--fw-delay:200ms">Business growth · systems · repeatable processes · leadership · transformation</p>
+            </header>
+            <div class="fw-journey__body" data-fw-reveal="forward">
+              <div class="fw-journey__motif">
+                <svg class="fw-motif fw-motif--ascend" viewBox="0 0 560 300" aria-hidden="true" focusable="false" data-fw-draw>
+                  <path d="M24 272 L204 150 L324 208 L528 36"/>
+                  <path d="M488 36 H528 V76"/>
+                  <circle class="fw-motif__node" cx="24" cy="272" r="9"/>
+                  <circle class="fw-motif__node" cx="204" cy="150" r="9"/>
+                  <circle class="fw-motif__node" cx="324" cy="208" r="9"/>
+                  <circle class="fw-motif__node" cx="528" cy="36" r="9"/>
+                </svg>
+              </div>
+              <ul class="fw-index fw-journey__topics" role="list" aria-label="Scale topics">
+                <li class="fw-index__row"><a class="fw-index__link" href="scale.html#systems"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h3">Systems<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="scale.html#transformation"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h3">Transformation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="scale.html#growth"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h3">Growth<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="scale.html#leadership"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h3">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                <li class="fw-index__row"><a class="fw-index__link" href="scale.html#business-development"><span class="fw-index__num" aria-hidden="true">05</span><span class="fw-index__title fw-h3">Business development<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+              </ul>
+              <a class="fw-link fw-journey__link" href="scale.html">Explore Scale <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </section>
+
+
+    <!-- =====================================================================
+         04 · WORKSHOPS & EVENTS: Soft Charcoal, AI Yellow accent (DESIGN §18.04, C-10, C-12)
+         PLACEHOLDER: all event dates, titles and locations are TBA.
+         Replace the "Register" links with GHL forms/calendars.
+         ===================================================================== -->
+    <section class="fw-section fw-events" id="events" data-fw-surface="charcoal" data-fw-accent="yellow" data-fw-chapter="learn" aria-labelledby="fw-events-title">
+      <div class="fw-container">
+        <div class="fw-grid fw-events__top">
+          <div class="fw-events__eyebrow">
+            <p class="fw-eyebrow">
+              <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+              <span class="fw-eyebrow__num">04</span> <span aria-hidden="true">·</span>
+              <span>Workshops &amp; Events</span>
+              <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+            </p>
+          </div>
+          <h2 class="fw-display-l fw-events__title" id="fw-events-title" data-fw-reveal="lines">
+            <span class="fw-line" style="--i:0"><span class="fw-line__in">Workshops</span></span>
+            <span class="fw-line fw-events__title-2" style="--i:1"><span class="fw-line__in"><span class="fw-hl">&amp;</span> Events</span></span>
+          </h2>
+          <dl class="fw-events__offerings" data-fw-reveal="fade" style="--fw-delay:200ms">
+            <div class="fw-events__offering">
+              <dt class="fw-label">Workshops</dt>
+              <dd class="fw-body">Focused, practical learning sessions.</dd>
+            </div>
+            <div class="fw-events__offering">
+              <dt class="fw-label">Events</dt>
+              <dd class="fw-body">Masterclasses, forums and community gatherings.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <article class="fw-grid fw-events__featured" aria-labelledby="fw-events-featured">
+          <div class="fw-events__featured-copy" data-fw-reveal="fade">
+            <p class="fw-label fw-events__featured-label">Next workshop</p>
+            <p class="fw-events__day" aria-hidden="true">25</p>
+            <p class="fw-label"><time datetime="2026-09-25">Friday · September 2026</time></p>
+            <h3 class="fw-h2 fw-events__featured-title" id="fw-events-featured">AI for Business: Hands-On Workshop</h3>
+            <p class="fw-body">Practical AI workflows for marketing, sales, and operations.</p>
+            <p class="fw-label fw-events__featured-meta"><span>Workshop</span><span aria-hidden="true"> · </span><span>Pampanga</span></p>
+            <a class="fw-btn fw-btn--primary fw-btn--lg" href="community.html?event=ai-for-business#register">Register now</a>
+          </div>
+          <figure class="fw-events__past">
+            <div class="fw-media fw-events__photo" data-fw-reveal="clip">
+              <picture>
+                <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w, assets/images/masterclass-room-1345.webp 1345w" sizes="(min-width: 1280px) 50vw, 100vw">
+                <img src="assets/images/ai-claude-masterclass-batch2.png" srcset="assets/images/masterclass-room-480.jpg 480w, assets/images/masterclass-room-960.jpg 960w, assets/images/masterclass-room-1345.jpg 1345w" sizes="(min-width: 1280px) 50vw, 100vw"
+                     width="1345" height="777" loading="lazy" decoding="async" style="object-position:100% 60%"
+                     alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1">
+              </picture>
+            </div>
+            <figcaption class="fw-label fw-media__caption">Past session · AI &amp; Claude Masterclass, Batch 1</figcaption>
+          </figure>
+        </article>
+
+        <div class="fw-events__list">
+          <h3 class="fw-label fw-events__list-title">Upcoming</h3>
+          <ul class="fw-events__rows" role="list">
+            <li class="fw-event-row">
+              <p class="fw-event-row__date"><span class="fw-h3">TBA</span></p>
+              <h4 class="fw-h4 fw-event-row__title">AI &amp; Claude Masterclass: next batch</h4>
+              <p class="fw-label fw-event-row__meta"><span>Masterclass</span><span aria-hidden="true"> · </span><span>Dates to be announced</span></p>
+              <a class="fw-btn fw-btn--reversed fw-event-row__cta" href="community.html?event=notify-masterclass#register">Get notified<span class="fw-visually-hidden">: next AI &amp; Claude Masterclass</span></a>
+            </li>
+            <li class="fw-event-row">
+              <p class="fw-event-row__date"><span class="fw-h3">TBA</span></p>
+              <h4 class="fw-h4 fw-event-row__title">Forums &amp; community gatherings</h4>
+              <p class="fw-label fw-event-row__meta"><span>Forum</span><span aria-hidden="true"> · </span><span>Dates to be announced</span></p>
+              <a class="fw-btn fw-btn--reversed fw-event-row__cta" href="community.html?event=notify-forums#register">Get notified<span class="fw-visually-hidden">: forums &amp; community gatherings</span></a>
+            </li>
+          </ul>
+          <a class="fw-link fw-events__all" href="community.html#events">See all events <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         05 · RESOURCES: Works White, Pink Ink accent (DESIGN §18.05, C-14)
+         Titles are from the concept. PLACEHOLDER: images and resource types.
+         Filter chips: js/main.js. Chip values match data-fw-category.
+         Ends with the Next-step bar that closes the Learn chapter.
+         ===================================================================== -->
+    <section class="fw-section fw-resources" id="resources" data-fw-surface="white" data-fw-accent="pink" data-fw-chapter="learn" aria-labelledby="fw-resources-title">
+      <div class="fw-container">
+        <div class="fw-grid fw-resources__top">
+          <div class="fw-resources__intro">
+            <p class="fw-eyebrow">
+              <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+              <span class="fw-eyebrow__num">05</span> <span aria-hidden="true">·</span>
+              <span>Resources</span>
+              <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+            </p>
+            <h2 class="fw-h1 fw-resources__title" id="fw-resources-title" data-fw-reveal="fade">Insights, guides and practical <span class="fw-hl">playbooks.</span></h2>
+          </div>
+          <div class="fw-chips fw-resources__chips" role="group" aria-label="Filter resources by topic" data-fw-filter="fw-resources-list">
+            <button type="button" class="fw-chip" aria-pressed="true" data-fw-filter-value="all">All</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="ai">AI</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="business">Business</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="leadership">Leadership</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="lifestyle">Lifestyle</button>
+            <button type="button" class="fw-chip" aria-pressed="false" data-fw-filter-value="faith-purpose">Faith &amp; Purpose</button>
+          </div>
+        </div>
+
+        <ul class="fw-resources__list" id="fw-resources-list" role="list">
+          <li class="fw-resource fw-resource--featured" data-fw-category="ai" data-fw-reveal="fade">
+            <a class="fw-resource__link" href="learn.html#ai">
+              <div class="fw-resource__media fw-media">
+                <!-- Temporary image source: https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488
+                     Replace with final Faith Works asset before launch. -->
+                <picture data-image-source="https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488">
+                  <source type="image/webp" srcset="assets/images/temp-ai-everyday-work-480.webp 480w, assets/images/temp-ai-everyday-work-960.webp 960w, assets/images/temp-ai-everyday-work-1440.webp 1440w, assets/images/temp-ai-everyday-work-1800.webp 1800w" sizes="(min-width: 1280px) 55vw, 100vw">
+                  <img src="assets/images/temp-ai-everyday-work-960.jpg" srcset="assets/images/temp-ai-everyday-work-480.jpg 480w, assets/images/temp-ai-everyday-work-960.jpg 960w, assets/images/temp-ai-everyday-work-1440.jpg 1440w, assets/images/temp-ai-everyday-work-1800.jpg 1800w" sizes="(min-width: 1280px) 55vw, 100vw"
+                       width="1800" height="1200" loading="lazy" decoding="async" style="object-position:50% 40%"
+                       alt="A professional working on a laptop at a café table">
+                </picture>
+              </div>
+              <p class="fw-label fw-resource__meta"><span class="fw-resource__cat">AI</span><span aria-hidden="true"> · </span><span>Insight</span></p>
+              <h3 class="fw-h2 fw-resource__title"><span class="fw-resource__title-text">AI Is Not Another Niche Skill. It Is Becoming a Foundational One.</span></h3>
+            </a>
+          </li>
+          <li class="fw-resource" data-fw-category="ai" data-fw-reveal="fade">
+            <a class="fw-resource__link" href="implement.html?resource=prompt-starter-kit#access">
+              <div class="fw-resource__media fw-media">
+                <!-- Temporary image source: https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0
+                     Replace with final Faith Works asset before launch. -->
+                <picture data-image-source="https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0">
+                  <source type="image/webp" srcset="assets/images/temp-starter-kit-480.webp 480w, assets/images/temp-starter-kit-960.webp 960w, assets/images/temp-starter-kit-1440.webp 1440w, assets/images/temp-starter-kit-1800.webp 1800w" sizes="(min-width: 1280px) 30vw, 100vw">
+                  <img src="assets/images/temp-starter-kit-960.jpg" srcset="assets/images/temp-starter-kit-480.jpg 480w, assets/images/temp-starter-kit-960.jpg 960w, assets/images/temp-starter-kit-1440.jpg 1440w, assets/images/temp-starter-kit-1800.jpg 1800w" sizes="(min-width: 1280px) 30vw, 100vw"
+                       width="1800" height="2718" loading="lazy" decoding="async" style="object-position:50% 40%"
+                       alt="A laptop beside printed checklists and planning sheets">
+                </picture>
+              </div>
+              <p class="fw-label fw-resource__meta"><span class="fw-resource__cat">AI</span><span aria-hidden="true"> · </span><span>Resource</span></p>
+              <h3 class="fw-h3 fw-resource__title"><span class="fw-resource__title-text">Prompt Starter Kit &amp; Tools Guide</span></h3>
+            </a>
+          </li>
+          <li class="fw-resource" data-fw-category="business" data-fw-reveal="fade">
+            <a class="fw-resource__link" href="learn.html#business">
+              <div class="fw-resource__media fw-media">
+                <!-- Temporary image source: https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI
+                     Replace with final Faith Works asset before launch. -->
+                <picture data-image-source="https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI">
+                  <source type="image/webp" srcset="assets/images/temp-learning-to-doing-480.webp 480w, assets/images/temp-learning-to-doing-960.webp 960w, assets/images/temp-learning-to-doing-1440.webp 1440w, assets/images/temp-learning-to-doing-1800.webp 1800w" sizes="(min-width: 1280px) 30vw, 100vw">
+                  <img src="assets/images/temp-learning-to-doing-960.jpg" srcset="assets/images/temp-learning-to-doing-480.jpg 480w, assets/images/temp-learning-to-doing-960.jpg 960w, assets/images/temp-learning-to-doing-1440.jpg 1440w, assets/images/temp-learning-to-doing-1800.jpg 1800w" sizes="(min-width: 1280px) 30vw, 100vw"
+                       width="1800" height="1013" loading="lazy" decoding="async" style="object-position:50% 40%"
+                       alt="Two colleagues working through a task together on a laptop">
+                </picture>
+              </div>
+              <p class="fw-label fw-resource__meta"><span class="fw-resource__cat">Business</span><span aria-hidden="true"> · </span><span>Insight</span></p>
+              <h3 class="fw-h3 fw-resource__title"><span class="fw-resource__title-text">From Learning to Doing: Why Applied Practice Matters</span></h3>
+            </a>
+          </li>
+        </ul>
+        <p class="fw-body fw-resources__empty" data-fw-filter-empty hidden>More resources in this category are on the way.</p>
+        <p class="fw-visually-hidden" aria-live="polite" data-fw-filter-status></p>
+
+        <div class="fw-resources__foot">
+          <a class="fw-link" href="learn.html#insights">View all insights &amp; resources <span class="fw-link__arrow" aria-hidden="true">→</span></a>
+        </div>
+
+        <!-- Next-step bar (C-14): bridge from Learn to Implement -->
+        <div class="fw-next" data-fw-reveal="forward">
+          <div>
+            <p class="fw-label fw-next__label">Next step</p>
+            <p class="fw-next__line">Ready to apply this? <span class="fw-next__to">→ Implement</span></p>
+          </div>
+          <a class="fw-btn fw-btn--dark" href="#programs"><span>Continue<span class="fw-visually-hidden"> to Implement</span></span><span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         06 · PROGRAMS: Faith Pink, Charcoal accent (DESIGN §18.06, C-10)
+         Opens the Implement chapter.
+         PLACEHOLDER: program names/details. Rows are audience tracks from C-07.
+         ===================================================================== -->
+    <section class="fw-section fw-programs" id="programs" data-fw-surface="pink" data-fw-accent="charcoal" data-fw-chapter="implement" aria-labelledby="fw-programs-title">
+      <div class="fw-container fw-grid fw-programs__grid">
+        <p class="fw-label fw-folio" aria-hidden="true">Chapter 02 · Implement</p>
+        <div class="fw-programs__intro">
+          <p class="fw-eyebrow">
+            <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+            <span class="fw-eyebrow__num">06</span> <span aria-hidden="true">·</span>
+            <span>Programs</span>
+            <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+          </p>
+          <h2 class="fw-h1 fw-programs__title" id="fw-programs-title" data-fw-reveal="fade">Deeper, structured learning and transformation.</h2>
+          <a class="fw-btn fw-btn--dark fw-btn--lg" href="implement.html#program"><span>View the program</span><span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+        </div>
+        <ol class="fw-programs__list" role="list">
+          <li class="fw-program" data-fw-reveal="forward">
+            <a class="fw-program__link" href="implement.html#program">
+              <span class="fw-program__num fw-label" aria-hidden="true">01</span>
+              <span class="fw-program__body">
+                <span class="fw-label fw-program__for">AI Workforce Accelerator · Track 01</span>
+                <span class="fw-h2 fw-program__title">AI-Ready Professional</span>
+                <span class="fw-body fw-program__line">You leave with: 30-Day AI Workforce Action Plan</span>
+              </span>
+              <span class="fw-program__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="fw-program" data-fw-reveal="forward" style="--fw-delay:70ms">
+            <a class="fw-program__link" href="implement.html#program">
+              <span class="fw-program__num fw-label" aria-hidden="true">02</span>
+              <span class="fw-program__body">
+                <span class="fw-label fw-program__for">AI Workforce Accelerator · Track 02</span>
+                <span class="fw-h2 fw-program__title">AI-Powered Daily Work</span>
+                <span class="fw-body fw-program__line">You leave with: AI-assisted workflow portfolio</span>
+              </span>
+              <span class="fw-program__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="fw-program" data-fw-reveal="forward" style="--fw-delay:140ms">
+            <a class="fw-program__link" href="implement.html#program">
+              <span class="fw-program__num fw-label" aria-hidden="true">03</span>
+              <span class="fw-program__body">
+                <span class="fw-label fw-program__for">AI Workforce Accelerator · Track 03</span>
+                <span class="fw-h2 fw-program__title">Implementation &amp; Leadership</span>
+                <span class="fw-body fw-program__line">You leave with: Implementation portfolio + 90-day roadmap</span>
+              </span>
+              <span class="fw-program__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="fw-program" data-fw-reveal="forward" style="--fw-delay:210ms">
+            <a class="fw-program__link" href="implement.html#program">
+              <span class="fw-program__num fw-label" aria-hidden="true">04</span>
+              <span class="fw-program__body">
+                <span class="fw-label fw-program__for">AI Workforce Accelerator · Track 04</span>
+                <span class="fw-h2 fw-program__title">Personalized 1:1 Coaching</span>
+                <span class="fw-body fw-program__line">You leave with: One priority AI solution</span>
+              </span>
+              <span class="fw-program__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         07 · FAITH AI: the one AI Yellow room, Charcoal accent (DESIGN §8, §18.07)
+         The wordmark's [ai] device is the only graphic. No chat mock-ups.
+         PLACEHOLDER: full description and the image.
+         ===================================================================== -->
+    <section class="fw-section fw-ai" id="faith-ai" data-fw-surface="yellow" data-fw-accent="charcoal" data-fw-chapter="implement" aria-labelledby="fw-ai-title">
+      <div class="fw-container">
+        <div class="fw-grid fw-ai__grid">
+          <p class="fw-ai__device" aria-hidden="true" data-fw-reveal="fade">
+            <span class="fw-ai__bracket">[</span><span class="fw-ai__ai">ai</span><span class="fw-ai__bracket">]</span>
+          </p>
+          <div class="fw-ai__copy">
+            <p class="fw-eyebrow">
+              <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+              <span class="fw-eyebrow__num">07</span> <span aria-hidden="true">·</span>
+              <span>Faith AI</span>
+              <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+            </p>
+            <h2 class="fw-display-l" id="fw-ai-title" data-fw-reveal="lines"><span class="fw-line"><span class="fw-line__in">Faith AI</span></span></h2>
+            <p class="fw-body-l fw-ai__lead" data-fw-placeholder>Part of Implement, the stage for applying what you learn.</p>
+            <a class="fw-btn fw-btn--dark fw-btn--lg" href="implement.html#faith-ai"><span>Explore Faith AI</span><span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+          <div class="fw-ai__media" data-fw-reveal="clip">
+            <div class="fw-media fw-ai__img">
+              <!-- Temporary image source: https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU
+                   Replace with final Faith Works asset before launch. -->
+              <picture data-image-source="https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU">
+                <source type="image/webp" srcset="assets/images/temp-faith-ai-480.webp 480w, assets/images/temp-faith-ai-960.webp 960w, assets/images/temp-faith-ai-1440.webp 1440w, assets/images/temp-faith-ai-1800.webp 1800w" sizes="(min-width: 1280px) 40vw, 100vw">
+                <img src="assets/images/temp-faith-ai-960.jpg" srcset="assets/images/temp-faith-ai-480.jpg 480w, assets/images/temp-faith-ai-960.jpg 960w, assets/images/temp-faith-ai-1440.jpg 1440w, assets/images/temp-faith-ai-1800.jpg 1800w" sizes="(min-width: 1280px) 40vw, 100vw"
+                     width="1800" height="3200" loading="lazy" decoding="async" style="object-position:50% 78%"
+                     alt="A young professional smiling while working on a laptop">
+              </picture>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next-step bar, reversed: bridge from Implement to Scale -->
+        <div class="fw-next fw-next--reversed" data-fw-reveal="forward">
+          <div>
+            <p class="fw-label fw-next__label">Next step</p>
+            <p class="fw-next__line">Ready to make it last? <span class="fw-next__to">→ Scale</span></p>
+          </div>
+          <a class="fw-btn fw-btn--primary" href="#community"><span>Continue<span class="fw-visually-hidden"> to Scale</span></span><span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         08 · COMMUNITY: Works White, Pink Ink accent (DESIGN §18.08, C-09, C-11, C-17)
+         Opens the Scale chapter. Mosaic: one tall + one wide + one small.
+         PLACEHOLDER: the small behind-the-scenes photo; the Connection and
+         Participation descriptions are intentionally empty (no invented copy).
+         ===================================================================== -->
+    <section class="fw-section fw-community" id="community" data-fw-surface="white" data-fw-accent="pink" data-fw-chapter="scale" aria-labelledby="fw-community-title">
+      <div class="fw-container fw-grid fw-community__grid">
+        <p class="fw-label fw-folio" aria-hidden="true">Chapter 03 · Scale</p>
+
+        <div class="fw-community__intro">
+          <p class="fw-eyebrow">
+            <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+            <span class="fw-eyebrow__num">08</span> <span aria-hidden="true">·</span>
+            <span>Community</span>
+            <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+          </p>
+          <h2 class="fw-display-l fw-community__title" id="fw-community-title" data-fw-reveal="lines">
+            <span class="fw-line" style="--i:0"><span class="fw-line__in">Events.</span></span>
+            <span class="fw-line" style="--i:1"><span class="fw-line__in"><span class="fw-hl">Connection.</span></span></span>
+            <span class="fw-line" style="--i:2"><span class="fw-line__in">Participation.</span></span>
+          </h2>
+        </div>
+
+        <ul class="fw-index fw-community__pillars" role="list">
+          <li class="fw-index__row">
+            <a class="fw-index__link" href="community.html#events">
+              <span class="fw-index__num" aria-hidden="true">01</span>
+              <span class="fw-community__pillar">
+                <span class="fw-index__title fw-h3">Events<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+                <span class="fw-body-s">Masterclasses, forums and community gatherings.</span>
+              </span>
+            </a>
+          </li>
+          <li class="fw-index__row">
+            <a class="fw-index__link" href="community.html#connection">
+              <span class="fw-index__num" aria-hidden="true">02</span>
+              <span class="fw-community__pillar">
+                <span class="fw-index__title fw-h3">Connection<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+              </span>
+            </a>
+          </li>
+          <li class="fw-index__row">
+            <a class="fw-index__link" href="community.html#participation">
+              <span class="fw-index__num" aria-hidden="true">03</span>
+              <span class="fw-community__pillar">
+                <span class="fw-index__title fw-h3">Participation<span class="fw-index__arrow" aria-hidden="true">→</span></span>
+              </span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="fw-community__mosaic">
+          <div class="fw-media fw-community__tall" data-fw-reveal="clip">
+            <picture>
+              <source type="image/webp" srcset="assets/images/workshop-qa-480.webp 480w, assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 1280px) 40vw, 50vw">
+              <img src="assets/images/workshop-qa-672.jpg" srcset="assets/images/workshop-qa-480.jpg 480w, assets/images/workshop-qa-672.jpg 672w" sizes="(min-width: 1280px) 40vw, 50vw"
+                   width="672" height="549" loading="lazy" decoding="async" style="object-position:100% 50%"
+                   alt="A participant asks a question while a facilitator holds a microphone during a Faith Works workshop">
+            </picture>
+          </div>
+          <div class="fw-media fw-community__wide" data-fw-reveal="clip" style="--fw-delay:70ms">
+            <picture>
+              <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w, assets/images/masterclass-room-1345.webp 1345w" sizes="(min-width: 1280px) 55vw, 100vw">
+              <img src="assets/images/masterclass-room-960.jpg" srcset="assets/images/masterclass-room-480.jpg 480w, assets/images/masterclass-room-960.jpg 960w, assets/images/masterclass-room-1345.jpg 1345w" sizes="(min-width: 1280px) 55vw, 100vw"
+                   width="1345" height="777" loading="lazy" decoding="async" style="object-position:100% 55%"
+                   alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1">
+            </picture>
+          </div>
+          <div class="fw-community__small" data-fw-reveal="clip" style="--fw-delay:140ms">
+            <div class="fw-media fw-community__img">
+              <picture>
+                <source type="image/webp" srcset="assets/images/workshop-slides-480.webp 480w, assets/images/workshop-slides-960.webp 960w, assets/images/workshop-slides-1280.webp 1280w" sizes="(min-width: 1280px) 30vw, 50vw">
+                <img src="assets/images/workshop-slides-960.jpg" srcset="assets/images/workshop-slides-480.jpg 480w, assets/images/workshop-slides-960.jpg 960w, assets/images/workshop-slides-1280.jpg 1280w" sizes="(min-width: 1280px) 30vw, 50vw"
+                     width="1280" height="573" loading="lazy" decoding="async" style="object-position:50% 50%"
+                     alt="A facilitator presenting slides to a seated workshop group">
+              </picture>
+            </div>
+          </div>
+          <div class="fw-community__cta">
+            <a class="fw-btn fw-btn--secondary fw-btn--lg" href="#join"><span>Join the community</span><span class="fw-btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         09 · LIFESTYLE & FOUNDER: Soft Charcoal, Pink Mid accent (DESIGN §18.09, C-15)
+         "A human layer, kept light": links out, no embedded social feeds.
+         PLACEHOLDER: channel URLs.
+         ===================================================================== -->
+    <section class="fw-founder" id="founder" data-fw-surface="charcoal" data-fw-accent="pinkMid" data-fw-chapter="scale" aria-labelledby="fw-founder-title">
+      <div class="fw-founder__copy">
+        <p class="fw-eyebrow">
+          <span class="fw-eyebrow__bracket" aria-hidden="true">[</span>
+          <span class="fw-eyebrow__num">09</span> <span aria-hidden="true">·</span>
+          <span>Lifestyle &amp; Founder</span>
+          <span class="fw-eyebrow__bracket" aria-hidden="true">]</span>
+        </p>
+        <h2 class="fw-h1 fw-founder__title" id="fw-founder-title" data-fw-reveal="fade">
+          Founder experiences, behind-the-scenes and <span class="fw-hl">personal perspective.</span>
+        </h2>
+        <p class="fw-body-l">The human side of Faith Works lives mostly on social and video channels.</p>
+        <div class="fw-founder__follow">
+          <p class="fw-label fw-founder__follow-label">Follow &amp; watch on social and video channels</p>
+          <ul class="fw-founder__channels" role="list">
+            <li><a class="fw-founder__channel" href="#" data-fw-placeholder>Facebook <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a class="fw-founder__channel" href="#" data-fw-placeholder>Instagram <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a class="fw-founder__channel" href="#" data-fw-placeholder>YouTube <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+            <li><a class="fw-founder__channel" href="#" data-fw-placeholder>LinkedIn <span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fw-founder__media" data-fw-reveal="clip">
+        <picture>
+          <source type="image/webp" srcset="assets/images/founder-portrait-480.webp 480w, assets/images/founder-portrait-960.webp 960w, assets/images/founder-portrait-1024.webp 1024w" sizes="(min-width: 1024px) 50vw, 100vw">
+          <img src="assets/images/founder-portrait-960.jpg" srcset="assets/images/founder-portrait-480.jpg 480w, assets/images/founder-portrait-960.jpg 960w, assets/images/founder-portrait-1024.jpg 1024w" sizes="(min-width: 1024px) 50vw, 100vw"
+               width="1024" height="1536" loading="lazy" decoding="async"
+               alt="Portrait of the Faith Works founder in a white blazer against a pink backdrop">
+        </picture>
+      </div>
+    </section>
+
+
+    <!-- =====================================================================
+         10 · FINAL CTA: Pink Tint, AI Yellow accent (DESIGN §18.10, mirrors C-18)
+         The only centred composition: the journey, arrived.
+         ===================================================================== -->
+    <section class="fw-section fw-final-cta" id="continue" data-fw-surface="pinkTint" data-fw-accent="yellow" data-fw-chapter="scale" aria-labelledby="fw-final-cta-title">
+      <svg class="fw-final-cta__circuit fw-final-cta__circuit--tl" viewBox="0 0 320 340" aria-hidden="true" focusable="false" data-fw-draw>
+        <path d="M0 12 H72 Q84 12 84 24 V100 Q84 112 96 112 H250"/>
+        <path d="M308 0 V128 Q308 140 296 140 H176 Q164 140 164 152 V310"/>
+        <path d="M0 270 H96 Q108 270 108 258 V236 Q108 224 120 224 H232"/>
+        <path d="M36 0 V190"/>
+        <circle class="fw-final-cta__node" cx="250" cy="112" r="4"/>
+        <circle class="fw-final-cta__node" cx="164" cy="310" r="4"/>
+        <circle class="fw-final-cta__node" cx="232" cy="224" r="4"/>
+        <circle class="fw-final-cta__node" cx="36" cy="190" r="4"/>
+      </svg>
+      <svg class="fw-final-cta__circuit fw-final-cta__circuit--br" viewBox="0 0 320 340" aria-hidden="true" focusable="false" data-fw-draw>
+        <path d="M0 12 H72 Q84 12 84 24 V100 Q84 112 96 112 H250"/>
+        <path d="M308 0 V128 Q308 140 296 140 H176 Q164 140 164 152 V310"/>
+        <path d="M0 270 H96 Q108 270 108 258 V236 Q108 224 120 224 H232"/>
+        <path d="M36 0 V190"/>
+        <circle class="fw-final-cta__node" cx="250" cy="112" r="4"/>
+        <circle class="fw-final-cta__node" cx="164" cy="310" r="4"/>
+        <circle class="fw-final-cta__node" cx="232" cy="224" r="4"/>
+        <circle class="fw-final-cta__node" cx="36" cy="190" r="4"/>
+      </svg>
+
+      <div class="fw-container fw-final-cta__inner">
+        <h2 class="fw-display-xl fw-final-cta__title" id="fw-final-cta-title" data-fw-reveal="lines">
+          <span class="fw-line" style="--i:0"><span class="fw-line__in">Learn.</span></span>
+          <span class="fw-line" style="--i:1"><span class="fw-line__in">Implement.</span></span>
+          <span class="fw-line" style="--i:2"><span class="fw-line__in">Scale.</span></span>
+        </h2>
+        <div class="fw-final-cta__brand" data-fw-reveal="fade" style="--fw-delay:300ms">
+          <span class="fw-wordmark"><img src="assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385"></span>
+        </div>
+        <p class="fw-body-l fw-final-cta__tagline" data-fw-reveal="fade" style="--fw-delay:380ms">A clearer digital home for practical education, business transformation, and purposeful growth.</p>
+        <div class="fw-btn-row fw-final-cta__ctas" data-fw-reveal="fade" style="--fw-delay:440ms">
+          <a class="fw-btn fw-btn--primary fw-btn--lg" href="learn.html">Explore Learning</a>
+          <a class="fw-btn fw-btn--secondary fw-btn--lg" href="#events">See upcoming events</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================================
+       FOOTER: Soft Charcoal, AI Yellow accent
+       PLACEHOLDER: the Join form is plain HTML. Replace it with a GHL form and
+       keep the .fw-footer__join wrapper. Social URLs are placeholders.
+       ===================================================================== -->
+  <footer class="fw-footer" id="join" data-fw-surface="charcoal" data-fw-accent="yellow">
+    <div class="fw-container fw-grid fw-footer__grid">
+      <div class="fw-footer__brand">
+        <a href="index.html" aria-label="Faith Works, home">
+          <span class="fw-wordmark"><img src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385"></span>
+        </a>
+        <p class="fw-body-s">A clearer digital home for practical education, business transformation, and purposeful growth.</p>
+      </div>
+
+      <form class="fw-footer__join" action="#" method="post" data-fw-placeholder data-fw-demo aria-labelledby="fw-join-title">
+        <h2 class="fw-h3" id="fw-join-title">Join Faith Works</h2>
+        <p class="fw-body-s">Updates on workshops, events and new resources.</p>
+        <div class="fw-footer__field">
+          <label class="fw-label" for="fw-join-email">Email address</label>
+          <div class="fw-footer__row">
+            <input class="fw-footer__input" id="fw-join-email" name="email" type="email" autocomplete="email" required>
+            <button class="fw-btn fw-btn--primary" type="submit">Join</button>
+          </div>
+        </div>
+        <p class="fw-body-s fw-form__status" role="status" data-fw-form-status></p>
+      </form>
+
+      <nav class="fw-footer__nav" id="fw-footer-nav" aria-label="Footer">
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="learn.html">Learn</a></p>
+          <ul role="list">
+            <li><a href="learn.html#ai">AI</a></li>
+            <li><a href="learn.html#business">Business</a></li>
+            <li><a href="learn.html#leadership">Leadership</a></li>
+            <li><a href="learn.html#workshops">Workshops</a></li>
+            <li><a href="learn.html#events">Events</a></li>
+            <li><a href="learn.html#resources">Resources</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="implement.html">Implement</a></p>
+          <ul role="list">
+            <li><a href="implement.html#frameworks">Frameworks</a></li>
+            <li><a href="implement.html#templates">Templates</a></li>
+            <li><a href="implement.html#workflows">Workflows</a></li>
+            <li><a href="implement.html#ai-tools">AI tools</a></li>
+            <li><a href="implement.html#programs">Programs</a></li>
+            <li><a href="implement.html#faith-ai">Faith AI</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="scale.html">Scale</a></p>
+          <ul role="list">
+            <li><a href="scale.html#systems">Systems</a></li>
+            <li><a href="scale.html#transformation">Transformation</a></li>
+            <li><a href="scale.html#growth">Growth</a></li>
+            <li><a href="scale.html#leadership">Leadership</a></li>
+            <li><a href="scale.html#business-development">Business development</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label"><a href="community.html">Community</a></p>
+          <ul role="list">
+            <li><a href="community.html#events">Events</a></li>
+            <li><a href="community.html#connection">Connection</a></li>
+            <li><a href="community.html#participation">Participation</a></li>
+          </ul>
+        </div>
+        <div class="fw-footer__col">
+          <p class="fw-label">Follow</p>
+          <ul role="list">
+            <li><a href="#" data-fw-placeholder>Facebook</a></li>
+            <li><a href="#" data-fw-placeholder>Instagram</a></li>
+            <li><a href="#" data-fw-placeholder>YouTube</a></li>
+            <li><a href="#" data-fw-placeholder>LinkedIn</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="fw-footer__legal">
+        <p class="fw-body-s">© 2026 Faith Works · part of the Faith Works PH ecosystem.</p>
+        <p class="fw-body-s"><a href="about.html">About</a></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
