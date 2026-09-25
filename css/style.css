@@ -2487,7 +2487,6 @@ select option:disabled { color: var(--fw-grey); }
   .fw-showcase__slide.is-active { transition-delay: 0s !important; }
 }
 
-}
 
 /* ---- Join the community: the Facebook Group call to action (a pink panel) ---- */
 .fw-group {
