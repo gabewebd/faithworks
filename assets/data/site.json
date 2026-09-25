@@ -1,0 +1,30 @@
+{
+  "_readme": "Site-wide settings that change over time. social: the Faith Works PH Facebook page, Instagram and LinkedIn, rendered as icon links wherever a page has data-fw-render=\"social\" (footer, Home, Community, About). icon must be one of: facebook, instagram, linkedin, youtube. Only add a channel once its URL is confirmed. community: the Faith Works Facebook GROUP (the community space, distinct from the page), rendered as its own 'Join the community' panel wherever a page has data-fw-render=\"community-cta\" (Home, Community, About).",
+  "social": [
+    {
+      "name": "Facebook",
+      "icon": "facebook",
+      "label": "Faith Works PH on Facebook",
+      "url": "https://www.facebook.com/profile.php?id=61580485384062"
+    },
+    {
+      "name": "Instagram",
+      "icon": "instagram",
+      "label": "Faith Works on Instagram",
+      "url": "https://www.instagram.com/faithworksph_/"
+    },
+    {
+      "name": "LinkedIn",
+      "icon": "linkedin",
+      "label": "Faith Natividad on LinkedIn",
+      "url": "https://www.linkedin.com/in/faithnatividad/"
+    }
+  ],
+  "community": {
+    "eyebrow": "Join the community",
+    "title": "The Faith Works Community",
+    "text": "A space to keep learning, share what you're applying, and stay connected between events.",
+    "ctaLabel": "Join the Faith Works Community",
+    "url": "https://www.facebook.com/share/g/1DGeoshBNh/"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "_readme": "Faith Works practical resources: the single source for resource cards on Home, Learn and Implement. Add a record and it appears in every resource list; no HTML changes. FIELDS: id (stable; also the value the Implement request form uses) · title · type (Guide | Framework | Checklist | Worksheet | Plan | Program | Event | Article — drives the card's mark) · category (label shown on cards) · topics (filter keys: ai, business, leadership, lifestyle, faith-purpose) · description · image (every resource has one: { base + widths } or a plain path string with imageAlt) · url (where it's explained or requested) · downloadUrl (a direct file link once one exists; null until then) · status ('available' = open now · 'on-request' = sent by email; the card links to the sign-up on Implement (#access) · 'coming-soon') · ctaLabel · featured (true on ONE resource: leads Learn's Resources and Home) · eventRef (optional: the id of an events.json record; title, description, image, date and registration link then come from that event, so they're never written twice).",
+  "resources": [
+    {
+      "id": "prompt-starter-kit",
+      "featured": true,
+      "type": "Guide",
+      "category": "AI",
+      "topics": [
+        "ai"
+      ],
+      "title": "Prompt Starter Kit & Tools Guide",
+      "description": "A practical starting point for professionals building their first AI-assisted workflow: prompts to adapt for writing, research and planning, a plain-language guide to choosing tools, and the habits that make results reliable.",
+      "url": "implement.html#access",
+      "downloadUrl": null,
+      "status": "on-request",
+      "ctaLabel": "Get the guide",
+      "image": {
+        "base": "assets/images/temp-starter-kit",
+        "widths": [
+          480,
+          960,
+          1440,
+          1800
+        ],
+        "width": 1800,
+        "height": 2718,
+        "position": "50% 40%",
+        "alt": "A laptop beside printed checklists and planning sheets",
+        "source": "https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0"
+      }
+    },
+    {
+      "id": "ai-linkedin-b2b-growth-system",
+      "eventRef": "ai-linkedin-b2b-growth-accelerator-2026",
+      "type": "Program",
+      "category": "AI · Business",
+      "topics": [
+        "ai",
+        "business"
+      ],
+      "status": "available"
+    },
+    {
+      "id": "opportunity-map",
+      "type": "Framework",
+      "category": "AI · Business",
+      "topics": [
+        "ai",
+        "business"
+      ],
+      "title": "AI Opportunity Map",
+      "description": "A three-step worksheet for finding where AI can help: list the work you repeat, mark the friction, and pick one low-risk place to start.",
+      "url": "implement.html#frameworks",
+      "downloadUrl": null,
+      "status": "on-request",
+      "ctaLabel": "Explore the framework",
+      "image": {
+        "base": "assets/images/temp-opportunity-map",
+        "widths": [
+          480,
+          960,
+          1440,
+          1800
+        ],
+        "width": 1800,
+        "height": 1200,
+        "position": "50% 45%",
+        "alt": "A man mapping ideas on a whiteboard",
+        "source": "https://unsplash.com/photos/man-in-white-long-sleeve-shirt-writing-on-white-board-um1zVjVCtEY"
+      }
+    },
+    {
+      "id": "research-workflow",
+      "type": "Checklist",
+      "category": "AI",
+      "topics": [
+        "ai"
+      ],
+      "title": "AI-Assisted Research Workflow",
+      "description": "Research, organize, analyze, draft, review: the five steps on one page, with the review questions to ask every time.",
+      "url": "implement.html#workflows",
+      "downloadUrl": null,
+      "status": "on-request",
+      "ctaLabel": "See the workflow",
+      "image": {
+        "base": "assets/images/temp-research-workflow",
+        "widths": [
+          480,
+          960,
+          1440,
+          1800
+        ],
+        "width": 1800,
+        "height": 1201,
+        "position": "50% 50%",
+        "alt": "A person taking notes with a pencil beside an open laptop",
+        "source": "https://unsplash.com/photos/person-holding-pencil-near-laptop-computer-5fNmWej4tAA"
+      }
+    },
+    {
+      "id": "program",
+      "type": "Program",
+      "category": "AI · Leadership",
+      "topics": [
+        "ai",
+        "leadership"
+      ],
+      "title": "AI Workforce Accelerator",
+      "description": "Structured tracks for professionals, business owners, leaders and teams, each ending in something you can use: an action plan, a workflow portfolio, a roadmap or one priority AI solution.",
+      "url": "implement.html#program",
+      "downloadUrl": null,
+      "status": "available",
+      "ctaLabel": "View the program",
+      "image": {
+        "base": "assets/images/temp-team-systems",
+        "widths": [
+          480,
+          960,
+          1440,
+          1800
+        ],
+        "width": 1800,
+        "height": 1200,
+        "position": "50% 45%",
+        "alt": "A team working together on laptops in a meeting room",
+        "source": "https://unsplash.com/photos/team-collaborating-on-laptops-in-modern-office-N3Bf0ArT5J0"
+      }
+    }
+  ]
+}

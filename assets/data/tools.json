@@ -1,0 +1,69 @@
+{
+  "_readme": "AI tools shown as EXAMPLES of tools used in practical, AI-enabled work (Implement #ai-tools). Not partnerships or endorsements, and no one is expected to use all of them. Fields: slug · name · category (a few words) · logo (a local single-colour SVG in assets/icons/tools/, drawn in the section's ink colour) · url (the tool's own site; opens in a new tab) · description (one plain sentence on what it's typically used for). Listed in the order shown. Logo sources: docs/IMAGE-SOURCES.md.",
+  "tools": [
+    {
+      "slug": "claude",
+      "name": "Claude",
+      "category": "AI assistant",
+      "logo": "assets/icons/tools/claude.svg",
+      "url": "https://claude.ai/",
+      "description": "Writing, analysis and long documents: drafting, summarizing and thinking a problem through."
+    },
+    {
+      "slug": "chatgpt",
+      "name": "ChatGPT",
+      "category": "AI assistant",
+      "logo": "assets/icons/tools/chatgpt.svg",
+      "url": "https://chatgpt.com/",
+      "description": "Everyday drafting, questions and brainstorming in a general-purpose chat assistant."
+    },
+    {
+      "slug": "gemini",
+      "name": "Gemini",
+      "category": "AI assistant",
+      "logo": "assets/icons/tools/gemini.svg",
+      "url": "https://gemini.google.com/",
+      "description": "Google's assistant, also available inside Gmail, Docs and Sheets for teams on Google Workspace."
+    },
+    {
+      "slug": "notebooklm",
+      "name": "NotebookLM",
+      "category": "Research",
+      "logo": "assets/icons/tools/notebooklm.svg",
+      "url": "https://notebooklm.google.com/",
+      "description": "Answers grounded in the sources you upload, such as reports, notes and transcripts."
+    },
+    {
+      "slug": "perplexity",
+      "name": "Perplexity",
+      "category": "Search",
+      "logo": "assets/icons/tools/perplexity.svg",
+      "url": "https://www.perplexity.ai/",
+      "description": "Web search that answers with citations, so you can check where each claim comes from."
+    },
+    {
+      "slug": "gamma",
+      "name": "Gamma",
+      "category": "Presentations",
+      "logo": "assets/icons/tools/gamma.svg",
+      "url": "https://gamma.app/",
+      "description": "First drafts of presentations, documents and simple web pages from an outline or prompt."
+    },
+    {
+      "slug": "claude-code",
+      "name": "Claude Code",
+      "category": "Coding agent",
+      "logo": "assets/icons/tools/claude-code.svg",
+      "url": "https://www.claude.com/product/claude-code",
+      "description": "Anthropic's coding agent: builds and edits software and automations from plain-language instructions."
+    },
+    {
+      "slug": "codex",
+      "name": "Codex",
+      "category": "Coding agent",
+      "logo": "assets/icons/tools/codex.svg",
+      "url": "https://openai.com/codex/",
+      "description": "OpenAI's coding agent: writes, reviews and changes code for software and automation tasks."
+    }
+  ]
+}

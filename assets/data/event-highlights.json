@@ -1,0 +1,128 @@
+{
+  "_readme": "Event highlights: the visual gallery on Community (#highlights). One object per photo or video; add one and it appears. Mix events freely: this is a board of Faith Works moments, not a list of one event. FIELDS: id · title (the event or moment, for screen readers and the overlay) · caption (a few words shown on the photo) · type ('photo' or 'video') · image (every item has one; for a video it's the poster: { base + widths } for responsive files, or a plain path string with imageAlt) · video (type 'video' only: path or URL of an .mp4, plays muted on hover/tap) · date (optional { day, month, year }) · url (optional: where the photo links, e.g. an album) · size ('large' 2×2 | 'wide' 2×1 | 'tall' 1×2 | 'regular' 1×1: the tile's shape on the 4-column board; sizes adding up to a multiple of 4 fill it evenly). Only caption what the photo actually shows.",
+  "highlights": [
+    {
+      "id": "highlight-masterclass-batch-3",
+      "title": "AI & Claude Masterclass, Batch 3",
+      "caption": "AI & Claude Masterclass — Batch 3",
+      "type": "photo",
+      "size": "large",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/masterclass-batch3",
+        "widths": [
+          480,
+          960,
+          1440,
+          1920
+        ],
+        "width": 1920,
+        "height": 1080,
+        "position": "0% 50%",
+        "alt": "Participants of the Faith Works AI & Claude Masterclass, Batch 3, posing together in the session room"
+      }
+    },
+    {
+      "id": "highlight-on-stage",
+      "title": "On stage at a Faith Works session",
+      "caption": "On stage",
+      "type": "photo",
+      "size": "tall",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/speaker-pink-blazer",
+        "widths": [
+          453
+        ],
+        "width": 453,
+        "height": 670,
+        "position": "50% 25%",
+        "alt": "A Faith Works speaker in a pink blazer presenting to a workshop audience with a microphone"
+      }
+    },
+    {
+      "id": "highlight-hands-on",
+      "title": "Hands-on work at the laptops",
+      "caption": "Hands-on, on real tasks",
+      "type": "photo",
+      "size": "regular",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/participants-laptop",
+        "widths": [
+          480,
+          508
+        ],
+        "width": 508,
+        "height": 499,
+        "position": "50% 40%",
+        "alt": "Workshop participants working on their laptops during a hands-on session"
+      }
+    },
+    {
+      "id": "highlight-qa",
+      "title": "Questions answered in the room",
+      "caption": "Open Q&A",
+      "type": "photo",
+      "size": "regular",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/workshop-qa",
+        "widths": [
+          480,
+          672
+        ],
+        "width": 672,
+        "height": 549,
+        "position": "100% 50%",
+        "alt": "A participant asks a question while a facilitator holds a microphone during a Faith Works workshop"
+      }
+    },
+    {
+      "id": "highlight-masterclass-batch-1",
+      "title": "AI & Claude Masterclass, Batch 1",
+      "caption": "AI & Claude Masterclass — Batch 1",
+      "type": "photo",
+      "size": "wide",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/masterclass-room",
+        "widths": [
+          480,
+          960,
+          1345
+        ],
+        "width": 1345,
+        "height": 777,
+        "position": "100% 55%",
+        "alt": "A full room of participants at the Faith Works AI & Claude Masterclass, Batch 1"
+      }
+    },
+    {
+      "id": "highlight-session",
+      "title": "A Faith Works workshop session",
+      "caption": "Workshop session",
+      "type": "photo",
+      "size": "wide",
+      "date": null,
+      "url": null,
+      "image": {
+        "base": "assets/images/workshop-slides",
+        "widths": [
+          480,
+          960,
+          1280
+        ],
+        "width": 1280,
+        "height": 573,
+        "position": "50% 50%",
+        "alt": "A facilitator presenting slides to a seated workshop group"
+      }
+    }
+  ]
+}

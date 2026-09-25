@@ -1,0 +1,152 @@
+{
+  "_readme": "Faith Works events: the single source for every upcoming event on Home, Learn and Community. Add a record and it appears everywhere it belongs; no HTML changes. FIELDS: id + slug (stable ids) · title · shortTitle (optional, for tight spots) · type (workshop | masterclass | program | forum) + typeLabel (shown on the page) · status ('upcoming'; past moments go in event-highlights.json) · featured (true on ONE upcoming event: it leads Home and Community) · date: { day: '30', month: 'SEP', year: '2026' } drives the yellow date card and the sort order; null when not set yet · dateDisplay (optional human text for the schedule, e.g. a multi-session cohort) · dateLabel (shown when date is null, e.g. 'Dates to be announced') · location · audience · host · description · highlights (short bullets) · note (small print) · registrationUrl + registrationLabel: the ONE call to action (https:// links open in a new tab; undated events point to the notify form, community.html#register) · tags · image: every event has one ({ base + widths } for responsive files, or a plain path string with imageAlt). Until an event has its own photo, use one from a past Faith Works session and say so in image.caption.",
+  "events": [
+    {
+      "id": "ai-linkedin-b2b-growth-accelerator-2026",
+      "slug": "ai-linkedin-b2b-growth-system",
+      "status": "upcoming",
+      "featured": true,
+      "type": "program",
+      "typeLabel": "Cohort program",
+      "title": "AI + LinkedIn B2B Growth Accelerator",
+      "shortTitle": "AI + LinkedIn B2B Growth",
+      "description": "Turn your LinkedIn into a B2B growth system: build the AI systems that turn visibility into qualified pipeline, with Faith Works PH and CAP Hernandez.",
+      "date": {
+        "day": "30",
+        "month": "SEP",
+        "year": "2026"
+      },
+      "dateDisplay": "Cohort launches 30 September",
+      "location": "Face-to-face + Zoom",
+      "audience": "CEOs, founders, consultants, sales leaders, coaches & professionals",
+      "host": "Faith Works PH × CAP Hernandez",
+      "highlights": [
+        "Authority people understand, and content with a commercial purpose.",
+        "A prospecting and outreach engine, with follow-up that runs without you.",
+        "A pipeline connected to revenue. You leave with working tools, not notes."
+      ],
+      "note": "Three build levels, all starting 30 September: Authority, Pipeline Pro and Revenue Master.",
+      "registrationUrl": "https://faithph.ai/ai--linkedin-b2b-growth-system",
+      "registrationLabel": "Register",
+      "tags": [
+        "ai",
+        "business",
+        "linkedin",
+        "sales"
+      ],
+      "_confirm": "Year of the 30 September start (the program page gives no year).",
+      "image": {
+        "base": "assets/images/ai-linkedin",
+        "widths": [
+          480,
+          960,
+          1080
+        ],
+        "width": 1080,
+        "height": 1350,
+        "position": "50% 50%",
+        "alt": "Event poster for the AI + LinkedIn B2B Growth Accelerator with Faith Natividad and CAP Hernandez: Two Voices, One Mission. Authority Workshop starts September 30, 1:00–6:00 PM, House of Transformation, Ayala Malls The 30th, Pasig City."
+      }
+    },
+    {
+      "id": "ai-for-business-2026-09-25",
+      "slug": "ai-for-business-hands-on-workshop",
+      "status": "upcoming",
+      "type": "workshop",
+      "typeLabel": "Workshop",
+      "title": "AI for Business: Hands-On Workshop",
+      "shortTitle": "AI for Business",
+      "description": "Practical AI workflows for marketing, sales, and operations.",
+      "date": {
+        "day": "25",
+        "month": "SEP",
+        "year": "2026"
+      },
+      "location": "RK Bistro PH, Pampanga",
+      "audience": "Business owners, marketing, sales & operations teams",
+      "highlights": [
+        "Find where AI fits in the marketing, sales and operations work you already do.",
+        "Build and test a practical workflow with guidance, on your own laptop.",
+        "Leave with prompts and steps you can reuse the next working day."
+      ],
+      "note": "No technical background required.",
+      "registrationUrl": "https://faithph.ai/faithworks-aiforbusiness-registration",
+      "registrationLabel": "Register",
+      "tags": [
+        "ai",
+        "business"
+      ],
+      "image": {
+        "base": "assets/images/masterclass-batch3",
+        "widths": [
+          480,
+          960,
+          1440,
+          1920
+        ],
+        "width": 1920,
+        "height": 1080,
+        "position": "0% 50%",
+        "alt": "Participants of the Faith Works AI & Claude Masterclass, Batch 3, posing together in the session room",
+        "caption": "Past session · AI & Claude Masterclass, Batch 3"
+      }
+    },
+    {
+      "id": "ai-claude-masterclass-next",
+      "slug": "ai-claude-masterclass-next-batch",
+      "status": "upcoming",
+      "type": "masterclass",
+      "typeLabel": "Masterclass",
+      "title": "AI & Claude Masterclass: next batch",
+      "description": "Deeper sessions on a single tool or topic, for people ready to go past the basics.",
+      "date": null,
+      "dateLabel": "Dates to be announced",
+      "registrationUrl": "community.html#register",
+      "registrationLabel": "Get notified",
+      "tags": [
+        "ai"
+      ],
+      "image": {
+        "base": "assets/images/masterclass-room",
+        "widths": [
+          480,
+          960,
+          1345
+        ],
+        "width": 1345,
+        "height": 777,
+        "position": "100% 55%",
+        "alt": "A full room of participants at the Faith Works AI & Claude Masterclass, Batch 1",
+        "caption": "Past session · AI & Claude Masterclass, Batch 1"
+      }
+    },
+    {
+      "id": "forums-community-gatherings",
+      "slug": "forums-community-gatherings",
+      "status": "upcoming",
+      "type": "forum",
+      "typeLabel": "Forum",
+      "title": "Forums & community gatherings",
+      "description": "Conversations on AI, business and the future of work, and a chance to meet others learning the same things.",
+      "date": null,
+      "dateLabel": "Dates to be announced",
+      "registrationUrl": "community.html#register",
+      "registrationLabel": "Get notified",
+      "tags": [
+        "community"
+      ],
+      "image": {
+        "base": "assets/images/workshop-qa",
+        "widths": [
+          480,
+          672
+        ],
+        "width": 672,
+        "height": 549,
+        "position": "100% 50%",
+        "alt": "A participant asks a question while a facilitator holds a microphone during a Faith Works workshop",
+        "caption": "Past session · Faith Works workshop"
+      }
+    }
+  ]
+}

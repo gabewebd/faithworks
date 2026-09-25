@@ -1,0 +1,402 @@
+{
+  "_readme": "Faith Works Insights: the single source for every Insight card (Home, Learn, related lists) and the article page (insight.html?slug=…). The site sorts by date, newest first. FIELDS: id · slug (the URL id: insight.html?slug=<slug>; never change once shared) · title · category (label shown on cards) · topics (filter keys: ai, business, leadership, lifestyle, faith-purpose) · date (YYYY-MM-DD) · author · readTime · excerpt (cards + the reader's opening line) · featured (true on ONE Insight: it leads Home and Learn) · image (every Insight has one; image format below) · content (blocks, in order) · resources (ids from resources.json, shown as 'Put it into practice' at the end) · related (slugs of other Insights). CONTENT BLOCKS: {type:'paragraph', text} · {type:'heading', text} · {type:'subheading', text} · {type:'list', items:[text or {title, text}], ordered?:true} · {type:'quote', text, cite?} · {type:'callout', label, title?, text?, items?} (examples, prompts, notes) · {type:'takeaway', title, items} · {type:'image', image, caption?} · {type:'link', href, label, text?} · {type:'cta', title, text?, label, href}. Text may contain simple inline HTML (<a>, <em>, <strong>). Older short names still work: p = paragraph, h2 = heading. IMAGE FORMAT: { base: 'assets/images/name' + widths: [480, 960…] builds name-480.webp/.jpg …, or url: 'https://…' for a single file } + width, height, alt, position, and source (where a temporary stock photo came from; see docs/IMAGE-SOURCES.md).",
+  "insights": [
+    {
+      "id": "ai-is-not-another-niche-skill",
+      "slug": "ai-is-not-another-niche-skill",
+      "title": "AI Is Not Another Niche Skill. It Is Becoming a Foundational One.",
+      "category": "AI",
+      "topics": ["ai"],
+      "date": "2026-09-18",
+      "author": "Faith Works",
+      "readTime": "4 min read",
+      "featured": true,
+      "excerpt": "AI is becoming part of everyday professional work. The opportunity is not to replace expertise, but to combine existing skills with better tools, workflows, and judgment.",
+      "image": {
+        "base": "assets/images/temp-ai-everyday-work",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 1200,
+        "position": "50% 40%",
+        "alt": "A professional working on a laptop at a café table",
+        "source": "https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488"
+      },
+      "content": [
+        { "type": "paragraph", "text": "For a long time, “AI skills” sounded like something for engineers and data teams. That is changing quickly. AI assistants now sit inside the software most professionals already use: email, documents, spreadsheets, chat and search. You no longer need to build anything to use them. You need to know how to work with them." },
+        { "type": "paragraph", "text": "That makes AI less like a specialty and more like a baseline skill, in the same way spreadsheets, email and web search once were. Nobody lists “can use email” on a CV any more, but everyone is expected to. AI is heading the same way." },
+        { "type": "heading", "text": "How a specialist skill becomes a basic one" },
+        { "type": "paragraph", "text": "Spreadsheets are a useful comparison. At first they belonged to accountants and analysts. Then they became the default tool for budgets, schedules, inventories and sign-up lists. Most people never learned advanced formulas, but almost everyone learned enough to be useful. The skill didn’t disappear; it spread." },
+        { "type": "paragraph", "text": "“Foundational” doesn’t mean everyone becomes an AI expert. It means everyone needs a working level of literacy: enough to use the tools on their own tasks, recognize a weak output, and know when not to use them at all." },
+        { "type": "heading", "text": "What AI literacy actually looks like at work" },
+        { "type": "paragraph", "text": "In practice, working AI literacy comes down to five habits. None of them are technical." },
+        { "type": "list", "items": [
+          { "title": "Choosing the right tasks.", "text": "Drafting, summarizing, restructuring and brainstorming suit AI well. Final decisions, sensitive conversations and anything you can’t check do not." },
+          { "title": "Writing a clear brief.", "text": "Say who the output is for, what it should do, how long it should be and what good looks like. A vague request gets a vague answer." },
+          { "title": "Giving context.", "text": "Paste in the notes, the previous email, the outline. The tool only knows what you give it." },
+          { "title": "Checking the output.", "text": "Read it the way a careful editor would: facts, numbers, names, tone. AI can be confidently wrong." },
+          { "title": "Protecting information.", "text": "Know what your organization allows you to share with which tools, and never paste in data you wouldn’t want stored elsewhere." }
+        ] },
+        { "type": "callout", "label": "Example", "title": "A weekly update, done two ways", "text": "Take a typical weekly team update. Done by hand, it means scrolling through chats and notes, then writing from scratch. Done with AI, you paste in your rough notes, ask for a short update grouped under <em>done</em>, <em>in progress</em> and <em>blocked</em>, then check every item against what actually happened. The writing gets faster. The judgment about what matters, and whether it’s accurate, is still yours." },
+        { "type": "heading", "text": "What doesn’t change: your expertise" },
+        { "type": "paragraph", "text": "AI can draft, summarize, sort and suggest, but it doesn’t know your clients, your market, your team or your standards. The people who get the most from it bring that knowledge to every output. They know what good looks like, so they can direct the tool and catch its mistakes." },
+        { "type": "paragraph", "text": "That’s why experience becomes more valuable, not less. A junior colleague and a senior one can use the same tool. The senior one usually gets a better result, because they ask better questions and recognize a weak answer faster." },
+        { "type": "quote", "text": "AI is starting to look less like a specialty and more like basic literacy." },
+        { "type": "heading", "text": "What does change: the shape of the working day" },
+        { "type": "paragraph", "text": "Work that used to take an afternoon, like first drafts, research summaries, meeting notes and reformatting, can shrink to a fraction of the time. That leaves more room for the parts of the job that need a person: conversations, decisions, relationships and careful thinking." },
+        { "type": "paragraph", "text": "It also changes what “done” means. A first draft arrives sooner, so more of the work moves into reviewing, editing and deciding. Those are skills worth practising deliberately." },
+        { "type": "heading", "text": "Where people usually get stuck" },
+        { "type": "list", "items": [
+          "Waiting to find the “right” tool before starting. Any mainstream assistant is enough to learn the habits.",
+          "Treating AI like a search box: one short question, one answer, done. It works better as a conversation you refine.",
+          "Skipping context, then deciding the tool “isn’t good enough” when it guesses wrong.",
+          "Trusting the first output without checking it, then losing confidence after one mistake."
+        ] },
+        { "type": "takeaway", "title": "Where to start this week", "items": [
+          "Pick one task you repeat every week and do it with AI assistance, start to finish.",
+          "Write your request like a brief: audience, purpose, length, format.",
+          "Keep the prompts that work in one document, and reuse them.",
+          "Review every output before it goes anywhere. That step is yours."
+        ] },
+        { "type": "heading", "text": "The real shift" },
+        { "type": "paragraph", "text": "The professionals who do well over the next few years won’t necessarily be the most technical. They’ll be the ones who combine what they already know with tools that remove the busywork, and who keep their judgment switched on while they do it. That’s a skill anyone can build, one task at a time." },
+        { "type": "cta", "title": "Start with a structured first step", "text": "The Prompt Starter Kit & Tools Guide walks you through your first AI-assisted workflow, with prompts to adapt and a plain-language guide to choosing tools.", "label": "Get the Prompt Starter Kit", "href": "implement.html#access" }
+      ],
+      "resources": ["prompt-starter-kit", "opportunity-map"],
+      "related": ["your-day-is-already-full", "ai-assisted-research-without-losing-accuracy", "where-human-judgment-still-matters"]
+    },
+    {
+      "id": "ai-assisted-research-without-losing-accuracy",
+      "slug": "ai-assisted-research-without-losing-accuracy",
+      "title": "How to Research Faster With AI Without Losing Accuracy",
+      "category": "AI · Workflows",
+      "topics": ["ai", "business"],
+      "date": "2026-09-15",
+      "author": "Faith Works",
+      "readTime": "4 min read",
+      "excerpt": "AI can cut hours of reading down to minutes. The risk is speed without accuracy. A five-step workflow keeps the sources attached and the final check human.",
+      "image": {
+        "base": "assets/images/temp-research-workflow",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 1201,
+        "position": "50% 50%",
+        "alt": "A person taking notes with a pencil beside an open laptop",
+        "source": "https://unsplash.com/photos/person-holding-pencil-near-laptop-computer-5fNmWej4tAA"
+      },
+      "content": [
+        { "type": "paragraph", "text": "Market scans, competitor notes, proposal research, briefing papers: a lot of professional work means reading a great deal to write a little. It’s exactly the kind of work AI speeds up well, and exactly the kind where a confident mistake can travel a long way." },
+        { "type": "paragraph", "text": "The answer isn’t to avoid AI for research. It’s to use a workflow that keeps every claim traceable to a source, and keeps the final check with a person. Here is the five-step version we use and teach." },
+        { "type": "heading", "text": "Step 1 · Research: gather sources, not answers" },
+        { "type": "paragraph", "text": "Start by collecting material, not conclusions. Use an AI search tool that shows citations, or pull together the reports, articles and notes you already trust. Ask for sources and summaries, and keep the links to the originals." },
+        { "type": "callout", "label": "Prompt to adapt", "text": "“I’m researching [topic] for [audience]. Find recent, credible sources on [specific question]. For each one, give the title, publisher, date, link and a two-sentence summary. Flag anything older than [time frame].”" },
+        { "type": "heading", "text": "Step 2 · Organize: group findings by theme" },
+        { "type": "paragraph", "text": "Once you have material, ask AI to sort it into themes, and keep a note of which source each point came from. This is where tools that work only from your uploaded documents are useful: answers stay grounded in what you gave them." },
+        { "type": "paragraph", "text": "A simple table is enough: theme, finding, source. If a finding has no source, it doesn’t go in the table." },
+        { "type": "heading", "text": "Step 3 · Analyze: compare, spot patterns, list open questions" },
+        { "type": "paragraph", "text": "Now ask the harder questions. Where do sources agree? Where do they disagree? What’s missing? Asking AI for open questions and counter-arguments is often more useful than asking for a conclusion." },
+        { "type": "list", "items": [
+          "“Which findings appear in more than one independent source?”",
+          "“Where do these sources contradict each other, and why might that be?”",
+          "“What would someone who disagrees with this conclusion point to?”",
+          "“What don’t we know yet that would change the recommendation?”"
+        ] },
+        { "type": "heading", "text": "Step 4 · Draft: in your structure, not the tool’s" },
+        { "type": "paragraph", "text": "Decide the structure yourself: the question, what you found, what it means, what you recommend. Then ask AI to draft into that structure from your organized notes. You’ll get something closer to what you need, and it’s much easier to check." },
+        { "type": "callout", "label": "Example", "title": "A one-page competitor brief", "text": "Instead of “write a competitor analysis”, give the outline: <em>who the three competitors are, what each offers, how they price, where we differ, and two open questions</em>. Paste the organized findings underneath. Ask for one page, plain language, with sources in brackets after each point." },
+        { "type": "heading", "text": "Step 5 · Review: this step stays human" },
+        { "type": "paragraph", "text": "Before anything leaves your desk, check it yourself. AI can state things confidently that aren’t true, mix up figures, or attach a real source to a claim the source never made." },
+        { "type": "takeaway", "title": "The review checklist", "items": [
+          "Open the source for every number, date, name and quote. Does it say what the draft says it says?",
+          "Is each source recent enough and credible enough for this audience?",
+          "Is anything stated as fact that is really an opinion or an estimate?",
+          "Would you be comfortable if the reader checked every link?",
+          "Is any confidential information in the draft that shouldn’t be?"
+        ] },
+        { "type": "heading", "text": "Where this workflow helps most, and where to be careful" },
+        { "type": "paragraph", "text": "It works best for tasks with lots of reading and a short output: briefs, summaries, proposals, background notes. Be more careful with legal, financial, medical or regulatory questions. Use AI to find and organize material there, but rely on qualified people and primary sources for the conclusions." },
+        { "type": "heading", "text": "From one-off to repeatable" },
+        { "type": "paragraph", "text": "The first time through, the workflow will feel slower than just asking a question. By the third time, you’ll have prompts you reuse, a table format you like, and a review habit that takes minutes. That’s when it stops being an experiment and becomes a system your team can share." },
+        { "type": "cta", "title": "Get the workflow on one page", "text": "The AI-Assisted Research Workflow checklist puts the five steps and the review questions on a single sheet.", "label": "Get the checklist", "href": "implement.html#access" }
+      ],
+      "resources": ["research-workflow", "prompt-starter-kit"],
+      "related": ["ai-is-not-another-niche-skill", "where-human-judgment-still-matters", "from-learning-to-doing"]
+    },
+    {
+      "id": "your-day-is-already-full",
+      "slug": "your-day-is-already-full",
+      "title": "Your Day Is Already Full. AI Keeps Getting Bookmarked.",
+      "category": "AI · Productivity",
+      "topics": ["ai", "lifestyle"],
+      "date": "2026-09-11",
+      "author": "Faith Works",
+      "readTime": "3 min read",
+      "excerpt": "Most professionals aren’t short on interest in AI. They’re short on time to try it. The fix isn’t a free afternoon; it’s attaching AI to work you’re already doing.",
+      "image": {
+        "base": "assets/images/temp-full-day",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 2700,
+        "position": "50% 60%",
+        "alt": "Two professionals working side by side at laptops in an office",
+        "source": "https://unsplash.com/photos/a-couple-of-men-sitting-at-a-table-with-laptops-A9qQ8vE1Bmw"
+      },
+      "content": [
+        { "type": "paragraph", "text": "You’ve saved the tutorials. You’ve bookmarked the tools. You’ve told yourself you’ll sit down with it properly next week. Then Monday happens, and the inbox, the meetings and the deadlines take the time you meant to spend learning." },
+        { "type": "paragraph", "text": "That isn’t a motivation problem. It’s a design problem. Learning that needs a free afternoon will always lose to work that’s due today." },
+        { "type": "heading", "text": "Why “finding time” doesn’t work" },
+        { "type": "paragraph", "text": "Setting time aside to “learn AI” treats it as a separate project. Separate projects get postponed. They also tend to use made-up examples, so even when you do find the time, what you practise doesn’t carry over to real work." },
+        { "type": "paragraph", "text": "The alternative is simpler: don’t add a new task. Change how you do one that’s already on your list." },
+        { "type": "heading", "text": "Attach AI to work that’s already on your list" },
+        { "type": "paragraph", "text": "Look at today’s tasks and pick one that involves writing, summarizing or reorganizing information. Do that task with AI assistance. You were going to spend the time anyway, so the learning costs little extra, and at the end you have finished work, not just a lesson." },
+        { "type": "heading", "text": "Five good first candidates" },
+        { "type": "list", "ordered": true, "items": [
+          { "title": "Meeting notes into follow-ups.", "text": "Paste your rough notes and ask for a short follow-up email with decisions, owners and dates." },
+          { "title": "Long documents into summaries.", "text": "Ask for the key points and open questions before you read the whole thing, so you know where to focus." },
+          { "title": "Routine emails into first drafts.", "text": "Replies you write often, like confirmations, polite declines and status updates, are ideal." },
+          { "title": "Messy lists into tidy tables.", "text": "Reformatting contact lists, schedules or inventories is tedious for people and quick for AI. Check the result." },
+          { "title": "Next week into a plan.", "text": "Paste your commitments and ask for a realistic schedule, then adjust it to how you actually work." }
+        ] },
+        { "type": "callout", "label": "Prompt to adapt", "title": "Meeting notes → follow-up email", "text": "“Here are my notes from a meeting with [who] about [topic]. Write a short follow-up email that thanks them, lists the decisions we made, lists each action with its owner and due date, and asks them to confirm. Keep it under 150 words and friendly but professional. Notes: [paste notes]”" },
+        { "type": "heading", "text": "Keep a small prompt file" },
+        { "type": "paragraph", "text": "When a prompt works, save it. A single document with five or six reliable prompts, each with blanks to fill in, will save you more time than any new tool. Over a few weeks it becomes your personal toolkit." },
+        { "type": "heading", "text": "What to expect in the first week" },
+        { "type": "paragraph", "text": "Your first few outputs will be uneven. That’s normal. Instead of starting again, tell the tool what to change: shorter, warmer, fewer bullet points, add the deadline. Refining is the skill. Most people who give up do so after one mediocre first draft." },
+        { "type": "takeaway", "title": "A simple first week", "items": [
+          "Monday: turn meeting notes into a follow-up email.",
+          "Wednesday: summarize a long document before you read it in full.",
+          "Friday: draft next week’s plan, then edit it into shape.",
+          "Each time: save the prompt if it worked, and note what you changed."
+        ] },
+        { "type": "heading", "text": "Small and repeated beats big and rare" },
+        { "type": "paragraph", "text": "Three small uses a week, on real work, build the habit faster than one long session you keep postponing. After a month, you won’t be “learning AI” any more. You’ll just be working, a bit faster, with a bit more room for the parts of the job that need you." },
+        { "type": "cta", "title": "Want more structure?", "text": "The AI-Powered Daily Work track of the AI Workforce Accelerator builds this into a portfolio of AI-assisted workflows for your own role.", "label": "See the program", "href": "implement.html#program" }
+      ],
+      "resources": ["prompt-starter-kit", "program"],
+      "related": ["a-learning-rhythm-that-fits-real-life", "ai-is-not-another-niche-skill", "from-learning-to-doing"]
+    },
+    {
+      "id": "from-learning-to-doing",
+      "slug": "from-learning-to-doing",
+      "title": "From Learning to Doing: Why Applied Practice Matters",
+      "category": "Business · Leadership",
+      "topics": ["business", "leadership"],
+      "date": "2026-09-04",
+      "author": "Faith Works",
+      "readTime": "3 min read",
+      "excerpt": "Watching a demo is not the same as using a tool on your own work. Skill shows up when you apply it, get stuck, and work it out.",
+      "image": {
+        "base": "assets/images/temp-learning-to-doing",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 1013,
+        "position": "50% 40%",
+        "alt": "Two colleagues working through a task together on a laptop",
+        "source": "https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI"
+      },
+      "content": [
+        { "type": "paragraph", "text": "Most of us have left a good talk or training session feeling inspired, then gone back to our desks and changed nothing. The ideas were sound. The examples made sense. But a week later, work looks exactly the same." },
+        { "type": "paragraph", "text": "The gap usually isn’t knowledge. It’s practice: specifically, practice on your own work, with your own messy inputs, while help is still close by." },
+        { "type": "heading", "text": "The gap between knowing and doing" },
+        { "type": "paragraph", "text": "Demonstrations are designed to go smoothly. The input is clean, the prompt is polished, and the output is good the first time. Real work isn’t like that. Your notes are half-finished, your spreadsheet has inconsistent columns, and your client wants something slightly different from what the template assumed." },
+        { "type": "paragraph", "text": "When you only watch, you never meet those problems. So the first time you try on your own, the tool seems to “not work”, and it’s easy to conclude it isn’t for you." },
+        { "type": "heading", "text": "Why practice beats information" },
+        { "type": "paragraph", "text": "When you apply a tool to your own task, you run into the real questions: How much context does it need? What do I do when the output is almost right? How do I check this? Working through those questions is where skill is actually built, and it sticks, because it’s attached to something you care about." },
+        { "type": "image", "image": {
+          "base": "assets/images/participants-laptop",
+          "widths": [480, 508],
+          "width": 508,
+          "height": 499,
+          "position": "50% 40%",
+          "alt": "Workshop participants working on their laptops during a hands-on Faith Works session"
+        }, "caption": "Hands-on work at a Faith Works session: real tasks, on your own laptop." },
+        { "type": "heading", "text": "What applied practice looks like" },
+        { "type": "list", "items": [
+          { "title": "Bring a real task.", "text": "A report you have to write, a process you want to speed up, a proposal that’s due. Not a hypothetical." },
+          { "title": "Build something.", "text": "Leave with a working prompt, a draft, a checklist or a small workflow, not just notes." },
+          { "title": "Get stuck while help is nearby.", "text": "The most useful moments are when something doesn’t work and someone can show you why." },
+          { "title": "Come back to it.", "text": "Use what you built again a week later, and improve it." }
+        ] },
+        { "type": "callout", "label": "Example", "title": "Two ways to spend an afternoon", "text": "One option: watch three tutorials on AI for writing. Another: take the proposal you owe a client this week, build an outline with AI, draft one section, and edit it until you’d actually send it. The second takes the same time, and at the end you have a finished section and a method you can reuse." },
+        { "type": "heading", "text": "Make it stick after the session" },
+        { "type": "paragraph", "text": "What happens in the seven days after learning something matters as much as the session itself. Use the new method again within a week, on a different task. Show a colleague what you built, since explaining it is its own kind of practice. And write down the one thing that made the biggest difference, so you don’t have to rediscover it." },
+        { "type": "quote", "text": "The gap usually isn’t knowledge. It’s practice." },
+        { "type": "takeaway", "title": "How to make learning stick", "items": [
+          "Bring a real task, not a hypothetical one.",
+          "Leave with something you’ve built, not just notes.",
+          "Use it again within seven days, on a different task.",
+          "Come back after a week and improve it."
+        ] },
+        { "type": "heading", "text": "Why programs end in something concrete" },
+        { "type": "paragraph", "text": "This is the idea behind how Faith Works programs are structured. Each track of the AI Workforce Accelerator ends in something you can use: a 30-day action plan, an AI-assisted workflow portfolio, an implementation roadmap, or one priority AI solution built with a coach. The output is the proof that learning became doing." },
+        { "type": "cta", "title": "See what each track leaves you with", "label": "Explore the AI Workforce Accelerator", "href": "implement.html#program" }
+      ],
+      "resources": ["program", "action-plan"],
+      "related": ["ai-is-not-another-niche-skill", "where-human-judgment-still-matters", "a-learning-rhythm-that-fits-real-life"]
+    },
+    {
+      "id": "where-human-judgment-still-matters",
+      "slug": "where-human-judgment-still-matters",
+      "title": "Where Human Judgment Still Matters",
+      "category": "Leadership",
+      "topics": ["leadership"],
+      "date": "2026-08-28",
+      "author": "Faith Works",
+      "readTime": "3 min read",
+      "excerpt": "AI can produce an answer quickly. Leaders still decide whether it’s the right one, and whether it’s right for their people.",
+      "image": {
+        "base": "assets/images/temp-leadership",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 1208,
+        "position": "50% 45%",
+        "alt": "A woman leading a discussion with her team around a table",
+        "source": "https://unsplash.com/photos/a-group-of-people-sitting-around-a-table-with-laptops-cNGvcAvxHAo"
+      },
+      "content": [
+        { "type": "paragraph", "text": "As AI takes on more drafting, sorting and summarizing, it’s tempting to think leadership becomes a question of which tools to buy. It isn’t. The more work AI can do, the more important three human decisions become: what to hand over, what goes out the door, and how the change feels to the people doing the work." },
+        { "type": "heading", "text": "1. Deciding what to hand over" },
+        { "type": "paragraph", "text": "Not every task should be automated, even when it could be. A useful way to decide is to look at three things together: how often the task happens, how costly a mistake would be, and whether a person’s attention is the point." },
+        { "type": "paragraph", "text": "A weekly stock report is frequent, low-risk and impersonal: a good candidate. A message to a client after a service failure is rare and relationship-heavy. AI can help draft it, but the person sending it should write it in their own words." },
+        { "type": "callout", "label": "A simple sorting guide", "items": [
+          "<strong>Repetitive and low-risk:</strong> AI drafts, a person checks.",
+          "<strong>Important or high-risk:</strong> a person leads, AI assists with research or structure.",
+          "<strong>Relationship-centred:</strong> a person does it. AI stays out, or helps only with preparation."
+        ] },
+        { "type": "heading", "text": "2. Deciding what goes out the door" },
+        { "type": "paragraph", "text": "Anything that reaches a client, a partner or the public needs a human review step. The mistake many teams make is assuming someone will remember to check. Build the review into the workflow instead: name who checks, what they check, and when." },
+        { "type": "list", "items": [
+          "Are the facts, figures and names correct, and can we point to where they came from?",
+          "Does it sound like us, and is the tone right for this reader?",
+          "Is there anything confidential in it that shouldn’t be?",
+          "Would we be comfortable if the reader knew how it was produced?"
+        ] },
+        { "type": "heading", "text": "3. Deciding how the change feels" },
+        { "type": "paragraph", "text": "When tools change how work gets done, people worry, often quietly. Will this replace me? Will I look slow while I learn? Am I allowed to use it? Leaders can’t solve that with a software licence." },
+        { "type": "paragraph", "text": "What helps is clarity and support: explain why the change is happening, be specific about what’s changing and what isn’t, give people time to practise on real work, and recognize the people who figure out good uses and share them." },
+        { "type": "quote", "text": "The more work AI can do, the more important the human decisions around it become." },
+        { "type": "heading", "text": "Write guidelines your team can actually follow" },
+        { "type": "paragraph", "text": "A one-page set of guidelines does more than a long policy nobody reads. It only needs to answer a few questions clearly:" },
+        { "type": "list", "items": [
+          "Which tools are approved for work use?",
+          "What information must never be pasted into an AI tool?",
+          "Which outputs always need a review before they’re sent, and by whom?",
+          "When do we tell clients or partners that AI was used?",
+          "Who do people ask when they’re unsure?"
+        ] },
+        { "type": "takeaway", "title": "Three decisions that stay human", "items": [
+          "What to hand over, and what needs a person’s attention.",
+          "What goes out the door, with a named review step built in.",
+          "How the change feels to the people doing the work."
+        ] },
+        { "type": "heading", "text": "Leading the change, not just approving it" },
+        { "type": "paragraph", "text": "The leaders who handle this well don’t need to be the most technical people in the room. They make the decisions only they can make, give their teams clear boundaries, and create room to learn. That’s what turns scattered experiments into practical adoption." },
+        { "type": "cta", "title": "Bring this to your team", "text": "Scale covers systems, transformation and leadership for organizations moving from AI experiments to everyday practice.", "label": "Explore Scale: Leadership", "href": "scale.html#leadership" }
+      ],
+      "resources": ["opportunity-map", "program"],
+      "related": ["purpose-before-productivity", "ai-assisted-research-without-losing-accuracy", "from-learning-to-doing"]
+    },
+    {
+      "id": "purpose-before-productivity",
+      "slug": "purpose-before-productivity",
+      "title": "Purpose Before Productivity",
+      "category": "Faith & Purpose",
+      "topics": ["faith-purpose"],
+      "date": "2026-08-21",
+      "author": "Faith Works",
+      "readTime": "3 min read",
+      "excerpt": "Better tools make it easier to do more. Purpose is what helps you decide what’s worth doing.",
+      "image": {
+        "base": "assets/images/temp-growth",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 2400,
+        "position": "50% 35%",
+        "alt": "A professional pausing to think in a warehouse aisle",
+        "source": "https://unsplash.com/photos/woman-in-black-long-sleeve-shirt-standing-near-brown-wooden-shelf-3BdlPx8sBPw"
+      },
+      "content": [
+        { "type": "paragraph", "text": "Every new tool promises more output: more posts, more emails, more reports, more done before lunch. Some of that is genuinely good news. But it’s worth pausing before chasing it, because “more” is only useful if it’s more of the right thing." },
+        { "type": "heading", "text": "More output isn’t the same as better work" },
+        { "type": "paragraph", "text": "When producing something becomes cheap, the scarce thing is no longer the effort to make it. It’s the judgment about whether it should exist at all. A team that uses AI to send twice as many messages hasn’t necessarily served anyone better. It may just have added to everyone’s inbox, including its own." },
+        { "type": "paragraph", "text": "Productivity tools amplify whatever direction you’re already heading in. If that direction is clear, they help you get there faster. If it isn’t, they help you get lost faster." },
+        { "type": "heading", "text": "Three questions before you optimize" },
+        { "type": "list", "ordered": true, "items": [
+          { "title": "What is this work for?", "text": "Name the outcome, not the activity. “Clients understand their options” is an outcome; “send the proposal” is an activity." },
+          { "title": "Who does it serve?", "text": "A client, a colleague, a community, your family? Knowing who helps you judge what “good” looks like." },
+          { "title": "What will I do with the time I save?", "text": "If you don’t decide, the time will quietly fill with more of the same." }
+        ] },
+        { "type": "callout", "label": "Example", "title": "Where do the saved hours go?", "text": "Suppose a founder uses AI to cut several hours a week from admin: invoices, scheduling, first drafts of routine emails. One version of that story ends with those hours absorbed by more admin. Another ends with a standing block for client conversations, a weekly hour to mentor a team member, and dinner at home on Thursdays. The tools are identical. The difference is a decision made in advance." },
+        { "type": "heading", "text": "Decide where the saved time goes" },
+        { "type": "paragraph", "text": "Before you streamline something, write down what the recovered time is for. Put it in your calendar as if it were a meeting. Protect it the same way. Efficiency that isn’t pointed at anything tends to disappear." },
+        { "type": "heading", "text": "Keep the human parts human" },
+        { "type": "paragraph", "text": "Some work is valuable precisely because a person does it: encouragement, apology, gratitude, counsel, prayer, care. AI can help you prepare, remember and organize, but these moments are the point of the work, not overhead to be reduced." },
+        { "type": "quote", "text": "Better tools make it easier to do more. Purpose is what helps you decide what’s worth doing." },
+        { "type": "takeaway", "title": "A five-minute weekly reflection", "items": [
+          "What did I spend the most time on this week, and did it matter?",
+          "Where did a tool save me time, and where did that time go?",
+          "What is one thing I want to protect time for next week?",
+          "Is there anything I automated that I should do myself?"
+        ] },
+        { "type": "heading", "text": "Working from purpose" },
+        { "type": "paragraph", "text": "Faith Works talks about practical education and purposeful growth together for a reason. Skills and systems matter, but they serve something bigger: the people, the craft and the calling behind the work. Start there, and the tools become a way to do more of what matters, rather than more of everything." }
+      ],
+      "resources": ["opportunity-map"],
+      "related": ["where-human-judgment-still-matters", "a-learning-rhythm-that-fits-real-life", "your-day-is-already-full"]
+    },
+    {
+      "id": "a-learning-rhythm-that-fits-real-life",
+      "slug": "a-learning-rhythm-that-fits-real-life",
+      "title": "A Learning Rhythm That Fits Real Life",
+      "category": "Lifestyle",
+      "topics": ["lifestyle"],
+      "date": "2026-08-14",
+      "author": "Faith Works",
+      "readTime": "3 min read",
+      "excerpt": "You don’t need whole days. Short, regular sessions tied to real work add up.",
+      "image": {
+        "base": "assets/images/temp-faith-ai",
+        "widths": [480, 960, 1440, 1800],
+        "width": 1800,
+        "height": 3200,
+        "position": "50% 70%",
+        "alt": "A young professional smiling while working on a laptop",
+        "source": "https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU"
+      },
+      "content": [
+        { "type": "paragraph", "text": "Most professional learning is planned around big blocks of time: a full-day course, a weekend of catching up, a “deep dive” scheduled for a quieter month that never arrives. For people with full jobs, families and commitments, that model rarely works." },
+        { "type": "paragraph", "text": "A better approach is a rhythm: short, regular sessions tied to real work, with an occasional deeper session to stretch further." },
+        { "type": "heading", "text": "Why short and regular beats long and rare" },
+        { "type": "paragraph", "text": "Short sessions are easier to protect. Fifteen minutes survives a busy week; a free afternoon usually doesn’t. Regular practice also means you come back to an idea before you’ve forgotten it, which is how skills settle in." },
+        { "type": "paragraph", "text": "And because each session uses a real task, nothing is wasted. Even on a week when you learn little, you’ve still done the work." },
+        { "type": "heading", "text": "Build the rhythm in four steps" },
+        { "type": "list", "ordered": true, "items": [
+          { "title": "Choose a slot.", "text": "Pick the same fifteen minutes, two or three times a week. Right after lunch or before your last meeting works well for many people." },
+          { "title": "Bring one real task.", "text": "Something already on your list: an email to draft, notes to summarize, a document to restructure." },
+          { "title": "Try one thing.", "text": "One new prompt, one new tool feature, or one new way of giving context. Just one." },
+          { "title": "Write one line.", "text": "What worked, what didn’t, what you’d try next time." }
+        ] },
+        { "type": "callout", "label": "Example", "title": "A four-week starting rhythm", "items": [
+          "<strong>Week 1:</strong> summaries. Long emails, reports and meeting notes.",
+          "<strong>Week 2:</strong> first drafts. Routine emails and short documents.",
+          "<strong>Week 3:</strong> research. Gathering and organizing sources, with the links kept.",
+          "<strong>Week 4:</strong> review. Look back at your notes and keep the three prompts you used most."
+        ] },
+        { "type": "heading", "text": "Keep a simple learning log" },
+        { "type": "paragraph", "text": "A log doesn’t need to be elaborate. A note on your phone with three columns (the task, what you tried, what worked) is enough. After a month you’ll have a record of what actually helps you, which is more useful than any general list of tips." },
+        { "type": "heading", "text": "Add a deeper session now and then" },
+        { "type": "paragraph", "text": "Regular practice builds the habit. Occasional deeper sessions, like a hands-on <a href=\"community.html#events\">workshop</a>, stretch you further: you try things you wouldn’t attempt alone, ask questions, and see how others are applying the same tools. Between sessions, a community of people learning the same things keeps the momentum going." },
+        { "type": "takeaway", "title": "Try this week", "items": [
+          "Choose one fifteen-minute slot and protect it.",
+          "Use it on a real task, not a tutorial.",
+          "Write down one thing that worked.",
+          "Repeat twice more before the week ends."
+        ] },
+        { "type": "heading", "text": "Learning as part of the week" },
+        { "type": "paragraph", "text": "The goal isn’t to become a full-time student of AI. It’s to make learning a normal part of how you work, small enough to keep doing and useful enough to be worth it. A few minutes, a few times a week, adds up faster than you’d expect." },
+        { "type": "cta", "title": "Keep learning between sessions", "text": "Join the Faith Works Community to share what you’re applying and stay connected between events.", "label": "Join the community", "href": "community.html#connection" }
+      ],
+      "resources": ["prompt-starter-kit"],
+      "related": ["your-day-is-already-full", "purpose-before-productivity", "from-learning-to-doing"]
+    }
+  ]
+}

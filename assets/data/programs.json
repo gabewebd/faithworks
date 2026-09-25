@@ -1,0 +1,72 @@
+{
+  "_readme": "Structured programs (Implement #program). One object per program; tracks render as tabs. FIELDS: id · title · summary · image (every program has one) · ctaLabel + url (the one call to action) · tracks: [{ id, title, summary, points: [], output }]. CONFIRM the track ↔ output pairing and track descriptions before launch.",
+  "programs": [
+    {
+      "id": "ai-workforce-accelerator",
+      "title": "AI Workforce Accelerator",
+      "summary": "Practical learning for Filipino professionals, business owners, leaders, and teams. Four tracks, each ending in something you can use.",
+      "ctaLabel": "Ask about the program",
+      "url": "scale.html#enquire",
+      "image": {
+        "base": "assets/images/temp-coaching",
+        "widths": [
+          480,
+          960,
+          1440,
+          1800
+        ],
+        "width": 1800,
+        "height": 2700,
+        "position": "50% 35%",
+        "alt": "Two people working through a problem together at a laptop",
+        "source": "https://unsplash.com/photos/two-men-are-looking-at-a-laptop-on-a-table-3HduTMXyzFc"
+      },
+      "tracks": [
+        {
+          "id": "ai-ready-professional",
+          "title": "AI-Ready Professional",
+          "summary": "A working foundation: what today's AI tools can do, how to prompt them well, and how to use them responsibly at work.",
+          "points": [
+            "Core tools and prompting",
+            "Safe, responsible use at work",
+            "Your first AI-assisted tasks"
+          ],
+          "output": "30-Day AI Workforce Action Plan"
+        },
+        {
+          "id": "ai-powered-daily-work",
+          "title": "AI-Powered Daily Work",
+          "summary": "AI inside the work you already do every day: writing, research, reporting and communication.",
+          "points": [
+            "Map your recurring tasks",
+            "Build repeatable AI-assisted workflows",
+            "Refine them on real work"
+          ],
+          "output": "An AI-assisted workflow portfolio"
+        },
+        {
+          "id": "implementation-leadership",
+          "title": "Implementation & Leadership",
+          "summary": "For people leading AI adoption in a team or business: where it fits, how to roll it out, and how to bring people with you.",
+          "points": [
+            "Prioritize use cases with the AI Opportunity Map",
+            "Plan the roll-out, with review steps built in",
+            "Communicate the change to your team"
+          ],
+          "output": "An implementation portfolio + 90-day roadmap"
+        },
+        {
+          "id": "coaching",
+          "title": "Personalized 1:1 Coaching",
+          "summary": "One-to-one guidance on your role or business, focused on the one problem that matters most right now.",
+          "points": [
+            "A session plan built around your goals",
+            "Hands-on help building and testing",
+            "Follow-up to refine the result"
+          ],
+          "output": "One priority AI solution"
+        }
+      ]
+    }
+  ]
+}

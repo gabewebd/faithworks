@@ -1,0 +1,54 @@
+{
+  "_readme": "Success stories and testimonials: rendered on Home (#stories). TESTIMONIALS (what is here now): id · status ('published') · name · quote — the person's own words, exactly as given (keep their wording, punctuation and emojis; never polish or shorten). No photos: a testimonial is its quote and name. When every entry is a testimonial they all show as equal quote cards (data-fw-limit on the section sets the maximum). STORIES (the longer format, optional): id · title · summary · category · image + imageAlt · url · quote · status ('published' | 'draft'); the first story leads with its photo. showDrafts: false hides drafts. NEVER invent a person, quote or result.",
+  "showDrafts": false,
+  "stories": [
+    {
+      "id": "testimonial-vanhessa-roset",
+      "status": "published",
+      "name": "Vanhessa Roset",
+      "quote": "I love Faithworks PH! Very intentional and magaling mag transfer ng knowledge and skills. Faith is an amazing leader too! ❤️ I love all her team members as well. They are the best"
+    },
+    {
+      "id": "testimonial-richard-noromor",
+      "status": "published",
+      "name": "Richard Noromor",
+      "quote": "Sulit! Highly recommended even if you're not techy. Super hands-on training and you'll learn plenty of AI tools you can actually use at work and sa daily life. 👍"
+    },
+    {
+      "id": "testimonial-marga-cayetano",
+      "status": "published",
+      "name": "Marga Cayetano",
+      "quote": "Faith Works is the best venue (wherever they are) to learn about AI tools! Only learn from the best!"
+    },
+    {
+      "id": "testimonial-zelle-jeremias-herbolario",
+      "status": "published",
+      "name": "Zelle Jeremias Herbolario",
+      "quote": "Such a great experience at the AI Employees Workshop! 🤖 Learned a lot, met amazing people, and got so many ideas I'm excited to apply. Definitely worth it! 🙌"
+    },
+    {
+      "id": "testimonial-leonalyn-dela-cruz",
+      "status": "published",
+      "name": "Leonalyn Dela Cruz",
+      "quote": "Grabe sa learning and giving si Miss Faith"
+    },
+    {
+      "id": "testimonial-carl-cortez-guinto",
+      "status": "published",
+      "name": "Carl Cortez Guinto",
+      "quote": "FaithWorks AI Workshop was a great experience. The sessions were meaningful, practical, a lot of learnings. I appreciated the welcoming atmosphere and the opportunity to learn and reflect. Overall, it was a worthwhile and inspiring workshop."
+    },
+    {
+      "id": "testimonial-jake-vistro",
+      "status": "published",
+      "name": "Jake Vistro",
+      "quote": "Attending Faith Works PH training is an opportunity to learn and discover AI and digital products. Thanks Coach Faith."
+    },
+    {
+      "id": "testimonial-marjorie-portuguese",
+      "status": "published",
+      "name": "Marjorie Portuguese",
+      "quote": "A fruitful and eye-opening AI training at Faith Works! It opened up so many new possibilities and gave me a deeper appreciation of how AI can help us work smarter, create better, and explore new opportunities. Excited to apply what I've learned and continue discovering what's possible ✨"
+    }
+  ]
+}

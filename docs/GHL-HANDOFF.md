@@ -1,11 +1,11 @@
 # GoHighLevel handoff
 
-The site is six HTML pages (`index`, `learn`, `implement`, `scale`, `community`, `about`) plus one `css/style.css`, one `js/main.js` and `assets/`. Every page uses the same CSS and JS.
+The site is six HTML pages (`index`, `learn`, `implement`, `scale`, `community`, `about`), the Insight page `insight.html`, one `css/style.css`, one `js/main.js`, and `assets/` (images, icons, and the JSON content in `assets/data/`). Every page uses the same CSS and JS.
 
 ## Steps
 1. **Upload `css/style.css` to the CDN.**
 2. **Upload `js/main.js` to the CDN.**
-3. **Upload the assets.** Put `assets/images/*` and `assets/icons/*` on the CDN or in the GHL media library.
+3. **Upload the assets.** Put `assets/images/*`, `assets/icons/*` and `assets/data/*.json` on the CDN, keeping the folder structure next to `js/` (`CDN_URL/js/main.js`, `CDN_URL/assets/data/…`). `main.js` finds the JSON and images relative to its own URL. If the JSON lives elsewhere, point to it on the script tag: `<script src="CDN_URL/js/main.js" data-fw-data="https://…/data/" defer></script>`.
 4. **Add the stylesheets** to GHL's site-wide **head** code:
    ```html
    <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,8 +29,14 @@ The site is six HTML pages (`index`, `learn`, `implement`, `scale`, `community`,
    - Replace the "Register" links with GHL forms or calendars.
    - Replace the footer `<form>` with a GHL form, but keep the `fw-footer__join` wrapper.
 
+## Dynamic content (JSON)
+- Elements with `data-fw-render="…"` are filled from the JSON (insight cards, events, resources, social icons). Paste them as they are, empty; `main.js` renders them.
+- **Insights:** the static version opens each Insight at `insight.html?slug=…`. In GHL, either publish an `insight` page containing the `insight.html` `<main>` and set `data-fw-insight-page="/insight"` on the script tag, or move each Insight into GHL's blog/CMS as its own page and change the card links.
+- **Events:** every registration link lives in `events.json` (`registrationUrl`), never in the HTML. The featured event (`featured: true`) leads Home and Community; Scale's growth section and the related-link lists pick it up too.
+- **JSON on a CDN:** upload `assets/data/` to the project CDN and set `data-fw-data="https://…/data/"` on the `main.js` script tag. The same JS fetches it; no server needed. Keep image paths in the JSON absolute (`https://…`) or relative to the site root.
+
 ## Good to know
 - **Each section's banner comment** in `index.html` says what it needs and what's still a placeholder.
-- **JavaScript is optional per section.** Without it, content shows without animation, and "Menu" jumps to the footer links.
+- **JavaScript** is needed for the JSON-driven content. Without it the static structure still shows, without animation, and "Menu" jumps to the footer links.
 - **If the CDN is slow,** content can briefly appear and then animate in once `main.js` loads. To avoid that, also add `<script>document.documentElement.classList.add("fw-js")</script>` to the head.
 - **Picture elements:** if GHL strips `<picture>`, a single `<img src="…">` is fine.
