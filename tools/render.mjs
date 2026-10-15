@@ -92,22 +92,31 @@ function ctaFor(p) {
   return { waitlist: "Join the waitlist", inquiry: "Ask about the next run", planned: "Register your interest", open: "Register" }[p.statusKey] || "Ask about this program";
 }
 
-// Home: editorial rows (program → what you leave with → an example output)
+// Home: bento of the three open-track programs. One featured card (Charcoal panel) spans two rows;
+// the other two sit beside it on solid Faith Pink and AI Yellow. Each colour panel carries a static
+// example of what a learner actually produces; the white body says what you leave with.
+const BENTO_TONE = { "ai-workforce-accelerator": "ink", "ai-linkedin-b2b-growth": "pink", "ai-websites-workflow-building": "yellow" };
+// The approved homepage's typographic marks for each pathway
+const BENTO_SYMBOL = { "ai-workforce-accelerator": "[ AI ]", "ai-linkedin-b2b-growth": "in ↗", "ai-websites-workflow-building": "↗_" };
 export function programRowsHome() {
-  return `<div class="outputs">${D.programs.filter((p) => p.statusKey !== "planned" || p.slug === "ai-websites-workflow-building").map((p) => `
-      <article class="outputs__row outputs__row--${p.tone}">
-        <div class="outputs__program">
-          <p class="outputs__cat">${esc(p.category)}</p>
+  const picks = D.programs.filter((p) => BENTO_TONE[p.slug]);
+  return `<div class="bento">${picks.map((p, i) => `
+      <article class="bento__card bento__card--${BENTO_TONE[p.slug]}${i === 0 ? " bento__card--feature" : ""}">
+        <div class="bento__art">
+          <p class="bento__labels">${esc(p.category)}</p>
+          <p class="bento__symbol" aria-hidden="true">${esc(BENTO_SYMBOL[p.slug])}</p>
+          ${preview(p.preview)}
+        </div>
+        <div class="bento__body">
           <h3><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
-          <p>${esc(p.summary)}</p>
-          ${badge(p.statusKey, p.statusLabel)}
+          <p class="bento__summary">${esc(p.summary)}</p>
+          <p class="bento__leave">You leave with</p>
+          ${list(p.outputs, "ticks bento__list")}
+          <div class="bento__foot">
+            <a class="btn btn--light" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            ${badge(p.statusKey, p.statusLabel)}
+          </div>
         </div>
-        <div class="outputs__leave">
-          <h4>You leave with</h4>
-          ${list(p.outputs, "outputs__list")}
-          <a class="text-link" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="link-arrow" aria-hidden="true">↗</span></a>
-        </div>
-        <div class="outputs__example">${preview(p.preview)}</div>
       </article>`).join("")}
     </div>`;
 }
