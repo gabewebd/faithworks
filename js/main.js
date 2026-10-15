@@ -1,26 +1,101 @@
 /* ==========================================================================
    Faith Works — single-page interactions
-   1. Navigation  2. Examples  3. Learning journey (+ build motif stage)
-   4. Dialog: programs, inquiry brief, design notes  5. Line-draw reveals
+   1. Helpers  2. Motion setup (split headings, draw paths, reveals)
+   3. Header + navigation  4. Pointer parallax  5. Tablists (examples, journey)
+   6. Pathway selector  7. Gallery loop  8. Dialogs: programs, inquiry, notes
+   Motion lives in CSS keyframes; this file only adds/removes state classes.
    ========================================================================== */
 (function () {
   "use strict";
 
+  /* ---- 1. Helpers --------------------------------------------------------- */
   var doc = document;
+  var root = doc.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  doc.documentElement.classList.add("js");
+  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  function $(sel, root) { return (root || doc).querySelector(sel); }
-  function $$(sel, root) { return Array.prototype.slice.call((root || doc).querySelectorAll(sel)); }
-
-  // Swap content with a short cross-fade (skipped when motion is reduced)
+  function $(sel, ctx) { return (ctx || doc).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  // Restart a CSS keyframe sequence by re-applying its trigger class
+  function replay(el, cls) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+  // Cross-fade content in place (skipped when motion is reduced)
   function swap(el, update) {
     if (reduceMotion) { update(); return; }
     el.classList.add("is-swapping");
-    setTimeout(function () { update(); el.classList.remove("is-swapping"); }, 140);
+    setTimeout(function () { update(); el.classList.remove("is-swapping"); }, 200);
+  }
+  // Type text out character by character (the full text stays in the HTML for no-JS / reduced motion)
+  function typeOut(el, delay) {
+    if (!el || reduceMotion) return;
+    var full = el.getAttribute("data-text") || el.textContent;
+    el.setAttribute("data-text", full);
+    clearTimeout(el._typing);
+    el.textContent = "";
+    var i = 0;
+    function tick() {
+      el.textContent = full.slice(0, ++i);
+      if (i < full.length) el._typing = setTimeout(tick, 34 + (i % 5) * 6);
+    }
+    el._typing = setTimeout(tick, delay || 0);
+  }
+  function stagger(list, prop) {
+    list.forEach(function (el, i) { el.style.setProperty(prop || "--c", i); });
   }
 
-  /* ---- 1. Navigation ------------------------------------------------------ */
+  /* ---- 2. Motion setup ---------------------------------------------------- */
+  // Headings marked data-split: each <br>-separated line gets its own mask
+  $$("[data-split]").forEach(function (h) {
+    var lines = h.innerHTML.split(/<br\s*\/?>/i);
+    h.innerHTML = lines.map(function (line, i) {
+      return '<span class="line" style="--l:' + i + '"><span>' + line.trim() + "</span></span>";
+    }).join(" ");
+  });
+
+  // Normalise every drawable path so one CSS dash pattern fits all lengths
+  $$("[data-draw] path").forEach(function (p) { p.setAttribute("pathLength", "1"); });
+
+  stagger($$(".flow__chips li"));
+  stagger($$(".flow__tools .tool"));
+  stagger($$(".flow__list li"));
+  stagger($$(".flow__pulse"));
+  stagger($$(".faq details"), "--q");
+
+  // Reveal once in view; pause loops again whenever a block leaves the viewport
+  var revealables = $$("[data-reveal]");
+  if (!("IntersectionObserver" in window)) {
+    revealables.forEach(function (el) { el.classList.add("is-in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var el = entry.target;
+        if (entry.isIntersecting) {
+          el.classList.remove("is-off");
+          if (!el.classList.contains("is-in")) {
+            // Two frames later, so the paused starting state is painted first
+            requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("is-in"); }); });
+          }
+        } else if (el.classList.contains("is-in")) {
+          el.classList.add("is-off");
+        }
+        el.dispatchEvent(new CustomEvent("fw:visibility", { detail: entry.isIntersecting }));
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    revealables.forEach(function (el) { io.observe(el); });
+  }
+  // The hero's task types itself as the entrance plays
+  typeOut($(".h-prompt__typed"), 1100);
+
+  /* ---- 3. Header + navigation -------------------------------------------- */
+  var header = $(".site-header");
   var menu = $(".menu");
   var nav = $("#main-navigation");
 
@@ -35,8 +110,21 @@
     if (e.key === "Escape" && nav.classList.contains("is-open")) { setMenu(false); menu.focus(); }
   });
 
+  // Scrolled state + reading progress, one rAF per scroll burst
+  var ticking = false;
+  function onScroll() {
+    var max = root.scrollHeight - window.innerHeight;
+    header.classList.toggle("is-scrolled", window.scrollY > 8);
+    header.style.setProperty("--progress", max > 0 ? Math.min(1, window.scrollY / max).toFixed(4) : 0);
+    ticking = false;
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
   // Mark the nav link for the section in view
-  var navLinks = $$('.site-nav > a:not(.btn)');
+  var navLinks = $$(".site-nav > a:not(.btn)");
   if ("IntersectionObserver" in window) {
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -53,61 +141,257 @@
     });
   }
 
-  /* ---- 2. Examples -------------------------------------------------------- */
+  /* ---- 4. Pointer parallax (hero) ---------------------------------------- */
+  // Clamped, eased, only on fine pointers with motion allowed, only while the hero is visible
+  var hero = $(".hero");
+  if (hero && finePointer && !reduceMotion) {
+    var layers = $$("[data-depth]", hero);
+    var target = { x: 0, y: 0 }, current = { x: 0, y: 0 }, raf = 0, heroVisible = true, rect = null;
+    function measure() { rect = hero.getBoundingClientRect(); }
+    function frame() {
+      current.x += (target.x - current.x) * 0.08;
+      current.y += (target.y - current.y) * 0.08;
+      layers.forEach(function (el) {
+        var d = Number(el.getAttribute("data-depth")) / 20;
+        el.style.setProperty("--px", (current.x * d).toFixed(2) + "px");
+        el.style.setProperty("--py", (current.y * d).toFixed(2) + "px");
+      });
+      if (Math.abs(target.x - current.x) > 0.05 || Math.abs(target.y - current.y) > 0.05) raf = requestAnimationFrame(frame);
+      else raf = 0;
+    }
+    hero.addEventListener("pointerenter", measure);
+    hero.addEventListener("pointermove", function (e) {
+      if (!heroVisible) return;
+      if (!rect) measure();
+      var nx = (e.clientX - rect.left) / rect.width - 0.5;
+      var ny = (e.clientY - rect.top) / rect.height - 0.5;
+      target.x = Math.max(-1, Math.min(1, nx * 2)) * 12;
+      target.y = Math.max(-1, Math.min(1, ny * 2)) * 10;
+      if (!raf) raf = requestAnimationFrame(frame);
+    });
+    hero.addEventListener("pointerleave", function () {
+      target.x = 0; target.y = 0;
+      if (!raf) raf = requestAnimationFrame(frame);
+    });
+    window.addEventListener("resize", function () { rect = null; }, { passive: true });
+    hero.addEventListener("fw:visibility", function (e) { heroVisible = e.detail; });
+    layers.forEach(function (el) { el.style.transition = "none"; });
+  }
+
+  /* ---- 5. Tablists ------------------------------------------------------- */
+  // Roving tabindex + arrow keys; onSelect receives the index
+  function tablist(list, tabs, onSelect, attr) {
+    attr = attr || "aria-selected";
+    function select(i, focus) {
+      tabs.forEach(function (t, n) {
+        var on = n === i;
+        t.setAttribute(attr, String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      if (focus) tabs[i].focus();
+      onSelect(i);
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { if (t.getAttribute(attr) !== "true") select(i); });
+    });
+    list.addEventListener("keydown", function (e) {
+      var i = tabs.indexOf(doc.activeElement);
+      if (i < 0) return;
+      var next = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1, ArrowUp: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      select((next + tabs.length) % tabs.length, true);
+    });
+  }
+
+  // Make it concrete: the workflow canvas replays for each task
   var examples = [
-    ["Turn a topic into a content plan.", "Start with your audience, one business objective and approved source notes.", "Check accuracy, voice and whether every claim is supported.", "A simple content planning workflow",
-      ["Choose one useful audience question", "Draft three angles from your source notes", "Review and turn one angle into a publishable draft"]],
-    ["Make lead follow-up more consistent.", "Start with an approved inquiry record, service details and the next action.", "Verify contact permission, pricing and context before sending.", "A follow-up preparation workflow",
-      ["Summarize the inquiry and missing details", "Draft a relevant next-step message", "Review the draft and record the follow-up date"]],
-    ["Help your team find an answer.", "Start with approved process notes and frequently asked questions.", "Check source permissions and keep human escalation available.", "An internal knowledge workflow",
-      ["Organize the approved source material", "Draft an answer with its source reference", "Flag gaps for the responsible team member"]]
+    { task: "Turn a topic into a content plan.", input: "Start with your audience, one business objective and approved source notes.",
+      chips: ["Your audience", "One business objective", "Approved source notes"],
+      review: "Check accuracy, voice and whether every claim is supported.", title: "A simple content planning workflow",
+      list: ["Choose one useful audience question", "Draft three angles from your source notes", "Review and turn one angle into a publishable draft"] },
+    { task: "Make lead follow-up more consistent.", input: "Start with an approved inquiry record, service details and the next action.",
+      chips: ["Inquiry record", "Service details", "Next action"],
+      review: "Verify contact permission, pricing and context before sending.", title: "A follow-up preparation workflow",
+      list: ["Summarize the inquiry and missing details", "Draft a relevant next-step message", "Review the draft and record the follow-up date"] },
+    { task: "Help your team find an answer.", input: "Start with approved process notes and frequently asked questions.",
+      chips: ["Process notes", "Frequently asked questions"],
+      review: "Check source permissions and keep human escalation available.", title: "An internal knowledge workflow",
+      list: ["Organize the approved source material", "Draft an answer with its source reference", "Flag gaps for the responsible team member"] }
   ];
-  var exampleBox = $(".example");
-  var exampleButtons = $$("[data-example]");
-
-  function selectExample(i) {
+  var canvas = $("#ex-panel");
+  function fill(listEl, items) {
+    listEl.replaceChildren.apply(listEl, items.map(function (t, i) {
+      var li = doc.createElement("li");
+      li.textContent = t;
+      li.style.setProperty("--c", i);
+      return li;
+    }));
+  }
+  var exTabs = $$("[data-example]");
+  tablist($(".flow__tabs"), exTabs, function (i) {
     var x = examples[i];
-    exampleButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(Number(b.dataset.example) === i)); });
-    swap(exampleBox, function () {
-      $("#example-task").textContent = x[0];
-      $("#example-input").textContent = x[1];
-      $("#example-review").textContent = x[2];
-      $("#example-title").textContent = x[3];
-      $("#example-list").replaceChildren.apply($("#example-list"), x[4].map(function (t) {
-        var li = doc.createElement("li"); li.textContent = t; return li;
-      }));
-    });
-  }
-  exampleButtons.forEach(function (b) {
-    b.addEventListener("click", function () { selectExample(Number(b.dataset.example)); });
+    canvas.setAttribute("aria-labelledby", exTabs[i].id);
+    $("#example-task").textContent = x.task;
+    $("#example-input").textContent = x.input;
+    $("#example-review").textContent = x.review;
+    $("#example-title").textContent = x.title;
+    fill($("#example-chips"), x.chips);
+    fill($("#example-list"), x.list);
+    if (!reduceMotion) replay(canvas, "is-playing");
   });
 
-  /* ---- 3. Learning journey ------------------------------------------------ */
-  var steps = [
-    ["Make AI feel less overwhelming.", "Understand what AI can do, where human judgment matters, and how to choose a practical starting point.", "Example: an AI readiness map"],
-    ["Start with one real task.", "Use AI to support an everyday task in your work. Build confidence through useful practice and review the result.", "Example: a repeatable content workflow"],
-    ["Make your first version real.", "Turn an idea into a simple prototype that you can explore, test and refine with guidance.", "Example: a landing page or lead tracker"],
-    ["Bring it into your workflow.", "Define how the process fits into real work, who is responsible, and what needs a human check.", "Example: a documented handoff"],
-    ["Learn from what happens next.", "Review results, gather feedback, and refine your process as your needs and skills grow.", "Example: a workflow improvement log"]
+  // Journey: five stages, five scenes
+  var stepTabs = $$("[data-step]");
+  var scenes = $$(".scene");
+  tablist($(".steps"), stepTabs, function (i) {
+    scenes.forEach(function (s, n) {
+      var on = n === i;
+      s.hidden = !on;
+      s.classList.toggle("is-active", on);
+    });
+    if (i === 0) typeOut($(".learn__typed"), 2300);
+  });
+  // The Learn prompt types when the scenes first come into view
+  var learnTyped = $(".learn__typed");
+  if (learnTyped && !reduceMotion) {
+    learnTyped.setAttribute("data-text", learnTyped.textContent);
+    learnTyped.textContent = "";
+    var typedOnce = false;
+    $(".scenes").addEventListener("fw:visibility", function (e) {
+      if (e.detail && !typedOnce && $(".scene--learn").classList.contains("is-active")) { typedOnce = true; typeOut(learnTyped, 2300); }
+    });
+  }
+
+  /* ---- 6. Pathway selector ----------------------------------------------- */
+  var programs = [
+    { name: "AI Workforce Masterclass & Accelerator", id: "program-workforce", tone: "stone",
+      focus: ["Assess your workflow readiness", "Identify one high-impact process", "Design a workflow and explore a first prototype"] },
+    { name: "AI + LinkedIn B2B Growth", id: "program-linkedin", tone: "pink",
+      focus: ["Clarify your audience and positioning", "Develop useful content ideas with AI", "Explore a repeatable B2B growth workflow"] },
+    { name: "AI Websites & Workflow Building", id: "program-websites", tone: "yellow",
+      focus: ["Choose a useful business project", "Build a first version with guided practice", "Review what is needed before real-world use"] }
   ];
-  var stepButtons = $$("[data-step]");
-  var journeyCopy = $(".journey-box__copy");
-  var motif = $(".motif-build");
+  var goals = [
+    { program: 0, output: "A workflow plan and first prototype" },
+    { program: 1, output: "A repeatable content and growth workflow" },
+    { program: 2, output: "A first landing page or workflow prototype" },
+    { team: true }
+  ];
+  var team = {
+    name: "Training for your organization", tone: "ink", output: "Help your team move from AI awareness to practical adoption",
+    focus: ["Align on your team’s priorities", "Learn through relevant use cases", "Apply AI in guided exercises", "Define the next implementation steps"]
+  };
+  var preview = $(".fit__preview");
+  var fitCta = $("#fit-cta");
+  var fitLink = $("#fit-link");
+  var currentGoal = 0;
+  var goalButtons = $$("[data-goal]");
+  stagger(goalButtons, "--g");
 
-  function selectStep(i) {
-    stepButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(Number(b.dataset.step) === i)); });
-    motif.setAttribute("data-stage", String(i));
-    swap(journeyCopy, function () {
-      $("#journey-title").textContent = steps[i][0];
-      $("#journey-copy").textContent = steps[i][1];
-      $("#journey-example").textContent = steps[i][2];
+  var goalChosen = false;
+  function showGoal(i) {
+    currentGoal = i;
+    var g = goals[i];
+    var p = g.team ? team : programs[g.program];
+    $$(".program").forEach(function (el) { el.classList.toggle("is-match", goalChosen && !g.team && el.id === p.id); });
+    swap(preview, function () {
+      preview.setAttribute("data-tone", p.tone);
+      $(".fit__kicker", preview).textContent = g.team ? "For your organization" : "Explore";
+      $("#fit-name").textContent = p.name;
+      $("#fit-output").textContent = g.team ? p.output : g.output;
+      $(".fit__output dt", preview).textContent = g.team ? "The aim" : "Typical learning output";
+      fill($("#fit-focus"), p.focus);
+      fitCta.firstChild.textContent = g.team ? "Prepare a training brief " : "Explore this pathway ";
+      fitLink.setAttribute("href", g.team ? "#business" : "#" + p.id);
+      fitLink.firstChild.textContent = g.team ? "See how it works " : "See it above ";
+      fitLink.querySelector(".link-arrow").textContent = g.team ? "↓" : "↑";
     });
   }
-  stepButtons.forEach(function (b) {
-    b.addEventListener("click", function () { selectStep(Number(b.dataset.step)); });
+  tablist($(".fit__goals"), goalButtons, function (i) { goalChosen = true; showGoal(i); }, "aria-checked");
+  fitCta.addEventListener("click", function () {
+    var g = goals[currentGoal];
+    if (g.team) inquiry("Corporate training");
+    else openProgram(g.program);
   });
+  showGoal(0);
 
-  /* ---- 4. Dialog ---------------------------------------------------------- */
+  /* ---- 7. Gallery loop --------------------------------------------------- */
+  // Each row loops seamlessly (its items are cloned once), can be dragged, pauses on
+  // hover, off-screen and with the toggle. Reduced motion: rows stay natively scrollable.
+  var gallery = $(".gallery");
+  var toggle = $(".gallery__toggle");
+  if (gallery && !reduceMotion) {
+    var paused = false, galleryVisible = false;
+    var rows = $$(".gallery__row", gallery).map(function (row) {
+      var track = $(".gallery__track", row);
+      $$("li", track).forEach(function (li) {
+        var clone = li.cloneNode(true);
+        clone.setAttribute("aria-hidden", "true");
+        $$("img", clone).forEach(function (img) { img.alt = ""; });
+        track.append(clone);
+      });
+      var state = {
+        row: row, track: track, x: 0, half: 0, hover: false, drag: null,
+        dir: row.classList.contains("gallery__row--reverse") ? 1 : -1,
+        speed: Number(row.getAttribute("data-speed")) || 24
+      };
+      function measureRow() { state.half = track.scrollWidth / 2; }
+      measureRow();
+      $$("img", track).forEach(function (img) { if (!img.complete) img.addEventListener("load", measureRow); });
+      window.addEventListener("resize", measureRow, { passive: true });
+      if (state.dir > 0) state.x = -state.half / 2;
+
+      row.addEventListener("pointerenter", function () { state.hover = true; });
+      row.addEventListener("pointerleave", function () { state.hover = false; });
+      row.addEventListener("pointerdown", function (e) {
+        state.drag = { start: e.clientX, x: state.x, id: e.pointerId, moved: false };
+      });
+      row.addEventListener("pointermove", function (e) {
+        if (!state.drag || e.pointerId !== state.drag.id) return;
+        var dx = e.clientX - state.drag.start;
+        if (!state.drag.moved && Math.abs(dx) > 6) {
+          state.drag.moved = true;
+          row.classList.add("is-dragging");
+          row.setPointerCapture(e.pointerId);
+        }
+        if (state.drag.moved) state.x = state.drag.x + dx;
+      });
+      function endDrag() { state.drag = null; row.classList.remove("is-dragging"); }
+      row.addEventListener("pointerup", endDrag);
+      row.addEventListener("pointercancel", endDrag);
+      return state;
+    });
+
+    var last = 0;
+    function loop(t) {
+      var dt = last ? Math.min(64, t - last) / 1000 : 0;
+      last = t;
+      rows.forEach(function (s) {
+        if (!s.half) return;
+        if (!paused && !s.hover && !s.drag) s.x += s.dir * s.speed * dt;
+        // Wrap within one copy of the items, so the loop never shows a seam
+        if (s.x <= -s.half) s.x += s.half;
+        if (s.x > 0) s.x -= s.half;
+        s.track.style.transform = "translate3d(" + s.x.toFixed(2) + "px,0,0)";
+      });
+      if (galleryVisible) requestAnimationFrame(loop);
+    }
+    gallery.addEventListener("fw:visibility", function (e) {
+      var was = galleryVisible;
+      galleryVisible = e.detail;
+      if (galleryVisible && !was) { last = 0; requestAnimationFrame(loop); }
+    });
+
+    toggle.hidden = false;
+    toggle.addEventListener("click", function () {
+      paused = !paused;
+      toggle.setAttribute("aria-pressed", String(paused));
+      $(".gallery__toggle-text", toggle).textContent = paused ? "Play gallery" : "Pause gallery";
+    });
+  }
+
+  /* ---- 8. Dialogs -------------------------------------------------------- */
   var modal = $("#modal");
   var modalContent = $(".modal__content", modal);
   var modalInvoker = null;
@@ -127,31 +411,21 @@
     $(".modal__close", modal).focus();
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-
   // Programs
-  var programs = [
-    ["AI Workforce Masterclass & Accelerator", ["Assess your workflow readiness", "Identify one high-impact process", "Design a workflow and explore a first prototype"]],
-    ["AI + LinkedIn B2B Growth", ["Clarify your audience and positioning", "Develop useful content ideas with AI", "Explore a repeatable B2B growth workflow"]],
-    ["AI Websites & Workflow Building", ["Choose a useful business project", "Build a first version with guided practice", "Review what is needed before real-world use"]]
-  ];
+  function openProgram(n) {
+    var p = programs[n];
+    show(
+      '<p class="modal__kicker">EXPLORE A LEARNING PATHWAY</p>' +
+      '<h2 class="modal__title">' + escapeHtml(p.name) + "</h2>" +
+      '<div class="modal__body"><p>Focus areas for this pathway:</p><ul>' +
+      p.focus.map(function (x) { return "<li>" + escapeHtml(x) + "</li>"; }).join("") +
+      '</ul><div class="notice">New schedules, fees, exact inclusions and prerequisites are to be confirmed. This preview does not accept registrations or payments.</div>' +
+      '<button type="button" class="btn btn--full" id="program-interest">Prepare my inquiry <span class="btn__arrow" aria-hidden="true">↗</span></button></div>'
+    );
+    $("#program-interest").addEventListener("click", function () { inquiry(p.name); });
+  }
   $$("[data-program]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var p = programs[Number(b.dataset.program)];
-      show(
-        '<p class="modal__kicker">EXPLORE A LEARNING PATHWAY</p>' +
-        '<h2 class="modal__title">' + escapeHtml(p[0]) + "</h2>" +
-        '<div class="modal__body"><p>Focus areas for this pathway:</p><ul>' +
-        p[1].map(function (x) { return "<li>" + escapeHtml(x) + "</li>"; }).join("") +
-        '</ul><div class="notice">New schedules, fees, exact inclusions and prerequisites are to be confirmed. This preview does not accept registrations or payments.</div>' +
-        '<button type="button" class="btn btn--full" id="program-interest">Prepare my inquiry <span aria-hidden="true">↗</span></button></div>'
-      );
-      $("#program-interest").addEventListener("click", function () { inquiry(p[0]); });
-    });
+    b.addEventListener("click", function () { openProgram(Number(b.dataset.program)); });
   });
 
   // Inquiry brief (prepared and downloaded locally; nothing is submitted)
@@ -186,7 +460,7 @@
       '<div id="context-fields"></div>' +
       '<label for="goals">What would you like to achieve?</label><textarea id="goals" name="goals" required maxlength="3000" placeholder="Describe one task or outcome that matters to you."></textarea>' +
       '<label for="timing">Preferred timing (optional)</label><input id="timing" name="timing" maxlength="120" placeholder="For example, next month or exploring options">' +
-      '<button class="btn btn--full">Download my brief <span aria-hidden="true">↓</span></button>' +
+      '<button class="btn btn--full">Download my brief <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></button>' +
       "</form>" +
       '<p class="small">No email or payment is required for this preview. You can review the downloaded brief before sharing it.</p>' +
       "</div>"
@@ -194,14 +468,14 @@
 
     var form = $("#inquiry");
     var select = $("#interest");
-    var options = ["Program interest", "Corporate training", "Speaking or partnership", "Faith AI discovery"]
-      .concat(programs.map(function (p) { return p[0]; }));
-    options.forEach(function (x) {
-      var o = doc.createElement("option");
-      o.textContent = x;
-      o.selected = x === type;
-      select.append(o);
-    });
+    ["Program interest", "Corporate training", "Speaking or partnership", "Faith AI discovery"]
+      .concat(programs.map(function (p) { return p.name; }))
+      .forEach(function (x) {
+        var o = doc.createElement("option");
+        o.textContent = x;
+        o.selected = x === type;
+        select.append(o);
+      });
 
     function renderFields() { $("#context-fields").innerHTML = contextFields[select.value] || defaultFields; }
     select.addEventListener("change", renderFields);
@@ -262,33 +536,5 @@
   }
   $$("[data-notes]").forEach(function (b) { b.addEventListener("click", notes); });
 
-  /* ---- 5. Line-draw reveals ----------------------------------------------- */
-  // Each path's length becomes --len so the stroke can draw itself in. Lengths are applied
-  // with transitions off so a line never animates from the fallback length to its real one.
-  function setDrawLengths(svg) {
-    var paths = $$("path", svg);
-    paths.forEach(function (p, i) {
-      p.style.transition = "none";
-      p.style.setProperty("--len", Math.ceil(p.getTotalLength()));
-      if (!p.style.getPropertyValue("--i")) p.style.setProperty("--i", i);
-    });
-    if (paths.length) getComputedStyle(paths[0]).strokeDashoffset; // commit the hidden state
-    paths.forEach(function (p) { p.style.transition = ""; });
-  }
-
-  var drawables = $$("[data-draw]");
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    drawables.forEach(function (el) { el.classList.add("is-in"); });
-  } else {
-    var drawObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var el = entry.target;
-        drawObserver.unobserve(el);
-        // Two frames later, so the hidden starting state has been painted first
-        requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("is-in"); }); });
-      });
-    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.2 });
-    drawables.forEach(function (el) { setDrawLengths(el); drawObserver.observe(el); });
-  }
+  window.__fwReady = true;
 })();
