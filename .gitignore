@@ -26,3 +26,15 @@ desktop.ini
 *.tmp
 *.temp
 *.log
+# Design-skill inspector output (screenshots, reports)
+.taste-skill/
+
+# Locally installed agent skills (not part of the site)
+.agents/
+
+# Word lock files created while a document is open
+~$*
+
+# Project documents and the client brief stay local (not in git)
+docs/*.docx
+Faith_Works_Website_Developer_Brief.pdf

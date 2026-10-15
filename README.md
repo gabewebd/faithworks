@@ -1,65 +1,59 @@
 # Faith Works Website
 
-The Faith Works homepage: practical AI learning for founders, professionals and teams.
+The faithph.ai website for Faith Works PH: practical AI learning for founders, professionals and teams.
+Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 2026).
 
-**Current phase:** a single-page foundation rebuilt from Ms. Faith's approved single-HTML design
-(`docs/source/faithworks-chatgpt-source.html`). Additional pages come after this page is reviewed and approved.
+**Current phase:** staging. Every page in the brief's sitemap exists. Forms are designed and tested but
+**not connected** to a CRM yet (preview mode: nothing is sent). The pages are `noindex` until launch.
 
-Built with **plain HTML, CSS and JavaScript**. No framework, no build step, no npm, no backend.
+Plain HTML, CSS and JavaScript. No framework, no npm packages, no backend. A small Node script generates
+the pages so that the header, footer and repeated content (programs, events, articles) come from one place.
 
-## Architecture
-
-| Layer | Where | What |
-| --- | --- | --- |
-| Structure + copy | `index.html` | The whole page, in source order |
-| Design | `css/style.css` | Tokens, components, motion graphics, responsive rules |
-| Interaction | `js/main.js` | Navigation, examples, learning journey, dialogs, line-draw reveals |
-| Media | `assets/icons`, `assets/images` | Wordmark, favicon, photography for later pages |
-| Downloads | `assets/downloads` | The starter worksheet |
-
-## Running it locally
+## Run it locally
 
 ```bash
-python -m http.server 8000     # then open http://localhost:8000
+node tools/build.mjs                         # regenerate pages after editing src/ or assets/data/
 ```
 
-Opening `index.html` directly also works, because nothing is fetched at runtime.
+Then open `index.html` directly, or use any local server (VS Code Live Server, `python -m http.server`).
+The default build writes **relative** links (`css/style.css`, `../learn/index.html`), so styles, images
+and navigation work from disk, from a sub-folder, or from a server root.
 
-## Project structure
+For production on a host that serves this folder at the domain root, build with clean URLs instead:
 
-```text
-fw/
-├── index.html
-├── css/style.css
-├── js/main.js
-├── assets/
-│   ├── downloads/AI_Workflow_Starter.txt
-│   ├── icons/          # wordmark, wordmark-reversed, favicon, tools/
-│   ├── images/
-│   └── data/           # JSON content from the earlier multi-page build, kept for later pages (not used yet)
-├── docs/
-│   ├── source/faithworks-chatgpt-source.html   # the approved design source (reference only)
-│   └── GHL-HANDOFF.md · GHL-FORMS.md · IMAGE-SOURCES.md
-└── DESIGN.md
+```bash
+node tools/build.mjs --deploy                # root-relative links: /learn/, /css/style.css
 ```
 
-## What works on the page
+## Where things live
 
-- Responsive navigation (menu below 1080px; Escape closes it) with the current section marked.
-- Example tabs ("Make it concrete") and the five-step learning journey.
-- Program details dialogs, FAQs, and the starter worksheet download.
-- The inquiry builder: it prepares a `.txt` conversation brief **locally**. Nothing is submitted, because forms, calendar and CRM are not connected yet (see `docs/GHL-HANDOFF.md`).
+| Path | What |
+| --- | --- |
+| `src/pages/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
+| `assets/data/programs.json` | Programs → `/learn/` cards and one `/programs/{slug}/` page each. Leave fee/dates `null` until approved. |
+| `assets/data/events.json` | Events → `/workshops/` (upcoming vs past), each with its own `destination` (external, internal or notify). |
+| `assets/data/resources.json`, `insights.json` | Resources list and articles (`/resources/{slug}/`). Articles are drafts. |
+| `assets/data/site.json` | `staging` flag, contact email, social and community URLs, `starterKitReady`. |
+| `tools/build.mjs`, `layout.mjs`, `render.mjs` | The generator, shared page chrome, and content/form renderers. |
+| `css/style.css` | The design system: tokens, components, states, responsive and reduced-motion rules. |
+| `js/main.js` | Navigation, tabs, program selector, thank-you state, analytics events (`dataLayer`, no personal data). |
+| `js/forms.js`, `js/config.js` | Form validation, states and submission; `config.js` sets the form mode (`preview` / `endpoint`) and the kit download URL. Never put secrets here. |
+| `docs/01–07_*.docx` | Project documents: scope, audit, gap list, architecture, copy, forms spec, acceptance checklist. |
 
-## Motion graphics
+Generated output (do not edit by hand): `index.html`, `404.html`, `sitemap.xml`, `robots.txt` and the
+route folders `about/ build/ business/ community/ contact/ free-ai-starter-kit/ learn/ privacy/ programs/
+resources/ speaking/ terms/ workshops/`.
 
-Two SVG motifs from the earlier build are reused:
+## Before launch
 
-- **Build motif** (framework → workflow → system) on the dark "Don't stop at knowing" card. It assembles once in view, and the selected journey step controls how much of the system is built. Improve adds a signal flowing through it.
-- **Corner circuits** on the yellow closing call to action. They draw in once.
+See `docs/07_Implementation_and_Acceptance_Checklist.docx`. In short: connect forms in GHL and pass the
+brief §14 tests, publish the final Starter Kit and set `starterKit.downloadUrl`, approve copy and legal pages,
+then set `"staging": false` (and `"starterKitReady": true`) in `site.json` and rebuild.
 
-All motion sits inside `prefers-reduced-motion: no-preference`. With reduced motion or without JS, the finished drawings show statically.
+## History
 
-## Previous implementation
-
-The earlier multi-page site (Learn, Build, Business, Community, Insights…) is preserved in Git history:
-commit `faff08d` ("Snapshot multi-page implementation before single-page rebuild").
+- `main`: the earliest multi-page build (SVG motifs originate here).
+- `faff08d`: multi-page snapshot before the single-page rebuild.
+- `c34bb13`: single-page homepage from Ms. Faith's approved HTML (`docs/source/faithworks-chatgpt-source.html`).
+- Uncommitted homepage work from before the full-site build is saved as a git stash entry:
+  `backup: homepage WIP before full-site build (2026-10-15)`.

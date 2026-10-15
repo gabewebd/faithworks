@@ -1,0 +1,100 @@
+<!--meta {
+  "path": "/learn/",
+  "title": "Learn AI · Programs and workshops · Faith Works",
+  "description": "Hands-on AI programs and workshops for founders, professionals and teams. See who each program is for, what you leave with, the format, requirements and status.",
+  "nav": "learn"
+}-->
+    <section class="phero phero--stone" aria-labelledby="learn-title">
+      <div class="wrap phero__grid">
+        <div class="phero__copy" data-reveal>
+          <h1 id="learn-title">Learn AI by doing.</h1>
+          <p class="phero__lead">Programs and workshops for people who want practical skills, not another list of tools. Bring a real task, practise with guidance, and leave with something you can use.</p>
+          <div class="actions">
+            <a class="btn" href="#programs">Browse programs <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></a>
+            <a class="btn btn--light" href="/workshops/">Upcoming workshops</a>
+          </div>
+        </div>
+        <figure class="phero__photo">
+          <picture>
+            <source type="image/webp" srcset="/assets/images/participants-laptop-480.webp 480w, /assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 900px) 40vw, 100vw">
+            <img src="/assets/images/participants-laptop-508.jpg" width="508" height="499" alt="Two participants working through an exercise together on a laptop at a Faith Works session." decoding="async">
+          </picture>
+        </figure>
+      </div>
+    </section>
+
+    <section class="journey-line wrap" aria-labelledby="journey-line-title">
+      <h2 id="journey-line-title" class="sr-only">The Faith Works learning journey</h2>
+      <ol class="journey-line__steps">
+        <li><b>Learn</b> the foundations</li>
+        <li><b>Apply</b> AI to a real task</li>
+        <li><b>Build</b> a useful first version</li>
+        <li><b>Implement</b> it in your work</li>
+        <li><b>Improve</b> it through feedback</li>
+      </ol>
+    </section>
+
+    <section class="section wrap" id="programs" aria-labelledby="programs-title">
+      <div class="section-head">
+        <h2 id="programs-title">Programs</h2>
+        <p>Each program states who it is for, what you leave with, the format and what you need. Dates and fees appear once they are confirmed for sale.</p>
+      </div>
+      {{programCards}}
+    </section>
+
+    <!-- Which pathway fits: a transparent selector, not an assessment -->
+    <section class="section band band--stone" aria-labelledby="fit-title">
+      <div class="wrap fit">
+        <div class="fit__intro">
+          <h2 id="fit-title" class="h3">Which program fits your goal?</h2>
+          <p class="fit__caption">Choose by the work you want to improve.</p>
+          <div class="fit__goals" role="radiogroup" aria-label="Your priority">
+            <button type="button" role="radio" aria-checked="true" data-goal="0"><span>Improve a recurring work process</span></button>
+            <button type="button" role="radio" aria-checked="false" tabindex="-1" data-goal="1"><span>Clarify my B2B positioning and content</span></button>
+            <button type="button" role="radio" aria-checked="false" tabindex="-1" data-goal="2"><span>Create a simple digital business tool</span></button>
+            <button type="button" role="radio" aria-checked="false" tabindex="-1" data-goal="3"><span>Get my team ready</span></button>
+          </div>
+        </div>
+        <div class="fit__preview" aria-live="polite" data-tone="stone">
+          <p class="fit__kicker">A good place to start</p>
+          <p class="fit__name" id="fit-name">AI Workforce Masterclass &amp; Accelerator</p>
+          <dl class="fit__output"><dt>Typical learning output</dt><dd id="fit-output">A workflow plan and first prototype</dd></dl>
+          <ul class="fit__focus" id="fit-focus">
+            <li>Assess your workflow readiness</li>
+            <li>Choose one recurring, reviewable process</li>
+            <li>Design a workflow and build a first prototype</li>
+          </ul>
+          <div class="fit__actions"><a class="btn" id="fit-cta" href="/programs/ai-workforce-accelerator/">View this program <span class="btn__arrow" aria-hidden="true">↗</span></a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" aria-labelledby="next-title">
+      <div class="section-head">
+        <h2 id="next-title">Upcoming workshops</h2>
+        <p>Times are shown in Philippine time (Asia/Manila). <a class="inline" href="/workshops/">See all workshops, including past events.</a></p>
+      </div>
+      {{events:upcoming}}
+    </section>
+
+    <section class="section section--rule wrap promise" aria-labelledby="promise-title">
+      <h2 id="promise-title">Before you register, every program page tells you</h2>
+      <ul class="promise__list">
+        <li><b>Who it is for</b> and what you should already know.</li>
+        <li><b>What you leave with</b>: a prototype, a workflow or a plan.</li>
+        <li><b>The format</b>, sessions, dates and time commitment.</li>
+        <li><b>The fee in PHP</b>, what it includes and any extra tool costs.</li>
+        <li><b>What is not included</b>, so there are no surprises.</li>
+        <li><b>How to register</b>, and the cancellation and refund terms.</li>
+      </ul>
+    </section>
+
+    <section class="section section--flush-top wrap">
+      <div class="band-cta">
+        <div>
+          <h2 class="h3">Not ready to choose a program?</h2>
+          <p>Start with the free AI Workflow Starter Kit. Pick one task and map your first workflow.</p>
+        </div>
+        <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </section>

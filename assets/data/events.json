@@ -1,151 +1,76 @@
 {
-  "_readme": "Faith Works events: the single source for every upcoming event on Home, Learn and Community. Add a record and it appears everywhere it belongs; no HTML changes. FIELDS: id + slug (stable ids) · title · shortTitle (optional, for tight spots) · type (workshop | masterclass | program | forum) + typeLabel (shown on the page) · status ('upcoming' | 'past': past events stay on file but leave every upcoming list; photos of past moments go in event-highlights.json) · featured (true on ONE upcoming event: it leads Home and Community) · date: { day: '30', month: 'SEP', year: '2026' } drives the yellow date card and the sort order; null when not set yet · dateDisplay (optional human text for the schedule, e.g. a multi-session cohort) · dateLabel (shown when date is null, e.g. 'Dates to be announced') · location · audience · host · description · highlights (short bullets) · note (small print) · registrationUrl + registrationLabel: the ONE call to action (https:// links open in a new tab; undated events point to the notify form, community.html#register) · tags · image: every event has one ({ base + widths } for responsive files, or a plain path string with imageAlt). Until an event has its own photo, use one from a past Faith Works session and say so in image.caption.",
+  "_readme": "Faith Works events, rendered on /workshops/ (and the next one on Home and /learn/) by tools/build.mjs. Brief §2: upcoming and past are separated; every event shows date, Asia/Manila time, venue, delivery format, capacity/status and a CTA. Brief §4: September and early-October 2026 campaigns are PAST. DESTINATION (each event keeps its own): destination.type = 'external' (its own page or registration funnel, e.g. a GHL funnel; opens in a new tab and is labelled as external) | 'internal' (a page on this site) | 'notify' (no page yet: the CTA goes to the notify form on /workshops/#notify) | 'none'. Never invent a URL: leave url null and use 'notify'. STATUS: open | waitlist | sold-out | tba | past. Times are Asia/Manila (PHT, UTC+8). PUBLISHING MODEL: whether events keep individual external pages or move to one internal template is NEEDS CLARIFICATION (see docs/04).",
+  "timezone": "Asia/Manila",
   "events": [
     {
-      "id": "ai-linkedin-b2b-growth-accelerator-2026",
-      "slug": "ai-linkedin-b2b-growth-system",
-      "status": "past",
-      "type": "program",
-      "typeLabel": "Cohort program",
-      "title": "AI + LinkedIn B2B Growth Accelerator",
-      "shortTitle": "AI + LinkedIn B2B Growth",
-      "description": "Turn your LinkedIn into a B2B growth system: build the AI systems that turn visibility into qualified pipeline, with Faith Works PH and CAP Hernandez.",
-      "date": {
-        "day": "30",
-        "month": "SEP",
-        "year": "2026"
-      },
-      "dateDisplay": "Cohort launches 30 September",
-      "location": "Face-to-face + Zoom",
-      "audience": "CEOs, founders, consultants, sales leaders, coaches & professionals",
-      "host": "Faith Works PH × CAP Hernandez",
-      "highlights": [
-        "Authority people understand, and content with a commercial purpose.",
-        "A prospecting and outreach engine, with follow-up that runs without you.",
-        "A pipeline connected to revenue. You leave with working tools, not notes."
-      ],
-      "note": "Three build levels, all starting 30 September: Authority, Pipeline Pro and Revenue Master.",
-      "registrationUrl": "https://faithph.ai/ai--linkedin-b2b-growth-system",
-      "registrationLabel": "Register",
-      "tags": [
-        "ai",
-        "business",
-        "linkedin",
-        "sales"
-      ],
-      "_confirm": "Year of the 30 September start (the program page gives no year).",
-      "image": {
-        "base": "assets/images/ai-linkedin",
-        "widths": [
-          480,
-          960,
-          1080
-        ],
-        "width": 1080,
-        "height": 1350,
-        "position": "50% 50%",
-        "alt": "Event poster for the AI + LinkedIn B2B Growth Accelerator with Faith Natividad and CAP Hernandez: Two Voices, One Mission. Authority Workshop starts September 30, 1:00–6:00 PM, House of Transformation, Ayala Malls The 30th, Pasig City."
-      }
-    },
-    {
-      "id": "ai-for-business-2026-09-25",
-      "slug": "ai-for-business-hands-on-workshop",
-      "status": "past",
-      "type": "workshop",
-      "typeLabel": "Workshop",
-      "title": "AI for Business: Hands-On Workshop",
-      "shortTitle": "AI for Business",
-      "description": "Practical AI workflows for marketing, sales, and operations.",
-      "date": {
-        "day": "25",
-        "month": "SEP",
-        "year": "2026"
-      },
-      "location": "RK Bistro PH, Pampanga",
-      "audience": "Business owners, marketing, sales & operations teams",
-      "highlights": [
-        "Find where AI fits in the marketing, sales and operations work you already do.",
-        "Build and test a practical workflow with guidance, on your own laptop.",
-        "Leave with prompts and steps you can reuse the next working day."
-      ],
-      "note": "No technical background required.",
-      "registrationUrl": "https://faithph.ai/faithworks-aiforbusiness-registration",
-      "registrationLabel": "Register",
-      "tags": [
-        "ai",
-        "business"
-      ],
-      "image": {
-        "base": "assets/images/masterclass-batch3",
-        "widths": [
-          480,
-          960,
-          1440,
-          1920
-        ],
-        "width": 1920,
-        "height": 1080,
-        "position": "0% 50%",
-        "alt": "Participants of the Faith Works AI & Claude Masterclass, Batch 3, posing together in the session room",
-        "caption": "Past session · AI & Claude Masterclass, Batch 3"
-      }
-    },
-    {
       "id": "ai-claude-masterclass-next",
-      "slug": "ai-claude-masterclass-next-batch",
-      "status": "upcoming",
-      "type": "masterclass",
-      "typeLabel": "Masterclass",
       "title": "AI & Claude Masterclass: next batch",
-      "description": "Deeper sessions on a single tool or topic, for people ready to go past the basics.",
+      "type": "Masterclass",
+      "status": "tba",
       "date": null,
+      "time": null,
       "dateLabel": "Dates to be announced",
-      "registrationUrl": "community.html#register",
-      "registrationLabel": "Get notified",
-      "tags": [
-        "ai"
-      ],
-      "image": {
-        "base": "assets/images/masterclass-room",
-        "widths": [
-          480,
-          960,
-          1345
-        ],
-        "width": 1345,
-        "height": 777,
-        "position": "100% 55%",
-        "alt": "A full room of participants at the Faith Works AI & Claude Masterclass, Batch 1",
-        "caption": "Past session · AI & Claude Masterclass, Batch 1"
-      }
+      "venue": null,
+      "format": "To be confirmed",
+      "capacity": null,
+      "summary": "Deeper sessions on one tool and one way of working, for people ready to go past the basics.",
+      "programRef": null,
+      "destination": { "type": "notify", "url": null, "label": "Get notified" },
+      "image": { "src": "/assets/images/masterclass-room-960.webp", "width": 960, "height": 555, "alt": "A full room of participants at an earlier Faith Works AI & Claude Masterclass", "caption": "Earlier batch" },
+      "owner": "Workshop registrations owner (to be assigned)",
+      "lastReviewed": "2026-10-15"
     },
     {
       "id": "forums-community-gatherings",
-      "slug": "forums-community-gatherings",
-      "status": "upcoming",
-      "type": "forum",
-      "typeLabel": "Forum",
       "title": "Forums & community gatherings",
-      "description": "Conversations on AI, business and the future of work, and a chance to meet others learning the same things.",
+      "type": "Forum",
+      "status": "tba",
       "date": null,
+      "time": null,
       "dateLabel": "Dates to be announced",
-      "registrationUrl": "community.html#register",
-      "registrationLabel": "Get notified",
-      "tags": [
-        "community"
-      ],
-      "image": {
-        "base": "assets/images/workshop-qa",
-        "widths": [
-          480,
-          672
-        ],
-        "width": 672,
-        "height": 549,
-        "position": "100% 50%",
-        "alt": "A participant asks a question while a facilitator holds a microphone during a Faith Works workshop",
-        "caption": "Past session · Faith Works workshop"
-      }
+      "venue": null,
+      "format": "To be confirmed",
+      "capacity": null,
+      "summary": "Conversations on AI, business and the future of work, and a chance to meet others who are learning the same things.",
+      "programRef": null,
+      "destination": { "type": "notify", "url": null, "label": "Get notified" },
+      "image": { "src": "/assets/images/workshop-qa-672.webp", "width": 672, "height": 549, "alt": "A participant asks a question during an open Q&A at a Faith Works workshop", "caption": "Earlier session" },
+      "owner": "Community owner (to be assigned)",
+      "lastReviewed": "2026-10-15"
+    },
+    {
+      "id": "ai-linkedin-b2b-growth-accelerator-2026",
+      "title": "AI + LinkedIn B2B Growth Accelerator",
+      "type": "Cohort program",
+      "status": "past",
+      "date": "2026-09-30",
+      "time": "1:00–6:00 PM",
+      "venue": "House of Transformation, Ayala Malls The 30th, Pasig City",
+      "format": "Face-to-face with a Zoom option",
+      "capacity": null,
+      "summary": "Positioning, content and follow-up systems for B2B growth, with Faith Works PH and CAP Hernandez.",
+      "programRef": "ai-linkedin-b2b-growth",
+      "destination": { "type": "external", "url": "https://faithph.ai/ai--linkedin-b2b-growth-system", "label": "Original event page" },
+      "image": { "src": "/assets/images/ai-linkedin-960.webp", "width": 960, "height": 1200, "alt": "Event poster for the AI + LinkedIn B2B Growth Accelerator with Faith Natividad and CAP Hernandez" },
+      "owner": "Workshop registrations owner (to be assigned)",
+      "lastReviewed": "2026-10-15"
+    },
+    {
+      "id": "ai-for-business-2026-09-25",
+      "title": "AI for Business: Hands-On Workshop",
+      "type": "Workshop",
+      "status": "past",
+      "date": "2026-09-25",
+      "time": null,
+      "venue": "RK Bistro PH, Pampanga",
+      "format": "In person",
+      "capacity": null,
+      "summary": "Practical AI workflows for marketing, sales and operations, built and tested on participants' own laptops.",
+      "programRef": null,
+      "destination": { "type": "external", "url": "https://faithph.ai/faithworks-aiforbusiness-registration", "label": "Original event page" },
+      "image": { "src": "/assets/images/masterclass-batch3-960.webp", "width": 960, "height": 540, "alt": "Participants of a Faith Works masterclass posing together in the session room", "caption": "Photo from an earlier Faith Works session" },
+      "owner": "Workshop registrations owner (to be assigned)",
+      "lastReviewed": "2026-10-15"
     }
   ]
 }

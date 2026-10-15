@@ -1,3 +1,5 @@
+> **Superseded (15 Oct 2026).** Kept for history. Current guidance: `docs/04_Architecture_and_Recommendations.docx` and `docs/06_Forms_and_Lead_Capture_Specification.docx` (scope, audit and gaps in docs 01–03). File names below refer to the earlier build.
+
 # GoHighLevel handoff
 
 The site follows the brief's launch sitemap: `index`, `learn` (Learn AI), `workshops`, `build` (Build with AI), `business` (For Business), `speaking`, `resources`, `about`, `community`, `contact`, `privacy`, the campaign pages `free-ai-starter-kit` and `free-ai-starter-kit-thank-you` (reduced header, no main nav), and the Insight page `insight.html`. `implement.html` and `scale.html` only redirect to `build.html` and `business.html`: make them 301 redirects in GHL. Every form's fields and copy are in `docs/GHL-FORMS.md`. There is one `css/style.css`, one `js/main.js`, and `assets/` (images, icons, and the JSON content in `assets/data/`). Every page uses the same CSS and JS.

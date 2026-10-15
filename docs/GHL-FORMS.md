@@ -1,3 +1,5 @@
+> **Superseded (15 Oct 2026).** Kept for history. Current guidance: `docs/04_Architecture_and_Recommendations.docx` and `docs/06_Forms_and_Lead_Capture_Specification.docx` (scope, audit and gaps in docs 01–03). File names below refer to the earlier build.
+
 # Form copy for the GoHighLevel build
 
 Every form on the site is a placeholder (`data-fw-demo`): it says it isn't connected yet and sends nothing. Use this guide to rebuild each one as a native GHL form, then swap it into the same section. The field labels, options, helper text and messages below are the ones on the pages. Sources are the developer brief (§5 lead journeys and form requirements, §12 landing page copy, §14 development specification).

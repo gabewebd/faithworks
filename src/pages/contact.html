@@ -1,0 +1,34 @@
+<!--meta {
+  "path": "/contact/",
+  "title": "Contact Faith Works",
+  "description": "Send Faith Works a message about programs, corporate training, speaking, Faith AI or anything else. Your inquiry is routed to the right person.",
+  "nav": "contact"
+}-->
+    <section class="phero phero--stone phero--compact" aria-labelledby="ct-title">
+      <div class="wrap phero__grid">
+        <div class="phero__copy" data-reveal>
+          <h1 id="ct-title">Contact Faith Works.</h1>
+          <p class="phero__lead">Tell us what you are looking for and we will route your message to the right person.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--flush-top wrap contact" aria-labelledby="route-title">
+      <div class="contact__side">
+        <h2 id="route-title" class="h3">Faster routes</h2>
+        <ul class="routes-list">
+          <li><a href="/business/#proposal"><b>Corporate training</b><span>Request a proposal with your team’s goals</span></a></li>
+          <li><a href="/speaking/#inquiry"><b>Speaking and partnerships</b><span>Send your event details</span></a></li>
+          <li><a href="/build/#demo"><b>Faith AI</b><span>Request a demo for one business process</span></a></li>
+          <li><a href="/learn/"><b>Programs and workshops</b><span>Join a waitlist from any program page</span></a></li>
+        </ul>
+        <h2 class="h3 contact__h">Other channels</h2>
+        <p>Email: {{contactEmail}}</p>
+        {{socialList}}
+        <p class="small">{{responseTime}}</p>
+      </div>
+      <div class="contact__form" id="inquiry">
+        <h2 class="h3">Send us a message</h2>
+        {{contactForm}}
+      </div>
+    </section>
