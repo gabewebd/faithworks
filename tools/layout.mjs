@@ -13,7 +13,7 @@ const NAV = [
   ["about", "/about/", "About"],
 ];
 
-const VERSION = "10";
+const VERSION = "11";
 
 function head({ title, description, path, site, image, noindex }) {
   const origin = site.origin.replace(/\/$/, "");
