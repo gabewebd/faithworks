@@ -19,16 +19,17 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:ital,wght@0,600;0,700;0,800;1,500&display=swap">
 
   <!-- All site CSS and JS. In GHL, swap these two paths for the CDN URLs. -->
-  <link rel="stylesheet" href="css/style.css?v=20260925e">
-  <script src="js/main.js?v=20260925e" defer></script>
+  <link rel="stylesheet" href="css/style.css?v=20261015a">
+  <script src="js/main.js?v=20261015a" defer></script>
 </head>
 <body>
   <a class="fw-skip" href="#main">Skip to content</a>
 
   <!-- =====================================================================
-       HEADER (DESIGN §10)
-       Six items + Join. Learn / Implement / Scale / Community open a short panel on hover/focus (CSS only).
-       data-fw-chapter-link marks the journey indicator items.
+       HEADER (DESIGN §10, brief §2 launch navigation)
+       Learn AI · Build with AI · For Business · Resources · About, plus the
+       persistent Free AI Starter Kit button. The first three open a short panel
+       on hover/focus (CSS only). data-fw-chapter-link marks the journey indicator.
        ===================================================================== -->
   <header class="fw-header" data-fw-header data-fw-surface="white">
     <div class="fw-container fw-header__bar">
@@ -41,79 +42,52 @@
 
       <nav class="fw-nav" aria-label="Primary">
         <ul class="fw-nav__list" role="list">
-          <li class="fw-nav__item">
-            <a class="fw-nav__link" href="index.html">Home</a>
-          </li>
-
           <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="learn">
-            <a class="fw-nav__link" href="learn.html">Learn<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <a class="fw-nav__link" href="learn.html">Learn AI<span class="fw-visually-hidden fw-nav__current"> (current section)</span></a>
             <div class="fw-nav__panel">
               <div class="fw-container fw-nav__panel-inner">
                 <div class="fw-nav__panel-intro">
-                  <p class="fw-h2">Learn</p>
-                  <p class="fw-voice">I want to understand this.</p>
+                  <p class="fw-h2">Learn AI</p>
                 </div>
                 <ul class="fw-index fw-nav__panel-list" role="list">
-                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#insights"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Insights<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#workshops"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#resources"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Resources<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="learn.html#programs"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Programs<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="workshops.html"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Workshops<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
                 </ul>
               </div>
             </div>
           </li>
-
           <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="implement">
-            <a class="fw-nav__link" href="implement.html">Implement<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <a class="fw-nav__link" href="build.html">Build with AI<span class="fw-visually-hidden fw-nav__current"> (current section)</span></a>
             <div class="fw-nav__panel">
               <div class="fw-container fw-nav__panel-inner">
                 <div class="fw-nav__panel-intro">
-                  <p class="fw-h2">Implement</p>
-                  <p class="fw-voice">I want to apply this.</p>
+                  <p class="fw-h2">Build with AI</p>
                 </div>
                 <ul class="fw-index fw-nav__panel-list" role="list">
-                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#frameworks"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Frameworks<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#templates"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Templates<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#workflows"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Workflows<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="implement.html#program"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Program<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="build.html#use-cases"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Use cases<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="build.html#faith-ai"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Faith AI<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
                 </ul>
               </div>
             </div>
           </li>
-
           <li class="fw-nav__item fw-nav__item--panel" data-fw-chapter-link="scale">
-            <a class="fw-nav__link" href="scale.html">Scale<span class="fw-visually-hidden fw-nav__current"> (current chapter)</span></a>
+            <a class="fw-nav__link" href="business.html">For Business<span class="fw-visually-hidden fw-nav__current"> (current section)</span></a>
             <div class="fw-nav__panel">
               <div class="fw-container fw-nav__panel-inner">
                 <div class="fw-nav__panel-intro">
-                  <p class="fw-h2">Scale</p>
-                  <p class="fw-voice">I want this to last.</p>
+                  <p class="fw-h2">For Business</p>
                 </div>
                 <ul class="fw-index fw-nav__panel-list" role="list">
-                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#systems"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Systems<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#transformation"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Transformation<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#growth"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Growth<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="scale.html#leadership"><span class="fw-index__num" aria-hidden="true">04</span><span class="fw-index__title fw-h4">Leadership<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="business.html"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Corporate training<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="speaking.html"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Speaking &amp; partnerships<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
+                  <li class="fw-index__row"><a class="fw-index__link" href="business.html#enquire"><span class="fw-index__num" aria-hidden="true">03</span><span class="fw-index__title fw-h4">Request a proposal<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
                 </ul>
               </div>
             </div>
           </li>
-
-          <li class="fw-nav__item fw-nav__item--panel">
-            <a class="fw-nav__link" href="community.html" aria-current="page">Community</a>
-            <div class="fw-nav__panel">
-              <div class="fw-container fw-nav__panel-inner">
-                <div class="fw-nav__panel-intro">
-                  <p class="fw-h2">Community</p>
-                  <p class="fw-voice">Highlights · the community</p>
-                </div>
-                <ul class="fw-index fw-nav__panel-list" role="list">
-                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#highlights"><span class="fw-index__num" aria-hidden="true">01</span><span class="fw-index__title fw-h4">Event highlights<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                  <li class="fw-index__row"><a class="fw-index__link" href="community.html#connection"><span class="fw-index__num" aria-hidden="true">02</span><span class="fw-index__title fw-h4">Faith Works Community<span class="fw-index__arrow" aria-hidden="true">→</span></span></a></li>
-                </ul>
-              </div>
-            </div>
+          <li class="fw-nav__item">
+            <a class="fw-nav__link" href="resources.html">Resources</a>
           </li>
-
           <li class="fw-nav__item">
             <a class="fw-nav__link" href="about.html">About</a>
           </li>
@@ -121,7 +95,7 @@
       </nav>
 
       <div class="fw-header__actions">
-        <a class="fw-btn fw-btn--primary fw-header__join" href="#join">Join</a>
+        <a class="fw-btn fw-btn--primary fw-header__join" href="free-ai-starter-kit.html" aria-label="Get the Free AI Starter Kit"><span class="fw-header__join-label"><span class="fw-header__join-pre">Get the </span>Free <span class="fw-header__join-mid">AI Starter </span>Kit</span></a>
         <!-- Without JavaScript "Menu" jumps to the footer navigation -->
         <a class="fw-header__menu fw-header__menu--nojs" href="#fw-footer-nav">Menu</a>
         <button class="fw-header__menu fw-header__menu--js" type="button" aria-expanded="false" aria-controls="fw-menu" data-fw-menu-toggle>
@@ -135,55 +109,41 @@
       <nav class="fw-container" aria-label="Primary (mobile)">
         <ul class="fw-menu__list" role="list">
           <li class="fw-menu__row">
-            <a class="fw-menu__link" href="index.html"><span class="fw-menu__num" aria-hidden="true">01</span><span>Home</span></a>
-          </li>
-          <li class="fw-menu__row">
             <details class="fw-menu__details">
-              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">02</span><span>Learn</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">01</span><span>Learn AI</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
               <ul class="fw-menu__sub" role="list">
-                <li><a href="learn.html">All of Learn</a></li>
-                <li><a href="learn.html#insights">Insights</a></li>
-                <li><a href="learn.html#workshops">Workshops</a></li>
-                <li><a href="learn.html#resources">Resources</a></li>
+                <li><a href="learn.html">All of Learn AI</a></li>
+                <li><a href="learn.html#programs">Programs</a></li>
+                <li><a href="workshops.html">Workshops</a></li>
               </ul>
             </details>
           </li>
           <li class="fw-menu__row">
             <details class="fw-menu__details">
-              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">03</span><span>Implement</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">02</span><span>Build with AI</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
               <ul class="fw-menu__sub" role="list">
-                <li><a href="implement.html">All of Implement</a></li>
-                <li><a href="implement.html#frameworks">Frameworks</a></li>
-                <li><a href="implement.html#templates">Templates</a></li>
-                <li><a href="implement.html#workflows">Workflows</a></li>
-                <li><a href="implement.html#program">Program</a></li>
+                <li><a href="build.html">All of Build with AI</a></li>
+                <li><a href="build.html#use-cases">Use cases</a></li>
+                <li><a href="build.html#faith-ai">Faith AI</a></li>
               </ul>
             </details>
           </li>
           <li class="fw-menu__row">
             <details class="fw-menu__details">
-              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">04</span><span>Scale</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
+              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">03</span><span>For Business</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
               <ul class="fw-menu__sub" role="list">
-                <li><a href="scale.html">All of Scale</a></li>
-                <li><a href="scale.html#systems">Systems</a></li>
-                <li><a href="scale.html#transformation">Transformation</a></li>
-                <li><a href="scale.html#growth">Growth</a></li>
-                <li><a href="scale.html#leadership">Leadership</a></li>
-              </ul>
-            </details>
-          </li>
-          <li class="fw-menu__row fw-menu__row--current">
-            <details class="fw-menu__details">
-              <summary class="fw-menu__link"><span class="fw-menu__num" aria-hidden="true">05</span><span>Community</span><span class="fw-menu__toggle" aria-hidden="true"></span></summary>
-              <ul class="fw-menu__sub" role="list">
-                <li><a href="community.html" aria-current="page">All of Community</a></li>
-                <li><a href="community.html#highlights">Event highlights</a></li>
-                <li><a href="community.html#connection">Faith Works Community</a></li>
+                <li><a href="business.html">All of For Business</a></li>
+                <li><a href="business.html">Corporate training</a></li>
+                <li><a href="speaking.html">Speaking &amp; partnerships</a></li>
+                <li><a href="business.html#enquire">Request a proposal</a></li>
               </ul>
             </details>
           </li>
           <li class="fw-menu__row">
-            <a class="fw-menu__link" href="about.html"><span class="fw-menu__num" aria-hidden="true">06</span><span>About</span></a>
+            <a class="fw-menu__link" href="resources.html"><span class="fw-menu__num" aria-hidden="true">04</span><span>Resources</span></a>
+          </li>
+          <li class="fw-menu__row">
+            <a class="fw-menu__link" href="about.html"><span class="fw-menu__num" aria-hidden="true">05</span><span>About</span></a>
           </li>
         </ul>
       </nav>
@@ -307,6 +267,7 @@
             <input class="fw-notify__input" id="register-email" name="email" type="email" autocomplete="email" required>
             <button class="fw-btn fw-btn--dark fw-btn--lg" type="submit">Notify me</button>
           </div>
+          <p class="fw-body-s fw-form__note">We will use your details to tell you about new dates. Read our <a href="privacy.html">Privacy Notice</a>.</p>
           <p class="fw-body-s fw-form__status" role="status" data-fw-form-status></p>
         </form>
       </div>
@@ -327,7 +288,7 @@
         <ul class="fw-related fw-bridge__related" role="list">
           <li data-fw-render="insight-link"><a class="fw-related__link" href="learn.html#insights"><span class="fw-label">Insights</span><span class="fw-h4 fw-related__title">Latest insights</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
           <li><a class="fw-related__link" href="index.html#stories"><span class="fw-label">Success stories</span><span class="fw-h4 fw-related__title">People putting it to work</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
-          <li><a class="fw-related__link" href="implement.html#program"><span class="fw-label">Program</span><span class="fw-h4 fw-related__title">AI Workforce Accelerator</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
+          <li><a class="fw-related__link" href="build.html#program"><span class="fw-label">Program</span><span class="fw-h4 fw-related__title">AI Workforce Accelerator</span><span class="fw-link__arrow" aria-hidden="true">→</span></a></li>
         </ul>
       </div>
     </section>
@@ -337,8 +298,7 @@
 
   <!-- =====================================================================
        FOOTER: Soft Charcoal, AI Yellow accent
-       PLACEHOLDER: the Join form is plain HTML. Replace it with a GHL form and
-       keep the .fw-footer__join wrapper. Social icons come from assets/data/site.json.
+       Social icons come from assets/data/site.json.
        ===================================================================== -->
   <footer class="fw-footer" id="join" data-fw-surface="charcoal" data-fw-accent="yellow">
     <div class="fw-container fw-grid fw-footer__grid">
@@ -346,58 +306,41 @@
         <a href="index.html" aria-label="Faith Works, home">
           <span class="fw-wordmark"><img src="assets/icons/wordmark-reversed.svg" alt="" width="1906" height="385"></span>
         </a>
-        <p class="fw-body-s">A clearer digital home for practical education, business transformation, and purposeful growth.</p>
+        <p class="fw-body-s">Work Better with AI—without becoming a tech expert. Learn. Implement. Scale.</p>
       </div>
 
-      <form class="fw-footer__join" action="#" method="post" data-fw-placeholder data-fw-demo aria-labelledby="fw-join-title">
-        <h2 class="fw-h3" id="fw-join-title">Join Faith Works</h2>
-        <p class="fw-body-s">Updates on workshops, events and new resources.</p>
-        <div class="fw-footer__field">
-          <label class="fw-label" for="fw-join-name">Name</label>
-          <input class="fw-footer__input" id="fw-join-name" name="name" type="text" autocomplete="name" required>
-        </div>
-        <div class="fw-footer__field">
-          <label class="fw-label" for="fw-join-email">Email address</label>
-          <div class="fw-footer__row">
-            <input class="fw-footer__input" id="fw-join-email" name="email" type="email" autocomplete="email" required>
-            <button class="fw-btn fw-btn--primary" type="submit">Join</button>
-          </div>
-        </div>
-        <p class="fw-body-s fw-form__status" role="status" data-fw-form-status></p>
-      </form>
 
       <nav class="fw-footer__nav" id="fw-footer-nav" aria-label="Footer">
         <div class="fw-footer__col">
-          <p class="fw-label"><a href="learn.html">Learn</a></p>
+          <p class="fw-label"><a href="learn.html">Learn AI</a></p>
           <ul role="list">
-            <li><a href="learn.html#insights">Insights</a></li>
-            <li><a href="learn.html#workshops">Workshops</a></li>
-            <li><a href="learn.html#resources">Resources</a></li>
+            <li><a href="learn.html#programs">Programs</a></li>
+            <li><a href="workshops.html">Workshops</a></li>
           </ul>
         </div>
         <div class="fw-footer__col">
-          <p class="fw-label"><a href="implement.html">Implement</a></p>
+          <p class="fw-label"><a href="build.html">Build with AI</a></p>
           <ul role="list">
-            <li><a href="implement.html#frameworks">Frameworks</a></li>
-            <li><a href="implement.html#templates">Templates</a></li>
-            <li><a href="implement.html#workflows">Workflows</a></li>
-            <li><a href="implement.html#program">Program</a></li>
+            <li><a href="build.html#use-cases">Use cases</a></li>
+            <li><a href="build.html#faith-ai">Faith AI</a></li>
           </ul>
         </div>
         <div class="fw-footer__col">
-          <p class="fw-label"><a href="scale.html">Scale</a></p>
+          <p class="fw-label"><a href="business.html">For Business</a></p>
           <ul role="list">
-            <li><a href="scale.html#systems">Systems</a></li>
-            <li><a href="scale.html#transformation">Transformation</a></li>
-            <li><a href="scale.html#growth">Growth</a></li>
-            <li><a href="scale.html#leadership">Leadership</a></li>
+            <li><a href="business.html">Corporate training</a></li>
+            <li><a href="speaking.html">Speaking &amp; partnerships</a></li>
+            <li><a href="business.html#enquire">Request a proposal</a></li>
           </ul>
         </div>
         <div class="fw-footer__col">
-          <p class="fw-label"><a href="community.html">Community</a></p>
+          <p class="fw-label">Faith Works</p>
           <ul role="list">
-            <li><a href="community.html#highlights">Event highlights</a></li>
-            <li><a href="community.html#connection">Faith Works Community</a></li>
+            <li><a href="free-ai-starter-kit.html">Free AI Starter Kit</a></li>
+            <li><a href="resources.html">Resources</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="fw-footer__col">
@@ -408,8 +351,8 @@
       </nav>
 
       <div class="fw-footer__legal">
-        <p class="fw-body-s">© 2026 Faith Works · part of the Faith Works PH ecosystem.</p>
-        <p class="fw-body-s"><a href="about.html">About</a></p>
+        <p class="fw-body-s">© 2026 Faith Works PH</p>
+        <p class="fw-body-s"><a href="privacy.html">Privacy Notice</a> · <a href="contact.html">Contact</a></p>
       </div>
     </div>
   </footer>

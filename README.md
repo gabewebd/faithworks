@@ -34,7 +34,13 @@ Any static host (Vercel, Netlify, S3, a CDN) works as-is.
 
 ```text
 fw/
-├── index.html · learn.html · implement.html · scale.html · community.html · about.html
+├── index.html                 # Home
+├── learn.html · workshops.html # Learn AI: programs, insights · upcoming + past events
+├── build.html                 # Build with AI: use cases, workflows, templates, Faith AI
+├── business.html · speaking.html  # For Business: corporate training · speaking & partnerships
+├── resources.html · about.html · community.html · contact.html · privacy.html
+├── free-ai-starter-kit.html · free-ai-starter-kit-thank-you.html  # Campaign landing (reduced header)
+├── implement.html · scale.html  # Redirects to build.html / business.html (old URLs)
 ├── insight.html            # One Insight: insight.html?slug=<slug> (shareable, refreshable)
 ├── css/style.css
 ├── js/main.js
@@ -56,10 +62,10 @@ fw/
 
 ## Editing content
 
-Each JSON file starts with a `_readme` describing its fields.
+Each JSON file starts with a `_readme` describing its fields. Form fields and copy for the GHL build are in `docs/GHL-FORMS.md`.
 
 - **New insight:** add an object to `insights.json` with a unique `slug`. It appears on Learn (newest first, filterable by `topics`), opens at `insight.html?slug=<slug>`, and can be listed in other insights' `related`. Set `featured: true` on one insight to lead Home and Learn. Body `content` is a list of blocks: `paragraph`, `heading`, `subheading`, `list` (optionally `ordered`), `quote`, `callout` (examples, prompts), `takeaway`, `image`, `link`, `cta`. `resources` (ids from `resources.json`) adds a "Put it into practice" block at the end.
-- **New event:** add an object to `events.json`. `status: "upcoming"` with a `date` shows it in full (Home features the `featured` one); without a date it's listed as "coming soon". `status: "past"` with a `gallery` of photos adds it to the Past Events gallery on Community (list newest first). Each event has ONE call to action: `registrationUrl` + `registrationLabel` (`https://` links open in a new tab). A past event with no photos or description shows "Details and photos coming soon"; past events also appear in Home's Event highlights strip.
+- **New event:** add an object to `events.json`. Set `status: "past"` once the date has gone: it leaves every upcoming list and appears under Past events on `workshops.html`. `status: "upcoming"` with a `date` shows it in full (Home features the `featured` one); without a date it's listed as "coming soon". `status: "past"` with a `gallery` of photos adds it to the Past Events gallery on Community (list newest first). Each event has ONE call to action: `registrationUrl` + `registrationLabel` (`https://` links open in a new tab). A past event with no photos or description shows "Details and photos coming soon"; past events also appear in Home's Event highlights strip.
 - **Featured event:** set `featured: true` on one dated upcoming event. Home and Community both render it from that one record, with the same `.fw-event-feature` markup.
 - **Resources:** add an object to `resources.json`. `type` (Guide, Framework, Checklist, Worksheet, Plan, Program, Event) sets the card's mark; `status` is `available`, `on-request` (added to the Implement request form automatically) or `coming-soon`. A resource with `eventRef` takes its title, text, photo, date and link from that event, so nothing is written twice.
 - **Success stories:** edit `success-stories.json` (title, summary, category, image + imageAlt, url). The first story leads. The current records are `draft` layout slots (marked "Draft" on the page) — replace them with real, permitted stories and set `"showDrafts": false` before launch. Never invent a person, quote or result.

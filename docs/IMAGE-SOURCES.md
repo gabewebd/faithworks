@@ -18,14 +18,14 @@ In HTML the source sits on the `<picture>` as `data-image-source` with a comment
 | `temp-full-day-*` | insights.json: *Your Day Is Already Full* | https://unsplash.com/photos/a-couple-of-men-sitting-at-a-table-with-laptops-A9qQ8vE1Bmw |
 | `temp-learning-to-doing-*` | insights.json: *From Learning to Doing* | https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI |
 | `temp-leadership-*` | insights.json: *Where Human Judgment Still Matters* | https://unsplash.com/photos/a-group-of-people-sitting-around-a-table-with-laptops-cNGvcAvxHAo |
-| `temp-growth-*` | insights.json: *Purpose Before Productivity*; scale.html | https://unsplash.com/photos/woman-in-black-long-sleeve-shirt-standing-near-brown-wooden-shelf-3BdlPx8sBPw |
-| `temp-research-workflow-*` | insights.json: *How to Research Faster With AI*; resources.json: *AI-Assisted Research Workflow*; implement.html | https://unsplash.com/photos/person-holding-pencil-near-laptop-computer-5fNmWej4tAA |
+| `temp-growth-*` | insights.json: *Purpose Before Productivity*; business.html | https://unsplash.com/photos/woman-in-black-long-sleeve-shirt-standing-near-brown-wooden-shelf-3BdlPx8sBPw |
+| `temp-research-workflow-*` | insights.json: *How to Research Faster With AI*; resources.json: *AI-Assisted Research Workflow*; build.html | https://unsplash.com/photos/person-holding-pencil-near-laptop-computer-5fNmWej4tAA |
 | `temp-starter-kit-*` | resources.json: *Prompt Starter Kit & Tools Guide* | https://unsplash.com/photos/silver-laptop-computer-near-notebook-ck0i9Dnjtj0 |
-| `temp-opportunity-map-*` | resources.json: *AI Opportunity Map*; implement.html | https://unsplash.com/photos/man-in-white-long-sleeve-shirt-writing-on-white-board-um1zVjVCtEY |
-| `temp-team-systems-*` | resources.json: *AI Workforce Accelerator*; scale.html | https://unsplash.com/photos/team-collaborating-on-laptops-in-modern-office-N3Bf0ArT5J0 |
-| `temp-transformation-*` | scale.html | https://unsplash.com/photos/man-presenting-charts-on-a-large-screen-to-audience-d80Nf1ptTfY |
-| `temp-coaching-*` | implement.html (Program); resources.json: *30-Day AI Workforce Action Plan* | https://unsplash.com/photos/two-men-are-looking-at-a-laptop-on-a-table-3HduTMXyzFc |
-| `temp-faith-ai-*` | index.html, implement.html (Faith AI); insights.json: *A Learning Rhythm That Fits Real Life* | https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU |
+| `temp-opportunity-map-*` | resources.json: *AI Opportunity Map*; build.html | https://unsplash.com/photos/man-in-white-long-sleeve-shirt-writing-on-white-board-um1zVjVCtEY |
+| `temp-team-systems-*` | resources.json: *AI Workforce Accelerator*; business.html | https://unsplash.com/photos/team-collaborating-on-laptops-in-modern-office-N3Bf0ArT5J0 |
+| `temp-transformation-*` | business.html | https://unsplash.com/photos/man-presenting-charts-on-a-large-screen-to-audience-d80Nf1ptTfY |
+| `temp-coaching-*` | build.html (Program); resources.json: *30-Day AI Workforce Action Plan* | https://unsplash.com/photos/two-men-are-looking-at-a-laptop-on-a-table-3HduTMXyzFc |
+| `temp-faith-ai-*` | index.html, build.html (Faith AI); insights.json: *A Learning Rhythm That Fits Real Life* | https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU |
 | `temp-talks-*` | learn.html (Talks) | https://unsplash.com/photos/black-condenser-microphone-UUPpu2sYV6E |
 | `temp-speaker-*` | community.html (Stay connected) | https://unsplash.com/photos/a-woman-standing-on-a-stage-with-a-microphone-9zutjaUEN3Q |
 

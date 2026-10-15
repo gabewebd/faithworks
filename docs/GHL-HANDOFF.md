@@ -1,6 +1,6 @@
 # GoHighLevel handoff
 
-The site is six HTML pages (`index`, `learn`, `implement`, `scale`, `community`, `about`), the Insight page `insight.html`, one `css/style.css`, one `js/main.js`, and `assets/` (images, icons, and the JSON content in `assets/data/`). Every page uses the same CSS and JS.
+The site follows the brief's launch sitemap: `index`, `learn` (Learn AI), `workshops`, `build` (Build with AI), `business` (For Business), `speaking`, `resources`, `about`, `community`, `contact`, `privacy`, the campaign pages `free-ai-starter-kit` and `free-ai-starter-kit-thank-you` (reduced header, no main nav), and the Insight page `insight.html`. `implement.html` and `scale.html` only redirect to `build.html` and `business.html`: make them 301 redirects in GHL. Every form's fields and copy are in `docs/GHL-FORMS.md`. There is one `css/style.css`, one `js/main.js`, and `assets/` (images, icons, and the JSON content in `assets/data/`). Every page uses the same CSS and JS.
 
 ## Steps
 1. **Upload `css/style.css` to the CDN.**
@@ -25,7 +25,7 @@ The site is six HTML pages (`index`, `learn`, `implement`, `scale`, `community`,
    - Change image paths (`assets/images/…`, `assets/icons/…`) to their CDN or GHL URLs.
    - Swap in real content wherever there's a placeholder. Open the page with `?placeholders` to see them all outlined.
 8. **Replace links and forms.**
-   - Update CTA `href`s. Pages link to each other as `learn.html`, `implement.html#programs` and so on; swap these for your GHL page URLs, keeping the `#anchors`.
+   - Update CTA `href`s. Pages link to each other as `learn.html`, `build.html#program` and so on; swap these for your GHL page URLs, keeping the `#anchors`.
    - Replace the "Register" links with GHL forms or calendars.
    - Replace the footer `<form>` with a GHL form, but keep the `fw-footer__join` wrapper.
 

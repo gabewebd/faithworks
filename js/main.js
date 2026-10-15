@@ -547,11 +547,12 @@
     return e && e.status === "upcoming" ? e : leadEvent(d);
   }
 
-  /* Resources: a record with eventRef takes its title, text, image and link from that event */
+  /* Resources: a record with eventRef takes its title, text, image and link from that event.
+     Once that event is past, the resource drops out (no stale Register links). */
   function resourceList(d) {
     return d.resources.resources.map(function (r) {
       var e = r.eventRef && findEvent(d.events, r.eventRef);
-      if (!e) return r.eventRef ? null : r;
+      if (!e || e.status !== "upcoming") return r.eventRef ? null : r;
       return {
         id: r.id, type: r.type || typeLabel(e), category: r.category, topics: r.topics || e.tags, featured: r.featured,
         title: e.title, description: e.description, image: imageOf(e), url: e.registrationUrl,
@@ -897,6 +898,22 @@
           '<span class="fw-scale-paths__item"><span class="fw-index__title fw-h3">' + esc(e.title) + '<span class="fw-index__arrow" aria-hidden="true">→</span></span>' +
           '<span class="fw-body-s">' + esc(e.dateLabel || "Dates to be announced") + ".</span></span>" +
           '<span class="fw-label fw-index__meta">' + esc(e.registrationLabel || "Get notified") + "</span></a></li>";
+      }).join("");
+    } },
+
+    /* Workshops · past events (events.json status "past"), newest first. Kept apart from
+       upcoming ones (brief §2) and never with a Register button. */
+    "event-past": { needs: ["events"], render: function (el, d) {
+      var list = d.events.events.filter(function (e) { return e.status === "past" && e.date; })
+        .sort(function (a, b) { return isoDate(b.date).localeCompare(isoDate(a.date)); });
+      if (!list.length) { (el.closest("[data-fw-render-wrap]") || el).hidden = true; return; }
+      el.innerHTML = list.map(function (e) {
+        return '<li class="fw-dl__item">' +
+          '<div><p class="fw-label fw-meta"><time datetime="' + isoDate(e.date) + '">' + dateText(e.date) + "</time>" +
+            (e.location ? SEP + "<span>" + esc(e.location) + "</span>" : "") + "</p>" +
+            '<h3 class="fw-h2">' + esc(e.title) + "</h3>" +
+            '<p class="fw-body">' + esc(e.description) + "</p></div>" +
+          '<p class="fw-label">Past event · ' + esc(typeLabel(e)) + "</p></li>";
       }).join("");
     } },
 

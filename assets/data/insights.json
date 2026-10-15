@@ -59,7 +59,7 @@
         ] },
         { "type": "heading", "text": "The real shift" },
         { "type": "paragraph", "text": "The professionals who do well over the next few years won’t necessarily be the most technical. They’ll be the ones who combine what they already know with tools that remove the busywork, and who keep their judgment switched on while they do it. That’s a skill anyone can build, one task at a time." },
-        { "type": "cta", "title": "Start with a structured first step", "text": "The Prompt Starter Kit & Tools Guide walks you through your first AI-assisted workflow, with prompts to adapt and a plain-language guide to choosing tools.", "label": "Get the Prompt Starter Kit", "href": "implement.html#access" }
+        { "type": "cta", "title": "Start with a structured first step", "text": "The Prompt Starter Kit & Tools Guide walks you through your first AI-assisted workflow, with prompts to adapt and a plain-language guide to choosing tools.", "label": "Get the Prompt Starter Kit", "href": "build.html#access" }
       ],
       "resources": ["prompt-starter-kit", "opportunity-map"],
       "related": ["your-day-is-already-full", "ai-assisted-research-without-losing-accuracy", "where-human-judgment-still-matters"]
@@ -116,7 +116,7 @@
         { "type": "paragraph", "text": "It works best for tasks with lots of reading and a short output: briefs, summaries, proposals, background notes. Be more careful with legal, financial, medical or regulatory questions. Use AI to find and organize material there, but rely on qualified people and primary sources for the conclusions." },
         { "type": "heading", "text": "From one-off to repeatable" },
         { "type": "paragraph", "text": "The first time through, the workflow will feel slower than just asking a question. By the third time, you’ll have prompts you reuse, a table format you like, and a review habit that takes minutes. That’s when it stops being an experiment and becomes a system your team can share." },
-        { "type": "cta", "title": "Get the workflow on one page", "text": "The AI-Assisted Research Workflow checklist puts the five steps and the review questions on a single sheet.", "label": "Get the checklist", "href": "implement.html#access" }
+        { "type": "cta", "title": "Get the workflow on one page", "text": "The AI-Assisted Research Workflow checklist puts the five steps and the review questions on a single sheet.", "label": "Get the checklist", "href": "build.html#access" }
       ],
       "resources": ["research-workflow", "prompt-starter-kit"],
       "related": ["ai-is-not-another-niche-skill", "where-human-judgment-still-matters", "from-learning-to-doing"]
@@ -169,7 +169,7 @@
         ] },
         { "type": "heading", "text": "Small and repeated beats big and rare" },
         { "type": "paragraph", "text": "Three small uses a week, on real work, build the habit faster than one long session you keep postponing. After a month, you won’t be “learning AI” any more. You’ll just be working, a bit faster, with a bit more room for the parts of the job that need you." },
-        { "type": "cta", "title": "Want more structure?", "text": "The AI-Powered Daily Work track of the AI Workforce Accelerator builds this into a portfolio of AI-assisted workflows for your own role.", "label": "See the program", "href": "implement.html#program" }
+        { "type": "cta", "title": "Want more structure?", "text": "The AI-Powered Daily Work track of the AI Workforce Accelerator builds this into a portfolio of AI-assisted workflows for your own role.", "label": "See the program", "href": "build.html#program" }
       ],
       "resources": ["prompt-starter-kit", "program"],
       "related": ["a-learning-rhythm-that-fits-real-life", "ai-is-not-another-niche-skill", "from-learning-to-doing"]
@@ -228,7 +228,7 @@
         ] },
         { "type": "heading", "text": "Why programs end in something concrete" },
         { "type": "paragraph", "text": "This is the idea behind how Faith Works programs are structured. Each track of the AI Workforce Accelerator ends in something you can use: a 30-day action plan, an AI-assisted workflow portfolio, an implementation roadmap, or one priority AI solution built with a coach. The output is the proof that learning became doing." },
-        { "type": "cta", "title": "See what each track leaves you with", "label": "Explore the AI Workforce Accelerator", "href": "implement.html#program" }
+        { "type": "cta", "title": "See what each track leaves you with", "label": "Explore the AI Workforce Accelerator", "href": "build.html#program" }
       ],
       "resources": ["program", "action-plan"],
       "related": ["ai-is-not-another-niche-skill", "where-human-judgment-still-matters", "a-learning-rhythm-that-fits-real-life"]
@@ -290,7 +290,7 @@
         ] },
         { "type": "heading", "text": "Leading the change, not just approving it" },
         { "type": "paragraph", "text": "The leaders who handle this well don’t need to be the most technical people in the room. They make the decisions only they can make, give their teams clear boundaries, and create room to learn. That’s what turns scattered experiments into practical adoption." },
-        { "type": "cta", "title": "Bring this to your team", "text": "Scale covers systems, transformation and leadership for organizations moving from AI experiments to everyday practice.", "label": "Explore Scale: Leadership", "href": "scale.html#leadership" }
+        { "type": "cta", "title": "Bring this to your team", "text": "Scale covers systems, transformation and leadership for organizations moving from AI experiments to everyday practice.", "label": "Explore Scale: Leadership", "href": "business.html#leadership" }
       ],
       "resources": ["opportunity-map", "program"],
       "related": ["purpose-before-productivity", "ai-assisted-research-without-losing-accuracy", "from-learning-to-doing"]
@@ -384,7 +384,7 @@
         { "type": "heading", "text": "Keep a simple learning log" },
         { "type": "paragraph", "text": "A log doesn’t need to be elaborate. A note on your phone with three columns (the task, what you tried, what worked) is enough. After a month you’ll have a record of what actually helps you, which is more useful than any general list of tips." },
         { "type": "heading", "text": "Add a deeper session now and then" },
-        { "type": "paragraph", "text": "Regular practice builds the habit. Occasional deeper sessions, like a hands-on <a href=\"community.html#events\">workshop</a>, stretch you further: you try things you wouldn’t attempt alone, ask questions, and see how others are applying the same tools. Between sessions, a community of people learning the same things keeps the momentum going." },
+        { "type": "paragraph", "text": "Regular practice builds the habit. Occasional deeper sessions, like a hands-on <a href=\"workshops.html\">workshop</a>, stretch you further: you try things you wouldn’t attempt alone, ask questions, and see how others are applying the same tools. Between sessions, a community of people learning the same things keeps the momentum going." },
         { "type": "takeaway", "title": "Try this week", "items": [
           "Choose one fifteen-minute slot and protect it.",
           "Use it on a real task, not a tutorial.",

@@ -1,11 +1,10 @@
 {
-  "_readme": "Faith Works events: the single source for every upcoming event on Home, Learn and Community. Add a record and it appears everywhere it belongs; no HTML changes. FIELDS: id + slug (stable ids) · title · shortTitle (optional, for tight spots) · type (workshop | masterclass | program | forum) + typeLabel (shown on the page) · status ('upcoming'; past moments go in event-highlights.json) · featured (true on ONE upcoming event: it leads Home and Community) · date: { day: '30', month: 'SEP', year: '2026' } drives the yellow date card and the sort order; null when not set yet · dateDisplay (optional human text for the schedule, e.g. a multi-session cohort) · dateLabel (shown when date is null, e.g. 'Dates to be announced') · location · audience · host · description · highlights (short bullets) · note (small print) · registrationUrl + registrationLabel: the ONE call to action (https:// links open in a new tab; undated events point to the notify form, community.html#register) · tags · image: every event has one ({ base + widths } for responsive files, or a plain path string with imageAlt). Until an event has its own photo, use one from a past Faith Works session and say so in image.caption.",
+  "_readme": "Faith Works events: the single source for every upcoming event on Home, Learn and Community. Add a record and it appears everywhere it belongs; no HTML changes. FIELDS: id + slug (stable ids) · title · shortTitle (optional, for tight spots) · type (workshop | masterclass | program | forum) + typeLabel (shown on the page) · status ('upcoming' | 'past': past events stay on file but leave every upcoming list; photos of past moments go in event-highlights.json) · featured (true on ONE upcoming event: it leads Home and Community) · date: { day: '30', month: 'SEP', year: '2026' } drives the yellow date card and the sort order; null when not set yet · dateDisplay (optional human text for the schedule, e.g. a multi-session cohort) · dateLabel (shown when date is null, e.g. 'Dates to be announced') · location · audience · host · description · highlights (short bullets) · note (small print) · registrationUrl + registrationLabel: the ONE call to action (https:// links open in a new tab; undated events point to the notify form, community.html#register) · tags · image: every event has one ({ base + widths } for responsive files, or a plain path string with imageAlt). Until an event has its own photo, use one from a past Faith Works session and say so in image.caption.",
   "events": [
     {
       "id": "ai-linkedin-b2b-growth-accelerator-2026",
       "slug": "ai-linkedin-b2b-growth-system",
-      "status": "upcoming",
-      "featured": true,
+      "status": "past",
       "type": "program",
       "typeLabel": "Cohort program",
       "title": "AI + LinkedIn B2B Growth Accelerator",
@@ -51,7 +50,7 @@
     {
       "id": "ai-for-business-2026-09-25",
       "slug": "ai-for-business-hands-on-workshop",
-      "status": "upcoming",
+      "status": "past",
       "type": "workshop",
       "typeLabel": "Workshop",
       "title": "AI for Business: Hands-On Workshop",
