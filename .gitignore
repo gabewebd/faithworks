@@ -1,7 +1,7 @@
 # Dependencies / build output
 node_modules/
 dist/
-build/
+# Note: no generic build/ rule. /build/ is the "Build with AI" page (build/index.html).
 .cache/
 .parcel-cache/
 
