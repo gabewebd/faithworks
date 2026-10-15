@@ -1,81 +1,65 @@
 # Faith Works Website
 
-A premium, content-rich website for Faith Works — a practical education and business transformation platform focused on AI, business, leadership, purposeful growth, and real-world implementation.
+The Faith Works homepage: practical AI learning for founders, professionals and teams.
 
-Built with **plain HTML, CSS, and JavaScript** plus **JSON for content**, for maximum portability and an eventual **GoHighLevel (GHL)** handoff.
+**Current phase:** a single-page foundation rebuilt from Ms. Faith's approved single-HTML design
+(`docs/source/faithworks-chatgpt-source.html`). Additional pages come after this page is reviewed and approved.
 
-**No framework. No build step. No npm. No backend.**
-
----
+Built with **plain HTML, CSS and JavaScript**. No framework, no build step, no npm, no backend.
 
 ## Architecture
 
 | Layer | Where | What |
 | --- | --- | --- |
-| Structure | `*.html` | Pages, navigation, permanent sections |
-| Design | `css/style.css` | The whole visual system |
-| Interaction | `js/main.js` | Animations, menus, rendering JSON content, Insight article pages |
-| Dynamic content | `assets/data/*.json` | Insights, events, resources, success stories, AI tools, social links |
-| Media | `assets/images`, `assets/icons` | Photos, logos |
-
-**Add data → content appears.** Adding an insight or an event means editing one JSON file, not five HTML pages.
+| Structure + copy | `index.html` | The whole page, in source order |
+| Design | `css/style.css` | Tokens, components, motion graphics, responsive rules |
+| Interaction | `js/main.js` | Navigation, examples, learning journey, dialogs, line-draw reveals |
+| Media | `assets/icons`, `assets/images` | Wordmark, favicon, photography for later pages |
+| Downloads | `assets/downloads` | The starter worksheet |
 
 ## Running it locally
-
-The JSON is loaded with `fetch()`, which browsers block on `file://` pages, so serve the folder:
 
 ```bash
 python -m http.server 8000     # then open http://localhost:8000
 ```
 
-Any static host (Vercel, Netlify, S3, a CDN) works as-is.
+Opening `index.html` directly also works, because nothing is fetched at runtime.
 
 ## Project structure
 
 ```text
 fw/
-├── index.html                 # Home
-├── learn.html · workshops.html # Learn AI: programs, insights · upcoming + past events
-├── build.html                 # Build with AI: use cases, workflows, templates, Faith AI
-├── business.html · speaking.html  # For Business: corporate training · speaking & partnerships
-├── resources.html · about.html · community.html · contact.html · privacy.html
-├── free-ai-starter-kit.html · free-ai-starter-kit-thank-you.html  # Campaign landing (reduced header)
-├── implement.html · scale.html  # Redirects to build.html / business.html (old URLs)
-├── insight.html            # One Insight: insight.html?slug=<slug> (shareable, refreshable)
+├── index.html
 ├── css/style.css
 ├── js/main.js
 ├── assets/
-│   ├── data/
-│   │   ├── insights.json         # Every Insight: cards on Home + Learn, and the article page (insight.html?slug=…)
-│   │   ├── events.json           # Upcoming events; date { day, month, year } drives the yellow date card
-│   │   ├── event-highlights.json # The photo/video gallery on Community (#highlights)
-│   │   ├── resources.json        # Guides, frameworks, checklists, programs (Learn, Implement)
-│   │   ├── programs.json         # The AI Workforce Accelerator and its tracks (Implement #program)
-│   │   ├── success-stories.json  # Success stories (Home); drafts until real ones exist
-│   │   ├── tools.json            # AI tools (Implement)
-│   │   └── site.json             # Social icons + the Facebook Group call to action
+│   ├── downloads/AI_Workflow_Starter.txt
+│   ├── icons/          # wordmark, wordmark-reversed, favicon, tools/
 │   ├── images/
-│   └── icons/              # Wordmark, favicon, tools/ (AI tool logos)
-├── docs/ (GHL-HANDOFF.md, IMAGE-SOURCES.md, concept PDF)
+│   └── data/           # JSON content from the earlier multi-page build, kept for later pages (not used yet)
+├── docs/
+│   ├── source/faithworks-chatgpt-source.html   # the approved design source (reference only)
+│   └── GHL-HANDOFF.md · GHL-FORMS.md · IMAGE-SOURCES.md
 └── DESIGN.md
 ```
 
-## Editing content
+## What works on the page
 
-Each JSON file starts with a `_readme` describing its fields. Form fields and copy for the GHL build are in `docs/GHL-FORMS.md`.
+- Responsive navigation (menu below 1080px; Escape closes it) with the current section marked.
+- Example tabs ("Make it concrete") and the five-step learning journey.
+- Program details dialogs, FAQs, and the starter worksheet download.
+- The inquiry builder: it prepares a `.txt` conversation brief **locally**. Nothing is submitted, because forms, calendar and CRM are not connected yet (see `docs/GHL-HANDOFF.md`).
 
-- **New insight:** add an object to `insights.json` with a unique `slug`. It appears on Learn (newest first, filterable by `topics`), opens at `insight.html?slug=<slug>`, and can be listed in other insights' `related`. Set `featured: true` on one insight to lead Home and Learn. Body `content` is a list of blocks: `paragraph`, `heading`, `subheading`, `list` (optionally `ordered`), `quote`, `callout` (examples, prompts), `takeaway`, `image`, `link`, `cta`. `resources` (ids from `resources.json`) adds a "Put it into practice" block at the end.
-- **New event:** add an object to `events.json`. Set `status: "past"` once the date has gone: it leaves every upcoming list and appears under Past events on `workshops.html`. `status: "upcoming"` with a `date` shows it in full (Home features the `featured` one); without a date it's listed as "coming soon". `status: "past"` with a `gallery` of photos adds it to the Past Events gallery on Community (list newest first). Each event has ONE call to action: `registrationUrl` + `registrationLabel` (`https://` links open in a new tab). A past event with no photos or description shows "Details and photos coming soon"; past events also appear in Home's Event highlights strip.
-- **Featured event:** set `featured: true` on one dated upcoming event. Home and Community both render it from that one record, with the same `.fw-event-feature` markup.
-- **Resources:** add an object to `resources.json`. `type` (Guide, Framework, Checklist, Worksheet, Plan, Program, Event) sets the card's mark; `status` is `available`, `on-request` (added to the Implement request form automatically) or `coming-soon`. A resource with `eventRef` takes its title, text, photo, date and link from that event, so nothing is written twice.
-- **Success stories:** edit `success-stories.json` (title, summary, category, image + imageAlt, url). The first story leads. The current records are `draft` layout slots (marked "Draft" on the page) — replace them with real, permitted stories and set `"showDrafts": false` before launch. Never invent a person, quote or result.
-- **AI tools:** edit `tools.json` (name, `category`, `logo` in `assets/icons/tools/`, `url`, `description`; `home: true` also lists it on Home). Shown as examples, not endorsements.
-- **Social links + Facebook Group:** edit `site.json` (`social` for the icons, `community` for the "Join the community" panel on Home and Community). Only add a channel once its URL is confirmed.
+## Motion graphics
 
-Images in JSON use `{ "base": "assets/images/name", "widths": [480, 960] }` (the site builds `name-480.webp` / `.jpg` …) or `{ "url": "https://…" }` for a single file, plus `width`, `height`, `alt` and `position`. Every insight, event and resource has an image. Temporary stock photos also carry `source` (their origin URL, output as `data-image-source`) and are listed in `docs/IMAGE-SOURCES.md`; an upcoming event using a photo from a past session says so in `caption`.
+Two SVG motifs from the earlier build are reused:
 
-## Insight article pages
+- **Build motif** (framework → workflow → system) on the dark "Don't stop at knowing" card. It assembles once in view, and the selected journey step controls how much of the system is built. Improve adds a signal flowing through it.
+- **Corner circuits** on the yellow closing call to action. They draw in once.
 
-Every Insight card links to its own page, `insight.html?slug=…`: the site header and footer with the full article rendered from `insights.json` (category, title, date, cover image, body, "Put it into practice" resources, related insights, Back and Share). An unknown slug shows a "not found" state with a link back to Learn.
+All motion sits inside `prefers-reduced-motion: no-preference`. With reduced motion or without JS, the finished drawings show statically.
 
-Social previews (Open Graph) for each Insight need per-page HTML, which a static JSON site can't generate; in GHL, Insights can become individual blog/CMS pages (see `docs/GHL-HANDOFF.md`).
+## Previous implementation
+
+The earlier multi-page site (Learn, Build, Business, Community, Insights…) is preserved in Git history:
+commit `faff08d` ("Snapshot multi-page implementation before single-page rebuild").
