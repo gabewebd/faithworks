@@ -149,25 +149,25 @@
 
           <div class="flow__canvas is-playing" data-ui id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
             <article class="flow__stage flow__stage--task">
-              <p class="flow__kicker"><span class="flow__step">01</span>THE TASK</p>
+              <p class="flow__kicker">THE TASK</p>
               <h3 id="example-task">Turn a topic into a content plan.</h3>
               <p id="example-input">Start with your audience, one business objective and approved source notes.</p>
               <ul class="flow__chips" id="example-chips" aria-label="Starting inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
             </article>
             <article class="flow__stage flow__stage--ai">
-              <p class="flow__kicker"><span class="flow__step">02</span>AI ASSISTS</p>
+              <p class="flow__kicker">AI ASSISTS</p>
               <div class="flow__tools" aria-hidden="true"><span class="flow__tool"><img class="tool" src="/assets/icons/tools/claude.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="/assets/icons/tools/chatgpt.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="/assets/icons/tools/gemini.svg" alt="" width="18" height="18"></span></div>
               <p class="flow__status"><span class="flow__status-dot" aria-hidden="true"></span>Drafts a first version</p>
               <span class="flow__bar" aria-hidden="true"><span></span></span>
               <p class="flow__note">Example tools only. Any capable assistant works.</p>
             </article>
             <article class="flow__stage flow__stage--check">
-              <p class="flow__kicker"><span class="flow__step">03</span>YOU STAY IN CONTROL</p>
+              <p class="flow__kicker">YOU STAY IN CONTROL</p>
               <span class="flow__seal" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></span>
               <p id="example-review">Check accuracy, voice and whether every claim is supported.</p>
             </article>
             <article class="flow__stage flow__stage--output">
-              <p class="flow__kicker"><span class="flow__step">04</span>ILLUSTRATIVE OUTPUT</p>
+              <p class="flow__kicker">ILLUSTRATIVE OUTPUT</p>
               <h3 id="example-title">A simple content planning workflow</h3>
               <ol id="example-list" class="flow__list"><li>Choose one useful audience question</li><li>Draft three angles from your source notes</li><li>Review and turn one angle into a publishable draft</li></ol>
               <a class="text-link" href="/learn/">Find a learning pathway <span class="link-arrow" aria-hidden="true">↗</span></a>
@@ -456,13 +456,25 @@
           <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <p class="small">Free. No card required. Designed for nontechnical learners.</p>
         </div>
-        <div class="worksheet" aria-label="What is inside the kit">
-          <p class="worksheet__title">Inside the kit</p>
-          <div><b>Task selector</b> Compare three recurring tasks</div>
-          <div><b>Workflow map</b> Inputs, AI steps, human checks</div>
-          <div><b>Prompt starter</b> With one completed example</div>
-          <div><b>Three examples</b> Content, follow-up, team knowledge</div>
-          <div><b>Small test plan</b> Try it safely, then improve</div>
+        <div class="kitart" data-ui aria-label="What is inside the kit">
+          <div class="kitart__stack">
+            <span class="kitart__back" aria-hidden="true"></span>
+            <div class="kitart__doc">
+              <div class="kitart__head">
+                <span class="kitart__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h4"/></svg></span>
+                <div>
+                  <p class="kitart__tag">Free PDF · Inside the kit</p>
+                  <p class="kitart__title">AI Workflow Starter Kit</p>
+                </div>
+              </div>
+              <ul class="kitart__list"><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Task selector</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Workflow map</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Prompt starter</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Three examples</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Small test plan</li></ul>
+            </div>
+            <!-- The workflow around the kit: your task, AI drafts, you review -->
+            <span class="kitart__wire" aria-hidden="true"></span>
+            <span class="kitart__node kitart__node--task" aria-hidden="true"><svg viewBox="0 0 48 40" focusable="false"><rect x="10" y="13" width="28" height="4" rx="2"/><rect x="10" y="23" width="18" height="4" rx="2"/></svg></span>
+            <span class="kitart__node kitart__node--ai" aria-hidden="true"><img src="/assets/icons/tools/claude.svg" alt="" width="26" height="26"></span>
+            <span class="kitart__node kitart__node--ok" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5 10 17.5 19 7"/></svg></span>
+          </div>
         </div>
       </div>
     </section>

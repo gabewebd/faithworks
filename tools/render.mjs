@@ -1,6 +1,13 @@
 // Content renderers for tools/build.mjs. A page source calls one with {{name}} or {{name:arg}}.
-// Everything here renders from assets/data/*.json so a content change is a data change.
+// Content comes from the CMS (tools/content.mjs). Program, event, resource and testimonial pages
+// are page documents (cms/shared/page-doc.mjs): this file fills in the values Details controls
+// and the parts only the website can generate (forms, lists of other pages).
 import { esc } from "./layout.mjs";
+import {
+  badge, tbc, list, extLink as ext, img, preview, eventCta, isPastEvent, programCtaLabel,
+  applyBindings, bindingValues, fillComponents, recordComponent,
+} from "../cms/shared/page-doc.mjs";
+export { img, preview };
 
 let D;
 export function init(data) { D = data; }
@@ -9,88 +16,30 @@ const TZ = "Asia/Manila";
 const today = new Date();
 
 /* ---- Helpers ----------------------------------------------------------- */
-const tbc = (v, fallback = "To be confirmed") => (v == null || v === "" ? `<span class="tbc">${fallback}</span>` : esc(v));
-const list = (items, cls = "") => `<ul${cls ? ` class="${cls}"` : ""}>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
-const ext = (url, label, track) =>
-  `<a class="text-link" href="${esc(url)}" target="_blank" rel="noopener"${track ? ` data-track="${track}"` : ""}>${esc(label)} <span class="link-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`;
-
 function eventDate(e) {
   if (!e.date) return null;
   return new Date(`${e.date}T12:00:00+08:00`);
 }
 function fmt(d, opts) { return new Intl.DateTimeFormat("en-PH", { timeZone: TZ, ...opts }).format(d); }
-function isPast(e) {
-  const d = eventDate(e);
-  return e.status === "past" || (d && d < today);
-}
+const isPast = (e) => isPastEvent(e.rec, today);
 
-const STATUS = {
-  open: ["Registration open", "open"],
-  waitlist: ["Waitlist", "waitlist"],
-  "sold-out": ["Sold out · waitlist open", "soldout"],
-  tba: ["Dates to be announced", "tba"],
-  past: ["Past event", "past"],
-  inquiry: ["Ask about the next run", "waitlist"],
-  planned: ["Planned · not yet open", "planned"],
-};
-function badge(key, label) {
-  const [text, tone] = STATUS[key] || [label || key, "tba"];
-  return `<span class="badge badge--${tone}">${esc(label || text)}</span>`;
+// A page document with its Details values and generated parts filled in. `site` adds the
+// components that need other content (forms, lists); the rest come from the record itself.
+function docBody(item, collection, site = {}) {
+  const { doc } = item;
+  let html = applyBindings(doc.html, bindingValues(collection, doc.rec), { removeEmptyLinks: true });
+  html = fillComponents(html, (name) => {
+    if (site[name]) return site[name]();
+    const out = recordComponent(name, collection, doc.rec, { today });
+    return out === undefined ? "" : out;
+  });
+  return `${doc.css ? `<style>${doc.css}</style>` : ""}<div class="cms-page ${doc.scope}">${html}</div>`;
 }
-
-/* ---- Output previews (illustrative interface fragments, no motion) ------ */
-const PREVIEWS = {
-  "readiness-map": () => `<figure class="preview" data-ui>
-      <figcaption class="preview__cap">Example output · Workflow readiness map</figcaption>
-      <table class="preview__table">
-        <thead><tr><th scope="col">Recurring task</th><th scope="col">How often</th><th scope="col">Risk</th><th scope="col">Who reviews</th></tr></thead>
-        <tbody>
-          <tr class="is-picked"><td>Weekly team update</td><td>Weekly</td><td><span class="chip chip--low">Low</span></td><td>You</td></tr>
-          <tr><td>Inquiry follow-up</td><td>Daily</td><td><span class="chip chip--low">Low</span></td><td>Owner</td></tr>
-          <tr><td>Client proposal</td><td>Monthly</td><td><span class="chip chip--mid">Medium</span></td><td>Manager</td></tr>
-        </tbody>
-      </table>
-      <p class="preview__foot"><span class="chip chip--pick">Start here</span> Weekly, low risk and easy to check.</p>
-    </figure>`,
-  "content-plan": () => `<figure class="preview" data-ui>
-      <figcaption class="preview__cap">Example output · Four-week content plan</figcaption>
-      <ol class="preview__plan">
-        <li><b>Week 1</b><span>Answer a question clients often ask</span><span class="chip chip--done">Reviewed</span></li>
-        <li><b>Week 2</b><span>Share a practical how-to from your work</span><span class="chip chip--done">Reviewed</span></li>
-        <li><b>Week 3</b><span>A lesson from a recent project</span><span class="chip chip--draft">AI draft</span></li>
-        <li><b>Week 4</b><span>Invite a conversation about one problem</span><span class="chip">Idea</span></li>
-      </ol>
-    </figure>`,
-  prototype: () => `<figure class="preview preview--proto" data-ui>
-      <figcaption class="preview__cap">Example output · A first landing page and lead tracker</figcaption>
-      <div class="proto">
-        <div class="proto__bar"><i></i><i></i><i></i><span>your-first-version</span></div>
-        <div class="proto__body">
-          <div class="proto__page"><span class="proto__nav"></span><span class="proto__h"></span><span class="proto__h proto__h--short"></span><span class="proto__btn"></span></div>
-          <div class="proto__tracker">
-            <p class="proto__title">Lead tracker</p>
-            <p class="proto__row"><span>New inquiry</span><b class="is-new">New</b></p>
-            <p class="proto__row"><span>Workshop question</span><b class="is-follow">Follow up</b></p>
-            <p class="proto__row"><span>Team proposal</span><b class="is-done">Done</b></p>
-          </div>
-        </div>
-      </div>
-    </figure>`,
-  assistant: () => `<figure class="preview" data-ui>
-      <figcaption class="preview__cap">Example output · A business assistant with review points</figcaption>
-      <div class="preview__chat">
-        <p class="preview__msg preview__msg--in">Can I move my session to next week?</p>
-        <p class="preview__msg preview__msg--out">Draft reply: “Yes, here are the available dates…”<span class="chip chip--draft">Needs your review</span></p>
-        <p class="preview__msg preview__msg--flag">Refund request detected → handed to a person</p>
-      </div>
-    </figure>`,
-};
-export function preview(kind) { return (PREVIEWS[kind] || (() => ""))(); }
+// "Custom page layout" pages are rendered without the global header and footer.
+const pageFrame = (item) => ({ chrome: item.doc.layout !== "custom" });
 
 /* ---- Programs ---------------------------------------------------------- */
-function ctaFor(p) {
-  return { waitlist: "Join the waitlist", inquiry: "Ask about the next run", planned: "Register your interest", open: "Register" }[p.statusKey] || "Ask about this program";
-}
+const ctaFor = (p) => programCtaLabel(p.rec);
 
 // Home: bento of the three open-track programs. One featured card (Charcoal panel) spans two rows;
 // the other two sit beside it on solid Faith Pink and AI Yellow. Each colour panel carries a static
@@ -98,6 +47,18 @@ function ctaFor(p) {
 const BENTO_TONE = { "ai-workforce-accelerator": "ink", "ai-linkedin-b2b-growth": "pink", "ai-websites-workflow-building": "yellow" };
 // The approved homepage's typographic marks for each pathway
 const BENTO_SYMBOL = { "ai-workforce-accelerator": "[ AI ]", "ai-linkedin-b2b-growth": "in ↗", "ai-websites-workflow-building": "↗_" };
+// Each colour panel shows one short, simplified example of what a learner produces.
+// Rows are [text, status, tone]; the tone colours the status chip, "picked" highlights the row.
+const BENTO_ART = {
+  "ai-workforce-accelerator": ["Pick one task to start", [["Weekly team update", "Start here", "picked"], ["Inquiry follow-up"], ["Client proposal"]]],
+  "ai-linkedin-b2b-growth": ["A four-week content plan", [["Week 1 · A client question", "Reviewed", "pink"], ["Week 2 · A practical how-to", "Reviewed", "pink"], ["Week 3 · A recent lesson", "AI draft", "yellow"]]],
+  "ai-websites-workflow-building": ["A simple lead tracker", [["New inquiry", "New", "pink"], ["Workshop question", "Follow up", "yellow"], ["Team proposal", "Done", "stone"]]],
+};
+function bentoArt(slug) {
+  const [label, rows] = BENTO_ART[slug];
+  return `<ul class="pick" aria-label="${esc(label)}">${rows.map(([t, chip, tone]) =>
+    `<li${tone === "picked" ? ' class="is-picked"' : ""}>${esc(t)}${chip ? ` <span class="pick__chip pick__chip--${tone}">${esc(chip)}</span>` : ""}</li>`).join("")}</ul>`;
+}
 export function programRowsHome() {
   const picks = D.programs.filter((p) => BENTO_TONE[p.slug]);
   return `<div class="bento">${picks.map((p, i) => `
@@ -105,7 +66,7 @@ export function programRowsHome() {
         <div class="bento__art">
           <p class="bento__labels">${esc(p.category)}</p>
           <p class="bento__symbol" aria-hidden="true">${esc(BENTO_SYMBOL[p.slug])}</p>
-          ${preview(p.preview)}
+          ${bentoArt(p.slug)}
         </div>
         <div class="bento__body">
           <h3><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
@@ -113,7 +74,7 @@ export function programRowsHome() {
           <p class="bento__leave">You leave with</p>
           ${list(p.outputs, "ticks bento__list")}
           <div class="bento__foot">
-            <a class="btn btn--light" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="link-arrow" aria-hidden="true">↗</span></a>
             ${badge(p.statusKey, p.statusLabel)}
           </div>
         </div>
@@ -143,100 +104,29 @@ export function programCards() {
 }
 
 export function programPage(p) {
+  if (!p.doc) return null;
   const others = D.programs.filter((o) => o.slug !== p.slug);
-  const facts = [
-    ["Status", badge(p.statusKey, p.statusLabel)],
-    ["Format", tbc(p.format)],
-    ["Time commitment", tbc(p.timeCommitment)],
-    ["Location", tbc(p.location)],
-    ["Fee", tbc(p.fee, "Published when the next intake is confirmed")],
-    ["Next intake", tbc(p.nextIntake, "To be announced")],
-    ["Instructor", tbc(p.instructor)],
-  ];
-  const section = (cond, html) => (cond ? html : "");
-  const body = `
-    <section class="phero phero--${p.tone} phero--program" aria-labelledby="program-title">
-      <div class="wrap phero__grid">
-        <div class="phero__copy">
-          <nav class="crumbs" aria-label="Breadcrumb"><a href="/learn/">Learn AI</a><span aria-hidden="true">/</span><span aria-current="page">${esc(p.shortTitle)}</span></nav>
-          <h1 id="program-title">${esc(p.title)}</h1>
-          <p class="phero__lead">${esc(p.summary)}</p>
-          <div class="actions">
-            <a class="btn" href="#register" data-track="registration_start">${ctaFor(p)} <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></a>
-            <a class="btn btn--light" href="/contact/?type=programs">Ask a question</a>
-          </div>
-        </div>
-        <aside class="facts" aria-label="Program facts">
-          <dl>${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
-        </aside>
-      </div>
-    </section>
-
-    <section class="section wrap split" aria-labelledby="for-title">
-      <div>
-        <h2 id="for-title">Who it’s for</h2>
-        <p class="split__lead">${esc(p.problem)}</p>
-      </div>
-      <div>${list(p.audience, "ticks")}</div>
-    </section>
-
-    <section class="section band band--stone" aria-labelledby="outcomes-title">
-      <div class="wrap outcomes">
-        <div>
-          <h2 id="outcomes-title">What you’ll learn</h2>
-          <ol class="numbered">${p.outcomes.map((o) => `<li>${esc(o)}</li>`).join("")}</ol>
-        </div>
-        <div class="outcomes__leave">
-          <h3>What you leave with</h3>
-          ${list(p.outputs, "ticks")}
-          ${preview(p.preview)}
-          <p class="small">Illustrative example. Your output depends on the task you bring.</p>
-        </div>
-      </div>
-    </section>
-
-    ${section(p.agenda.length, `<section class="section wrap" aria-labelledby="agenda-title">
-      <div class="section-head"><h2 id="agenda-title">How it runs</h2><p>The outline below is the planned flow. Session dates and durations are confirmed with each intake.</p></div>
-      <ol class="agenda">${p.agenda.map((a) => `<li><h3>${esc(a.title)}</h3><p>${esc(a.text)}</p></li>`).join("")}</ol>
-    </section>`)}
-
-    <section class="section wrap needs" aria-labelledby="needs-title">
-      <h2 id="needs-title" class="sr-only">Requirements and scope</h2>
-      <div class="needs__col"><h3>What you need</h3>${list(p.requirements, "ticks")}</div>
-      ${section(p.inclusions && p.inclusions.length, `<div class="needs__col"><h3>Included</h3>${list(p.inclusions || [], "ticks")}</div>`)}
-      ${section(p.exclusions && p.exclusions.length, `<div class="needs__col needs__col--not"><h3>Not included</h3>${list(p.exclusions, "crosses")}</div>`)}
-    </section>
-
-    ${section(p.faq.length, `<section class="section section--rule wrap" aria-labelledby="pfaq-title">
-      <div class="faq"><div class="faq__head"><h2 id="pfaq-title">Questions about this program</h2></div>
-      <div class="faq__items">${p.faq.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("")}</div></div>
-    </section>`)}
-
-    <section class="section band band--pink" id="register" aria-labelledby="register-title">
-      <div class="wrap formblock">
-        <div class="formblock__intro">
-          <h2 id="register-title">${ctaFor(p)}.</h2>
-          <p>${p.statusKey === "open" ? "Reserve your place." : "There is no open intake yet. Leave your details and we will contact you when dates, fees and inclusions are confirmed. No payment is taken here."}</p>
-          ${badge(p.statusKey, p.statusLabel)}
-        </div>
-        ${programForm(p)}
-      </div>
-    </section>
-
-    <section class="section wrap" aria-labelledby="more-title">
-      <h2 id="more-title" class="h3">Other programs</h2>
-      <ul class="more">${others.map((o) => `<li><a href="/programs/${o.slug}/" data-track="program_click"><span>${esc(o.title)}</span>${badge(o.statusKey, o.statusLabel)}</a></li>`).join("")}</ul>
-    </section>`;
+  const body = docBody(p, "programs", {
+    "program-form": () => programForm(p),
+    "other-programs": () => others.map((o) => `<li><a href="/programs/${o.slug}/" data-track="program_click"><span>${esc(o.title)}</span>${badge(o.statusKey, o.statusLabel)}</a></li>`).join(""),
+  });
   return {
-    title: `${p.title} · Faith Works`,
-    description: p.summary,
+    title: p.seoTitle || `${p.title} · Faith Works`,
+    description: p.metaDescription || p.summary,
     path: `/programs/${p.slug}/`,
     nav: "learn",
     body,
+    image: p.socialImage || p.image?.url,
+    ...pageFrame(p),
   };
 }
 
 /* ---- Events ------------------------------------------------------------ */
+const venue = (e, past) => tbc(e.venue, past ? "Not listed" : "To be confirmed") + (e.mapUrl ? ` · ${ext(e.mapUrl, "Map")}` : "");
+const timeLabel = (e) => (e.timeZone && e.timeZone !== "Asia/Manila" ? `Time (${esc(e.timeZone)})` : "Time (Asia/Manila)");
+const timeValue = (e, past) => (e.time ? esc(e.time) + (e.timeZone && e.timeZone !== "Asia/Manila" ? "" : " PHT") : '<span class="tbc">' + (past ? "Not listed" : "To be confirmed") + "</span>");
+const eventImg = (im) => `<img src="${esc(im.src)}"${im.width && im.height ? ` width="${im.width}" height="${im.height}"` : ""} alt="${esc(im.alt)}" loading="lazy" decoding="async">`;
+
 function eventCard(e) {
   const d = eventDate(e);
   const past = isPast(e);
@@ -244,12 +134,7 @@ function eventCard(e) {
   const when = d
     ? `<time datetime="${e.date}">${fmt(d, { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</time>`
     : `<span>${esc(e.dateLabel || "Date to be announced")}</span>`;
-  const dest = e.destination || { type: "none" };
-  let cta = "";
-  if (!past && dest.type === "notify") cta = `<a class="btn btn--light" href="/workshops/?event=${esc(e.id)}#notify">${esc(dest.label || "Get notified")}<span class="sr-only"> about ${esc(e.title)}</span></a>`;
-  else if (!past && dest.type === "internal") cta = `<a class="btn" href="${esc(dest.url)}">${esc(dest.label || "Register")}</a>`;
-  else if (!past && dest.type === "external") cta = `<a class="btn" href="${esc(dest.url)}" target="_blank" rel="noopener" data-track="registration_start">${esc(dest.label || "Register")} <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens the event’s own page in a new tab)</span></a>`;
-  else if (past && dest.type === "external" && dest.url) cta = ext(dest.url, dest.label || "Original event page");
+  const cta = eventCta(e.rec, past);
   const program = e.programRef && D.programs.find((p) => p.slug === e.programRef);
   return `<article class="event${past ? " event--past" : ""}">
       <div class="event__date" aria-hidden="true">${d ? `<b>${fmt(d, { day: "numeric" })}</b><span>${fmt(d, { month: "short" })} ${fmt(d, { year: "numeric" })}</span>` : `<b>TBA</b><span>Date soon</span>`}</div>
@@ -259,16 +144,37 @@ function eventCard(e) {
         <p>${esc(e.summary)}</p>
         <dl class="event__facts">
           <div><dt>Date</dt><dd>${when}</dd></div>
-          <div><dt>Time (Asia/Manila)</dt><dd>${e.time ? esc(e.time) + " PHT" : '<span class="tbc">' + (past ? "Not listed" : "To be confirmed") + "</span>"}</dd></div>
-          <div><dt>Venue</dt><dd>${tbc(e.venue, past ? "Not listed" : "To be confirmed")}</dd></div>
+          <div><dt>${timeLabel(e)}</dt><dd>${timeValue(e, past)}</dd></div>
+          <div><dt>Venue</dt><dd>${venue(e, past)}</dd></div>
           <div><dt>Format</dt><dd>${tbc(e.format)}</dd></div>
           <div><dt>Capacity</dt><dd>${tbc(e.capacity, past ? "Not listed" : "To be confirmed")}</dd></div>
         </dl>
-        <div class="event__cta">${cta}${program ? `<a class="text-link" href="/programs/${program.slug}/">About the program <span class="link-arrow" aria-hidden="true">↗</span></a>` : ""}</div>
+        <div class="event__cta">${cta}${e.hasPage ? `<a class="text-link" href="/events/${esc(e.slug)}/">Event details <span class="link-arrow" aria-hidden="true">↗</span></a>` : ""}${program ? `<a class="text-link" href="/programs/${program.slug}/">About the program <span class="link-arrow" aria-hidden="true">↗</span></a>` : ""}</div>
       </div>
-      ${e.image ? `<figure class="event__img"><img src="${esc(e.image.src)}" width="${e.image.width}" height="${e.image.height}" alt="${esc(e.image.alt)}" loading="lazy" decoding="async">${e.image.caption ? `<figcaption>${esc(e.image.caption)}</figcaption>` : ""}</figure>` : ""}
+      ${e.image ? `<figure class="event__img">${eventImg(e.image)}${e.image.caption ? `<figcaption>${esc(e.image.caption)}</figcaption>` : ""}</figure>` : ""}
     </article>`;
 }
+export function eventPage(e) {
+  if (!e.doc) return null;
+  const past = isPast(e);
+  const program = e.programRef && D.programs.find((p) => p.slug === e.programRef);
+  const body = docBody(e, "events", {
+    "event-actions": () => {
+      const cta = eventCta(e.rec, past);
+      return cta || program ? `${cta}${program ? `<a class="btn btn--light" href="/programs/${program.slug}/">About the program</a>` : ""}` : null;
+    },
+  });
+  return {
+    title: e.seoTitle || `${e.title} · Faith Works`,
+    description: e.metaDescription || e.summary,
+    path: `/events/${e.slug}/`,
+    nav: "learn",
+    body,
+    image: e.socialImage || e.image?.src,
+    ...pageFrame(e),
+  };
+}
+
 export function events(which) {
   const up = D.events.filter((e) => !isPast(e));
   const past = D.events.filter(isPast).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
@@ -285,24 +191,16 @@ export function eventOptions() {
 }
 
 /* ---- Resources and articles -------------------------------------------- */
-function img(image, sizes, cls = "") {
-  if (!image) return "";
-  const base = "/" + image.base.replace(/^\//, "");
-  const ws = image.widths;
-  const set = (ext) => ws.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
-  const mid = ws.find((w) => w >= 960) || ws[ws.length - 1];
-  return `<picture${cls ? ` class="${cls}"` : ""}><source type="image/webp" srcset="${set("webp")}" sizes="${sizes}"><img src="${base}-${mid}.jpg" srcset="${set("jpg")}" sizes="${sizes}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="lazy" decoding="async" style="object-position:${esc(image.position || "50% 50%")}"></picture>`;
-}
-
 export function resourceList() {
   return `<div class="rlist">${D.resources.map((r) => {
-    const attrs = r.access === "download" ? ` download data-track="download_click"` : r.access === "external" ? ` target="_blank" rel="noopener"` : ` data-track="starter_kit_click"`;
+    const attrs = r.hasPage ? "" : r.access === "download" ? ` download data-track="download_click"` : r.access === "external" ? ` target="_blank" rel="noopener"` : ` data-track="starter_kit_click"`;
+    const down = !r.hasPage && r.access === "download";
     return `<article class="rlist__item${r.featured ? " rlist__item--featured" : ""}">
         <p class="rlist__kind">${esc(r.kind)}</p>
         <h3>${esc(r.title)}</h3>
         <p>${esc(r.summary)}</p>
-        <p class="rlist__access">${esc(r.accessLabel)}</p>
-        <a class="btn${r.featured ? "" : " btn--light"}" href="${esc(r.url)}"${attrs}>${esc(r.ctaLabel)} <span class="btn__arrow${r.access === "download" ? " btn__arrow--down" : ""}" aria-hidden="true">${r.access === "download" ? "↓" : "↗"}</span></a>
+        <p class="rlist__access">${esc(r.accessLabel || "")}</p>
+        <a class="btn${r.featured ? "" : " btn--light"}" href="${esc(r.hasPage ? `/resources/${r.slug}/` : r.url)}"${attrs}>${esc(r.ctaLabel)} <span class="btn__arrow${down ? " btn__arrow--down" : ""}" aria-hidden="true">${down ? "↓" : "↗"}</span></a>
       </article>`;
   }).join("")}</div>`;
 }
@@ -321,7 +219,7 @@ export function articleCards(limit) {
     </div>`;
 }
 
-function block(b) {
+export function block(b) {
   const t = b.type;
   if (t === "paragraph" || t === "p") return `<p>${b.text}</p>`;
   if (t === "heading" || t === "h2") return `<h2>${b.text}</h2>`;
@@ -339,40 +237,56 @@ function block(b) {
   return "";
 }
 
+const relatedArticles = (slug) => D.articles.filter((x) => x.slug !== slug).slice(0, 3)
+  .map((r) => `<li><a href="/resources/${r.slug}/"><span>${esc(r.title)}</span><span class="small">${esc(r.readTime)}</span></a></li>`).join("");
+
 export function articlePage(a) {
-  const d = new Date(`${a.date}T12:00:00+08:00`);
-  const related = D.articles.filter((x) => x.slug !== a.slug).slice(0, 3);
-  const body = `
-    <article class="article">
-      <header class="article__head wrap">
-        <nav class="crumbs" aria-label="Breadcrumb"><a href="/resources/">Resources</a><span aria-hidden="true">/</span><span aria-current="page">Article</span></nav>
-        <h1>${esc(a.title)}</h1>
-        <p class="article__lead">${esc(a.excerpt)}</p>
-        <p class="article__meta">${esc(a.author)} · <time datetime="${a.date}">${fmt(d, { day: "numeric", month: "long", year: "numeric" })}</time> · ${esc(a.readTime)}</p>
-      </header>
-      <div class="article__cover wrap">${img(a.image, "(min-width: 1200px) 1200px, 100vw")}</div>
-      <div class="article__body">${a.content.map(block).join("\n")}</div>
-    </article>
-    <section class="section wrap" aria-labelledby="related-title">
-      <h2 id="related-title" class="h3">Keep reading</h2>
-      <ul class="more">${related.map((r) => `<li><a href="/resources/${r.slug}/"><span>${esc(r.title)}</span><span class="small">${esc(r.readTime)}</span></a></li>`).join("")}</ul>
-    </section>`;
-  return { title: `${a.title} · Faith Works`, description: a.excerpt, path: `/resources/${a.slug}/`, nav: "resources", body, image: `/${a.image.base}-1440.jpg` };
+  if (!a.doc) return null;
+  const body = docBody(a, "resources", { "related-articles": () => relatedArticles(a.slug) });
+  return {
+    title: a.seoTitle || `${a.title} · Faith Works`, description: a.metaDescription || a.excerpt, path: `/resources/${a.slug}/`, nav: "resources", body,
+    image: a.socialImage || (a.image?.base ? `/${a.image.base}-1440.jpg` : a.image?.url), ...pageFrame(a),
+  };
+}
+// Guides, templates and other downloads have a page only when their page editor has content.
+export function resourcePage(r) {
+  if (!r.doc) return null;
+  const body = docBody(r, "resources", { "related-articles": () => relatedArticles(r.slug) });
+  return {
+    title: r.seoTitle || `${r.title} · Faith Works`, description: r.metaDescription || r.summary, path: `/resources/${r.slug}/`, nav: "resources", body,
+    image: r.socialImage || r.image?.url, ...pageFrame(r),
+  };
 }
 
 /* ---- Proof ------------------------------------------------------------- */
+// A renderer with nothing to show returns this marker; tools/build.mjs then removes the
+// enclosing <section> so no empty heading is published (brief §2: hide empty sections).
+export const EMPTY_SECTION = "<!--fw:empty-section-->";
 // Exact quotes, exact attribution. Consent evidence is NEEDS VERIFICATION (docs/03).
 export function testimonials(limit) {
   const pick = D.stories.filter((s) => s.quote).slice(0, Number(limit) || 3);
+  if (!pick.length) return EMPTY_SECTION;
   return `<div class="quotes">${pick.map((s, i) => `
-      <figure class="quote quote--${["pink", "stone", "yellow"][i % 3]}">
-        <blockquote><p>${esc(s.quote)}</p></blockquote>
-        <figcaption>${esc(s.name)}<span>Workshop participant</span></figcaption>
-      </figure>`).join("")}
+      ${storyCard(s, ["pink", "stone", "yellow"][i % 3])}`).join("")}
     </div>`;
+}
+// With a card template, the template arranges the exact quote and name (bound from Details);
+// a card whose class is just "quote" takes the rotating colour.
+export function storyCard(s, tone) {
+  if (!s.card) {
+    return `<figure class="quote quote--${tone}">
+        <blockquote><p>${esc(s.quote)}</p></blockquote>
+        <figcaption>${esc(s.name)}<span>${esc(s.role || "Workshop participant")}</span></figcaption>
+      </figure>`;
+  }
+  let html = applyBindings(s.card.html, bindingValues("testimonials", s.card.rec), { removeEmptyLinks: true });
+  html = fillComponents(html, (name) => { const out = recordComponent(name, "testimonials", s.card.rec, { today }); return out === undefined ? "" : out; });
+  html = html.trim().replace(/^<figure class="quote"/, `<figure class="quote quote--${tone}"`);
+  return s.card.css ? `<div class="cms-card ${s.card.scope}"><style>${s.card.css}</style>${html}</div>` : html;
 }
 
 /* ---- Site settings ----------------------------------------------------- */
+export const contactPhone = () => D.site.contactPhone ? `<p>Phone: <a class="text-link" href="tel:${esc(D.site.contactPhone.replace(/[^0-9+]/g, ""))}">${esc(D.site.contactPhone)}</a></p>` : "";
 export const contactEmail = () => `<a class="text-link" href="mailto:${esc(D.site.contactEmail)}">${esc(D.site.contactEmail)}</a>`;
 export const communityLink = (label) => `<a class="btn" href="${esc(D.site.community.url)}" target="_blank" rel="noopener" data-track="community_click">Join the Faith Works Community <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens Facebook in a new tab)</span></a>`;
 export const socialList = () => `<ul class="social">${D.site.social.map((s) => `<li>${ext(s.url, s.label)}</li>`).join("")}</ul>`;

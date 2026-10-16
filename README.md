@@ -6,14 +6,22 @@ Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 
 **Current phase:** staging. Every page in the brief's sitemap exists. Forms are designed and tested but
 **not connected** to a CRM yet (preview mode: nothing is sent). The pages are `noindex` until launch.
 
-Plain HTML, CSS and JavaScript. No framework, no npm packages, no backend. A small Node script generates
-the pages so that the header, footer and repeated content (programs, events, articles) come from one place.
+Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
+that the header, footer and repeated content (programs, events, articles) come from one place.
+
+**Content is managed in the Faith Works CMS** (`cms/`, a separate app backed by Google Sheets; see
+[`cms/README.md`](cms/README.md)). The website stays static: it reads CMS content only while it is built.
 
 ## Run it locally
 
 ```bash
-node tools/build.mjs                         # regenerate pages after editing src/ or assets/data/
+node tools/build.mjs                         # build from the CMS fixtures (cms/fixtures/seed.json)
+node tools/build.mjs --content=local         # build from your local CMS (cms/.data/store.json)
+CONTENT_SOURCE=cms CMS_CONTENT_URL=https://cms.example node tools/build.mjs --deploy   # production: live CMS content
 ```
+
+Content view: drafts are shown only while Site settings say **staging** (noindex + staging bar).
+Otherwise only published, approved content is built (`--view=published|preview` overrides).
 
 Then open `index.html` directly, or use any local server (VS Code Live Server, `python -m http.server`).
 The default build writes **relative** links (`css/style.css`, `../learn/index.html`), so styles, images
@@ -30,19 +38,20 @@ node tools/build.mjs --deploy                # root-relative links: /learn/, /cs
 | Path | What |
 | --- | --- |
 | `src/pages/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
-| `assets/data/programs.json` | Programs → `/learn/` cards and one `/programs/{slug}/` page each. Leave fee/dates `null` until approved. |
-| `assets/data/events.json` | Events → `/workshops/` (upcoming vs past), each with its own `destination` (external, internal or notify). |
-| `assets/data/resources.json`, `insights.json` | Resources list and articles (`/resources/{slug}/`). Articles are drafts. |
-| `assets/data/site.json` | `staging` flag, contact email, social and community URLs, `starterKitReady`. |
-| `tools/build.mjs`, `layout.mjs`, `render.mjs` | The generator, shared page chrome, and content/form renderers. |
-| `css/style.css` | The design system: tokens, components, states, responsive and reduced-motion rules. |
+| `cms/` | The CMS (dashboard, API, Google Sheets store). Programs, events, resources/articles, testimonials, tags and site settings are edited there. |
+| `cms/fixtures/seed.json` | Development content fixture (all current content, with its approval state). Regenerate with `node cms/scripts/seed-from-site.mjs`. |
+| `assets/data/programs.json`, `events.json`, `resources.json`, `insights.json`, `success-stories.json`, `site.json` | **Migration source only** (used to create the seed). The build no longer reads them; edit content in the CMS. |
+| `tools/content.mjs` | The website's content interface: fixtures, local CMS or live CMS → the shapes the templates render. |
+| `tools/build.mjs`, `layout.mjs`, `render.mjs` | The generator, shared page chrome, and content/form renderers (CMS page documents with their Details values, forms and lists filled in). |
+| `css/style.css` | The design system: tokens, components, states, responsive and reduced-motion rules; section 21 holds the CMS page templates (program, event, resource pages, testimonial cards, `fw-*` editor blocks). |
 | `js/main.js` | Navigation, tabs, program selector, thank-you state, analytics events (`dataLayer`, no personal data). |
 | `js/forms.js`, `js/config.js` | Form validation, states and submission; `config.js` sets the form mode (`preview` / `endpoint`) and the kit download URL. Never put secrets here. |
 | `docs/01–07_*.docx` | Project documents: scope, audit, gap list, architecture, copy, forms spec, acceptance checklist. |
 
 Generated output (do not edit by hand): `index.html`, `404.html`, `sitemap.xml`, `robots.txt` and the
 route folders `about/ build/ business/ community/ contact/ free-ai-starter-kit/ learn/ privacy/ programs/
-resources/ speaking/ terms/ workshops/`.
+resources/ speaking/ terms/ workshops/` (and `events/` when an event has its own page content). Pages for
+content that is no longer in the build's content view are removed automatically.
 
 ## Before launch
 

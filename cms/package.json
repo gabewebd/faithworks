@@ -1,0 +1,19 @@
+{
+  "name": "faithworks-cms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Faith Works headless CMS: dashboard + API, Google Sheets content store. No runtime dependencies.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build-static.mjs",
+    "test": "node --test \"test/*.test.mjs\"",
+    "seed:fixtures": "node scripts/seed-from-site.mjs",
+    "sheets:setup": "node scripts/sheets.mjs setup",
+    "sheets:seed": "node scripts/sheets.mjs seed",
+    "sheets:check": "node scripts/sheets.mjs check",
+    "backup": "node scripts/sheets.mjs backup",
+    "restore": "node scripts/sheets.mjs restore"
+  }
+}

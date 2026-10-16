@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1100" viewBox="0 0 900 1100" role="img" aria-label="Placeholder image">
+  <rect width="900" height="1100" fill="#F4F4F5"/>
+  <rect x="24" y="24" width="852" height="1052" rx="20" fill="none" stroke="#DFE0E3" stroke-width="4" stroke-dasharray="18 14"/>
+  <g transform="translate(450 510)" fill="none" stroke="#55575A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-70" y="-50" width="140" height="100" rx="12"/>
+    <circle cx="-30" cy="-15" r="12"/>
+    <path d="M-62 40 -20 0 10 25 30 8 62 40"/>
+  </g>
+  <text x="50%" y="610" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="34" font-weight="600" fill="#1A1E24">Placeholder image</text>
+  <text x="50%" y="654" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="24" fill="#55575A">Replace in the CMS page editor</text>
+</svg>
