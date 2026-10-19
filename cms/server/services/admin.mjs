@@ -1,27 +1,31 @@
 // Users and roles, tags, audit log, recovery and backup.
-import { ROLES, ALL_TABS, CONTENT_COLLECTIONS, isAdmin } from "../../shared/schema.mjs";
+import { ROLES, ALL_TABS, CONTENT_COLLECTIONS, isSuperAdmin, normalizeRole } from "../../shared/schema.mjs";
 import { slugify } from "../../shared/validate.mjs";
 import { HttpError, randomId, now } from "../http.mjs";
 
 const EMAIL_RE = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
 
 export function createAdmin({ store, cfg, log, auth }) {
-  const requireSuper = (user) => { if (user.role !== "super_admin") throw new HttpError(403, "Only a Super Admin can do this.", "forbidden"); };
-  const requireAdmin = (user) => { if (!isAdmin(user.role)) throw new HttpError(403, "Only admins can do this.", "forbidden"); };
+  const requireAdmin = (user) => { if (!isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can do this.", "forbidden"); };
 
   return {
     /* ---- Users (Super Admin) ---- */
+    // Rows saved with an unknown role are listed with needs_review: they cannot sign in until a
+    // Super Admin saves a current role.
     async listUsers(user) {
-      requireSuper(user);
+      requireAdmin(user);
       const rows = await store.list("users");
       const pinned = cfg.superAdmins.map((email) => ({ id: email, email, name: rows.find((r) => r.id === email)?.name || "", role: "super_admin", active: true, pinned: true }));
-      return [...pinned, ...rows.filter((r) => !cfg.superAdmins.includes(r.id)).map((r) => ({ id: r.id, email: r.email, name: r.name, role: r.role, active: r.active, version: r.version, updated_at: r.updated_at, updated_by: r.updated_by }))];
+      return [...pinned, ...rows.filter((r) => !cfg.superAdmins.includes(r.id)).map((r) => ({
+        id: r.id, email: r.email, name: r.name, role: normalizeRole(r.role) || "author", active: r.active && !!normalizeRole(r.role), version: r.version, updated_at: r.updated_at, updated_by: r.updated_by,
+        ...(ROLES[r.role] ? {} : { needs_review: true, stored_role: String(r.role || "(none)") }),
+      }))];
     },
     async saveUser(user, input, { requestId } = {}) {
-      requireSuper(user);
+      requireAdmin(user);
       const email = String(input.email || "").trim().toLowerCase();
       if (!EMAIL_RE.test(email)) throw new HttpError(422, "Enter a valid email address.", "invalid", { errors: { email: "Enter a valid email address." } });
-      if (!ROLES[input.role]) throw new HttpError(422, "Choose a role.", "invalid", { errors: { role: "Choose a role." } });
+      if (!ROLES[input.role]) throw new HttpError(422, "Choose a role: Super Admin or Author.", "invalid", { errors: { role: "Choose Super Admin or Author." } });
       if (cfg.superAdmins.includes(email)) throw new HttpError(409, "This Super Admin is set in the deployment settings (CMS_SUPER_ADMINS) and cannot be changed here.", "pinned");
       if (email === user.email) throw new HttpError(409, "You cannot change your own role or access.", "self");
       if (cfg.allowedDomains.length && !cfg.allowedDomains.includes(email.split("@")[1])) throw new HttpError(422, `Only these email domains may sign in: ${cfg.allowedDomains.join(", ")}.`, "invalid", { errors: { email: "Domain not allowed." } });
@@ -76,7 +80,7 @@ export function createAdmin({ store, cfg, log, auth }) {
 
     /* ---- Recovery (Super Admin) ---- */
     async recovery(user) {
-      requireSuper(user);
+      requireAdmin(user);
       const t = await store.listMany([...CONTENT_COLLECTIONS, "settings", "published"]);
       const live = new Map(t.published.filter((p) => p.state === "live").map((p) => [`${p.collection}:${p.record_id}`, p]));
       const out = { deleted: [], repair: [], orphans: [], live: live.size };
@@ -94,7 +98,7 @@ export function createAdmin({ store, cfg, log, auth }) {
 
     // Full JSON export of every tab (Super Admin). Downloaded by the browser; nothing is stored.
     async backup(user, { requestId } = {}) {
-      requireSuper(user);
+      requireAdmin(user);
       const data = await store.listMany(ALL_TABS);
       await log.log(user, "backup_download", "", "", "", `${Object.values(data).reduce((n, rows) => n + rows.length, 0)} rows`, requestId);
       return { format: "faithworks-cms-backup", version: 1, exported_at: now(), store: store.kind, tabs: data };

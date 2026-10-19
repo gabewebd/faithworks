@@ -2,7 +2,7 @@
 // Everything is built with DOM APIs and textContent: CMS data is never inserted as HTML in
 // the dashboard, so content cannot run script here. Page HTML is only ever rendered inside
 // sandboxed iframes (see html-editor.mjs).
-import { STATUSES, ROLES } from "/shared/schema.mjs";
+import { STATUSES, ROLES, statusOf } from "/shared/schema.mjs";
 
 export function h(tag, attrs, ...children) {
   const el = document.createElement(tag);
@@ -120,11 +120,14 @@ export async function busy(btn, fn) {
 }
 
 /* ---- Formatting ---- */
+// Statuses from the earlier review workflow (old History rows) show as Draft, as they are read.
 export function statusBadge(status) {
-  const s = STATUSES[status] || { label: status, tone: "stone" };
+  const s = STATUSES[statusOf(status)];
   return h("span", { class: `badge badge--${s.tone}`, title: s.help || "" }, s.label);
 }
-export const liveBadge = (live) => (live ? h("span", { class: "badge badge--live", title: `Version ${live.version} is on the website` }, `Live · v${live.version}`) : null);
+export const liveBadge = (live) => (!live ? null : live.hidden
+  ? h("span", { class: "badge badge--yellow", title: `Version ${live.version} is published but “Show on the website” is off` }, "Hidden")
+  : h("span", { class: "badge badge--live", title: `Version ${live.version} is on the website` }, `Live · v${live.version}`));
 export const roleLabel = (r) => ROLES[r]?.label || r;
 export function when(iso) {
   if (!iso) return "—";

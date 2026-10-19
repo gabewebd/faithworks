@@ -106,7 +106,7 @@ code { font-size: 0.9em; }
 /* Secondary text on Faith Pink and AI Yellow uses a deeper charcoal so it keeps AA contrast */
 .band--pink, .phero--pink, .phero--yellow, .route--pink, .route--yellow, .flow__stage--check, .founder, .quote--pink, .quote--yellow,
 .pcard--pink, .pcard--yellow, .scope--pink, .scope--yellow, .kit-hero, .thanks, .contact__form, .cta, .resource, .band-cta, .business,
-.cm-grid__rules, .takeaway, .article__cta, .formats__item, .notice, .form__status--preview, .bento__art { --muted: #2E3238; }
+.cm-grid__rules, .takeaway, .article__cta, .formats__item, .notice, .form__status--preview, .prog--pink, .prog--yellow { --muted: #2E3238; }
 
 /* 3. Layout + shared ------------------------------------------------------- */
 .wrap { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
@@ -120,6 +120,10 @@ code { font-size: 0.9em; }
 .section-head h2:only-child { margin: 0; }
 
 .eyebrow { display: flex; align-items: center; gap: 9px; margin: 0; font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.4; }
+/* Section labels are text-only editorial eyebrows: the phrase alone, set small, bold and tracked.
+   No fill, no outline, no leading rule. Charcoal on light grounds, White on Charcoal. */
+.eyebrow:not(.hero__eyebrow) { width: fit-content; max-width: 100%; color: var(--ink); font-size: 12px; letter-spacing: 0.16em; line-height: 1.3; }
+.section--dark .eyebrow { color: var(--white); }
 .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--rose-dot); }
 .small { font-size: var(--fs-small); color: var(--muted); line-height: 1.6; }
 .intro { font-size: var(--fs-lead); color: var(--muted); max-width: 520px; }
@@ -237,7 +241,14 @@ code { font-size: 0.9em; }
 .site-footer__top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr); gap: 48px; padding-bottom: 40px; }
 .site-footer__brand p { max-width: 320px; margin: 14px 0 0; font-size: var(--fs-small); color: var(--muted-dark); }
 .site-footer__brand .site-footer__tagline { margin-top: 6px; color: var(--yellow); font-weight: 600; }
-.site-footer__links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; font-size: var(--fs-small); }
+.site-footer__links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; font-size: var(--fs-small); }
+/* Community and Contact: the footer's two most visible links */
+.site-footer__brand .site-footer__reach { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; max-width: none; }
+.site-footer__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1.5px solid rgb(255 255 255 / 0.55); border-radius: 999px; color: var(--white); font-size: 15px; font-weight: 600; white-space: nowrap; transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast); }
+.site-footer__cta:hover { border-color: var(--white); background: rgb(255 255 255 / 0.08); }
+.site-footer__cta--pink { border-color: var(--pink); background: var(--pink); color: var(--ink); }
+.site-footer__cta--pink:hover { border-color: var(--white); background: var(--white); color: var(--ink); }
+.site-footer__cta:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .site-footer__links div { display: flex; flex-direction: column; align-items: start; }
 .site-footer__links h2 { margin: 0 0 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted-dark); }
 .site-footer__links a { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; color: var(--white); transition: color var(--dur-fast); }
@@ -364,7 +375,6 @@ code { font-size: 0.9em; }
 
 /* 8. Home: journey (dark) -------------------------------------------------- */
 .section--dark { background: var(--ink); color: var(--white); }
-.section--dark .eyebrow { color: var(--yellow); }
 .section--dark .section-head > p { color: var(--muted-dark); }
 .journey { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
 .steps { display: flex; flex-direction: column; margin-top: 28px; }
@@ -497,38 +507,57 @@ code { font-size: 0.9em; }
 .proto__progress b { display: block; height: 100%; background: var(--ink); transform-origin: left; }
 
 /* 9. Programs -------------------------------------------------------------- */
-/* Home: program bento. The featured card spans two rows; colour panels in Charcoal,
-   Faith Pink and AI Yellow carry a static example of what learners produce. */
-.bento { display: grid; grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); grid-template-rows: auto auto; gap: 16px; }
-.bento__card { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); overflow: hidden; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1.5px var(--line); }
-.bento__card--feature { grid-row: span 2; grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr auto; }
-.bento__card--feature .bento__art { justify-content: space-between; }
-.bento__art { display: flex; flex-direction: column; gap: 14px; padding: clamp(18px, 2vw, 26px); background: var(--tone); }
-.bento__card--ink { --tone: var(--ink); }
-.bento__card--pink { --tone: var(--pink); }
-.bento__card--yellow { --tone: var(--yellow); }
-.bento__labels { margin: 0; font-size: var(--fs-small); font-weight: 600; }
-.bento__card--ink .bento__labels { color: var(--yellow); }
-.bento__symbol { margin: 0; font-size: clamp(44px, 4.4vw, 68px); font-weight: 700; line-height: 1; letter-spacing: -0.08em; }
-.bento__card--feature .bento__symbol { font-size: clamp(56px, 6vw, 92px); color: var(--yellow); }
-.pick { list-style: none; display: grid; gap: 8px; margin: auto 0 0; padding: 0; }
-.pick li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; background: var(--white); color: var(--ink); font-size: 14px; font-weight: 500; }
-.bento__card--ink .pick li { background: rgb(255 255 255 / 0.08); color: var(--white); }
-.bento__card--ink .pick li.is-picked { background: var(--yellow); color: var(--ink); font-weight: 600; }
-.pick__chip { flex: none; padding: 3px 10px; border-radius: 999px; color: var(--ink); font-size: 12px; font-weight: 600; }
-.pick__chip--picked { background: var(--ink); color: var(--yellow); }
-.pick__chip--pink { background: var(--pink); }
-.pick__chip--yellow { background: var(--yellow); }
-.pick__chip--stone { background: var(--stone); }
-.bento__body { display: flex; flex-direction: column; gap: 10px; padding: clamp(20px, 2.4vw, 30px); }
-.bento__body h3 { font-size: clamp(22px, 2vw, 28px); line-height: 1.15; letter-spacing: -0.035em; }
-.bento__card--feature .bento__body h3 { font-size: clamp(26px, 2.6vw, 34px); }
-.bento__body h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
-.bento__summary { margin: 0; color: var(--muted); }
-.bento__leave { margin: 6px 0 0; font-size: var(--fs-small); font-weight: 600; }
-.bento__list { gap: 6px; }
-.bento__list li { font-size: 15px; font-weight: 500; }
-.bento__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: auto; padding-top: 8px; }
+/* Home: programs as static horizontal cards. Each card is a filled brand surface (Charcoal, Faith
+   Pink, AI Yellow) carrying a cover plate in a contrasting brand colour, so colour and the drawn
+   cover do the work: no shadows, no outline. Cover, then category/title/summary, then (behind a
+   hairline in the surface's ink) what you leave with and the actions. */
+.pstack { list-style: none; display: grid; gap: 14px; }
+.prog { --surface: var(--ink); --on: var(--white); --muted: var(--muted-dark); --rule: rgb(255 255 255 / 0.2);
+  --plate: var(--yellow); --plate-ink: var(--ink); --mark: var(--yellow); --btn-bg: var(--yellow); --btn-fg: var(--ink); --btn-hover: var(--white); }
+.prog--pink { --surface: var(--pink); --on: var(--ink); --muted: #2E3238; --rule: rgb(26 30 36 / 0.22);
+  --plate: var(--ink); --plate-ink: var(--white); --mark: var(--ink); --btn-bg: var(--ink); --btn-fg: var(--white); --btn-hover: var(--white); }
+.prog--yellow { --surface: var(--yellow); --on: var(--ink); --muted: #2E3238; --rule: rgb(26 30 36 / 0.22);
+  --plate: var(--white); --plate-ink: var(--ink); --mark: var(--ink); --btn-bg: var(--ink); --btn-fg: var(--white); --btn-hover: var(--white); }
+.prog__card { display: grid; grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.12fr) minmax(300px, 1fr); grid-template-areas: "cover main side"; gap: 0 clamp(24px, 3vw, 48px); padding: 12px clamp(24px, 2.6vw, 36px) 12px 12px; border-radius: var(--r-lg); background: var(--surface); color: var(--on); }
+.prog__cover { grid-area: cover; position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 232px; padding: 14px 16px 40px; border-radius: 12px; background: var(--plate); color: var(--plate-ink); overflow: hidden; }
+.prog__cover svg { width: 100%; max-width: 340px; height: auto; margin-inline: auto; overflow: visible; }
+.prog__steps { position: absolute; left: 16px; right: 16px; bottom: 12px; margin: 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; line-height: 1.4; }
+/* Cover artwork. Fills and strokes come from the brand palette; "on" is the plate's own ink. */
+.pc__ln { fill: none; stroke: var(--plate-ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.pc__ln--on { stroke: var(--white); }
+.pc__ln--ink { stroke: var(--ink); }
+.pc__ln--pink { stroke: var(--pink); }
+.pc__soft { opacity: 0.5; }
+.pc__faint { opacity: 0.3; }
+.pc__node { fill: var(--ink); stroke-width: 2; }
+.pc__ink { fill: var(--ink); }
+.pc__yel { fill: var(--yellow); }
+.pc__pink { fill: var(--pink); }
+.pc__white { fill: var(--white); }
+.pc__paper { fill: var(--white); stroke: var(--ink); stroke-width: 2.5; }
+.pc__cut { stroke: var(--ink); stroke-width: 6; }
+.pc__type { font-family: var(--font); font-weight: 700; }
+.pc__type--yel { fill: var(--yellow); font-size: 44px; letter-spacing: -0.04em; }
+.pc__type--in { fill: var(--ink); font-size: 84px; letter-spacing: -0.06em; }
+.pc__type--ai { fill: var(--ink); font-size: 23px; letter-spacing: -0.02em; }
+.pc__label { fill: var(--white); font-family: var(--font); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+.prog__main { grid-area: main; align-self: center; padding-block: clamp(20px, 2.4vw, 32px); }
+.prog__cat { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.prog__title { margin: 12px 0 14px; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.08; letter-spacing: -0.045em; }
+.prog__title a { text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 6px; transition: text-decoration-color var(--dur-fast); }
+.prog__title a:hover { text-decoration-color: currentColor; }
+.prog__summary { margin: 0; max-width: 44ch; color: var(--muted); font-size: 15.5px; line-height: 1.6; }
+.prog__side { grid-area: side; display: flex; flex-direction: column; padding: clamp(20px, 2.4vw, 30px) 0 clamp(16px, 1.8vw, 22px) clamp(24px, 2.6vw, 36px); border-left: 1px solid var(--rule); }
+.prog__leave { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.prog__outs { list-style: none; margin: 0 0 18px; counter-reset: out; }
+.prog__outs li { display: grid; grid-template-columns: 26px minmax(0, 1fr); padding: 9px 0; font-size: 15px; font-weight: 500; line-height: 1.45; counter-increment: out; }
+.prog__outs li + li { border-top: 1px solid var(--rule); }
+.prog__outs li::before { content: counter(out, decimal-leading-zero); padding-top: 0.2em; color: var(--mark); font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.prog__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; margin-top: auto; }
+.prog .prog__btn { min-height: 44px; padding: 9px 18px; border-color: var(--btn-bg); background: var(--btn-bg); color: var(--btn-fg); }
+.prog .prog__btn:hover { border-color: var(--btn-hover); background: var(--btn-hover); color: var(--ink); }
+.prog__status { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.prog :focus-visible { outline-color: var(--on); }
 .programs__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 28px; }
 .programs__foot .small { flex-basis: 100%; margin: 0; }
 
@@ -604,16 +633,19 @@ code { font-size: 0.9em; }
 .fit__preview.is-swapping > * { opacity: 0; }
 
 /* 10. Business, proof, gallery --------------------------------------------- */
-.business__photo img { object-position: 100% 55%; }
-.business { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: clamp(24px, 4vw, 56px); align-items: center; padding: clamp(28px, 4vw, 52px); background: var(--pink); border-radius: 24px; }
-.business__copy h2 + p { margin-top: 16px; max-width: 500px; }
-.business .btn--light:hover { background: var(--ink); }
-.business__list { list-style: none; margin: 0 0 14px; }
-.business__list li { display: flex; justify-content: space-between; gap: 16px; padding: 15px 0; border-bottom: 1px solid rgb(26 30 36 / 0.19); font-weight: 500; }
-.business__list span { font-size: 13px; font-weight: 600; }
-.business .small { color: var(--ink); margin: 0; }
-.business__photo { align-self: stretch; overflow: hidden; border-radius: var(--r-lg); }
-.business__photo img { width: 100%; height: 100%; min-height: 260px; object-fit: cover; }
+/* Home: For your organization. The copy and the four verbs of an engagement on Faith Pink; a real
+   session fills the other half, so the block reads people first. */
+.business { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(24px, 4vw, 64px); padding: clamp(12px, 1.3vw, 18px); background: var(--pink); border-radius: 24px; }
+.business__copy { padding: clamp(16px, 3vw, 44px) 0 clamp(16px, 3vw, 44px) clamp(12px, 2.6vw, 40px); }
+.business__copy h2 + p { margin-top: 16px; max-width: 520px; }
+.business__ways { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; max-width: 560px; margin: 28px 0 0; }
+.business__ways li { padding: 13px 0 16px; border-top: 1.5px solid var(--ink); font-size: 15px; line-height: 1.4; }
+.business__ways b { display: block; margin-bottom: 2px; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.2; letter-spacing: -0.03em; }
+.business__for { margin: 14px 0 0; max-width: 46ch; font-size: var(--fs-small); color: var(--muted); }
+.business .actions { margin-bottom: 0; }
+.business__photo { overflow: hidden; min-height: 340px; border-radius: var(--r-lg); background: var(--pink-tint); }
+.business__photo picture { display: contents; }
+.business__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 55%; }
 
 .gallery { padding-block: clamp(24px, 3vw, 40px) var(--section); }
 .gallery__title { margin: 0 0 22px; font-size: clamp(26px, 3vw, 38px); }
@@ -699,7 +731,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .cta__pattern path { fill: none; stroke: var(--pink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .cta__pattern circle { r: 3.5px; fill: var(--pink); }
 .cta__inner { position: relative; z-index: 1; max-width: 680px; margin-inline: auto; }
-.cta .eyebrow { justify-content: center; }
+.cta .eyebrow { margin-inline: auto; }
 .cta h2 { margin: 14px auto 16px; }
 .cta--plain { background: var(--yellow); }
 .cta--plain h2 { margin-top: 0; font-size: clamp(26px, 2.8vw, 38px); }
@@ -922,6 +954,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 @keyframes fw-line { from { transform: translateY(108%); } to { transform: none; } }
 @keyframes fw-wipe-r { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes fw-wipe-l { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+@keyframes fw-badge { from { opacity: 0; transform: translateX(-8px); clip-path: inset(0 100% 0 0 round 5px); } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0 round 5px); } }
 @keyframes fw-wipe-up { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes fw-pop { 0% { opacity: 0; transform: scale(0.7); } 70% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes fw-slide-l { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
@@ -939,7 +972,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .motion [data-draw] circle { animation: fw-pop 500ms var(--ease-out) calc(var(--draw-delay, 0ms) + 700ms + var(--n, 0) * 100ms) both; }
 
 /* Section heads: label wipes, heading lines rise out of their masks, then the copy */
-.motion .section-head .eyebrow, .motion .journey__intro > .eyebrow, .motion .faq__head .eyebrow, .motion .resource .eyebrow, .motion .business__copy .eyebrow, .motion .about__lead > .eyebrow, .motion .cta .eyebrow { animation: fw-wipe-r 700ms var(--ease-expo) both; }
+.motion .section-head .eyebrow, .motion .journey__intro > .eyebrow, .motion .faq__head .eyebrow, .motion .resource .eyebrow, .motion .business__copy .eyebrow, .motion .about__lead > .eyebrow, .motion .cta .eyebrow { animation: fw-badge 650ms var(--ease-expo) both; }
 .motion [data-split] .line > span { animation: fw-line 900ms var(--ease-expo) calc(120ms + var(--l, 0) * 90ms) both; }
 .motion .section-head > p, .motion .business__copy > p, .motion .business__copy .actions, .motion .resource > div:first-child > p, .motion .resource .btn, .motion .ecosystem__mission, .motion .ecosystem__lede, .motion .founder, .motion .cta__inner > p, .motion .cta__inner .actions, .motion .steps { animation: fw-rise 800ms var(--ease-out) 320ms both; }
 .motion .phero__copy[data-reveal] > *, .motion .about-hero [data-reveal] > * { animation: fw-rise 700ms var(--ease-out) both; }
@@ -1000,8 +1033,13 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .motion .ecosystem__list a { animation: fw-rise 600ms var(--ease-out) 150ms both; }
 .motion .faq details { animation: fw-rise 500ms var(--ease-out) calc(200ms + var(--q, 0) * 60ms) both; }
 .motion details[open] p { animation: fw-rise 320ms var(--ease-out) both; }
-.motion .business__list li { animation: fw-wipe-r 600ms var(--ease-expo) calc(400ms + var(--n, 0) * 100ms) both; }
-.business__list li:nth-child(2) { --n: 1; } .business__list li:nth-child(3) { --n: 2; } .business__list li:nth-child(4) { --n: 3; }
+.motion .business__ways li { animation: fw-wipe-r 600ms var(--ease-expo) calc(400ms + var(--n, 0) * 100ms) both; }
+.business__ways li:nth-child(2) { --n: 1; } .business__ways li:nth-child(3) { --n: 2; } .business__ways li:nth-child(4) { --n: 3; }
+.motion .business__for { animation: fw-rise 800ms var(--ease-out) 720ms both; }
+.motion .business__photo { animation: fw-wipe-up 900ms var(--ease-expo) 200ms both; }
+
+/* Program cards: each rises as it comes into view, then its mark draws */
+.motion .prog { animation: fw-rise 700ms var(--ease-out) both; }
 .motion .kitart__list li { animation: fw-wipe-r 500ms var(--ease-expo) calc(500ms + var(--n, 0) * 90ms) both; }
 .kitart__list li:nth-child(2) { --n: 1; } .kitart__list li:nth-child(3) { --n: 2; } .kitart__list li:nth-child(4) { --n: 3; } .kitart__list li:nth-child(5) { --n: 4; }
 
@@ -1027,10 +1065,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .hero__copy { max-width: 720px; margin-inline: auto; }
   .hero__input { justify-self: end; }
   .hero__output { justify-self: start; }
-  .business { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .business__photo { grid-column: 1 / -1; }
-  .business__photo img { min-height: 0; aspect-ratio: 21 / 9; }
-  .bento__card:not(.bento__card--feature) { grid-template-columns: minmax(0, 1fr); }
+  .prog__card { grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr); grid-template-areas: "cover main" "cover side"; }
+  .prog__main { align-self: end; padding-bottom: 18px; }
+  .prog__side { padding: 18px 0 clamp(16px, 2vw, 22px); border-left: 0; border-top: 1px solid var(--rule); }
   .approach { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .flow__canvas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .site-footer__top { grid-template-columns: minmax(0, 1fr); }
@@ -1046,6 +1083,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .section-head > p { margin-top: 14px; }
   .journey, .resource, .faq, .fit { grid-template-columns: minmax(0, 1fr); }
   .faq__head { position: static; }
+  .business__copy { padding: 18px 10px 4px; }
+  .business__photo { min-height: 0; aspect-ratio: 16 / 9; }
   .strip { flex-wrap: wrap; justify-content: start; gap: 8px 22px; }
   .strip__label { width: 100%; }
   .ecosystem__list { grid-template-columns: minmax(0, 1fr); }
@@ -1106,15 +1145,21 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .learn__note:not(.learn__note--pick) { display: none; }
   .proto__body { grid-template-columns: minmax(0, 1fr); }
   .proto__page { display: none; }
-  .bento { grid-template-columns: minmax(0, 1fr); }
-  .bento__card--feature { grid-row: auto; }
+  .prog__card { grid-template-columns: minmax(0, 1fr); grid-template-areas: "cover" "main" "side"; padding: 8px 8px 6px; }
+  .prog__cover { min-height: 0; padding: 12px 14px 36px; }
+  .prog__cover svg { max-width: 260px; }
+  .prog__main { padding: 22px 12px 18px; }
+  .prog__title { font-size: 26px; }
+  .prog__side { padding: 16px 12px 14px; }
+  .prog__actions { gap: 4px 18px; }
+  .business__ways { grid-template-columns: minmax(0, 1fr); }
   .preview__plan li { grid-template-columns: minmax(0, 1fr) auto; }
   .preview__plan b { grid-column: 1 / -1; }
-  .bento__art .preview__plan li { grid-template-columns: minmax(0, 1fr) auto; }
   .preview__table { font-size: 12px; }
   .preview__table th, .preview__table td { padding: 7px 6px; }
   .founder { grid-template-columns: minmax(0, 1fr) 110px; padding: 16px; }
-  .business, .resource { padding: 24px 18px; border-radius: var(--r-lg); }
+  .resource { padding: 24px 18px; border-radius: var(--r-lg); }
+  .business { padding: 10px; border-radius: var(--r-lg); }
   .business h2, .resource h2 { font-size: 29px; }
   .kitart { padding: 40px 22px 40px 60px; }
   .kitart__back { inset: -18px -12px 40px 36px; }
@@ -1348,10 +1393,42 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .quote blockquote { margin: 0; }
 .quote blockquote p { margin: 0; font-size: 18px; line-height: 1.55; font-weight: 500; letter-spacing: -0.01em; }
 .quote blockquote p::before { content: "“"; display: block; height: 0.6em; margin-bottom: 8px; font-size: 56px; line-height: 1; font-weight: 700; color: var(--pink); }
+.quote--ink { --q-bg: var(--ink); color: var(--white); }
 .quote figcaption { display: grid; font-weight: 700; }
 .quote figcaption span { font-size: var(--fs-small); font-weight: 400; color: var(--muted); }
-.quote__portrait img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
-.cms-card { display: grid; }
+/* Name with an optional round photo beside it */
+.quote .quote__by { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.quote .quote__name { font-size: 16px; font-weight: 700; color: inherit; }
+.quote__photo { flex: none; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: var(--stone); box-shadow: 0 0 0 2px var(--white); }
+.quote--ink .quote__photo { box-shadow: 0 0 0 2px var(--ink-3); }
+
+/* 12a. Events calendar (Workshops). js/main.js draws the month from the embedded data. ------ */
+.cal { padding: clamp(16px, 2vw, 24px); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--paper); }
+.cal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.cal__title { margin: 0; font-size: var(--fs-h3); }
+.cal__nav { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); font: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
+.cal__nav:hover { background: var(--stone-2); }
+.cal__nav:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal__dow { padding: 4px 6px; font-size: 12px; font-weight: 600; color: var(--muted); text-align: left; }
+.cal__day { min-height: 92px; padding: 6px; border-radius: var(--r-sm); background: var(--stone-2); font-size: 13px; }
+.cal__day--out { background: transparent; color: #8B8E92; }
+.cal__day--today { box-shadow: inset 0 0 0 2px var(--ink); }
+.cal__num { display: block; margin-bottom: 4px; font-weight: 600; }
+.cal__ev { display: block; margin-top: 3px; padding: 3px 6px; border-radius: 6px; background: var(--yellow); color: var(--ink); font-size: 12px; font-weight: 600; line-height: 1.3; text-decoration: none; overflow-wrap: anywhere; }
+.cal__ev:hover { background: var(--pink); }
+.cal__ev:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.cal__ev--past { background: var(--stone); color: var(--muted); }
+.cal__ev small { display: block; font-weight: 500; }
+.cal__empty { margin: 12px 0 0; color: var(--muted); }
+@media (max-width: 640px) {
+  /* Phones: a list of the month's days that have events */
+  .cal__grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .cal__day { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 4px 10px; min-height: 0; padding: 8px; }
+  .cal__dow, .cal__day--out, .cal__day--empty { display: none; }
+  .cal__num { margin: 4px 0 0; white-space: nowrap; }
+  .cal__ev { grid-column: 2; margin-top: 0; padding: 6px 8px; font-size: 13px; }
+}
 
 /* 13. Responsive ------------------------------------------------------------ */
 @media (max-width: 1240px) {

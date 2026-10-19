@@ -1,6 +1,7 @@
 // Shared page chrome: <head>, header (full or campaign), footer, staging bar.
 // Brief §2: launch navigation Learn AI | Build with AI | For Business | Resources | About,
-// logo → Home, persistent CTA → /free-ai-starter-kit. Community and Contact live in the footer.
+// logo → Home, persistent CTA → /free-ai-starter-kit. Community and Contact live in the footer,
+// as its two most visible links (under the brand line).
 // The campaign landing page uses a reduced header: logo and privacy access only.
 
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -13,7 +14,7 @@ const NAV = [
   ["about", "/about/", "About"],
 ];
 
-const VERSION = "13";
+const VERSION = "14";
 
 // Site settings come from the CMS (tools/content.mjs). Each has a default equal to the
 // approved copy, so an unset value never blanks the header or footer.
@@ -73,7 +74,7 @@ function head({ title, description, path, site, image, noindex }) {
 
 function stagingBar(site) {
   if (!site.staging) return "";
-  return `<div class="staging" role="note"><div class="wrap staging__inner"><span class="dot" aria-hidden="true"></span><span><strong>Staging preview.</strong> Forms are not connected yet, so nothing you enter is sent or stored. Content marked as draft awaits approval.</span></div></div>`;
+  return `<div class="staging" role="note"><div class="wrap staging__inner"><span class="dot" aria-hidden="true"></span><span><strong>Staging preview.</strong> Forms are not connected yet, so nothing you enter is sent or stored. Draft content is shown here before it is published.</span></div></div>`;
 }
 
 function header(nav, variant, site) {
@@ -112,11 +113,14 @@ function footer(site, variant) {
           <a class="logo" href="/" aria-label="Faith Works home"><img src="${esc(logoReversed(site))}" alt="" width="168" height="34"></a>
           <p>${esc(site.footerTagline || "Work better with AI, without becoming a tech expert.")}</p>
           <p class="site-footer__tagline">${esc(site.footerMotto || "Learn. Implement. Scale.")}</p>
+          <p class="site-footer__reach">
+            <a class="site-footer__cta site-footer__cta--pink" href="/community/" data-track="community_click">Join the Community <span class="icon-arrow" aria-hidden="true">↗</span></a>
+            <a class="site-footer__cta" href="/contact/">Contact us <span class="icon-arrow" aria-hidden="true">↗</span></a>
+          </p>
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="/learn/">Learn AI</a><a href="/workshops/">Workshops</a><a href="/resources/">Resources</a><a href="/free-ai-starter-kit/">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="/business/">For Business</a><a href="/build/">Build with AI</a><a href="/speaking/">Speaking &amp; partnerships</a></div>
-          <div><h2>Faith Works</h2><a href="/about/">About</a><a href="/community/">Community</a><a href="/contact/">Contact</a></div>
+          <div><h2>Work with us</h2><a href="/business/">For Business</a><a href="/build/">Build with AI</a><a href="/speaking/">Speaking &amp; partnerships</a><a href="/about/">About Faith Works</a></div>
           <div><h2>Follow</h2>${social}<a href="${esc(site.community.url)}" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

@@ -8,23 +8,25 @@
 import { TIME_ZONES, DOC_VERSION } from "./page-doc.mjs";
 
 export const ROLES = {
-  super_admin: { label: "Super Admin", rank: 3 },
-  main_admin: { label: "Main Admin", rank: 2 },
-  author: { label: "Author", rank: 1 },
+  super_admin: { label: "Super Admin", rank: 2, help: "Full CMS and administrative access." },
+  author: { label: "Author", rank: 1, help: "Can create, edit and publish their own content, but cannot manage users or administrative settings." },
 };
-export const isAdmin = (role) => role === "super_admin" || role === "main_admin";
+// Any other stored role is refused at sign-in and flagged on Users and roles until a Super
+// Admin assigns a current role.
+export const normalizeRole = (role) => (ROLES[role] ? role : null);
+export const isSuperAdmin = (role) => normalizeRole(role) === "super_admin";
 
-// Workflow statuses (brief §7 content register + review states). Tags are separate.
+// Publishing statuses. There is no approval step: whoever may edit an item publishes it.
+//   Draft: saved, not on the website.  Published: on the website (events and testimonials
+//   also need "Show on the website" on).  Archived: kept for the record, off the website.
 export const STATUSES = {
-  needed: { label: "Needed", tone: "stone", help: "Planned, no content yet." },
-  draft: { label: "Draft", tone: "stone", help: "Being written. Not visible on the website." },
-  in_review: { label: "Under Review", tone: "yellow", help: "Submitted. Waiting for an admin to review." },
-  changes_requested: { label: "Changes Requested", tone: "pink", help: "The reviewer asked for changes." },
-  approved: { label: "Approved", tone: "green", help: "Approved. An admin can publish it." },
-  published: { label: "Published", tone: "green", help: "Live on the website exactly as shown." },
-  rejected: { label: "Rejected", tone: "red", help: "Not approved for the website." },
+  draft: { label: "Draft", tone: "stone", help: "Saved, but not on the website. Press Publish when it is ready." },
+  published: { label: "Published", tone: "green", help: "On the website exactly as shown." },
   archived: { label: "Archived", tone: "stone", help: "Kept for the record. Not on the website." },
 };
+// Records saved with any other status are read as Drafts (nothing is rewritten until the item
+// is saved); whether an item is live is decided by the `published` tab, never by its status.
+export const statusOf = (status) => (STATUSES[status] ? status : "draft");
 
 // Production domain and route conventions (tools/build.mjs).
 export const SITE_ORIGIN_DEFAULT = "https://faithph.ai";
@@ -32,12 +34,15 @@ export const SITE_ORIGIN_DEFAULT = "https://faithph.ai";
 /* ---- Field helpers ---------------------------------------------------------
    type: text | textarea | slug | url | email | date | time | number | boolean | select |
          tags | authors | ref | list | pairs | html | css | json
-   required: needed to submit/approve/publish (drafts may be incomplete)
+   required: needed to publish (drafts may be incomplete)
    public: false keeps the field out of the published snapshot (internal data)
-   adminOnly / superOnly: field-level write permission (enforced on the server)
+   adminOnly: field-level write permission (enforced on the server)
    long: number of spreadsheet cells the value may span (a cell holds 50,000 characters)
    hidden: stored, but not a form field (set by the page editor or the server)
    computed: calculated by the server on save (never typed in)
+   retired: (in a collection's `retired` list, not `fields`) a field this CMS no longer uses. Old
+           rows are still read so migrateRecord() can convert them, and the stored value is kept
+           on every write, but new sheets do not get the column and it is never published.
    legacy: a field from before page documents. Its stored value is kept (nothing is deleted)
            and still read for records that have not been re-saved, but it is no longer
            edited: that content now lives in the page itself (see shared/page-doc.mjs).
@@ -50,18 +55,18 @@ const legacy = (...fields) => fields.map((x) => ({ ...x, legacy: true, hidden: t
 const SEO = [
   f("seo_title", "SEO title (browser tab and search)", "text", { group: "seo", max: 120, help: "Leave empty to use “{title} · Faith Works”. Shown as the <title> in the page editor’s HTML." }),
   f("meta_description", "Meta description", "textarea", { group: "seo", max: 300, rows: 3, help: "One or two sentences for search results and link previews. Leave empty to use the summary." }),
-  f("social_image_url", "Social sharing image URL", "url", { group: "seo", help: "Optional. Leave empty to use the featured image." }),
+  f("social_image_url", "Social sharing image URL", "url", { hidden: true }), // kept for existing items; pages share the featured image
 ];
 const FEATURED = [
   f("featured_image_url", "Featured image URL", "url", { group: "media", image: true, help: "Optional. Paste an image address (https://… or /assets/images/…). The page shows it wherever its template has the featured image block." }),
   f("featured_image_alt", "Image description (alt text)", "text", { group: "media", max: 200, help: "Describe what the image shows, for screen readers. Required when an image is set." }),
 ];
-// Authors replace the old free-text owner and per-item editor list. Every CMS user can edit
-// content (publishing still needs an admin); authors only say who wrote it.
+// Authors replace the old free-text owner and per-item editor list. The people listed here
+// (and whoever created the item) own it: they may edit and publish it (shared/workflow.mjs).
 const PUBLISHING = [
-  f("authors", "Authors", "authors", { group: "publishing", public: false, help: "People on the CMS user list. Shown as the byline where the page has one." }),
+  f("authors", "Authors", "authors", { group: "publishing", public: false, help: "People on the CMS user list. They can edit and publish this item, and are shown as the byline where the page has one." }),
   f("byline", "Byline", "text", { hidden: true, computed: true }),
-  f("tags", "Tags", "tags", { group: "publishing", help: "Type to search. Type a new name, or use “New tag” in the list, to create one (admins)." }),
+  f("tags", "Tags", "tags", { group: "publishing", help: "Type to search. Type a new name, or use “New tag” in the list, to create one (Super Admins)." }),
   // Kept for existing items (list order, review reminders) but no longer edited
   f("sort_order", "Display order", "number", { hidden: true }),
   f("review_date", "Next review date", "date", { hidden: true, public: false }),
@@ -78,11 +83,19 @@ const PAGE = (label) => [
   f("doc_version", "Page document version", "number", { hidden: true }),
 ];
 
+// Card colours from the brand palette (css/style.css: .quote--…). Faith Pink is the default.
+export const CARD_TONES = [
+  { value: "pink", label: "Faith Pink", swatch: "#fbe3e9" }, { value: "yellow", label: "AI Yellow", swatch: "#fff1c2" },
+  { value: "stone", label: "Stone", swatch: "#eeeae5" }, { value: "ink", label: "Charcoal", swatch: "#1a1e24" },
+];
+// An event has its own page when the registration button goes to it, or when the author asks for one.
+export const eventHasPage = (r) => r?.registration_type === "page" || r?.event_page === true;
+
 export const COLLECTIONS = {
   programs: {
     label: "Programs", singular: "Program", prefix: "prg", labelField: "title", route: "/programs/{slug}/", page: "Program page",
     description: "Learning programs shown on Learn AI and as their own pages.",
-    groups: { main: "Program", enrol: "Enrolment and price", media: "Featured image", seo: "Search and sharing", publishing: "Authors and tags" },
+    groups: { main: "Program", enrol: "Enrolment and price", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
     fields: [
       f("title", "Title", "text", { group: "main", required: true, max: 160, help: "The page’s main heading. Editing the heading in the page editor changes it here too." }),
       f("slug", "URL slug", "slug", { group: "main", required: true }),
@@ -108,42 +121,49 @@ export const COLLECTIONS = {
 
   events: {
     label: "Events", singular: "Event", prefix: "evt", labelField: "title", route: "/events/{slug}/", page: "Event page",
-    description: "Workshops and events on the Workshops page. Upcoming and past are separated automatically.",
-    groups: { main: "Event", when: "Date and time", where: "Venue and registration", media: "Featured image", seo: "Search and sharing", publishing: "Authors and tags" },
+    description: "Events on the Workshops page and its calendar. Upcoming and past are separated automatically from the dates.",
+    groups: { main: "Event", when: "Date and time", where: "Location", reg: "Registration", media: "Event image", page: "Event page", visibility: "Visibility and authors" },
     fields: [
-      f("title", "Event title", "text", { group: "main", required: true, max: 160, help: "The page’s main heading. Editing the heading in the page editor changes it here too." }),
-      f("slug", "URL slug", "slug", { group: "main", required: true }),
-      f("summary", "Summary", "textarea", { group: "main", required: true, max: 500, rows: 3, help: "Shown on the Workshops list and as the page introduction." }),
-      f("event_type", "Event type", "text", { group: "main", max: 80, help: "e.g. “Masterclass”, “Workshop”." }),
-      f("related_program_id", "Related program", "ref", { group: "main", ref: "programs", help: "Optional. Links the event to a program page." }),
-      f("event_date", "Start date", "date", { group: "when", help: "Leave empty while the date is not confirmed." }),
+      f("title", "Event title", "text", { group: "main", required: true, max: 160, help: "Shown on the event card and the calendar." }),
+      f("summary", "Short description", "textarea", { group: "main", max: 500, rows: 3, help: "Optional. One or two sentences for the event card." }),
+      f("event_date", "Start date", "date", { group: "when", required: true, help: "Needed to publish. The calendar and the upcoming and past lists use it." }),
       f("start_time", "Start time", "time", { group: "when" }),
-      f("end_date", "End date", "date", { group: "when", help: "Only for events over several days." }),
-      f("end_time", "End time", "time", { group: "when" }),
+      f("end_date", "End date", "date", { group: "when", help: "Optional. Only for events over several days." }),
+      f("end_time", "End time", "time", { group: "when", help: "Optional. Leave empty when the duration is not known." }),
       f("time_zone", "Time zone", "select", { group: "when", required: true, searchable: true, options: TIME_ZONES.map(([value, label]) => ({ value, label })), help: "Times are stored exactly as entered, in this zone. Changing the zone never moves the event." }),
-      f("date_label", "Text while no date is set", "text", { group: "when", max: 80, help: "e.g. “Dates to be announced”." }),
-      f("registration_deadline", "Registration deadline", "date", { group: "when" }),
-      f("delivery_format", "Delivery format", "select", { group: "where", required: true, options: opt([["in_person", "In person (offline)"], ["online", "Online"], ["hybrid", "Hybrid"], ["tbc", "To be confirmed"]]) }),
-      f("venue", "Venue", "text", { group: "where", max: 200, half: true, showIf: (r) => r.delivery_format !== "online" }),
-      f("map_url", "Map link", "url", { group: "where", showIf: (r) => r.delivery_format !== "online" }),
-      f("meeting_url", "Online meeting link", "url", { group: "where", showIf: (r) => r.delivery_format === "online" || r.delivery_format === "hybrid", help: "Shown on the event page. Do not use a link that must stay private." }),
-      f("capacity", "Capacity", "number", { group: "where" }),
-      f("event_status", "Event status", "select", { group: "where", required: true, options: opt([["open", "Registration open"], ["waitlist", "Waitlist"], ["sold-out", "Sold out · waitlist open"], ["tba", "Dates to be announced"], ["past", "Past event"]]) }),
-      f("cta_type", "Registration destination", "select", { group: "where", required: true, options: opt([["external", "External page (e.g. a GHL funnel)"], ["internal", "A page on this website"], ["notify", "“Get notified” form on Workshops"], ["none", "No button"]]) }),
-      f("registration_url", "Registration URL", "url", { group: "where", showIf: (r) => r.cta_type === "external" || r.cta_type === "internal", help: "The existing registration or payment page. Never invent one. Page buttons marked “registration URL” follow it." }),
-      f("cta_label", "Button label", "text", { group: "where", max: 80, showIf: (r) => r.cta_type !== "none" }),
-      ...PAGE("Event page"), ...FEATURED, ...SEO, ...PUBLISHING,
-      ...legacy(
-        f("format_label", "Format text shown on the page"), f("online_info", "Online joining information", "textarea"), f("is_past", "This is a past event", "boolean"),
-        f("featured_image_caption", "Image caption"), f("image_width", "Image width (px)", "number"), f("image_height", "Image height (px)", "number"),
-        ...OLD_OWNERSHIP),
+      f("venue", "Location or meeting details", "text", { group: "where", max: 200, help: "Optional. e.g. “Makati City, Metro Manila” or “Online (Zoom link sent after you register)”. Do not paste a private meeting link." }),
+      f("registration_type", "Where should the registration button go?", "select", { group: "reg", required: true, widget: "radio", options: [
+        { value: "external", label: "External link", note: "A GoHighLevel page, form or funnel, or any other address." },
+        { value: "page", label: "CMS event page", note: "A page for this event on the website, built with the page editor." },
+        { value: "none", label: "No registration link", note: "Information only. The card shows no button." },
+      ] }),
+      f("registration_url", "Registration link", "url", { group: "reg", showIf: (r) => r.registration_type === "external", help: "The existing registration page, e.g. the GHL funnel. It opens in a new tab." }),
+      f("cta_label", "Button text", "text", { group: "reg", max: 60, showIf: (r) => r.registration_type !== "none", help: "Optional. Leave empty for “Register”." }),
+      f("event_page", "Also give this event its own page on the website", "boolean", { group: "reg", showIf: (r) => r.registration_type !== "page", help: "Optional. The card then links to “Event details”, while the button still goes to the registration link." }),
+      f("featured_image_url", "Image URL", "url", { group: "media", image: true, help: "Optional. Shown on the event card (and on the event page, if it has one). Paste https://… or /assets/images/…" }),
+      f("featured_image_alt", "Image description (alt text)", "text", { group: "media", max: 200, help: "Describe what the image shows, for screen readers. Needed when an image is set." }),
+      f("slug", "Page address (URL slug)", "slug", { group: "page", required: true, showIf: (r) => eventHasPage(r), help: "Created from the title. Only used when the event has its own page." }),
+      ...SEO.map((x) => (x.hidden ? x : { ...x, group: "page", showIf: (r) => eventHasPage(r) })),
+      ...PAGE("Event page"),
+      f("visible", "Show on the website", "boolean", { group: "visibility", help: "Turn off to hide a published event without deleting it. Press Publish to apply the change." }),
+      ...PUBLISHING.filter((x) => ["authors", "byline", "sort_order"].includes(x.key)),
+    ],
+    // Earlier versions: related program, event type and status, the old registration options, venue details.
+    retired: [
+      f("event_type", "Event type"), f("related_program_id", "Related program"), f("date_label", "Text while no date is set"),
+      f("registration_deadline", "Registration deadline", "date"), f("delivery_format", "Delivery format"), f("map_url", "Map link", "url"),
+      f("meeting_url", "Online meeting link", "url"), f("capacity", "Capacity", "number"), f("event_status", "Event status"), f("cta_type", "Registration destination"),
+      f("tags", "Tags", "tags"), f("review_date", "Next review date", "date"),
+      f("featured_image_caption", "Image caption"), f("image_width", "Image width (px)", "number"), f("image_height", "Image height (px)", "number"),
+      f("format_label", "Format text shown on the page"), f("online_info", "Online joining information", "textarea"), f("is_past", "This is a past event", "boolean"),
+      ...OLD_OWNERSHIP,
     ],
   },
 
   resources: {
     label: "Resources", singular: "Resource", prefix: "res", labelField: "title", route: "/resources/{slug}/", page: "Resource page",
     description: "Articles, guides, templates, checklists and other resources.",
-    groups: { main: "Resource", dest: "Card button", media: "Featured image", seo: "Search and sharing", publishing: "Authors and tags" },
+    groups: { main: "Resource", dest: "Card button", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
     fields: [
       f("title", "Title", "text", { group: "main", required: true, max: 160, help: "The page’s main heading. Editing the heading in the page editor changes it here too." }),
       f("slug", "URL slug", "slug", { group: "main", required: true }),
@@ -165,34 +185,32 @@ export const COLLECTIONS = {
   },
 
   testimonials: {
-    label: "Testimonials", singular: "Testimonial", prefix: "tst", labelField: "display_name", route: null, page: "Card template",
-    description: "Participant quotes and success stories. Published only with recorded consent and display approval.",
-    groups: { main: "Quote", consent: "Source and consent", media: "Photo", publishing: "Authors and tags" },
+    label: "Testimonials", singular: "Testimonial", prefix: "tst", labelField: "display_name", route: null,
+    description: "Quotes from participants and clients. Published testimonials set to “Show on the website” appear on the home page.",
+    groups: { main: "Testimonial", look: "Card", visibility: "Visibility" },
     fields: [
-      f("display_name", "Name shown on the website", "text", { group: "main", required: true, max: 160, help: "As approved by the person." }),
-      f("role_org", "Role or organization shown", "text", { group: "main", max: 160, help: "Only if the person approved showing it." }),
-      f("quote", "Exact quote or result", "textarea", { group: "main", required: true, max: 2000, rows: 5, help: "Exactly as the person wrote or said it. Do not polish or shorten. The card shows it word for word; it cannot be edited in the card template." }),
-      f("kind", "Kind", "select", { group: "main", required: true, options: opt([["testimonial", "Testimonial (quote)"], ["success_story", "Success story (result)"]]) }),
-      f("attribution", "Attribution (full name as given)", "text", { group: "consent", required: true, public: false, max: 160 }),
-      f("source", "Source", "text", { group: "consent", required: true, public: false, max: 200, help: "Where the quote came from, e.g. “Post-workshop feedback form, Batch 3”." }),
-      f("source_ref", "Source link or internal reference", "text", { group: "consent", public: false, max: 500 }),
-      f("consent_status", "Consent", "select", { group: "consent", required: true, public: false, options: opt([["not_recorded", "Not recorded yet"], ["requested", "Requested"], ["obtained", "Obtained"], ["declined", "Declined"], ["withdrawn", "Withdrawn"]]) }),
-      f("consent_evidence", "Consent evidence", "textarea", { group: "consent", public: false, max: 1000, rows: 2, help: "Where the written consent is kept (file name, email subject and date). Do not paste personal data." }),
-      f("consent_date", "Consent date", "date", { group: "consent", public: false }),
-      f("display_approved", "Approved for display", "boolean", { group: "consent", public: false, adminOnly: true, help: "Admins only. Required before publishing." }),
-      ...FEATURED.map((x) => ({ ...x, label: x.key === "featured_image_url" ? "Photo URL" : x.label, help: x.key === "featured_image_url" ? "Optional. Only with the person’s permission." : x.help })),
-      f("body_html", "Card template", "html", { group: "body", long: 2, cssField: "body_css" }),
-      f("body_css", "Card styles (CSS)", "css", { group: "body", hidden: true }),
-      f("doc_version", "Page document version", "number", { hidden: true }),
-      ...PUBLISHING,
-      ...legacy(...OLD_OWNERSHIP),
+      f("quote", "Testimonial", "textarea", { group: "main", required: true, max: 2000, rows: 5, help: "The quote or feedback, as the person gave it." }),
+      f("display_name", "Person’s name", "text", { group: "main", required: true, max: 120 }),
+      f("featured_image_url", "Profile photo", "url", { group: "look", image: true, round: true, help: "Optional. A small round photo beside the name. Paste https://… or /assets/images/…" }),
+      f("tone", "Card colour", "select", { group: "look", required: true, widget: "swatches", options: CARD_TONES }),
+      f("visible", "Show on the website", "boolean", { group: "visibility", help: "Turn off to hide it from the website. It stays saved here, so you can show it again later. Press Publish to apply the change." }),
+      f("authors", "Authors", "authors", { hidden: true, public: false }),
+      f("sort_order", "Display order", "number", { hidden: true }),
+    ],
+    // Earlier versions: role line, kind, source and consent tracking, display approval and card templates.
+    retired: [
+      f("role_org", "Role or organization shown"), f("kind", "Kind"), f("attribution", "Attribution"), f("source", "Source"), f("source_ref", "Source link"),
+      f("consent_status", "Consent"), f("consent_evidence", "Consent evidence", "textarea"), f("consent_date", "Consent date", "date"),
+      f("display_approved", "Approved for display", "boolean"), f("featured_image_alt", "Photo description"),
+      f("body_html", "Card template", "html", { long: 2 }), f("body_css", "Card styles (CSS)", "css"), f("doc_version", "Page document version", "number"),
+      f("byline", "Byline"), f("tags", "Tags", "tags"), f("review_date", "Next review date", "date"), ...OLD_OWNERSHIP,
     ],
   },
 
   settings: {
     label: "Site settings", singular: "Site settings", prefix: "set", labelField: "brand", route: null, singleton: "site",
     description: "Logo, contacts, social links, global calls to action, footer, legal links and tracking IDs.",
-    groups: { main: "Brand and contact", social: "Social and community", cta: "Global call to action", footer: "Footer and legal", system: "Launch and tracking (Super Admin)" },
+    groups: { main: "Brand and contact", social: "Social and community", cta: "Global call to action", footer: "Footer and legal", system: "Launch and tracking" },
     fields: [
       f("brand", "Brand name", "text", { group: "main", required: true, max: 80 }),
       f("logo_url", "Logo URL", "url", { group: "main", image: true }),
@@ -209,12 +227,12 @@ export const COLLECTIONS = {
       f("footer_motto", "Footer tagline", "text", { group: "footer", max: 80 }),
       f("privacy_url", "Privacy Notice URL", "url", { group: "footer" }),
       f("terms_url", "Terms URL", "url", { group: "footer" }),
-      f("origin", "Website address (canonical origin)", "url", { group: "system", required: true, superOnly: true }),
-      f("staging", "Staging mode (noindex, staging bar, draft preview builds)", "boolean", { group: "system", superOnly: true }),
-      f("starter_kit_ready", "Starter Kit is ready for public traffic", "boolean", { group: "system", superOnly: true }),
-      f("ga4_id", "Google Analytics 4 measurement ID", "text", { group: "system", superOnly: true, pattern: "^G-[A-Z0-9]{4,16}$", help: "Approved IDs only, e.g. G-ABC123XYZ. Never paste secrets or API keys." }),
-      f("gtm_id", "Google Tag Manager container ID", "text", { group: "system", superOnly: true, pattern: "^GTM-[A-Z0-9]{4,12}$" }),
-      f("meta_pixel_id", "Meta Pixel ID", "text", { group: "system", superOnly: true, pattern: "^[0-9]{6,20}$" }),
+      f("origin", "Website address (canonical origin)", "url", { group: "system", required: true, adminOnly: true }),
+      f("staging", "Staging mode (noindex, staging bar, draft preview builds)", "boolean", { group: "system", adminOnly: true }),
+      f("starter_kit_ready", "Starter Kit is ready for public traffic", "boolean", { group: "system", adminOnly: true }),
+      f("ga4_id", "Google Analytics 4 measurement ID", "text", { group: "system", adminOnly: true, pattern: "^G-[A-Z0-9]{4,16}$", help: "Approved IDs only, e.g. G-ABC123XYZ. Never paste secrets or API keys." }),
+      f("gtm_id", "Google Tag Manager container ID", "text", { group: "system", adminOnly: true, pattern: "^GTM-[A-Z0-9]{4,12}$" }),
+      f("meta_pixel_id", "Meta Pixel ID", "text", { group: "system", adminOnly: true, pattern: "^[0-9]{6,20}$" }),
     ],
   },
 };
@@ -226,8 +244,6 @@ export const ALL_COLLECTIONS = [...CONTENT_COLLECTIONS, "settings"];
 export const SYSTEM_FIELDS = [
   "id", "status", "version", "write_id",
   "created_at", "created_by", "updated_at", "updated_by",
-  "submitted_at", "submitted_by", "reviewed_at", "reviewed_by", "review_note",
-  "approved_at", "approved_by", "approved_version",
   "published_at", "published_by", "published_version", "published_slug", "previous_slugs",
   "deleted_at", "deleted_by",
 ];
@@ -246,6 +262,8 @@ export function fieldsOf(collection) {
   if (!c) throw new Error(`Unknown collection: ${collection}`);
   return c.fields;
 }
+// Retired fields of a collection (readable from older rows; see the field notes above).
+export const retiredOf = (collection) => COLLECTIONS[collection]?.retired || [];
 export function field(collection, key) { return fieldsOf(collection).find((x) => x.key === key); }
 export const hasSlug = (collection) => !!field(collection, "slug");
 
@@ -292,9 +310,38 @@ export function blankRecord(collection) {
   for (const x of fieldsOf(collection)) rec[x.key] = emptyValue(x);
   if (fieldsOf(collection).some((x) => x.key === "doc_version")) rec.doc_version = DOC_VERSION;
   if (fieldsOf(collection).some((x) => x.key === "page_layout")) rec.page_layout = "site";
-  if (collection === "events") { rec.time_zone = "Asia/Manila"; rec.cta_type = "notify"; rec.event_status = "tba"; rec.delivery_format = "tbc"; }
+  if (collection === "events") { rec.time_zone = "Asia/Manila"; rec.registration_type = "none"; rec.visible = true; }
   if (collection === "programs") { rec.enrollment_status = "waitlist"; rec.tone = "stone"; }
   if (collection === "resources") { rec.resource_type = "article"; }
-  if (collection === "testimonials") { rec.kind = "testimonial"; rec.consent_status = "not_recorded"; }
+  if (collection === "testimonials") { rec.tone = "pink"; rec.visible = true; }
   return rec;
+}
+
+// Records and published copies saved by earlier versions, converted when they are read (by the
+// server's store, the public snapshot and the website build). Idempotent; nothing is written
+// until someone saves, and the retired values it reads stay stored.
+//   statuses      Needed, Under Review, Changes Requested, Approved, Rejected → Draft
+//   events        the old "Registration destination": an external page, or a page on this
+//                 website (a /path), becomes External link with the same address; the
+//                 "Get notified" form and No button become No registration link. Events with
+//                 page content keep their page (event_page). Shown on the website.
+//   testimonials  Faith Pink card. Shown, unless consent was declined or withdrawn or (live
+//                 copies) the website was holding the live copy back for missing consent.
+export function migrateRecord(collection, rec) {
+  if (!rec || typeof rec !== "object") return rec;
+  const out = { ...rec };
+  if (CONTENT_COLLECTIONS.includes(collection) && out.status !== undefined) out.status = statusOf(out.status);
+  if (collection === "events" && !out.registration_type) {
+    const url = String(out.registration_url || "").trim();
+    out.registration_type = ["external", "internal"].includes(out.cta_type) && url ? "external" : "none";
+    if (out.registration_type === "none") out.registration_url = "";
+    if (out.event_page !== true) out.event_page = !!String(out.body_html || "").trim();
+    if (out.cta_type === "notify") out.cta_label = "";
+    out.visible = true;
+  }
+  if (collection === "testimonials" && !out.tone) {
+    out.tone = "pink";
+    out.visible = "consent_ok" in out ? out.consent_ok === true : !["declined", "withdrawn"].includes(out.consent_status);
+  }
+  return out;
 }

@@ -3,17 +3,19 @@
 // string (valueInputOption=RAW), so nothing is ever evaluated as a formula.
 // Long values (page HTML, JSON snapshots) span overflow columns key, key__2, key__3…
 // because one Google Sheets cell holds at most 50,000 characters.
-import { COLLECTIONS, SYSTEM_TABS, columnsFor, longCells } from "../../shared/schema.mjs";
+// Retired fields (shared/schema.mjs) are read when an older sheet still has their columns, so
+// records can be migrated, and written back unchanged; new sheets never get those columns.
+import { COLLECTIONS, SYSTEM_TABS, columnsFor, longCells, retiredOf } from "../../shared/schema.mjs";
 import { HttpError } from "../http.mjs";
 
 export const CHUNK = 45000;
 
 const SYSTEM_TYPES = {
-  version: "number", approved_version: "number", published_version: "number",
+  version: "number", published_version: "number",
   payload: "json", data: "json", active: "boolean", archived: "boolean",
 };
 function typeOf(tab, key) {
-  const fd = COLLECTIONS[tab]?.fields.find((x) => x.key === key);
+  const fd = COLLECTIONS[tab]?.fields.find((x) => x.key === key) || retiredOf(tab).find((x) => x.key === key);
   return fd ? fd.type : SYSTEM_TYPES[key] || "text";
 }
 
@@ -57,7 +59,7 @@ export function checkHeader(tab, header) {
 
 // Row values (array aligned to header) → record
 export function decodeRow(tab, header, row) {
-  const known = new Set(columnsFor(tab).map((c) => splitColumn(c)[0]));
+  const known = new Set([...columnsFor(tab).map((c) => splitColumn(c)[0]), ...retiredOf(tab).map((x) => x.key)]);
   const parts = {};
   header.forEach((col, i) => {
     if (!col) return;
@@ -79,7 +81,7 @@ export function encodeRow(tab, header, rec, existing = []) {
     const [key] = splitColumn(col);
     if (key in encoded || !(key in rec)) continue;
     const s = encodeValue(typeOf(tab, key), rec[key]);
-    const cells = longCells(tab, key);
+    const cells = Math.max(longCells(tab, key), retiredOf(tab).find((x) => x.key === key)?.long || 1);
     if (s.length > CHUNK * cells) {
       throw new HttpError(413, `“${key}” is too long to store (${s.length.toLocaleString()} characters; the limit is ${(CHUNK * cells).toLocaleString()}).`, "too_long");
     }

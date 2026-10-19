@@ -1,25 +1,26 @@
-// Content records: create, edit, review workflow, publishing. Every permission is checked
-// here on the server; the dashboard only mirrors these rules to decide which buttons to show.
+// Content records: create, edit, publishing. Every permission (role and item ownership) is
+// checked here on the server; the dashboard only mirrors these rules to decide which buttons
+// to show. There is no approval step: an item's owners and Super Admins publish it.
 //
 // Draft vs live: a record row is the WORKING COPY. What the website shows is the sanitized
 // payload in the `published` tab. Editing a live item changes only the working copy (its
-// status returns to Draft and needs approval again); the live copy stays until re-published.
+// status returns to Draft); the live copy stays until the draft is published.
 //
-// Publishing is staged so a partial failure never exposes unapproved content:
-//   1. validate the approved working copy and build its public payload;
+// Publishing is staged so a partial failure never exposes content nobody published:
+//   1. validate the working copy and build its public payload;
 //   2. write the payload to `published` and confirm it   <- the moment it goes live;
 //   3. mark the record Published and confirm it;
 //   4. write history + audit, refresh the public cache, start a website rebuild.
 // If step 2 fails, nothing changed. If step 3 fails, the item is live but still marked
-// Approved; the dashboard flags it and "Finish publishing" (reconcile) completes it.
-import { COLLECTIONS, CONTENT_COLLECTIONS, isAdmin, hasSlug, publicPath } from "../../shared/schema.mjs";
-import { normalize, validate, slugify, testimonialPublishable } from "../../shared/validate.mjs";
-import { ACTIONS, canEdit, canView, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
+// Draft; the dashboard flags it and "Finish publishing" (reconcile) completes it.
+import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin, hasSlug, publicPath, migrateRecord, eventHasPage } from "../../shared/schema.mjs";
+import { normalize, validate, slugify } from "../../shared/validate.mjs";
+import { ACTIONS, canEdit, canView, canManage, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
 import { toPublic } from "../../shared/public.mjs";
 import { readingTime, bylineOf } from "../../shared/page-doc.mjs";
 import { HttpError, randomId, now } from "../http.mjs";
 
-const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "kind", "consent_status", "display_approved"];
+const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "registration_type", "event_page", "visible", "tone", "featured_image_url", "display_name"];
 
 export function createRecords({ store, cfg, log, onPublicChange = async () => ({}) }) {
   const assertCollection = (c) => { if (!COLLECTIONS[c]) throw new HttpError(404, "Unknown content type.", "not_found"); };
@@ -36,27 +37,33 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     const needsRepair = !!(live && Number(rec.published_version || 0) < Number(live.version));
     return {
       collection, record: rec, label: labelOf(collection, rec),
-      live: live ? { version: live.version, slug: live.slug, published_at: live.published_at, published_by: live.published_by, url: publicPath(collection, live.slug) } : null,
+      live: live ? { version: live.version, slug: live.slug, published_at: live.published_at, published_by: live.published_by, url: collection !== "events" || eventHasPage(live.payload) ? publicPath(collection, live.slug) : "/workshops/", hidden: live.payload?.visible === false } : null,
       needs_repair: needsRepair,
       draft_differs: !!(live && rec.status !== "published"),
       can_edit: canEdit(user, collection, rec),
-      actions: allowedActions(user, collection, rec, { live: !!live }).concat(needsRepair && isAdmin(user.role) ? ["reconcile"] : []),
-      public_url: hasSlug(collection) && rec.slug ? publicPath(collection, rec.slug) : null,
+      actions: allowedActions(user, collection, rec, { live: !!live }).concat(needsRepair && canManage(user, collection, rec) ? ["reconcile"] : []),
+      public_url: hasSlug(collection) && rec.slug && (collection !== "events" || eventHasPage(rec)) ? publicPath(collection, rec.slug) : null,
     };
   }
 
   // Field-level permissions: keep the stored value of fields this role may not change.
+  // The authors list decides who may edit an item. Its creator and Super Admins manage the list;
+  // a co-author may add people and take themselves off, but not remove anyone else.
   function guardFields(user, collection, incoming, current) {
     const blank = normalize(collection, {});
     for (const fd of COLLECTIONS[collection].fields) {
-      const locked = (fd.adminOnly && !isAdmin(user.role)) || (fd.superOnly && user.role !== "super_admin");
+      const locked = fd.adminOnly && !isSuperAdmin(user.role);
       if (locked) incoming[fd.key] = current ? current[fd.key] : blank[fd.key];
+    }
+    if (current && Array.isArray(current.authors) && Array.isArray(incoming.authors) && !isSuperAdmin(user.role) && current.created_by !== user.email) {
+      const removed = current.authors.filter((e) => e !== user.email && !incoming.authors.includes(e));
+      if (removed.length) fail422({ authors: `Only the person who created this item or a Super Admin can remove another author (${removed.join(", ")}).` });
     }
     return incoming;
   }
 
   // CMS users who can be named as authors: active people on the user list plus the pinned
-  // Super Admins. email → display name.
+  // admins. email → display name.
   async function authorDirectory() {
     const users = await store.list("users");
     const out = new Map();
@@ -77,16 +84,15 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       data._authorSet = new Set([...dir.keys(), ...(current?.authors || [])]);
     }
     if (collection === "resources") data.read_time = data.resource_type === "article" ? readingTime(data.body_html) : "";
+    // Events: a registration link only for "External link"; the address follows the title.
+    if (collection === "events" && data.registration_type !== "external") data.registration_url = "";
     return data;
   }
 
-  async function checkRefs(collection, rec) {
-    const tabs = ["tags", collection];
-    if (collection === "events") tabs.push("programs");
-    const t = await store.listMany([...new Set(tabs)], { fresh: false });
+  async function checkRefs(collection) {
+    const t = await store.listMany([...new Set(["tags", collection])], { fresh: false });
     const tags = new Set(t.tags.filter((x) => !x.archived).map((x) => x.id));
-    const refs = collection === "events" ? new Set(t.programs.filter((p) => !p.deleted_at).map((p) => p.id)) : null;
-    return { tags, refs, siblings: t[collection] };
+    return { tags, siblings: t[collection] };
   }
 
   function slugProblem(collection, rec, siblings, livePayloadSlugs = []) {
@@ -101,11 +107,19 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
   }
 
   async function validateAll(collection, rec, { strict }) {
-    const { tags, refs, siblings } = await checkRefs(collection, rec);
-    const errors = validate(collection, rec, { strict, tags, refs, authors: rec._authorSet || null });
+    const { tags, siblings } = await checkRefs(collection);
+    const errors = validate(collection, rec, { strict, tags, authors: rec._authorSet || null });
     const sp = slugProblem(collection, rec, siblings);
     if (sp) errors.slug = sp;
     return errors;
+  }
+  // A slug made from the title, with -2, -3… added when another item already uses it.
+  async function freeSlug(collection, base) {
+    if (!base) return base;
+    const { siblings } = await checkRefs(collection);
+    let slug = base;
+    for (let n = 2; slugProblem(collection, { id: "", slug }, siblings); n++) slug = `${base.slice(0, 76)}-${n}`;
+    return slug;
   }
   const fail422 = (errors, message = "Please fix the highlighted fields.") => { throw new HttpError(422, message, "invalid", { errors }); };
 
@@ -120,7 +134,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     const next = { ...rec, ...patch, version: Number(rec.version) + 1, write_id: randomId("w", 6), updated_at: now(), updated_by: user.email };
     const saved = await store.update(collection, rec.id, next, { expectWriteId: rec.write_id });
     await log.snapshot(user, collection, saved, kind);
-    await log.log(user, kind, collection, rec.id, saved.version, patch.review_note && kind !== "save" ? `Note: ${patch.review_note}` : "", requestId);
+    await log.log(user, kind, collection, rec.id, saved.version, "", requestId);
     return saved;
   }
 
@@ -131,21 +145,24 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
 
     async list(user, collection, { q = "", status = "", tag = "", includeDeleted = false } = {}) {
       assertCollection(collection);
-      if (collection === "settings" && !isAdmin(user.role)) throw new HttpError(403, "Only admins can open Site settings.", "forbidden");
+      if (collection === "settings" && !isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can open Site settings.", "forbidden");
       const t = await store.listMany([collection, "published"], { fresh: false });
       const live = new Map(t.published.filter((p) => p.collection === collection && p.state === "live").map((p) => [p.record_id, p]));
       const needle = q.trim().toLowerCase();
       return t[collection]
-        .filter((r) => (includeDeleted && user.role === "super_admin") || !r.deleted_at)
+        .filter((r) => (includeDeleted && isSuperAdmin(user.role)) || !r.deleted_at)
         .filter((r) => canView(user, collection, r))
-        .filter((r) => !status || r.status === status || (status === "live" && live.has(r.id)))
+        .filter((r) => {
+          const shown = live.has(r.id) && live.get(r.id).payload?.visible !== false;
+          return !status || r.status === status || (status === "live" && shown) || (status === "hidden" && live.has(r.id) && !shown);
+        })
         .filter((r) => !tag || (r.tags || []).includes(tag))
         .filter((r) => !needle || [labelOf(collection, r), r.slug, r.summary, r.byline, r.content_owner, r.quote].some((v) => String(v || "").toLowerCase().includes(needle)))
         .map((r) => {
           const l = live.get(r.id);
           return {
             ...Object.fromEntries(SUMMARY_FIELDS.map((k) => [k, r[k]])), label: labelOf(collection, r),
-            live: l ? { version: l.version, slug: l.slug } : null, needs_repair: !!(l && Number(r.published_version || 0) < Number(l.version)),
+            live: l ? { version: l.version, slug: l.slug, hidden: l.payload?.visible === false } : null, needs_repair: !!(l && Number(r.published_version || 0) < Number(l.version)),
             can_edit: canEdit(user, collection, r),
           };
         })
@@ -161,11 +178,11 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async create(user, collection, input = {}, { requestId } = {}) {
       assertCollection(collection);
       if (COLLECTIONS[collection].singleton) {
-        if (!isAdmin(user.role)) throw new HttpError(403, "Only admins can create Site settings.", "forbidden");
+        if (!isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can create Site settings.", "forbidden");
         if (await store.get(collection, COLLECTIONS[collection].singleton)) throw new HttpError(409, "Site settings already exist. Edit them instead.", "exists");
       }
       const data = guardFields(user, collection, normalize(collection, input), null);
-      if (hasSlug(collection) && !data.slug) data.slug = slugify(data.title);
+      if (hasSlug(collection) && !data.slug) data.slug = await freeSlug(collection, slugify(data.title)); // e.g. a monthly event with the same title
       if (Array.isArray(data.authors) && !data.authors.length && !COLLECTIONS[collection].singleton) data.authors = [user.email];
       await prepare(collection, input, data, null);
       const errors = await validateAll(collection, { ...data, id: "" }, { strict: false });
@@ -174,9 +191,8 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       const stamp = now();
       const rec = {
         ...data, id: COLLECTIONS[collection].singleton || randomId(COLLECTIONS[collection].prefix, 6),
-        status: input.status === "needed" && isAdmin(user.role) ? "needed" : "draft", version: 1, write_id: randomId("w", 6),
+        status: "draft", version: 1, write_id: randomId("w", 6),
         created_at: stamp, created_by: user.email, updated_at: stamp, updated_by: user.email,
-        submitted_at: "", submitted_by: "", reviewed_at: "", reviewed_by: "", review_note: "", approved_at: "", approved_by: "", approved_version: "",
         published_at: "", published_by: "", published_version: "", published_slug: "", previous_slugs: "", deleted_at: "", deleted_by: "",
       };
       const saved = await store.insert(collection, rec);
@@ -188,15 +204,14 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async save(user, collection, id, { version, data = {}, confirmSlugChange = false } = {}, { requestId } = {}) {
       const { rec, live } = await load(collection, id);
       if (!canEdit(user, collection, rec)) {
-        throw new HttpError(403, rec.status === "in_review" ? "This item is under review. Withdraw it from review to edit it." : "You do not have permission to edit this item.", "forbidden");
+        throw new HttpError(403, rec.status === "archived" ? "Archived items cannot be edited. Restore it to draft first." : "Only this item's authors or a Super Admin can edit it.", "forbidden");
       }
       checkVersion(rec, version);
       const incoming = guardFields(user, collection, normalize(collection, data), rec);
       await prepare(collection, data, incoming, rec);
       if (hasSlug(collection) && !incoming.slug) incoming.slug = rec.slug || slugify(incoming.title);
       const liveSlug = live?.slug;
-      if (live && hasSlug(collection) && incoming.slug !== liveSlug) {
-        if (!isAdmin(user.role)) throw new HttpError(403, "Only an admin can change the address of a published page.", "slug_locked");
+      if (live && hasSlug(collection) && incoming.slug !== liveSlug && (collection !== "events" || eventHasPage(live.payload))) {
         if (!confirmSlugChange) throw new HttpError(409, `This page is live at ${publicPath(collection, liveSlug)}. Changing the slug moves it to ${publicPath(collection, incoming.slug)}; the old address will redirect after the next publish. Confirm to continue.`, "slug_change_confirm");
       }
       const errors = await validateAll(collection, { ...incoming, id }, { strict: false });
@@ -204,14 +219,12 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       delete incoming._authorSet;
       const changed = COLLECTIONS[collection].fields.some((fd) => JSON.stringify(incoming[fd.key] ?? null) !== JSON.stringify(rec[fd.key] ?? null));
       if (!changed) return { ...view(user, collection, rec, live), unchanged: true };
-      const status = rec.status === "in_review" ? "in_review" : statusAfterSave(rec.status);
-      const patch = { ...incoming, status };
-      if (status !== rec.status && ["approved", "published"].includes(rec.status)) Object.assign(patch, { approved_at: "", approved_by: "", approved_version: "" });
+      const patch = { ...incoming, status: statusAfterSave(rec.status) };
       const saved = await write(user, collection, rec, patch, "save", { requestId });
       return view(user, collection, saved, live);
     },
 
-    async act(user, collection, id, action, { version, note = "" } = {}, { requestId } = {}) {
+    async act(user, collection, id, action, { version } = {}, { requestId } = {}) {
       if (action === "publish") return this.publish(user, collection, id, { version }, { requestId });
       if (action === "reconcile") return this.reconcile(user, collection, id, { requestId });
       if (!ACTIONS[action] && action !== "undelete") throw new HttpError(404, "Unknown action.", "not_found");
@@ -220,29 +233,11 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       const allowed = allowedActions(user, collection, rec, { live: !!live });
       if (!allowed.includes(action)) throw new HttpError(403, `You cannot ${ACTIONS[action]?.label.toLowerCase() || action} this item in its current state.`, "forbidden");
       const stamp = now();
-      const trimmed = String(note || "").trim().slice(0, 1000);
-      if (ACTIONS[action]?.note && trimmed.length < 3) throw new HttpError(422, "Add a short note explaining what needs to change.", "note_required", { errors: { note: "Required." } });
 
       let patch;
       let unpublished = false;
       switch (action) {
-        case "submit": {
-          const errors = await validateAll(collection, rec, { strict: true });
-          if (Object.keys(errors).length) fail422(errors, "Complete the required fields before submitting for review.");
-          patch = { status: "in_review", submitted_at: stamp, submitted_by: user.email, review_note: trimmed || rec.review_note };
-          break;
-        }
-        case "withdraw": patch = { status: "draft" }; break;
-        case "approve": {
-          const errors = await validateAll(collection, rec, { strict: true });
-          if (collection === "testimonials") { const p = testimonialPublishable(rec); if (p.length) errors.consent_status = p.join(" "); }
-          if (Object.keys(errors).length) fail422(errors, "This item cannot be approved until the highlighted fields are complete.");
-          patch = { status: "approved", approved_at: stamp, approved_by: user.email, approved_version: Number(rec.version) + 1, reviewed_at: stamp, reviewed_by: user.email, review_note: trimmed };
-          break;
-        }
-        case "request_changes": patch = { status: "changes_requested", reviewed_at: stamp, reviewed_by: user.email, review_note: trimmed }; break;
-        case "reject": patch = { status: "rejected", reviewed_at: stamp, reviewed_by: user.email, review_note: trimmed }; break;
-        case "unpublish": patch = { status: rec.status === "published" ? "approved" : rec.status }; unpublished = true; break;
+        case "unpublish": patch = { status: "draft" }; unpublished = true; break;
         case "archive": patch = { status: "archived" }; unpublished = !!live; break;
         case "restore": patch = { status: "draft" }; break;
         case "delete": patch = { deleted_at: stamp, deleted_by: user.email }; unpublished = !!live; break;
@@ -260,13 +255,14 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     },
 
     async publish(user, collection, id, { version } = {}, { requestId } = {}) {
-      if (!isAdmin(user.role)) throw new HttpError(403, "Only admins can publish.", "forbidden");
+      if (collection === "settings" && !isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can publish Site settings.", "forbidden");
       const { rec, liveRow } = await load(collection, id);
+      if (!canManage(user, collection, rec)) throw new HttpError(403, "Only this item's authors or a Super Admin can publish it.", "forbidden");
       checkVersion(rec, version);
       if (rec.deleted_at) throw new HttpError(409, "Deleted items cannot be published.", "deleted");
-      if (rec.status !== "approved") throw new HttpError(409, "Only approved content can be published. Approve this version first.", "not_approved");
+      if (rec.status === "archived") throw new HttpError(409, "Archived items cannot be published. Restore it to draft first.", "archived");
+      if (rec.status === "published") throw new HttpError(409, "This version is already on the website.", "already_published");
       const errors = await validateAll(collection, rec, { strict: true });
-      if (collection === "testimonials") { const p = testimonialPublishable(rec); if (p.length) errors.consent_status = p.join(" "); }
       if (hasSlug(collection)) {
         const pub = await store.list("published");
         const taken = pub.filter((p) => p.collection === collection && p.state === "live" && p.record_id !== id).map((p) => p.slug);
@@ -309,10 +305,10 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
 
     // Completes a publish whose second step failed (live copy newer than the record says).
     async reconcile(user, collection, id, { requestId } = {}) {
-      if (!isAdmin(user.role)) throw new HttpError(403, "Only admins can repair publishing.", "forbidden");
       const { rec, live } = await load(collection, id);
+      if (!canManage(user, collection, rec)) throw new HttpError(403, "Only this item's authors or a Super Admin can finish publishing it.", "forbidden");
       if (!live || Number(rec.published_version || 0) >= Number(live.version)) return { ...view(user, collection, rec, live), unchanged: true };
-      const contentUnchanged = Number(rec.version) === Number(live.version) - 1 && rec.status === "approved";
+      const contentUnchanged = Number(rec.version) === Number(live.version) - 1 && rec.status === "draft";
       const patch = { published_version: live.version, published_at: live.published_at, published_by: live.published_by, published_slug: live.slug, previous_slugs: (live.payload?.previous_slugs || []).join(", ") };
       if (contentUnchanged) patch.status = "published";
       const next = { ...rec, ...patch, version: contentUnchanged ? Number(live.version) : Number(rec.version) + 1, write_id: randomId("w", 6), updated_at: now(), updated_by: user.email };
@@ -329,15 +325,16 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       return rows.sort((a, b) => String(b.at).localeCompare(String(a.at))).map((h) => ({ id: h.id, version: h.version, kind: h.kind, status: h.status, at: h.at, by: h.by }));
     },
 
-    // Copies an earlier version's content into the working copy as a new draft (admins).
+    // Copies an earlier version's content into the working copy as a new draft (anyone who may
+    // edit the item; save() checks that).
     async restoreVersion(user, collection, id, historyId, { version } = {}, { requestId } = {}) {
-      if (!isAdmin(user.role)) throw new HttpError(403, "Only admins can restore earlier versions.", "forbidden");
       const h = (await store.list("history")).find((x) => x.id === historyId && x.record_id === id);
       if (!h?.data) throw new HttpError(404, "That version was not found.", "not_found");
       const { rec } = await load(collection, id);
       if (rec.deleted_at) throw new HttpError(409, "Restore the deleted item first (Recovery).", "deleted");
       if (rec.status === "archived") throw new HttpError(409, "Restore the archived item to draft first.", "archived");
-      const data = Object.fromEntries(COLLECTIONS[collection].fields.map((fd) => [fd.key, h.data[fd.key]]));
+      const old = migrateRecord(collection, h.data); // versions saved before the current fields
+      const data = Object.fromEntries(COLLECTIONS[collection].fields.map((fd) => [fd.key, old[fd.key]]));
       const out = await this.save(user, collection, id, { version, data, confirmSlugChange: true }, { requestId });
       await log.log(user, "restore_version", collection, id, out.record.version, `From version ${h.version} (${h.at})`, requestId);
       return out;
@@ -346,28 +343,30 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async dashboard(user) {
       const t = await store.listMany([...CONTENT_COLLECTIONS, "published"], { fresh: false });
       const today = now().slice(0, 10);
-      const counts = {}, review = [], mine = [], overdue = [], repair = [], consent = [];
+      const counts = {}, mine = [], overdue = [], repair = [];
       const liveIds = new Map(t.published.filter((p) => p.state === "live").map((p) => [`${p.collection}:${p.record_id}`, p]));
       for (const c of CONTENT_COLLECTIONS) {
         counts[c] = {};
         for (const r of t[c]) {
           if (r.deleted_at) continue;
           counts[c][r.status] = (counts[c][r.status] || 0) + 1;
-          const item = { collection: c, id: r.id, label: labelOf(c, r), status: r.status, updated_at: r.updated_at, updated_by: r.updated_by, review_note: r.review_note };
-          if (r.status === "in_review") review.push(item);
+          const item = { collection: c, id: r.id, label: labelOf(c, r), status: r.status, updated_at: r.updated_at, updated_by: r.updated_by };
+          // Authors see the to-do lists for the items they own; Super Admins see everything.
+          const manage = canManage(user, c, r);
           const mineItem = (r.authors || []).includes(user.email) || r.created_by === user.email || r.updated_by === user.email;
-          if (canEdit(user, c, r) && ["draft", "changes_requested", "needed"].includes(r.status) && mineItem) mine.push(item);
-          if (r.review_date && r.review_date < today && !["archived", "rejected"].includes(r.status)) overdue.push({ ...item, review_date: r.review_date });
+          if (canEdit(user, c, r) && r.status === "draft" && (mineItem || isSuperAdmin(user.role))) mine.push(item);
+          if (manage && r.review_date && r.review_date < today && r.status !== "archived") overdue.push({ ...item, review_date: r.review_date });
           const l = liveIds.get(`${c}:${r.id}`);
-          if (l && Number(r.published_version || 0) < Number(l.version)) repair.push(item);
-          if (c === "testimonials" && !["archived", "rejected"].includes(r.status) && testimonialPublishable(r).length) consent.push(item);
+          if (manage && l && Number(r.published_version || 0) < Number(l.version)) repair.push(item);
+          if (l && l.payload?.visible === false) counts[c].hidden = (counts[c].hidden || 0) + 1;
         }
-        counts[c].live = [...liveIds.keys()].filter((k) => k.startsWith(`${c}:`)).length;
+        counts[c].live = [...liveIds.keys()].filter((k) => k.startsWith(`${c}:`)).length - (counts[c].hidden || 0);
       }
-      const recent = isAdmin(user.role)
-        ? (await store.list("audit_log")).sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 12)
-        : [];
-      return { counts, review, mine: mine.slice(0, 20), overdue: overdue.slice(0, 20), repair, consent: consent.length, recent };
+      // Super Admins see everyone's recent activity; Authors see their own content changes.
+      const recent = (await store.list("audit_log"))
+        .filter((a) => isSuperAdmin(user.role) || (a.actor === user.email && a.collection))
+        .sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 12);
+      return { counts, mine: mine.sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at))).slice(0, 20), overdue: overdue.slice(0, 20), repair, recent };
     },
   };
 }

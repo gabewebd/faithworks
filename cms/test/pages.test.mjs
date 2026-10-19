@@ -103,8 +103,7 @@ test("every content type has a complete starter template that publishes cleanly"
     assert.ok(!/<iframe/i.test(html), `${c}: no pretend video embed`);
     for (const m of html.matchAll(/src="([^"]+)"/g)) assert.match(m[1], /^\/assets\/images\/placeholder-(16x9|4x3|portrait)\.svg$/, "only labelled placeholder images");
   }
-  const card = starterTemplate("testimonials").html;
-  assert.ok(card.includes('data-cms-bind="quote"') && card.includes('data-cms-bind="display-name"'));
+  assert.equal(starterTemplate("testimonials").html, "", "testimonials are cards, not pages");
   for (const s of Object.values(SNIPPETS)) assert.deepEqual(sanitizeHtml(s.html).report, [], s.label);
 });
 
@@ -139,8 +138,8 @@ test("authors are CMS users; the byline uses names, never emails; the creator is
   assert.equal(created.status, 201);
   assert.deepEqual(rec(created).authors, [USERS.author]);
   assert.equal(rec(created).byline, "Dev Author");
-  const two = await u.author.put(`/api/records/programs/${rec(created).id}`, { version: 1, data: program({ authors: [USERS.author, USERS.main] }) });
-  assert.equal(rec(two).byline, "Dev Author and Dev Main Admin");
+  const two = await u.author.put(`/api/records/programs/${rec(created).id}`, { version: 1, data: program({ authors: [USERS.author, USERS.super] }) });
+  assert.equal(rec(two).byline, "Dev Author and Dev Super Admin");
   const bad = await u.author.put(`/api/records/programs/${rec(created).id}`, { version: 2, data: program({ authors: ["stranger@example.test"] }) });
   assert.equal(bad.status, 422);
   assert.match(bad.data.error.errors.authors, /Not on the CMS user list/);
@@ -161,8 +160,8 @@ test("reading time is calculated by the server; a typed value is ignored", async
 test("saving from the simplified form keeps every stored legacy value", async () => {
   const { u, cleanup } = await setup();
   const p = seed.programs[0];
-  const view = await u.main.get(`/api/records/programs/${p.id}`);
-  const saved = await u.main.put(`/api/records/programs/${p.id}`, { version: view.data.record.version, data: { ...program({ slug: p.slug, title: p.title }) } });
+  const view = await u.super.get(`/api/records/programs/${p.id}`);
+  const saved = await u.super.put(`/api/records/programs/${p.id}`, { version: view.data.record.version, data: { ...program({ slug: p.slug, title: p.title }) } });
   assert.equal(saved.status, 200);
   const r = rec(saved);
   assert.deepEqual(r.target_audience, p.target_audience);
@@ -174,7 +173,7 @@ test("saving from the simplified form keeps every stored legacy value", async ()
 
 test("event dates are validated as a range", async () => {
   const { u, cleanup } = await setup();
-  const base = { title: "Ev", slug: "ev-range", summary: "S", time_zone: "Asia/Manila", delivery_format: "online", event_status: "open", cta_type: "none" };
+  const base = { title: "Ev", slug: "ev-range", summary: "S", time_zone: "Asia/Manila", registration_type: "none" };
   const bad = await u.author.post("/api/records/events", { data: { ...base, event_date: "2026-11-20", end_date: "2026-11-19" } });
   assert.equal(bad.status, 422);
   assert.ok(bad.data.error.errors.end_date);
@@ -202,17 +201,70 @@ test("preview: the page follows Details, custom layouts drop the global chrome, 
   cleanup();
 });
 
-test("testimonial cards show the exact quote from Details, whatever the template says", async () => {
+test("testimonial cards: the quote, the name, an optional round photo and the card colour", async () => {
   const { u, cleanup } = await setup();
   const t = seed.testimonials[0];
-  const body = `<figure class="quote"><blockquote><p data-cms-bind="quote">An invented, polished quote.</p></blockquote><figcaption><b data-cms-bind="display-name">Someone else</b></figcaption></figure>`;
-  const res = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, body_html: body, doc_version: DOC_VERSION } });
-  assert.equal(res.status, 200);
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  assert.ok(res.data.html.includes(esc(t.quote)), "exact quote");
-  assert.ok(!res.data.html.includes("invented"));
-  assert.ok(!res.data.html.includes("Someone else"));
+  const plain = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, tone: "yellow", featured_image_url: "" } });
+  assert.equal(plain.status, 200);
+  assert.ok(plain.data.html.includes(esc(t.quote)), "the quote as written");
+  assert.match(plain.data.html, /<figure class="quote quote--yellow">/);
+  assert.match(plain.data.html, new RegExp(`<span class="quote__name">${esc(t.display_name)}</span>`));
+  assert.ok(!plain.data.html.includes("quote__photo"), "no image element without a photo");
+  const photo = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: false } });
+  assert.match(photo.data.html, /<figure class="quote quote--ink">/);
+  assert.match(photo.data.html, /<img class="quote__photo" src="\/assets\/images\/ana\.jpg" alt=""/, "a round photo beside the name");
   cleanup();
+});
+
+test("event cards: registration buttons follow the destination; no empty buttons", async () => {
+  const R = await import("../../tools/render.mjs");
+  const { toRenderData } = await import("../../tools/content.mjs");
+  const { buildSnapshot } = await import("../shared/public.mjs");
+  const base = { status: "draft", version: 1, time_zone: "Asia/Manila", visible: true, start_time: "13:00", end_time: "17:00" };
+  const records = {
+    settings: seed.settings,
+    events: [
+      { ...base, id: "e1", title: "GHL", slug: "ghl", event_date: "2099-01-10", registration_type: "external", registration_url: "https://faithph.ai/funnel", cta_label: "Get tickets", event_page: true, body_html: "<h1>GHL</h1>", doc_version: 2 },
+      { ...base, id: "e2", title: "Info only", slug: "info", event_date: "2099-01-11", registration_type: "none" },
+      { ...base, id: "e3", title: "CMS page", slug: "cms-page", event_date: "2099-01-12", registration_type: "page", body_html: "<h1>Page</h1>", doc_version: 2 },
+      { ...base, id: "e4", title: "Old", slug: "old", event_date: "2020-01-10", registration_type: "external", registration_url: "https://faithph.ai/old" },
+      { ...base, id: "e5", title: "Hidden", slug: "hidden", event_date: "2099-01-13", registration_type: "none", visible: false },
+    ],
+  };
+  const d = toRenderData(buildSnapshot({ records, view: "preview" }));
+  R.init(d);
+  const up = R.events("upcoming"), past = R.events("past");
+  const card = (html, slug) => html.slice(html.indexOf(`id="event-${slug}"`), html.indexOf("</article>", html.indexOf(`id="event-${slug}"`)));
+  assert.match(card(up, "ghl"), /href="https:\/\/faithph\.ai\/funnel" target="_blank"[^>]*>Get tickets/, "button to the external funnel");
+  assert.match(card(up, "ghl"), /href="\/events\/ghl\/">Event details/, "and a separate detail page link");
+  assert.ok(!/class="btn|event__cta/.test(card(up, "info")), "no button, no empty button row");
+  assert.match(card(up, "cms-page"), /href="\/events\/cms-page\/"[^>]*>Register/);
+  assert.ok(!card(up, "cms-page").includes("Event details"), "the button already goes to the page");
+  assert.ok(!card(past, "old").includes("class=\"btn"), "past events have no registration button");
+  assert.ok(!up.includes("Hidden") && !past.includes("Hidden"), "hidden events are left out");
+  assert.ok(up.indexOf("event-ghl") < up.indexOf("event-info") && up.indexOf("event-info") < up.indexOf("event-cms-page"), "upcoming in date order");
+  assert.equal(R.eventPage(d.events.find((e) => e.slug === "info")), null, "no page without one");
+  assert.ok(R.eventPage(d.events.find((e) => e.slug === "cms-page")).body.includes("<h1>Page</h1>"));
+  const cal = R.calendarData();
+  assert.deepEqual(cal.map((e) => [e.id, e.start, e.end, e.url]), [
+    ["old", "2020-01-10T13:00:00+08:00", "2020-01-10T17:00:00+08:00", "/workshops/#event-old"],
+    ["ghl", "2099-01-10T13:00:00+08:00", "2099-01-10T17:00:00+08:00", "/events/ghl/"],
+    ["info", "2099-01-11T13:00:00+08:00", "2099-01-11T17:00:00+08:00", "/workshops/#event-info"],
+    ["cms-page", "2099-01-12T13:00:00+08:00", "2099-01-12T17:00:00+08:00", "/events/cms-page/"],
+  ]);
+  assert.ok(R.eventCalendar().includes("data-cal-data"), "the calendar embeds the same data");
+});
+
+test("event times keep their own time zone; past is decided in that zone", async () => {
+  const { eventInstant, isPastEvent } = await import("../shared/page-doc.mjs");
+  assert.equal(eventInstant("2026-07-01", "09:30", "Europe/London"), "2026-07-01T09:30:00+01:00", "summer time");
+  assert.equal(eventInstant("2026-12-01", "09:30", "Europe/London"), "2026-12-01T09:30:00+00:00");
+  assert.equal(eventInstant("2026-12-01", "", "Asia/Manila"), "2026-12-01", "all day");
+  const now = new Date("2026-10-19T17:00:00Z"); // 20 Oct 01:00 in Manila, 19 Oct 10:00 in Los Angeles
+  assert.equal(isPastEvent({ event_date: "2026-10-19", time_zone: "Asia/Manila" }, now), true);
+  assert.equal(isPastEvent({ event_date: "2026-10-19", time_zone: "America/Los_Angeles" }, now), false);
+  assert.equal(isPastEvent({ event_date: "", time_zone: "Asia/Manila" }, now), false, "no date: never past");
 });
 
 test("scoped Page CSS keeps its design tokens even when it starts with a comment", async () => {

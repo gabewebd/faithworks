@@ -1,7 +1,6 @@
 // Normalize and validate record data. Used by the server (authoritative) and the dashboard
-// (instant feedback). Drafts may be incomplete; `strict` (submit, approve, publish) checks
-// every required field.
-import { fieldsOf, emptyValue } from "./schema.mjs";
+// (instant feedback). Drafts may be incomplete; `strict` (publish) checks every required field.
+import { fieldsOf, emptyValue, eventHasPage } from "./schema.mjs";
 
 export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -113,21 +112,12 @@ export function validate(collection, rec, { strict = false, tags = null, refs = 
     if (rec.end_date && !rec.event_date) errors.end_date = "Add the start date first.";
     else if (rec.end_date && rec.end_date < rec.event_date) errors.end_date = "The end date must be on or after the start date.";
     else if (rec.start_time && rec.end_time && (!rec.end_date || rec.end_date === rec.event_date) && rec.end_time <= rec.start_time) errors.end_time = "End time must be after the start time.";
-    if (strict && rec.cta_type === "external" && !rec.registration_url) errors.registration_url = "An external destination needs its registration URL.";
-    if (strict && rec.cta_type === "internal" && !String(rec.registration_url || "").startsWith("/")) errors.registration_url = "An internal destination needs a site path starting with /.";
-    if (strict && !rec.event_date && !rec.date_label) errors.date_label = "Add a date, or the text to show while no date is set.";
+    if (rec.end_time && !rec.start_time) errors.end_time = "Add the start time first.";
+    if (strict && rec.registration_type === "external" && !rec.registration_url) errors.registration_url = "Add the registration link (for example the GHL page), or choose another option.";
+    if (strict && eventHasPage(rec) && !String(rec.body_html || "").trim()) errors.body_html = "The event page has no content yet. Build it on the Event page tab, or turn the event page off.";
   }
   if (collection === "resources" && strict && rec.resource_type !== "article" && !rec.file_url) errors.file_url = "Guides, downloads and external resources need a file URL or link.";
   if (collection === "resources" && strict && rec.resource_type === "article" && !String(rec.body_html || "").trim()) errors.body_html = "An article needs its content.";
   if (collection === "programs" && strict && Number(rec.doc_version) >= 2 && !String(rec.body_html || "").trim()) errors.body_html = "A program needs its page content.";
   return errors;
-}
-
-// Publishing a testimonial needs recorded consent and an admin's display approval (brief §6, decision D7).
-export function testimonialPublishable(rec) {
-  const problems = [];
-  if (rec.consent_status !== "obtained") problems.push("Consent is not recorded as obtained.");
-  if (!String(rec.consent_evidence || "").trim()) problems.push("Consent evidence is missing.");
-  if (rec.display_approved !== true) problems.push("Display approval has not been given.");
-  return problems;
 }

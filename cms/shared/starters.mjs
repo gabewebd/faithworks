@@ -7,7 +7,6 @@
 // labelled as placeholders. Video sections stay empty until a YouTube or Vimeo address is
 // added in the visual editor, so nothing pretends to play.
 
-import { TESTIMONIAL_CARD } from "./page-doc.mjs";
 // Page CSS holds only what is special to one page; the site styles (css/style.css) do the rest.
 const CSS = `/* Styles for this page only (the website styles already apply).
    Add your own classes here, for example:
@@ -198,7 +197,7 @@ function events() {
 <section class="phero phero--yellow phero--program" aria-labelledby="page-title">
   <div class="wrap phero__grid">
     <div class="phero__copy">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="/workshops/">Workshops</a><span aria-hidden="true">/</span><span aria-current="page" data-cms-bind="event-type" data-cms-empty="Event"></span></nav>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/workshops/">Workshops</a><span aria-hidden="true">/</span><span aria-current="page">Event</span></nav>
       <h1 id="page-title" data-cms-bind="title">This Is the Full HTML Template</h1>
       <p class="phero__lead" data-cms-bind="summary">This section demonstrates a heading and introductory paragraph.</p>
       <div class="actions">
@@ -241,8 +240,8 @@ ${card("Wrap-up", "Example: questions, next steps and resources.", "yellow")}
       <h3 class="fw-subhead">When and where</h3>
       <p class="fw-meta"><span data-cms-bind="event-date"></span></p>
       <p class="fw-meta"><span data-cms-bind="event-time" data-cms-empty="Time to be confirmed"></span> · <span data-cms-bind="duration" data-cms-empty="Duration to be confirmed"></span></p>
-      <p class="fw-meta"><span data-cms-bind="venue" data-cms-empty="Venue to be confirmed"></span></p>
-      <p class="small">These lines come from Details, so they always match the event’s date, time and venue.</p>
+      <p class="fw-meta"><span data-cms-bind="venue" data-cms-empty="Location to be confirmed"></span></p>
+      <p class="small">These lines come from Details, so they always match the event’s date, time and location.</p>
     </div>
   </div>
 </section>
@@ -351,8 +350,8 @@ function resources() {
 }
 
 export function starterTemplate(collection) {
-  const html = { programs, events, resources }[collection]?.() ?? (collection === "testimonials" ? TESTIMONIAL_CARD + "\n" : "");
-  return { html, css: collection === "testimonials" ? "" : CSS };
+  const html = { programs, events, resources }[collection]?.() ?? "";
+  return { html, css: html ? CSS : "" };
 }
 
 // Blocks the visual editor can insert (Insert menu). Same classes as the starters.

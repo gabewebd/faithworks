@@ -29,36 +29,32 @@ export const BINDINGS = {
   title: { label: "Title", field: "title", twoWay: true },
   summary: { label: "Summary", field: "summary", twoWay: true },
   price: { label: "Price", field: "price_text" },
-  "event-type": { label: "Event type", field: "event_type" },
+  "event-type": { label: "Event type (older events)", field: null },
   "event-date": { label: "Date", field: "event_date" },
   "event-time": { label: "Time", field: "start_time" },
   duration: { label: "Duration (calculated from the start and end)", field: "end_time" },
   timezone: { label: "Time zone", field: "time_zone" },
-  venue: { label: "Venue", field: "venue" },
+  venue: { label: "Location", field: "venue" },
   "read-time": { label: "Reading time (calculated from the article)", field: null },
   byline: { label: "Authors", field: "authors" },
   "publish-date": { label: "Publish date", field: "publish_date" },
   category: { label: "Category", field: "category" },
-  quote: { label: "Exact quote", field: "quote" },
-  "display-name": { label: "Name shown", field: "display_name" },
-  role: { label: "Role or organization", field: "role_org" },
 };
 export const LINKS = {
   "registration-url": { label: "Registration URL", field: "registration_url" },
   "resource-url": { label: "Destination URL", field: "file_url" },
-  "map-url": { label: "Map link", field: "map_url" },
-  "meeting-url": { label: "Online meeting link", field: "meeting_url" },
+  "map-url": { label: "Map link (older events)", field: null },
+  "meeting-url": { label: "Online meeting link (older events)", field: null },
 };
 export const COMPONENTS = {
   "status-badge": { label: "Status badge", help: "Shows the enrolment or event status from Details." },
   "featured-image": { label: "Featured image", help: "The featured image and its description from Details." },
   "article-meta": { label: "Byline, date and reading time", help: "Authors and publish date from Details; reading time is calculated." },
-  "event-facts": { label: "Event facts", help: "Date, time, duration, venue, format and capacity from Details." },
-  "event-actions": { label: "Registration button", help: "The registration button from Details → Venue and registration." },
+  "event-facts": { label: "Event facts", help: "Date, time, duration and location from Details." },
+  "event-actions": { label: "Registration button", help: "The registration button from Details → Registration (none when this page is the registration page)." },
   "program-form": { label: "Interest form", help: "The program’s interest form. Added by the website." },
   "other-programs": { label: "Other programs", help: "Listed automatically from the published programs." },
   "related-articles": { label: "Keep reading", help: "Other articles, listed automatically." },
-  portrait: { label: "Photo", help: "The person’s photo from Details (only with their permission)." },
   "online-info": { label: "Joining online", help: "Online joining information (older events)." },
 };
 
@@ -118,10 +114,31 @@ export function eventTimeText(rec) {
   const tz = rec.time_zone || "Asia/Manila";
   return `${t} ${tzAbbrev(tz)}`.trim();
 }
+// Past once its last day (the end date, or the start date) is over in the event's own time
+// zone. Events without a date are never past.
 export function isPastEvent(rec, today = new Date()) {
-  if (rec.event_status === "past" || (rec.is_past === true && !isDoc(rec))) return true;
   const last = DATE_RE.test(rec.end_date || "") ? rec.end_date : rec.event_date;
-  return DATE_RE.test(last || "") ? new Date(`${last}T12:00:00+08:00`) < today : false;
+  if (!DATE_RE.test(last || "")) return false;
+  return last < localDate(today, rec.time_zone || "Asia/Manila");
+}
+// The calendar date (YYYY-MM-DD) of an instant in a time zone.
+export function localDate(when, tz = "Asia/Manila") {
+  try { return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(when); }
+  catch { return when.toISOString().slice(0, 10); }
+}
+// A date and wall-clock time in a zone as ISO 8601 with that day's UTC offset (for the
+// calendar and structured data). Without a time: the date alone (an all-day event).
+export function eventInstant(date, time, tz = "Asia/Manila") {
+  if (!DATE_RE.test(date || "")) return null;
+  if (!time) return date;
+  const guess = new Date(`${date}T${time}:00Z`);
+  let offset = 0;
+  try {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).formatToParts(guess).map((p) => [p.type, p.value]));
+    offset = Math.round((Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute) - guess.getTime()) / 60000);
+  } catch { /* unknown zone: UTC */ }
+  const sign = offset < 0 ? "-" : "+", a = Math.abs(offset);
+  return `${date}T${time}:00${sign}${String(Math.floor(a / 60)).padStart(2, "0")}:${String(a % 60).padStart(2, "0")}`;
 }
 
 /* ---- Reading time ------------------------------------------------------------ */
@@ -299,7 +316,6 @@ export function bindingValues(collection, rec, { authorNames } = {}) {
     timezone: TIME_ZONES.find(([k]) => k === (rec.time_zone || "Asia/Manila"))?.[1] || rec.time_zone || "", venue: rec.venue || "",
   });
   if (collection === "resources") v["read-time"] = rec.resource_type === "article" || !rec.resource_type ? readingTime(rec.body_html) || rec.read_time || "" : "";
-  if (collection === "testimonials") Object.assign(v, { title: rec.display_name || "", quote: rec.quote || "", "display-name": rec.display_name || "", role: rec.role_org || "Workshop participant" });
   const links = {
     "registration-url": rec.registration_url || "", "resource-url": rec.file_url || "", "map-url": rec.map_url || "", "meeting-url": rec.meeting_url || "",
   };
@@ -322,7 +338,7 @@ export const extLink = (url, label, track) =>
 
 export const STATUS = {
   open: ["Registration open", "open"], waitlist: ["Waitlist", "waitlist"], "sold-out": ["Sold out · waitlist open", "soldout"],
-  tba: ["Dates to be announced", "tba"], past: ["Past event", "past"], inquiry: ["Ask about the next run", "waitlist"], planned: ["Planned · not yet open", "planned"],
+  tba: ["Date to be announced", "tba"], past: ["Past event", "past"], upcoming: ["Upcoming", "planned"], inquiry: ["Ask about the next run", "waitlist"], planned: ["Planned · not yet open", "planned"],
 };
 export function badge(key, label) {
   const [text, tone] = STATUS[key] || [label || key, "tba"];
@@ -350,41 +366,39 @@ export function featuredImage(collection, rec) {
   return { url: rec.featured_image_url, alt: rec.featured_image_alt || "", ...legacySize };
 }
 
-export const FORMAT = { in_person: "In person", online: "Online", hybrid: "Hybrid (in person and online)", tbc: "To be confirmed" };
-const eventFormat = (rec) => (!isDoc(rec) && rec.format_label) || FORMAT[rec.delivery_format] || null;
+
+// The badge on an event: past, registration open, upcoming, or no date yet.
+export function eventStatus(rec, today = new Date()) {
+  if (isPastEvent(rec, today)) return "past";
+  if (!DATE_RE.test(rec.event_date || "")) return "tba";
+  return rec.registration_type && rec.registration_type !== "none" ? "open" : "upcoming";
+}
 
 export function eventFacts(rec, today = new Date()) {
-  const past = isPastEvent(rec, today);
   const tz = rec.time_zone || "Asia/Manila";
-  const d = DATE_RE.test(rec.event_date || "");
   const t = timeRange(rec.start_time, rec.end_time);
-  const dateHtml = d
+  const dateHtml = DATE_RE.test(rec.event_date || "")
     ? rec.end_date && rec.end_date !== rec.event_date && DATE_RE.test(rec.end_date)
       ? `<time datetime="${rec.event_date}">${fmtDate(rec.event_date, LONG)}</time> – <time datetime="${rec.end_date}">${fmtDate(rec.end_date, LONG)}</time>`
       : `<time datetime="${rec.event_date}">${fmtDate(rec.event_date, LONG)}</time>`
-    : esc(rec.date_label || "Date to be announced");
-  const facts = [
-    ["Status", badge(past ? "past" : rec.event_status)],
-    ["Date", dateHtml],
-    [tz !== "Asia/Manila" ? `Time (${esc(tz)})` : "Time (Asia/Manila)", t ? esc(t) + (tz !== "Asia/Manila" ? "" : " PHT") : `<span class="tbc">${past ? "Not listed" : "To be confirmed"}</span>`],
-  ];
+    : "Date to be announced";
+  const facts = [["Status", badge(eventStatus(rec, today))], ["Date", dateHtml]];
+  if (t) facts.push([`Time (${esc(tzAbbrev(tz))})`, esc(t)]);
   const dur = eventDuration(rec);
   if (dur) facts.push(["Duration", esc(dur)]);
-  facts.push(
-    ["Venue", tbc(rec.venue, past ? "Not listed" : "To be confirmed") + (rec.map_url ? ` · ${extLink(rec.map_url, "Map")}` : "")],
-    ["Format", tbc(eventFormat(rec))],
-    ["Capacity", tbc(rec.capacity, past ? "Not listed" : "To be confirmed")]);
-  if (rec.meeting_url && !past) facts.push(["Online", extLink(rec.meeting_url, "Joining link")]);
-  if (rec.registration_deadline && !past) facts.push(["Register by", `<time datetime="${rec.registration_deadline}">${fmtDate(rec.registration_deadline)}</time>`]);
+  if (rec.venue) facts.push(["Location", esc(rec.venue)]);
   return facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
 }
-export function eventCta(rec, past) {
-  const type = rec.cta_type || "none", url = rec.registration_url, label = rec.cta_label;
-  const id = rec.slug;
-  if (!past && type === "notify") return `<a class="btn btn--light" href="/workshops/?event=${esc(id)}#notify">${esc(label || "Get notified")}<span class="sr-only"> about ${esc(rec.title)}</span></a>`;
-  if (!past && type === "internal" && url) return `<a class="btn" href="${esc(url)}">${esc(label || "Register")}</a>`;
-  if (!past && type === "external" && url) return `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener" data-track="registration_start">${esc(label || "Register")} <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens the event’s own page in a new tab)</span></a>`;
-  if (past && type === "external" && url) return extLink(url, label || "Original event page");
+// The registration button. Past events and "No registration link" have none. On the event's
+// own page (onPage), a CMS event page needs no button: the page is the registration page.
+export function eventCta(rec, past, { onPage = false } = {}) {
+  if (past) return "";
+  const type = rec.registration_type || "none", label = rec.cta_label || "Register";
+  const about = `<span class="sr-only"> for ${esc(rec.title)}</span>`;
+  if (type === "external" && rec.registration_url) {
+    return `<a class="btn" href="${esc(rec.registration_url)}" target="_blank" rel="noopener" data-track="registration_start">${esc(label)}${about} <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`;
+  }
+  if (type === "page" && rec.slug && !onPage) return `<a class="btn" href="/events/${esc(rec.slug)}/" data-track="registration_start">${esc(label)}${about}</a>`;
   return "";
 }
 export function articleMeta(rec) {
@@ -395,14 +409,13 @@ export function articleMeta(rec) {
 // Components the record alone can render (the website build adds forms and lists).
 export function recordComponent(name, collection, rec, { today = new Date(), authorNames } = {}) {
   switch (name) {
-    case "status-badge": return collection === "events" ? badge(isPastEvent(rec, today) ? "past" : rec.event_status) : badge(rec.enrollment_status, rec.enrollment_label || "");
+    case "status-badge": return collection === "events" ? badge(eventStatus(rec, today)) : badge(rec.enrollment_status, rec.enrollment_label || "");
     case "featured-image": {
       const im = featuredImage(collection, rec);
       if (!im) return null;
       const cap = !isDoc(rec) && rec.featured_image_caption ? `<figcaption class="small">${esc(rec.featured_image_caption)}</figcaption>` : "";
       return img(im, "(min-width: 1200px) 1200px, 100vw") + cap;
     }
-    case "portrait": return rec.featured_image_url ? `<img src="${esc(rec.featured_image_url)}" alt="${esc(rec.featured_image_alt || "")}" loading="lazy" decoding="async">` : null;
     case "article-meta": return articleMeta({ ...rec, byline: bylineOf(rec, authorNames) });
     case "event-facts": return eventFacts(rec, today);
     case "online-info": return rec.online_info && !isPastEvent(rec, today) ? `<h2 id="join-title" class="h3">Joining online</h2><p>${esc(rec.online_info)}</p>` : null;
@@ -599,20 +612,13 @@ ${r.body_html || ""}
 </section>
 `;
 }
-export const TESTIMONIAL_CARD = `<figure class="quote">
-  <div class="quote__portrait" data-cms-component="portrait"></div>
-  <blockquote><p data-cms-bind="quote"></p></blockquote>
-  <figcaption><b data-cms-bind="display-name"></b><span data-cms-bind="role"></span></figcaption>
-</figure>`;
-
 export function upgradeRecord(collection, rec) {
-  if (!rec || isDoc(rec) || !["programs", "events", "resources", "testimonials"].includes(collection)) return rec;
+  if (!rec || isDoc(rec) || !["programs", "events", "resources"].includes(collection)) return rec;
   const out = { ...rec, doc_version: DOC_VERSION, page_layout: rec.page_layout || "site", upgraded: true };
   const hasBody = !!String(rec.body_html || "").trim();
   if (collection === "programs") out.body_html = legacyProgram(rec);
   else if (collection === "events") out.body_html = hasBody ? legacyEvent(rec) : "";
   else if (collection === "resources") out.body_html = (rec.resource_type || "article") === "article" ? legacyArticle(rec) : rec.body_html || "";
-  else if (collection === "testimonials") out.body_html = TESTIMONIAL_CARD;
   // Values the page shows from Details are written in, as the editor would.
   if (out.body_html) out.body_html = applyBindings(out.body_html, bindingValues(collection, out));
   if (collection === "events" && !hasBody) out.upgraded = false;

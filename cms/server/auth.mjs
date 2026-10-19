@@ -1,12 +1,13 @@
 // Sign-in with Google (OpenID Connect, authorization code + PKCE). The CMS never sees or
 // stores a password. Who may sign in, and with which role, is decided on the server:
 //   - CMS_SUPER_ADMINS (environment) are always Super Admins and cannot be demoted from the UI;
-//   - everyone else must be an active row in the `users` tab, managed by a Super Admin.
+//   - everyone else must be an active row in the `users` tab, managed by a Super Admin. Rows
+//     with an unknown role cannot sign in.
 // Role changes and removals apply within USER_TTL_MS (the role is re-read, not kept in the cookie).
 import { createHash, randomBytes } from "node:crypto";
 import { sign, verify, safeEqual } from "./session.mjs";
 import { HttpError, parseCookies, cookie, now } from "./http.mjs";
-import { ROLES } from "../shared/schema.mjs";
+import { normalizeRole } from "../shared/schema.mjs";
 
 const USER_TTL_MS = 30_000;
 const GOOGLE_AUTH = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -29,8 +30,9 @@ export function createAuth({ cfg, store, audit, fetchImpl = globalThis.fetch }) 
     if (!email) return null;
     const row = (await userRows()).find((u) => u.id === email);
     if (cfg.superAdmins.includes(email)) return { email, name: row?.name || email, role: "super_admin", pinned: true };
-    if (!row || row.active !== true || !ROLES[row.role]) return null;
-    return { email, name: row.name || email, role: row.role, pinned: false };
+    const role = normalizeRole(row?.role);
+    if (!row || row.active !== true || !role) return null;
+    return { email, name: row.name || email, role, pinned: false };
   }
 
   async function currentUser(request) {

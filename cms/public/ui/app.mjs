@@ -1,7 +1,7 @@
 // Dashboard shell: sign-in, role-based navigation, hash router and unsaved-change guard.
 // Navigation only mirrors permissions; the server enforces them on every request.
 import { h, clear, api, toast, errorText, roleLabel, icon, setUnauthorizedHandler, dialog } from "./dom.mjs";
-import { COLLECTIONS, CONTENT_COLLECTIONS, isAdmin } from "/shared/schema.mjs";
+import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin } from "/shared/schema.mjs";
 import { editorView } from "./editor.mjs";
 import { dashboardView, listView, tagsView, usersView, activityView, recoveryView } from "./views.mjs";
 
@@ -66,7 +66,7 @@ function googleMark() {
 
 /* ---- Shell ---- */
 function shell(content, active) {
-  const admin = isAdmin(app.user.role), sup = app.user.role === "super_admin";
+  const admin = isSuperAdmin(app.user.role);
   const navLink = (href, ic, label, key) => h("a", { href, "aria-current": active === key ? "page" : null, onclick: () => shellEl.classList.remove("nav-open") }, icon(ic), label);
   const icons = { programs: "book", events: "calendar", resources: "file", testimonials: "quote" };
   const nav = h("nav", { class: "nav", "aria-label": "CMS" },
@@ -74,7 +74,7 @@ function shell(content, active) {
     h("p", { class: "nav-label" }, "Content"),
     CONTENT_COLLECTIONS.map((c) => navLink(`#/c/${c}`, icons[c], COLLECTIONS[c].label, c)),
     admin ? [h("p", { class: "nav-label" }, "Site"), navLink("#/c/settings/site", "settings", "Site settings", "settings"), navLink("#/tags", "tag", "Tags", "tags"), navLink("#/activity", "log", "Activity log", "activity")] : null,
-    sup ? [h("p", { class: "nav-label" }, "Administration"), navLink("#/users", "users", "Users and roles", "users"), navLink("#/recovery", "shield", "Recovery and backup", "recovery")] : null);
+    admin ? [h("p", { class: "nav-label" }, "Administration"), navLink("#/users", "users", "Users and roles", "users"), navLink("#/recovery", "shield", "Recovery and backup", "recovery")] : null);
   const logout = h("button", { type: "button", onclick: async () => { if (app.current?.isDirty?.() && !(await dialog({ title: "Sign out?", body: "You have unsaved changes that will be lost.", confirm: "Sign out", danger: true })).ok) return; await api("POST", "/api/auth/logout", {}).catch(() => {}); location.hash = ""; location.reload(); } }, "Sign out");
   const sidebar = h("aside", { class: "sidebar", id: "sidebar" }, h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")), nav,
     h("div", { class: "me" }, h("b", {}, app.user.name), h("span", { class: "role" }, roleLabel(app.user.role)), h("div", { class: "small", style: "opacity:.7;overflow:hidden;text-overflow:ellipsis" }, app.user.email), logout));
@@ -85,6 +85,11 @@ function shell(content, active) {
 }
 
 /* ---- Router ---- */
+// Super Admin screens. A direct link from an Author gets "No access" here, and the API refuses
+// the same requests on its own (this check only avoids showing controls that would fail).
+const ADMIN_ROUTES = new Set(["tags", "users", "activity", "recovery"]);
+const noAccess = () => ({ el: h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "No access. "), "Only Super Admins can open this page. ", h("a", { href: "#/" }, "Back to the dashboard")))) });
+
 async function route(force = false) {
   const hash = location.hash || "#/";
   if (!force && app.current?.isDirty?.() && hash !== app.lastHash) {
@@ -96,7 +101,8 @@ async function route(force = false) {
   let view, active;
   clear(appEl, shell(h("p", { class: "loading" }, "Loading…"), active));
   try {
-    if (!path.length) { active = "dashboard"; view = { el: await dashboardView(app) }; }
+    if ((ADMIN_ROUTES.has(path[0]) || (path[0] === "c" && path[1] === "settings")) && !isSuperAdmin(app.user.role)) view = noAccess();
+    else if (!path.length) { active = "dashboard"; view = { el: await dashboardView(app) }; }
     else if (path[0] === "c" && COLLECTIONS[path[1]]) {
       const collection = path[1];
       active = collection;

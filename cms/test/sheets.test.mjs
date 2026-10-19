@@ -193,7 +193,7 @@ test("access problems give actionable messages", async () => {
   await assert.rejects(bad.list("tags"), /private key could not be read/);
 });
 
-test("full CMS flow on the Sheets adapter: create, approve, publish, public content", async () => {
+test("full CMS flow on the Sheets adapter: create, publish, public content", async () => {
   const g = fakeGoogle();
   // Seed the users and settings the app needs.
   const store = makeStore(g);
@@ -206,8 +206,7 @@ test("full CMS flow on the Sheets adapter: create, approve, publish, public cont
   const u = await signedIn(t.app);
   let r = (await u.author.post("/api/records/resources", { data: article() })).data.record;
   assert.ok(r.id);
-  r = (await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version })).data.record;
-  const pub = await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  const pub = await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   assert.equal(pub.status, 200, JSON.stringify(pub.data));
   const content = (await u.author.get("/api/public/content")).data;
   assert.equal(content.resources[0].title, "Testing the CMS");
@@ -216,4 +215,61 @@ test("full CMS flow on the Sheets adapter: create, approve, publish, public cont
   const history = await store.list("history");
   assert.ok(history.some((h) => h.kind === "publish" && h.data.title === "Testing the CMS"));
   t.cleanup();
+});
+
+test("new sheets get only the current columns; older sheets keep their retired columns", async () => {
+  const { columnsFor } = await import("../shared/schema.mjs");
+  for (const old of ["related_program_id", "cta_type", "event_status", "delivery_format", "approved_by", "review_note"]) assert.ok(!columnsFor("events").includes(old), `events: no ${old}`);
+  for (const old of ["consent_status", "display_approved", "role_org", "kind", "attribution", "body_html"]) assert.ok(!columnsFor("testimonials").includes(old), `testimonials: no ${old}`);
+  assert.deepEqual(columnsFor("testimonials").slice(-7), ["quote", "display_name", "featured_image_url", "tone", "visible", "authors", "sort_order"]);
+
+  // An older sheet: retired columns are still there, with values
+  const g = fakeGoogle();
+  g.sheets.events[0] = [...g.sheets.events[0], "cta_type", "related_program_id", "notes"];
+  const store = makeStore(g);
+  const header = g.sheets.events[0];
+  const row = header.map((c) => ({ id: "evt_1", status: "approved", version: "1", write_id: "w1", title: "Old", slug: "old", time_zone: "Asia/Manila", registration_url: "https://faithph.ai/x", cta_type: "external", related_program_id: "prg_9", notes: "hand-written" })[c] ?? "");
+  g.sheets.events.push(row);
+  const { withMigrations } = await import("../server/store/migrate.mjs");
+  const m = withMigrations(store);
+  const got = await m.get("events", "evt_1");
+  assert.deepEqual([got.status, got.registration_type, got.registration_url, got.cta_type], ["draft", "external", "https://faithph.ai/x", "external"], "read and migrated");
+  await m.update("events", "evt_1", { ...got, title: "Saved", write_id: "w2" }, { expectWriteId: "w1" });
+  const after = Object.fromEntries(header.map((c, i) => [c, g.sheets.events[1][i]]));
+  assert.deepEqual([after.title, after.status, after.registration_type, after.cta_type, after.related_program_id, after.notes], ["Saved", "draft", "external", "external", "prg_9", "hand-written"], "retired and hand-added columns are kept");
+});
+
+test("seed is idempotent: after a partial, rate-limited run it adds only missing rows, one append per tab", async () => {
+  const { seedSheets } = await import("../scripts/seed-sheets.mjs");
+  const g = fakeGoogle({ shuffle: true });
+  const store = makeStore(g);
+  const api = createSheetsApi({ spreadsheetId: "sheet123", clientEmail: "cms@project.iam.gserviceaccount.com", privateKey, fetchImpl: g.fetchImpl, baseDelayMs: 1, log: { error() {} } });
+  const seed = {
+    programs: [sample({ id: "p1", write_id: "a" }), sample({ id: "p2", write_id: "b", slug: "b" })],
+    resources: [sample({ id: "r1", write_id: "c" }), sample({ id: "r2", write_id: "d", slug: "d" })],
+    users: [{ id: "u1", email: "x@y.z", write_id: "e" }],
+  };
+  const quiet = { log() {} };
+  // State left by the failed run: p1 written and then edited in the CMS, nothing else.
+  await store.insert("programs", { ...seed.programs[0], title: "Edited", write_id: "z" });
+
+  const dry = await seedSheets(api, seed, { dryRun: true, skipTabs: ["users"], log: quiet });
+  assert.deepEqual(dry.programs.missing.map((r) => r.id), ["p2"]);
+  assert.deepEqual(dry.programs.edited.map((r) => r.id), ["p1"]);
+  assert.equal((await store.list("programs")).length, 1, "dry run writes nothing");
+
+  g.faults.push({ match: "resources", method: "POST", status: 429 }); // first resources append is rate limited
+  g.faults.push({ match: ":append", method: "POST", after: true }); // programs append lands, then the connection drops
+  g.calls.length = 0;
+  await seedSheets(api, seed, { skipTabs: ["users"], sleep: async () => {}, log: quiet });
+  assert.equal(g.faults.length, 0, "both faults fired");
+  const appends = g.calls.filter((c) => c.url.includes(":append")).length;
+  await seedSheets(api, seed, { skipTabs: ["users"], log: quiet }); // rerun: no-op
+  assert.equal(g.calls.filter((c) => c.url.includes(":append")).length, appends, "rerun appends nothing");
+
+  const programs = await store.list("programs");
+  assert.deepEqual(programs.map((r) => r.id).sort(), ["p1", "p2"]);
+  assert.equal(programs.find((r) => r.id === "p1").title, "Edited", "existing rows are never overwritten");
+  assert.deepEqual((await store.list("resources")).map((r) => r.id).sort(), ["r1", "r2"]);
+  assert.equal((await store.list("users")).length, 0);
 });

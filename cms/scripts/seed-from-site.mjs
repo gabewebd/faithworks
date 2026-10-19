@@ -1,11 +1,10 @@
 // Builds cms/fixtures/seed.json from the site's verified content in assets/data/*.json.
 // Run once per content migration: `node cms/scripts/seed-from-site.mjs`.
 //
-// Rules: nothing is invented. Approval states come from each item's content-register field
-// (anything that is not a register status becomes Draft, with the original note kept).
-// Testimonials are imported as drafts with consent "not recorded" (decision D7: publish proof
-// only with documented consent). Only Site settings are seeded as published, because the
-// website cannot be built without them. Dev users use the reserved example.test domain and
+// Rules: nothing is invented. Every content item is imported as a Draft (the CMS has no
+// approval states; an item goes live when someone publishes it). Testimonials are imported as
+// drafts: confirm the person agreed to be quoted before publishing them. Only Site settings
+// are seeded as published, because the website cannot be built without them. Dev users use the reserved example.test domain and
 // are only usable through the local development login.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -22,19 +21,16 @@ const id = (prefix, key) => `${prefix}_${createHash("sha256").update(key).digest
 const IMPORTED_AT = "2026-10-15T00:00:00.000Z";
 const ACTOR = "system:import";
 
-const REGISTER = { needed: "needed", draft: "draft", "under review": "in_review", approved: "approved", published: "published" };
-function registerStatus(approval) {
-  const s = REGISTER[String(approval || "").trim().toLowerCase()];
-  return s ? { status: s, note: "" } : { status: "draft", note: approval ? `Imported approval note: “${approval}”.` : "" };
-}
+const registerStatus = () => ({ status: "draft" }); // content-register states are not imported
 
 function record(collection, fields, extra = {}) {
   const rec = { ...blankRecord(collection), ...normalize(collection, { ...blankRecord(collection), ...fields }) };
+  // Imported content is in the pre-page-document shape: the CMS and the build upgrade it on read
+  if (!("doc_version" in fields)) { delete rec.doc_version; delete rec.page_layout; }
   return {
     id: extra.id, status: extra.status || "draft", version: 1, write_id: "seed",
     created_at: IMPORTED_AT, created_by: ACTOR, updated_at: IMPORTED_AT, updated_by: ACTOR,
-    submitted_at: "", submitted_by: "", reviewed_at: "", reviewed_by: "", review_note: extra.note || "",
-    approved_at: "", approved_by: "", approved_version: "", published_at: "", published_by: "",
+    published_at: "", published_by: "",
     published_version: "", published_slug: "", previous_slugs: "", deleted_at: "", deleted_by: "",
     ...rec,
   };
@@ -53,9 +49,8 @@ const programs = data("programs.json").programs.map((p, i) => {
     next_intake: p.nextIntake, agenda: p.agenda, faq: p.faq, cta_label: CTA[p.statusKey] || "Ask about this program",
     tone: p.tone, preview_kind: p.preview || "", history: typeof p.history === "string" ? p.history : p.history ? JSON.stringify(p.history) : "",
     content_owner: p.owner, sort_order: (i + 1) * 10,
-  }, { id: id("prg", p.slug), status, note });
+  }, { id: id("prg", p.slug), status });
 });
-const programId = Object.fromEntries(programs.map((p) => [p.slug, p.id]));
 
 /* ---- Events ---- */
 function parseTimes(t) {
@@ -73,14 +68,14 @@ function delivery(format) {
 }
 const events = data("events.json").events.map((e, i) => {
   const [start, end] = parseTimes(e.time);
+  // An existing registration page (e.g. a GHL funnel) stays the button's destination
+  const external = ["external", "internal"].includes(e.destination?.type) && e.destination?.url;
   return record("events", {
-    title: e.title, slug: e.id, event_type: e.type, related_program_id: e.programRef ? programId[e.programRef] || "" : "",
-    summary: e.summary, event_date: e.date, date_label: e.dateLabel, start_time: start, end_time: end, time_zone: "Asia/Manila",
-    delivery_format: delivery(e.format), format_label: e.format, venue: e.venue, capacity: e.capacity, event_status: e.status,
-    is_past: e.status === "past", cta_type: e.destination?.type || "none", registration_url: e.destination?.url, cta_label: e.destination?.label,
-    featured_image_url: e.image?.src, featured_image_alt: e.image?.alt, featured_image_caption: e.image?.caption,
-    image_width: e.image?.width, image_height: e.image?.height, content_owner: e.owner, sort_order: (i + 1) * 10,
-  }, { id: id("evt", e.id), status: "draft", note: "Imported from events.json (no approval state recorded)." });
+    title: e.title, slug: e.id, summary: e.summary, event_date: e.date, start_time: start, end_time: end, time_zone: "Asia/Manila",
+    venue: e.venue, registration_type: external ? "external" : "none", registration_url: external ? e.destination.url : "",
+    cta_label: external ? e.destination.label : "", event_page: false, visible: true,
+    featured_image_url: e.image?.src, featured_image_alt: e.image?.alt, sort_order: (i + 1) * 10,
+  }, { id: id("evt", e.id), status: "draft" });
 });
 
 /* ---- Resources: articles (insights.json) and guides (resources.json) ---- */
@@ -94,7 +89,7 @@ const articles = data("insights.json").insights.map((a, i) => {
     cover_image_url: `/${a.image.base}-${w}.jpg`, cover_image_alt: a.image.alt,
     cover_image_meta: { base: a.image.base, widths: a.image.widths, width: a.image.width, height: a.image.height, position: a.image.position, source: a.image.source },
     tags: a.topics, sort_order: (i + 1) * 10,
-  }, { id: id("res", a.slug), status, note });
+  }, { id: id("res", a.slug), status });
 });
 const guides = data("resources.json").resources.map((r, i) => {
   const { status, note } = registerStatus(r.approval);
@@ -102,13 +97,14 @@ const guides = data("resources.json").resources.map((r, i) => {
     title: r.title, slug: r.id, resource_type: /worksheet/i.test(r.kind) && !/guide/i.test(r.kind) ? "worksheet" : "guide",
     category: r.kind, summary: r.summary, author: "Faith Works", access_rule: r.access, access_label: r.accessLabel,
     file_url: r.url, cta_label: r.ctaLabel, featured: !!r.featured, sort_order: (i + 1) * 10,
-  }, { id: id("res", r.id), status, note });
+  }, { id: id("res", r.id), status });
 });
 
 /* ---- Testimonials ---- */
+// The card colours rotate as on the staging home page.
 const testimonials = data("success-stories.json").stories.map((s, i) => record("testimonials", {
-  kind: "testimonial", quote: s.quote, attribution: s.name, display_name: s.name, consent_status: "not_recorded", sort_order: (i + 1) * 10,
-}, { id: id("tst", s.id), status: "draft", note: "Imported from the staging site. Record the source, consent evidence and display approval before publishing (decision D7)." }));
+  quote: s.quote, display_name: s.name, tone: ["pink", "stone", "yellow"][i % 3], visible: true, sort_order: (i + 1) * 10,
+}, { id: id("tst", s.id), status: "draft" }));
 
 /* ---- Site settings ---- */
 const site = data("site.json");
@@ -119,8 +115,8 @@ const settings = record("settings", {
   primary_cta_label: "Get the Free AI Starter Kit", primary_cta_url: "/free-ai-starter-kit/",
   footer_tagline: "Work better with AI, without becoming a tech expert.", footer_motto: "Learn. Implement. Scale.",
   privacy_url: "/privacy/", terms_url: "/terms/", origin: site.origin, staging: site.staging, starter_kit_ready: site.starterKitReady,
-}, { id: "site", status: "published", note: "Imported from site.json. URLs need verification before launch (docs/02)." });
-Object.assign(settings, { approved_at: IMPORTED_AT, approved_by: ACTOR, approved_version: 1, published_at: IMPORTED_AT, published_by: ACTOR, published_version: 1 });
+}, { id: "site", status: "published" }); // URLs need verification before launch (docs/02)
+Object.assign(settings, { published_at: IMPORTED_AT, published_by: ACTOR, published_version: 1 });
 
 /* ---- Tags (from article topics) ---- */
 const TAG_LABELS = { ai: "AI", business: "Business", leadership: "Leadership", lifestyle: "Lifestyle", "faith-purpose": "Faith and purpose" };
@@ -132,7 +128,7 @@ const devUser = (email, name, role) => ({ id: email, email, name, role, active: 
 const store = {
   _readme: "Development fixture for the Faith Works CMS (JSON adapter). Generated by cms/scripts/seed-from-site.mjs from assets/data/*.json. Not the production content store: production uses Google Sheets. The example.test users only work with the local development login.",
   programs, events, resources: [...articles, ...guides], testimonials, settings: [settings], tags,
-  users: [devUser("super.admin@example.test", "Dev Super Admin", "super_admin"), devUser("main.admin@example.test", "Dev Main Admin", "main_admin"), devUser("author@example.test", "Dev Author", "author"), devUser("second.author@example.test", "Dev Second Author", "author")],
+  users: [devUser("super.admin@example.test", "Dev Super Admin", "super_admin"), devUser("author@example.test", "Dev Author", "author"), devUser("second.author@example.test", "Dev Second Author", "author")],
   published: [{ id: "settings:site", record_id: "site", collection: "settings", slug: "", version: 1, state: "live", published_at: IMPORTED_AT, published_by: ACTOR, write_id: "seed", payload: toPublic("settings", settings) }],
   history: [], audit_log: [],
 };

@@ -1,5 +1,5 @@
 // Record editor: Details (essential metadata), the page editor (HTML / Visual), History,
-// workflow actions and the full-page preview. Success is only shown after the server confirms.
+// publishing actions and the full-page preview. Success is only shown after the server confirms.
 //
 // Details and the page are kept consistent through explicit markers (shared/page-doc.mjs):
 // Details values are written into marked elements of the page, and the marked title and
@@ -7,10 +7,15 @@
 import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, icon, ApiError } from "./dom.mjs";
 import { renderField, computedField } from "./fields.mjs";
 import { createHtmlEditor } from "./html-editor.mjs";
-import { COLLECTIONS, STATUSES, blankRecord, isAdmin, publicPath } from "/shared/schema.mjs";
+import { COLLECTIONS, STATUSES, blankRecord, isSuperAdmin, eventHasPage, statusOf } from "/shared/schema.mjs";
 import { ACTIONS } from "/shared/workflow.mjs";
 import { BINDINGS, bindingValues, upgradeRecord, readingTime, eventDuration, bylineOf, DOC_VERSION } from "/shared/page-doc.mjs";
 import { starterTemplate } from "/shared/starters.mjs";
+
+// History rows name the step that saved each version. Steps of the retired workflow (older
+// versions) are shown generically.
+const KINDS = { create: "Created", save: "Saved", publish: "Published", unpublish: "Unpublished", archive: "Archived", restore: "Restored to draft", delete: "Deleted", undelete: "Restored", reconcile: "Finished publishing", restore_version: "Earlier version restored" };
+export const historyKind = (k) => KINDS[k] || "Earlier workflow step";
 
 export async function editorView(app, { collection, id }) {
   const C = COLLECTIONS[collection];
@@ -19,14 +24,13 @@ export async function editorView(app, { collection, id }) {
   const TABS = [["details", "Details"], ...(hasPage ? [["page", C.page || "Page"]] : []), ["history", "History"]];
   const root = h("div", {}, h("p", { class: "loading" }, "Loading…"));
   let view = null, fields = new Map(), computed = {}, htmlEd = null, baseline = "", dirty = false, tab = "details", bindTimer, lastHtml = "";
-  const ctx = { user: app.user, config: app.config, collection, tags: [], refs: {}, authors: [], onChange: (key) => fieldChanged(key), getTitle: () => fields.get("title")?.get() };
+  const ctx = { user: app.user, config: app.config, collection, tags: [], authors: [], onChange: (key) => fieldChanged(key), getTitle: () => fields.get("title")?.get() };
 
-  const [tags, programs, authors] = await Promise.all([
+  const [tags, authors] = await Promise.all([
     api("GET", "/api/tags").catch(() => []),
-    collection === "events" ? api("GET", "/api/options/programs").catch(() => []) : Promise.resolve([]),
     collection === "settings" ? Promise.resolve([]) : api("GET", "/api/authors").catch(() => []),
   ]);
-  ctx.tags = tags; ctx.refs.programs = programs; ctx.authors = authors;
+  ctx.tags = tags; ctx.authors = authors;
   const authorNames = Object.fromEntries(authors.map((a) => [a.email, a.name]));
 
   if (isNew) {
@@ -95,6 +99,13 @@ export async function editorView(app, { collection, id }) {
       if (f) f.el.hidden = !fd.showIf(rec);
     }
     root.querySelectorAll("fieldset.card").forEach((card) => { card.hidden = ![...card.querySelectorAll(":scope > .field")].some((x) => !x.hidden); });
+    // Events: the Event page tab is there only when the event has its own page
+    if (collection === "events") {
+      const on = eventHasPage(rec);
+      const btn = root.querySelector('[data-tab="page"]');
+      if (btn) btn.hidden = !on;
+      if (!on && tab === "page") showTab("details");
+    }
   }
   function updateComputed() {
     const rec = current();
@@ -204,21 +215,19 @@ export async function editorView(app, { collection, id }) {
   }
 
   function head(rec, readOnly) {
-    const superAdmin = app.user.role === "super_admin";
     const label = rec[C.labelField] || rec.title || (isNew ? `New ${C.singular.toLowerCase()}` : rec.id);
     const save = h("button", { class: "btn", type: "button", "data-save": "", disabled: !isNew, onclick: (e) => busy(e.currentTarget, () => save_()) }, isNew ? "Create draft" : "Save draft");
     const buttons = [];
     if (C.route !== null || collection === "testimonials") buttons.push(h("button", { class: "btn btn--light", type: "button", "data-preview": "", onclick: (e) => openPreview(e.currentTarget) }, icon("eye"), "Preview"));
     if (!readOnly) buttons.push(save);
-    // Super Admins publish in one step (save → approve → publish); everyone else uses the review flow.
-    const oneStep = superAdmin && !isNew && (view.actions.includes("publish") || view.actions.includes("approve"));
-    const primary = superAdmin ? ["reconcile"].filter((a) => view.actions.includes(a)) : ["submit", "approve", "publish", "reconcile"].filter((a) => view.actions.includes(a));
-    if (oneStep) buttons.push(h("button", { class: "btn btn--yellow", type: "button", onclick: (e) => busy(e.currentTarget, () => publishNow()) }, "Publish"));
-    for (const a of primary) buttons.push(h("button", { class: `btn ${a === "publish" ? "btn--yellow" : a === "approve" ? "btn--pink" : "btn--light"}`, type: "button", onclick: (e) => busy(e.currentTarget, () => act(a)) }, a === "reconcile" ? "Finish publishing" : ACTIONS[a].label));
-    const hidden = superAdmin ? ["submit", "withdraw", "approve", "publish"] : [];
-    const more = view.actions.filter((a) => !primary.includes(a) && !hidden.includes(a));
+    // Super Admins, and Authors on their own items, publish in one step (save, then publish).
+    // Also on published items: editing one and pressing Publish saves and publishes the change.
+    const canPublish = !isNew && (view.actions.includes("publish") || (view.can_edit && rec.status === "published"));
+    if (canPublish) buttons.push(h("button", { class: "btn btn--yellow", type: "button", onclick: (e) => busy(e.currentTarget, () => publishNow()) }, "Publish"));
+    if (view.actions.includes("reconcile")) buttons.push(h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, () => act("reconcile")) }, "Finish publishing"));
+    const more = view.actions.filter((a) => !["publish", "reconcile"].includes(a));
     if (more.length) {
-      const pop = h("div", { class: "menu-pop", hidden: true, role: "menu" }, more.map((a) => h("button", { type: "button", role: "menuitem", class: ["delete", "reject", "archive", "unpublish"].includes(a) ? "danger" : "", onclick: () => { pop.hidden = true; act(a); } }, a === "undelete" ? "Restore deleted item" : ACTIONS[a].label)));
+      const pop = h("div", { class: "menu-pop", hidden: true, role: "menu" }, more.map((a) => h("button", { type: "button", role: "menuitem", class: ["delete", "archive", "unpublish"].includes(a) ? "danger" : "", onclick: () => { pop.hidden = true; act(a); } }, a === "undelete" ? "Restore deleted item" : ACTIONS[a].label)));
       const toggle = h("button", { class: "btn btn--light", type: "button", "aria-haspopup": "menu", onclick: () => { pop.hidden = !pop.hidden; } }, "More…");
       document.addEventListener("click", (e) => { if (!toggle.contains(e.target) && !pop.contains(e.target)) pop.hidden = true; });
       buttons.push(h("div", { class: "menu-wrap" }, toggle, pop));
@@ -237,38 +246,34 @@ export async function editorView(app, { collection, id }) {
     if (view.needs_repair) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing did not finish. "), "The website already shows the new version, but this item's status was not updated. Use “Finish publishing”."))));
     if (rec.deleted_at) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Deleted "), `${when(rec.deleted_at)} by ${who(rec.deleted_by)}. It is not on the website.`))));
     if (rec.upgraded && !isNew) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Converted to the page editor. "), "Same content; nothing changes until you save and publish."))));
-    if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "This item is live. "), `The website shows version ${view.live.version}. Changes here are a new draft and need approval before they replace the live version.`))));
-    if (rec.review_note && ["changes_requested", "rejected", "in_review", "approved"].includes(rec.status)) out.push(h("div", { class: `alert ${rec.status === "rejected" ? "alert--error" : "alert--pink"}` }, h("div", {}, h("p", {}, h("strong", {}, rec.status === "changes_requested" ? "Changes requested: " : rec.status === "rejected" ? "Rejected: " : "Note: "), rec.review_note), rec.reviewed_by ? h("p", { class: "small" }, `${who(rec.reviewed_by)}, ${when(rec.reviewed_at)}`) : null)));
-    if (rec.status === "in_review" && !view.can_edit) out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, "This item is under review, so it cannot be edited. ", view.actions.includes("withdraw") ? "Withdraw it from review to make changes." : ""))));
-    if (!view.can_edit && rec.status !== "in_review" && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? "Archived items cannot be edited. An admin can restore it to draft." : "You can view this item but not edit it."))));
-    if (collection === "testimonials") out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing needs: "), "the exact quote, its source, recorded consent and admin display approval."))));
+    if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "This item is live. "), `The website shows version ${view.live.version}. Changes here are a new draft; publish them to replace the live version.`))));
+    if (view.live?.hidden) out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Hidden. "), "The published version has “Show on the website” turned off, so it is not on the website. Turn it on and press Publish to show it again."))));
+    if (!view.can_edit && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? (view.actions.includes("restore") ? "Archived items cannot be edited. Use More… → Restore to draft to edit it again." : "Archived items cannot be edited. Its authors or a Super Admin can restore it to draft.") : "You can view this item but not edit it. Only its authors and Super Admins can change it."))));
     return out;
   }
 
   function side(rec) {
-    const s = STATUSES[rec.status];
+    const s = STATUSES[statusOf(rec.status)];
     const live = view.live;
     const siteUrl = (path) => `${app.config.siteOrigin || app.config.publicSiteUrl}${path}`;
     return h("aside", { class: "side" },
       h("div", { class: "card" },
         h("h3", {}, "Status"),
         h("p", {}, statusBadge(rec.status)),
-        h("p", { class: "small muted" }, s?.help || ""),
-        live ? h("p", { class: "small" }, "Live on the website: version ", h("b", {}, String(live.version)), live.url ? [" · ", h("a", { class: "icon-link", href: siteUrl(live.url), target: "_blank", rel: "noopener" }, "View", icon("external"))] : null) : h("p", { class: "small muted" }, isNew ? "" : "Not on the website."),
+        h("p", { class: "small muted" }, live?.hidden && rec.status === "published" ? "Published, with “Show on the website” turned off." : s?.help || ""),
+        live && !live.hidden ? h("p", { class: "small" }, "Live on the website: version ", h("b", {}, String(live.version)), live.url ? [" · ", h("a", { class: "icon-link", href: siteUrl(live.url), target: "_blank", rel: "noopener" }, "View", icon("external"))] : null)
+          : h("p", { class: "small muted" }, isNew ? "" : live ? `Published (version ${live.version}), but hidden from the website.` : "Not on the website."),
         isNew ? null : h("dl", { class: "kv" },
           h("dt", {}, "Created"), h("dd", {}, `${when(rec.created_at)} · ${who(rec.created_by)}`),
           h("dt", {}, "Last saved"), h("dd", {}, `${when(rec.updated_at)} · ${who(rec.updated_by)}`),
-          rec.submitted_by ? [h("dt", {}, "Submitted"), h("dd", {}, `${when(rec.submitted_at)} · ${who(rec.submitted_by)}`)] : null,
-          rec.approved_by ? [h("dt", {}, "Approved"), h("dd", {}, `${when(rec.approved_at)} · ${who(rec.approved_by)}`)] : null,
           live ? [h("dt", {}, "Published"), h("dd", {}, `${when(live.published_at)} · ${who(live.published_by)}`)] : null)),
       h("div", { class: "card" },
         h("h3", {}, "How publishing works"),
         h("ol", { class: "small muted", style: "padding-left:18px;margin:0" },
           h("li", {}, "Save your draft as often as you like. Every save is kept in History."),
-          app.user.role === "super_admin"
-            ? h("li", {}, "Press Publish: it approves and publishes in one step. The website rebuilds within a few minutes.")
-            : [h("li", {}, isAdmin(app.user.role) ? "Approve it when it is ready (or review a submission)." : "Submit it for review. An admin approves it or asks for changes."),
-              h("li", {}, "An admin publishes the approved version. The website rebuilds within a few minutes.")])));
+          h("li", {}, "Press Publish to put it on the website. The website rebuilds within a few minutes."),
+          ["events", "testimonials"].includes(collection) ? h("li", {}, "To take it off the website but keep it here, turn off “Show on the website” and press Publish.") : null,
+          isSuperAdmin(app.user.role) ? null : h("li", {}, "You can publish, unpublish and archive the items you created or are listed on as an author. Other items are view only."))));
   }
 
   /* ---- Saving ---- */
@@ -330,21 +335,21 @@ export async function editorView(app, { collection, id }) {
     return null;
   }
 
-  /* ---- Workflow ---- */
-  // Super Admin: save, approve and publish in one go. Each step is still checked by the
-  // server and recorded in History and the activity log.
+  /* ---- Publishing ---- */
+  // Save, then publish. Both steps are checked by the server and recorded in History and the
+  // activity log.
   async function publishNow() {
     const r = await dialog({ title: "Publish to the website?", confirm: "Publish",
       body: view.live ? `This replaces the live version ${view.live.version}. The website rebuilds within a few minutes.` : "It appears on the website after the next rebuild (usually a few minutes)." });
     if (!r.ok) return;
     if (dirty || htmlEd?.hasVisualChanges()) { const saved = await save_({ quiet: true }); if (!saved) return; }
+    if (view.record.status === "published") { toast("This version is already on the website. Change something first, then publish.", "info"); return; }
     const step = async (action) => {
       try {
-        view = upgrade(await api("POST", `/api/records/${collection}/${encodeURIComponent(view.record.id)}/actions/${action}`, { version: view.record.version, note: "" }));
+        view = upgrade(await api("POST", `/api/records/${collection}/${encodeURIComponent(view.record.id)}/actions/${action}`, { version: view.record.version }));
         return true;
       } catch (e) { render(); handleError(e, () => {}); return false; }
     };
-    if (view.record.status !== "approved" && !(await step("approve"))) return;
     if (!(await step("publish"))) return;
     render();
     toast(view.warning || "Published.", view.warning ? "warn" : "ok", view.warning ? 0 : 5000);
@@ -353,32 +358,26 @@ export async function editorView(app, { collection, id }) {
   }
   async function act(action) {
     const rec = view.record;
-    if (dirty && !["unpublish", "archive", "delete", "reconcile", "undelete", "withdraw", "reject", "request_changes"].includes(action)) {
+    if (dirty && !["unpublish", "archive", "delete", "reconcile", "undelete"].includes(action)) {
       const saved = await save_({ quiet: true });
       if (!saved) return;
     } else if (dirty) {
       const r = await dialog({ title: "Unsaved changes", body: "You have unsaved changes. Discard them and continue?", confirm: "Discard and continue", danger: true });
       if (!r.ok) return;
     }
-    let note = "";
     const label = action === "reconcile" ? "Finish publishing" : ACTIONS[action]?.label || action;
     const confirms = {
       publish: { title: "Publish to the website?", body: view.live ? `Version ${view.record.version} will replace the live version ${view.live.version}. The website rebuilds within a few minutes.` : "This item will appear on the website after the next rebuild (usually a few minutes).", confirm: "Publish" },
-      unpublish: { title: "Take this off the website?", body: "The page is removed at the next website rebuild. The content stays here as Approved.", confirm: "Unpublish", danger: true },
+      unpublish: { title: "Take this off the website?", body: "It is removed at the next website rebuild. The content stays here as a Draft.", confirm: "Unpublish", danger: true },
       archive: { title: "Archive this item?", body: "Archived items are kept for the record and removed from the website.", confirm: "Archive", danger: true },
       delete: { title: "Delete this item?", body: "It disappears from the dashboard and the website. A Super Admin can restore it from Recovery.", confirm: "Delete", danger: true },
-      request_changes: { title: "Request changes", body: "Explain what needs to change. The author sees this note.", confirm: "Send back", note: { label: "What needs to change?", required: true } },
-      reject: { title: "Reject this item", body: "The item will not be published. Explain why.", confirm: "Reject", danger: true, note: { label: "Reason", required: true } },
-      approve: { title: "Approve this version?", body: "An admin can then publish it.", confirm: "Approve", note: { label: "Note for the author (optional)" } },
-      submit: { title: "Submit for review?", body: "An admin will review it. It cannot be edited while it is under review (you can withdraw it).", confirm: "Submit", note: { label: "Note for the reviewer (optional)" } },
     };
     if (confirms[action]) {
       const r = await dialog(confirms[action]);
       if (!r.ok) return;
-      note = r.value;
     }
     try {
-      const res = await api("POST", `/api/records/${collection}/${encodeURIComponent(rec.id)}/actions/${action}`, { version: view.record.version, note });
+      const res = await api("POST", `/api/records/${collection}/${encodeURIComponent(rec.id)}/actions/${action}`, { version: view.record.version });
       view = upgrade(res);
       render();
       if (res.warning) toast(res.warning, "warn", 0);
@@ -454,15 +453,15 @@ export async function editorView(app, { collection, id }) {
     try {
       const rows = await api("GET", `/api/records/${collection}/${encodeURIComponent(view.record.id)}/history`);
       clear(panel, h("div", { class: "card" }, h("h2", {}, "Version history"),
-        h("p", { class: "muted small" }, "Every save and workflow step is kept, Details and page together. Admins can copy an earlier version back into the draft (it then needs approval again)."),
+        h("p", { class: "muted small" }, "Every save and publishing step is kept, Details and page together. Anyone who can edit this item can copy an earlier version back into the draft (it then needs publishing again)."),
         rows.length ? h("ul", { class: "list history" }, rows.map((r) => h("li", {},
-          h("span", { class: "mono" }, `v${r.version}`), h("span", {}, `${r.kind} · `, statusBadge(r.status)), h("span", { class: "muted" }, `${when(r.at)} · ${who(r.by)}`), h("span", { class: "spacer" }),
-          isAdmin(app.user.role) && view.can_edit && r.version !== view.record.version ? h("button", { class: "btn btn--light btn--sm", type: "button", onclick: (e) => busy(e.currentTarget, () => restoreVersion(r)) }, "Restore this version") : null)))
+          h("span", { class: "mono" }, `v${r.version}`), h("span", {}, `${historyKind(r.kind)} · `, statusBadge(r.status)), h("span", { class: "muted" }, `${when(r.at)} · ${who(r.by)}`), h("span", { class: "spacer" }),
+          view.can_edit && r.version !== view.record.version ? h("button", { class: "btn btn--light btn--sm", type: "button", onclick: (e) => busy(e.currentTarget, () => restoreVersion(r)) }, "Restore this version") : null)))
           : h("p", { class: "muted" }, "No history yet.")));
     } catch (e) { clear(panel, h("p", { class: "error" }, errorText(e))); }
   }
   async function restoreVersion(r) {
-    const ok = await dialog({ title: `Restore version ${r.version}?`, body: "Its Details and page replace the current draft. The live website is not changed until you approve and publish.", confirm: "Restore as draft" });
+    const ok = await dialog({ title: `Restore version ${r.version}?`, body: "Its Details and page replace the current draft. The live website is not changed until you publish.", confirm: "Restore as draft" });
     if (!ok.ok) return;
     try {
       view = upgrade(await api("POST", `/api/records/${collection}/${encodeURIComponent(view.record.id)}/history/${r.id}/restore`, { version: view.record.version }));

@@ -1,7 +1,7 @@
 // Public content for the website build, and the website rebuild trigger.
 //
-// /api/public/content returns ONLY live content (the `published` tab): never drafts, review
-// notes, consent evidence or editors' emails (see shared/public.mjs). It is cached in memory
+// /api/public/content returns ONLY live content (the `published` tab), without hidden events and
+// testimonials: never drafts, internal fields or editors' emails (see shared/public.mjs). It is cached in memory
 // for CACHE_MS; if Google Sheets is unavailable the last good snapshot is served (marked
 // stale) rather than an error, and the CDN may serve its own copy (stale-if-error).
 // The public website itself is static: it only calls this endpoint while being built.

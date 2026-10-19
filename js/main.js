@@ -3,6 +3,7 @@
    1. Helpers  2. Motion setup (split headings, draw paths, reveals)
    3. Header + navigation  4. Tablists (home: examples, journey)
    5. Program selector (learn)  6. Starter kit thank-you  7. Analytics events
+   8. Events calendar (workshops)  9. Testimonial photos
    Each module checks that its elements exist, so one file serves every page.
    Motion lives in CSS; this file only adds/removes state classes.
    ========================================================================== */
@@ -244,6 +245,76 @@
   doc.addEventListener("click", function (e) {
     var el = e.target.closest && e.target.closest("[data-track]");
     if (el) track(el.getAttribute("data-track"), { link_url: el.getAttribute("href") || "" });
+  });
+
+  /* ---- 8. Events calendar (workshops) ------------------------------------- */
+  // Draws one month from the event data the build embeds (published, visible events only).
+  // Dates are the event's own calendar dates (as entered in its time zone), so they never shift.
+  var cal = $("[data-fw-calendar]");
+  if (cal) {
+    var calEvents = [];
+    try { calEvents = JSON.parse($("[data-cal-data]", cal).textContent) || []; } catch (err) { calEvents = []; }
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    var iso = function (y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); };
+    var todayIso = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    var byDay = {};
+    calEvents.forEach(function (ev) {
+      var first = String(ev.start || "").slice(0, 10), last = String(ev.end || ev.start || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(first)) return;
+      if (!(last >= first)) last = first;
+      var d = new Date(first + "T12:00:00Z"), guard = 0;
+      while (guard++ < 62) {
+        var key = d.toISOString().slice(0, 10);
+        (byDay[key] = byDay[key] || []).push(ev);
+        if (key >= last) break;
+        d.setUTCDate(d.getUTCDate() + 1);
+      }
+    });
+    // Start on the month of the next upcoming event, or this month
+    var next = calEvents.filter(function (ev) { return !ev.past; })[0];
+    var startIso = next ? String(next.start).slice(0, 10) : todayIso;
+    var view = { y: +startIso.slice(0, 4), m: +startIso.slice(5, 7) - 1 };
+    var grid = $("[data-cal-grid]", cal), title = $("[data-cal-title]", cal), empty = $("[data-cal-empty]", cal);
+    var el = function (tag, cls, text) { var n = doc.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
+    var draw = function () {
+      title.textContent = MONTHS[view.m] + " " + view.y;
+      grid.textContent = "";
+      DOW.forEach(function (d) { grid.appendChild(el("span", "cal__dow", d)); });
+      var lead = new Date(Date.UTC(view.y, view.m, 1)).getUTCDay();
+      var days = new Date(Date.UTC(view.y, view.m + 1, 0)).getUTCDate();
+      var cells = Math.ceil((lead + days) / 7) * 7, any = false;
+      for (var i = 0; i < cells; i++) {
+        var day = i - lead + 1;
+        if (day < 1 || day > days) { grid.appendChild(el("div", "cal__day cal__day--out")); continue; }
+        var key = iso(view.y, view.m, day), list = byDay[key] || [];
+        var cell = el("div", "cal__day" + (key === todayIso ? " cal__day--today" : "") + (list.length ? "" : " cal__day--empty"));
+        var label = new Date(key + "T12:00:00Z").toLocaleDateString("en-PH", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" });
+        cell.appendChild(el("span", "cal__num", window.innerWidth <= 640 ? label : String(day)));
+        list.forEach(function (ev) {
+          any = true;
+          var a = el("a", "cal__ev" + (ev.past ? " cal__ev--past" : ""), ev.title);
+          a.href = ev.url;
+          if (ev.external) { a.target = "_blank"; a.rel = "noopener"; }
+          if (ev.time) a.appendChild(el("small", "", ev.time));
+          a.setAttribute("aria-label", ev.title + ", " + label + (ev.time ? ", " + ev.time : "") + (ev.external ? " (opens in a new tab)" : ""));
+          cell.appendChild(a);
+        });
+        grid.appendChild(cell);
+      }
+      empty.hidden = any;
+    };
+    $("[data-cal-prev]", cal).addEventListener("click", function () { view.m--; if (view.m < 0) { view.m = 11; view.y--; } draw(); });
+    $("[data-cal-next]", cal).addEventListener("click", function () { view.m++; if (view.m > 11) { view.m = 0; view.y++; } draw(); });
+    draw();
+  }
+
+  /* ---- 9. Testimonial photos ---------------------------------------------- */
+  // A photo that cannot load is removed, so a card never shows a broken image.
+  $$(".quote__photo").forEach(function (img) {
+    var drop = function () { img.remove(); };
+    if (img.complete && img.naturalWidth === 0) drop(); else img.addEventListener("error", drop);
   });
 
   window.__fwReady = true;

@@ -117,12 +117,18 @@ for (const r of data.resources.filter((x) => x.hasPage)) {
   emit(`/resources/${r.slug}/`, layout({ ...R.resourcePage(r), site: data.site }));
 }
 
-// One shared template for events that have their own page content (events/{slug}). Other
-// events keep their listed destination (e.g. an existing GHL funnel), as agreed in docs/04 §7.
+// One shared template for events that have their own page (a CMS event page, or "its own page"
+// turned on) with content (events/{slug}). Other events link straight to their registration
+// destination (e.g. an existing GHL funnel), as agreed in docs/04 §7.
 for (const e of data.events.filter((x) => x.hasPage)) {
   const page = R.eventPage(e);
   emit(`/events/${e.slug}/`, layout({ ...page, site: data.site }));
 }
+
+// The events calendar feed: published, visible events with a date (the Workshops calendar
+// embeds the same data, so it also works when the site is opened from disk).
+mkdirSync(join(ROOT, "events"), { recursive: true });
+writeFileSync(join(ROOT, "events", "calendar.json"), JSON.stringify({ generated_at: snapshot.generated_at, events: R.calendarData() }, null, 2) + "\n");
 
 // Old URLs of renamed pages keep working: a small redirect page at each old route, plus a
 // _redirects file (Netlify; other hosts ignore it) for real 301s in deploy mode.

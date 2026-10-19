@@ -6,7 +6,7 @@
 //
 // and two views:
 //
-//   published only live, approved content. The production build.
+//   published only live content (published, and not hidden). The production build.
 //   preview   current drafts, for review on staging. Refused unless site settings say staging
 //             (noindex + staging bar), so drafts can never reach an indexable production build.
 //
@@ -17,7 +17,8 @@ import { dirname, join } from "node:path";
 import { buildSnapshot, checkSnapshot } from "../cms/shared/public.mjs";
 import { sanitizeHtml } from "../cms/shared/sanitize-html.mjs";
 import { sanitizeCss, scopeCss } from "../cms/shared/sanitize-css.mjs";
-import { upgradeRecord, isDoc, extractList, extractText, readingTime, featuredImage, bylineOf, timeRange, FORMAT } from "../cms/shared/page-doc.mjs";
+import { upgradeRecord, isDoc, extractList, extractText, readingTime, featuredImage, bylineOf, timeRange, eventInstant } from "../cms/shared/page-doc.mjs";
+import { eventHasPage } from "../cms/shared/schema.mjs";
 
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 
@@ -118,19 +119,19 @@ export function toRenderData(snap) {
       doc, rec: p, ...seo(p),
     };
   });
-  const programById = new Map(programs.map((p) => [p.id, p]));
-
+  // Events: the card and calendar need only the dates; a page is built when the event has one
+  // (CMS event page, or "its own page") and the page has content.
   const events = snap.events.map((e) => {
-    const doc = pageDoc("events", e);
+    const doc = eventHasPage(e) ? pageDoc("events", e) : null;
     const im = featuredImage("events", e);
+    const tz = e.time_zone || "Asia/Manila";
     return {
-      id: e.slug, rid: e.id, slug: e.slug, title: e.title, type: e.event_type, status: e.is_past && !isDoc(e) ? "past" : e.event_status,
-      date: nz(e.event_date), endDate: nz(e.end_date), time: timeRange(e.start_time, e.end_time), timeZone: e.time_zone || "Asia/Manila", dateLabel: nz(e.date_label),
-      venue: nz(e.venue), mapUrl: nz(e.map_url), format: (!isDoc(e) && e.format_label) || FORMAT[e.delivery_format] || null, capacity: e.capacity ?? null,
-      summary: e.summary, programRef: programById.get(e.related_program_id)?.slug || null,
-      destination: { type: e.cta_type || "none", url: nz(e.registration_url), label: nz(e.cta_label) },
-      image: im ? { src: im.url, width: im.width ?? null, height: im.height ?? null, alt: im.alt, caption: !isDoc(e) ? nz(e.featured_image_caption) : null } : null,
-      registrationDeadline: nz(e.registration_deadline), onlineInfo: nz(e.online_info), doc, hasPage: !!doc, rec: e, ...seo(e),
+      id: e.slug, rid: e.id, slug: e.slug, title: e.title, summary: nz(e.summary),
+      date: nz(e.event_date), endDate: nz(e.end_date), time: timeRange(e.start_time, e.end_time), timeZone: tz,
+      start: eventInstant(e.event_date, e.start_time, tz), end: eventInstant(e.end_date || e.event_date, e.end_time, tz),
+      venue: nz(e.venue), registration: { type: e.registration_type || "none", url: nz(e.registration_url), label: nz(e.cta_label) },
+      image: im ? { src: im.url, width: im.width ?? null, height: im.height ?? null, alt: im.alt } : null,
+      doc, hasPage: !!doc, rec: e, ...seo(e),
     };
   });
 
@@ -149,10 +150,9 @@ export function toRenderData(snap) {
     };
   });
 
-  // Testimonials keep the exact quote and attribution; a card template (if any) only arranges them.
+  // Testimonials: the quote, the name, an optional round photo and the card colour.
   const stories = snap.testimonials.map((t) => ({
-    id: t.id, status: "published", name: t.display_name, role: nz(t.role_org), quote: t.quote, kind: t.kind,
-    card: isDoc(t) ? pageDoc("testimonials", t) : null, rec: t,
+    id: t.id, name: t.display_name, quote: t.quote, photo: nz(t.featured_image_url), tone: t.tone || "pink",
   }));
 
   const s = snap.settings;

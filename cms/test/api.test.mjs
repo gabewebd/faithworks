@@ -1,8 +1,10 @@
-// End-to-end API tests on the JSON store: roles, workflow, publishing, concurrency, public output.
+// End-to-end API tests on the JSON store: roles, publishing, visibility, concurrency, public output.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { testApp, signedIn, client, article, USERS } from "./helpers.mjs";
 import { loadConfig } from "../server/config.mjs";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 async function setup() {
   const t = testApp();
@@ -53,73 +55,132 @@ test("dev login only works on localhost", async () => {
   cleanup();
 });
 
-test("author workflow: draft → submit → review; any author can co-edit; only admins approve and publish", async () => {
+test("authors edit and publish their own content; nobody skips the version check", async () => {
   const { u, cleanup } = await setup();
   const created = await u.author.post("/api/records/resources", { data: article({ summary: "" }) });
   assert.equal(created.status, 201);
   const r = rec(created);
-  assert.equal(r.status, "draft");
   assert.equal(r.created_by, USERS.author);
-
-  // Strict validation on submit
-  const bad = await u.author.post(`/api/records/resources/${r.id}/actions/submit`, { version: r.version });
+  assert.deepEqual(r.authors, [USERS.author], "the creator is the first author");
+  // Publishing checks the required fields
+  const bad = await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   assert.equal(bad.status, 422);
   assert.ok(bad.data.error.errors.summary);
-
-  const saved = await u.author.put(`/api/records/resources/${r.id}`, { version: r.version, data: article() });
-  assert.equal(saved.status, 200);
-  assert.equal(rec(saved).version, 2);
-
-  // Every CMS user may edit content (no per-item editor list); nobody can skip the version check
-  assert.equal((await u.author2.put(`/api/records/resources/${r.id}`, { version: 1, data: article({ title: "Stale" }) })).status, 409);
-  const co = await u.author2.put(`/api/records/resources/${r.id}`, { version: 2, data: article({ title: "Co-edited" }) });
-  assert.equal(co.status, 200);
-  assert.equal(rec(co).updated_by, USERS.author2);
-  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/approve`, { version: 3 })).status, 403);
-  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: 3 })).status, 403);
-
-  const sub = await u.author.post(`/api/records/resources/${r.id}/actions/submit`, { version: 3 });
-  assert.equal(sub.status, 200);
-  assert.equal(rec(sub).status, "in_review");
-  // Locked while under review
-  assert.equal((await u.author.put(`/api/records/resources/${r.id}`, { version: 4, data: article({ title: "Edit" }) })).status, 403);
-  const wd = await u.author.post(`/api/records/resources/${r.id}/actions/withdraw`, { version: 4 });
-  assert.equal(rec(wd).status, "draft");
+  assert.equal((await u.author.put(`/api/records/resources/${r.id}`, { version: 99, data: article() })).status, 409, "stale version");
+  const ed = await u.author.put(`/api/records/resources/${r.id}`, { version: r.version, data: article() });
+  assert.equal(ed.status, 200, "the author edits their own draft");
+  const pub = await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: rec(ed).version });
+  assert.equal(pub.status, 200, "authors publish their own content");
+  assert.equal(rec(pub).status, "published");
+  const un = await u.author.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: rec(pub).version });
+  assert.equal(un.status, 200, "and unpublish it");
+  assert.equal(un.data.live, null);
+  assert.equal(rec(un).status, "draft", "an unpublished item is a draft again");
+  // Super Admin only: deleting and managing the CMS
+  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/delete`, { version: rec(un).version })).status, 403);
+  assert.equal((await u.author.get("/api/users")).status, 403);
+  assert.equal((await u.author.get("/api/records/settings/site")).status, 403);
   cleanup();
 });
 
-test("only approved content is published; live copy is separate from draft edits", async () => {
+test("authors cannot change another author's content, even with direct requests", async () => {
   const { u, cleanup } = await setup();
   let r = rec(await u.author.post("/api/records/resources", { data: article() }));
-  r = rec(await u.author.post(`/api/records/resources/${r.id}/actions/submit`, { version: r.version }));
-  assert.equal((await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version })).status, 409, "cannot publish unapproved");
-  const ch = await u.main.post(`/api/records/resources/${r.id}/actions/request_changes`, { version: r.version, note: "" });
-  assert.equal(ch.status, 422, "a note is required");
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/request_changes`, { version: r.version, note: "Add a source." }));
-  assert.equal(r.status, "changes_requested");
-  assert.equal(r.review_note, "Add a source.");
-  r = rec(await u.author.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "With a source." }) }));
-  r = rec(await u.author.post(`/api/records/resources/${r.id}/actions/submit`, { version: r.version }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
-  assert.equal(r.status, "approved");
-  const pub = await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  const other = u.author2;
+  const view = (await other.get(`/api/records/resources/${r.id}`)).data;
+  assert.equal(view.can_edit, false, "others may read it, not edit it");
+  assert.deepEqual(view.actions, [], "and get no workflow actions");
+  assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Taken over" }) })).status, 403);
+  assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author, USERS.author2] }) })).status, 403, "cannot add themselves as an author");
+  for (const a of ["archive", "delete"]) {
+    assert.equal((await other.post(`/api/records/resources/${r.id}/actions/${a}`, { version: r.version })).status, 403, a);
+  }
+  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version })).status, 403, "cannot publish it");
+  r = rec(await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
+  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: r.version })).status, 403, "cannot unpublish it");
+  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/reconcile`, {})).status, 403, "cannot finish publishing it");
+  const hist = (await other.get(`/api/records/resources/${r.id}/history`)).data;
+  assert.equal((await other.post(`/api/records/resources/${r.id}/history/${hist[0].id}/restore`, { version: r.version })).status, 403, "cannot restore a version");
+  // Imported content (created by the importer, no authors) belongs to Super Admins
+  const prog = (await u.author.get("/api/records/programs")).data[0];
+  assert.equal(prog.can_edit, false);
+  const pv = (await u.super.get(`/api/records/programs/${prog.id}`)).data;
+  assert.equal(pv.can_edit, true, "Super Admins edit any content");
+  // A Super Admin can edit and delete an Author's item
+  const sv = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Edited by the Super Admin" }) });
+  assert.equal(sv.status, 200);
+  assert.equal((await u.super.post(`/api/records/resources/${r.id}/actions/delete`, { version: rec(sv).version })).status, 200);
+  cleanup();
+});
+
+test("co-authors share an item; only its creator or a Super Admin removes someone else", async () => {
+  const { u, cleanup } = await setup();
+  let r = rec(await u.author.post("/api/records/resources", { data: article({ authors: [USERS.author, USERS.author2] }) }));
+  r = rec(await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author, USERS.author2], summary: "Co-written" }) }));
+  assert.equal(r.summary, "Co-written", "a listed author edits");
+  const drop = await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author2] }) });
+  assert.equal(drop.status, 422, "a co-author cannot remove another author");
+  assert.match(drop.data.error.errors.authors, /Super Admin/);
+  r = rec(await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author] }) }));
+  assert.deepEqual(r.authors, [USERS.author], "they can take themselves off");
+  assert.equal((await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article() })).status, 403, "and then lose access");
+  const sa = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author2] }) });
+  assert.equal(sa.status, 200, "Super Admins reassign authors");
+  const own = await u.author.put(`/api/records/resources/${r.id}`, { version: rec(sa).version, data: article({ authors: [USERS.author] }) });
+  assert.equal(own.status, 200, "the creator keeps access and manages the authors list");
+  assert.deepEqual(rec(own).authors, [USERS.author]);
+  cleanup();
+});
+
+test("authors cannot open or use Super Admin features through the API", async () => {
+  const { u, cleanup } = await setup();
+  const a = u.author;
+  assert.equal((await a.get("/api/audit")).status, 403);
+  assert.equal((await a.get("/api/recovery")).status, 403);
+  assert.equal((await a.get("/api/backup")).status, 403);
+  assert.equal((await a.post("/api/deploy", {})).status, 403);
+  assert.equal((await a.post("/api/tags", { label: "Mine" })).status, 403);
+  assert.equal((await a.put("/api/tags/ai", { label: "Renamed" })).status, 403);
+  assert.equal((await a.put("/api/records/settings/site", { version: 1, data: { origin: "https://evil.example" } })).status, 403);
+  assert.equal((await a.post("/api/records/settings/site/actions/publish", { version: 1 })).status, 403);
+  const created = await a.post("/api/records/resources", { data: article({ slug: "planned-item" }), status: "needed" });
+  assert.equal(rec(created).status, "draft", "new items are always drafts");
+  await u.super.post("/api/records/resources", { data: article({ slug: "admin-item" }) });
+  const dash = (await a.get("/api/dashboard")).data;
+  assert.ok(dash.recent.length, "Authors see their own recent activity");
+  assert.ok(dash.recent.every((x) => x.actor === USERS.author), "and only their own");
+  assert.ok((await u.super.get("/api/dashboard")).data.recent.some((x) => x.actor === USERS.author), "Super Admins see everyone's");
+  cleanup();
+});
+
+test("publishing is one step with no approval; the live copy is separate from draft edits", async () => {
+  const { u, cleanup } = await setup();
+  let r = rec(await u.author.post("/api/records/resources", { data: article() }));
+  for (const old of ["submit", "approve", "withdraw", "request_changes", "reject"]) {
+    assert.equal((await u.super.post(`/api/records/resources/${r.id}/actions/${old}`, { version: r.version })).status, 404, `no ${old} action`);
+  }
+  const view = (await u.author.get(`/api/records/resources/${r.id}`)).data;
+  assert.deepEqual(view.actions.sort(), ["archive", "publish"], "a draft can be published or archived by its author");
+  const pub = await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   assert.equal(pub.status, 200);
   assert.equal(rec(pub).status, "published");
   assert.equal(pub.data.live.version, rec(pub).version);
   assert.equal(pub.data.deploy.triggered, false, "no hook configured");
+  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: rec(pub).version })).status, 409, "nothing to publish twice");
+  for (const k of ["approved_at", "approved_by", "approved_version", "submitted_at", "reviewed_by", "review_note"]) assert.ok(!(k in rec(pub)), `no ${k} column`);
 
   let content = (await u.author.get("/api/public/content")).data;
   assert.equal(content.view, "published");
-  assert.equal(content.resources.find((x) => x.id === r.id).summary, "With a source.");
+  assert.equal(content.resources.find((x) => x.id === r.id).summary, "A test article.");
 
   // Editing the live item: back to draft, live copy unchanged
-  const edited = await u.main.put(`/api/records/resources/${r.id}`, { version: rec(pub).version, data: article({ summary: "Unapproved change" }) });
+  const edited = await u.author.put(`/api/records/resources/${r.id}`, { version: rec(pub).version, data: article({ summary: "A draft change" }) });
   assert.equal(rec(edited).status, "draft");
   assert.equal(edited.data.draft_differs, true);
-  content = (await u.author.get("/api/public/content")).data; // cache invalidated on publish only, so read through the service
-  const fresh = await u.main.get(`/api/records/resources/${r.id}`);
+  content = (await u.author.get("/api/public/content")).data;
+  const fresh = await u.super.get(`/api/records/resources/${r.id}`);
   assert.equal(fresh.data.live.version, rec(pub).version);
-  assert.equal(content.resources.find((x) => x.id === r.id).summary, "With a source.");
+  assert.equal(content.resources.find((x) => x.id === r.id).summary, "A test article.");
   cleanup();
 });
 
@@ -127,7 +188,7 @@ test("public content never includes drafts or internal fields", async () => {
   const { u, cleanup } = await setup();
   const content = (await u.author.get("/api/public/content")).data;
   assert.equal(content.programs.length, 0, "seeded programs are drafts");
-  assert.equal(content.testimonials.length, 0, "no testimonial has recorded consent");
+  assert.equal(content.testimonials.length, 0, "seeded testimonials are drafts");
   assert.ok(content.settings.origin);
   const body = JSON.stringify(content);
   for (const secret of ["content_owner", "consent_evidence", "review_note", "created_by", "example.test", "assigned_to", "attribution"]) assert.ok(!body.includes(secret), `leaked ${secret}`);
@@ -148,13 +209,13 @@ test("preview endpoint needs the preview token and returns working copies", asyn
 
 test("concurrent edits are detected (version check)", async () => {
   const { u, cleanup } = await setup();
-  const r = rec(await u.main.post("/api/records/resources", { data: article() }));
-  const a = await u.main.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Admin A" }) });
+  const r = rec(await u.author.post("/api/records/resources", { data: article() }));
+  const a = await u.author.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Author" }) });
   assert.equal(a.status, 200);
-  const b = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Admin B" }) });
+  const b = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Super Admin" }) });
   assert.equal(b.status, 409);
   assert.equal(b.data.error.code, "conflict");
-  assert.equal(b.data.error.current.updated_by, USERS.main);
+  assert.equal(b.data.error.current.updated_by, USERS.author);
   cleanup();
 });
 
@@ -165,15 +226,13 @@ test("slugs: format, duplicates and live slug changes", async () => {
   assert.match(dup.data.error.errors.slug, /already used/);
   assert.equal((await u.author.post("/api/records/resources", { data: article({ slug: "Bad Slug!" }) })).status, 422);
 
-  let r = rec(await u.main.post("/api/records/resources", { data: article() }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
-  const needsConfirm = await u.main.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ slug: "renamed-article" }) });
+  let r = rec(await u.super.post("/api/records/resources", { data: article() }));
+  r = rec(await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
+  const needsConfirm = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ slug: "renamed-article" }) });
   assert.equal(needsConfirm.status, 409);
   assert.equal(needsConfirm.data.error.code, "slug_change_confirm");
-  r = rec(await u.main.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ slug: "renamed-article" }), confirmSlugChange: true }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
+  r = rec(await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ slug: "renamed-article" }), confirmSlugChange: true }));
+  r = rec(await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
   const content = (await u.author.get("/api/public/content")).data;
   assert.deepEqual(content.redirects, [{ from: "/resources/testing-the-cms/", to: "/resources/renamed-article/" }]);
   // The old slug stays reserved for the redirect
@@ -181,102 +240,214 @@ test("slugs: format, duplicates and live slug changes", async () => {
   cleanup();
 });
 
-test("testimonials need consent evidence and admin display approval", async () => {
+test("testimonials: quote, name, optional photo, card colour and a visibility switch", async () => {
   const { u, cleanup } = await setup();
-  const data = { kind: "testimonial", quote: "It helped.", attribution: "Ana Cruz", display_name: "Ana C.", source: "Feedback form, Batch 3", consent_status: "obtained", consent_evidence: "Consent form 2026-10-01 (Drive: Consents/AnaC.pdf)", content_owner: "Faith", review_date: "2027-01-01", display_approved: true };
+  const data = { quote: "It helped my whole team.", display_name: "Ana Cruz", tone: "yellow", visible: true };
   let t = rec(await u.author.post("/api/records/testimonials", { data }));
-  assert.equal(t.display_approved, false, "authors cannot set display approval");
-  t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/submit`, { version: t.version }));
-  const refused = await u.main.post(`/api/records/testimonials/${t.id}/actions/approve`, { version: t.version });
-  assert.equal(refused.status, 422);
-  assert.match(refused.data.error.errors.consent_status, /Display approval/);
-  t = rec(await u.main.post(`/api/records/testimonials/${t.id}/actions/withdraw`, { version: t.version }));
-  t = rec(await u.main.put(`/api/records/testimonials/${t.id}`, { version: t.version, data }));
-  assert.equal(t.display_approved, true);
-  t = rec(await u.main.post(`/api/records/testimonials/${t.id}/actions/approve`, { version: t.version }));
-  t = rec(await u.main.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
-  const content = (await u.author.get("/api/public/content")).data;
-  const pub = content.testimonials.find((x) => x.id === t.id);
-  assert.equal(pub.display_name, "Ana C.");
-  assert.equal(pub.consent_ok, true);
-  assert.equal(pub.attribution, undefined);
-  assert.equal(pub.consent_evidence, undefined);
+  assert.equal(t.featured_image_url, "", "the photo is optional");
+  assert.equal(t.status, "draft");
+  for (const gone of ["consent_status", "display_approved", "attribution", "role_org", "kind", "body_html"]) assert.ok(!(gone in t), `no ${gone}`);
+  assert.equal((await u.author.post("/api/records/testimonials", { data: { ...data, tone: "neon" } })).status, 422, "only brand colours");
+  t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
+  let pub = (await u.author.get("/api/public/content")).data.testimonials.find((x) => x.id === t.id);
+  assert.deepEqual([pub.quote, pub.display_name, pub.tone, pub.visible, pub.featured_image_url], ["It helped my whole team.", "Ana Cruz", "yellow", true, ""]);
+  assert.equal(pub.authors, undefined, "owners stay internal");
+
+  // Photo and colour change; hide it: still saved in the CMS, off the website
+  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: false } }));
+  t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
+  let content = (await u.author.get("/api/public/content")).data;
+  assert.ok(!content.testimonials.some((x) => x.id === t.id), "hidden testimonials are not public");
+  const list = (await u.author.get("/api/records/testimonials?status=hidden")).data;
+  assert.ok(list.some((x) => x.id === t.id && x.live.hidden), "and listed as hidden in the CMS");
+  assert.equal((await u.author.get("/api/dashboard")).data.counts.testimonials.hidden, 1);
+  // Show it again
+  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: true } }));
+  t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
+  content = (await u.author.get("/api/public/content")).data;
+  pub = content.testimonials.find((x) => x.id === t.id);
+  assert.equal(pub.tone, "ink");
+  assert.equal(pub.featured_image_url, "/assets/images/ana.jpg");
+  // Another author cannot hide it
+  assert.equal((await u.author2.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, visible: false } })).status, 403);
   cleanup();
 });
 
-test("site settings: admins only; security fields are Super Admin only", async () => {
+test("site settings: Super Admins only, including launch and tracking fields", async () => {
   const { u, cleanup } = await setup();
   assert.equal((await u.author.get("/api/records/settings/site")).status, 403);
-  const s = (await u.main.get("/api/records/settings/site")).data;
-  const data = { ...s.record, contact_email: "hello@faithph.ai", origin: "https://evil.example", ga4_id: "G-HACKED1" };
-  const saved = rec(await u.main.put("/api/records/settings/site", { version: s.record.version, data }));
+  const s = (await u.super.get("/api/records/settings/site")).data;
+  const data = { ...s.record, contact_email: "hello@faithph.ai", ga4_id: "G-ABC1234" };
+  const saved = rec(await u.super.put("/api/records/settings/site", { version: s.record.version, data }));
   assert.equal(saved.contact_email, "hello@faithph.ai");
-  assert.equal(saved.origin, "https://faithph.ai", "main admin cannot change the origin");
-  assert.equal(saved.ga4_id, "", "main admin cannot add tracking");
+  assert.equal(saved.ga4_id, "G-ABC1234", "Super Admins manage tracking IDs");
   const bad = await u.super.put("/api/records/settings/site", { version: saved.version, data: { ...saved, ga4_id: "<script>" } });
   assert.equal(bad.status, 422);
   cleanup();
 });
 
-test("users: only Super Admins manage roles; nobody changes their own", async () => {
+test("users: only Super Admins manage people; two roles; nobody changes their own", async () => {
   const { u, cleanup } = await setup();
-  assert.equal((await u.main.get("/api/users")).status, 403);
-  assert.equal((await u.main.post("/api/users", { email: "x@example.test", role: "super_admin" })).status, 403);
+  assert.equal((await u.author.get("/api/users")).status, 403);
+  assert.equal((await u.author.post("/api/users", { email: "x@example.test", role: "super_admin" })).status, 403);
+  assert.equal((await u.author.post("/api/users", { email: USERS.author, role: "super_admin" })).status, 403, "an Author cannot promote themselves");
+  assert.equal((await u.author.get("/api/session")).data.user.role, "author");
+  for (const retired of ["main_admin", "publisher", "editor"]) {
+    assert.equal((await u.super.post("/api/users", { email: "y@example.test", role: retired })).status, 422, `no ${retired} role`);
+  }
   const created = await u.super.post("/api/users", { email: "New.Editor@Example.test", name: "New", role: "author" });
   assert.equal(created.status, 200);
   assert.equal(created.data.id, "new.editor@example.test");
-  assert.equal((await u.super.post("/api/users", { email: USERS.super, role: "author" })).status, 409);
+  assert.equal((await u.super.post("/api/users", { email: USERS.super, role: "author" })).status, 409, "not your own role");
+  const list = (await u.super.get("/api/users")).data;
+  assert.deepEqual([...new Set(list.map((x) => x.role))].sort(), ["author", "super_admin"]);
   // Deactivating a user takes effect on their next request
   await u.super.post("/api/users", { email: USERS.author2, name: "Gone", role: "author", active: false });
   assert.equal((await u.author2.get("/api/dashboard")).status, 401);
   cleanup();
 });
 
+test("accounts saved with an unknown role cannot sign in and are flagged for review", async () => {
+  const t = testApp();
+  const stamp = "2026-10-01T00:00:00.000Z";
+  const row = (id, role) => ({ id, email: id, name: id, role, active: true, version: 1, write_id: "w", created_at: stamp, created_by: "test", updated_at: stamp, updated_by: "test" });
+  await t.app.store.insert("users", row("old.admin@example.test", "main_admin"));
+  await t.app.store.insert("users", row("old.publisher@example.test", "publisher"));
+  await t.app.store.insert("users", row("odd@example.test", "owner"));
+  const sup = await client(t.app, USERS.super).login();
+  for (const id of ["old.admin@example.test", "old.publisher@example.test", "odd@example.test"]) {
+    assert.equal((await client(t.app, id).post("/api/auth/dev-login", { email: id })).status, 403, `${id} cannot sign in`);
+  }
+  const list = (await sup.get("/api/users")).data;
+  const flagged = Object.fromEntries(list.filter((x) => x.needs_review).map((x) => [x.id, x.stored_role]));
+  assert.deepEqual(flagged, { "old.admin@example.test": "main_admin", "old.publisher@example.test": "publisher", "odd@example.test": "owner" });
+  const fixed = await sup.post("/api/users", { email: "old.admin@example.test", role: "super_admin", version: 1 });
+  assert.equal(fixed.status, 200);
+  assert.ok(!(await sup.get("/api/users")).data.find((x) => x.id === "old.admin@example.test").needs_review);
+  t.cleanup();
+});
+
 test("archive, delete and recovery", async () => {
   const { u, cleanup } = await setup();
-  let r = rec(await u.main.post("/api/records/resources", { data: article() }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
-  assert.equal((await u.main.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version })).status, 403, "main admin cannot delete");
+  let r = rec(await u.super.post("/api/records/resources", { data: article() }));
+  r = rec(await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
+  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version })).status, 403, "authors cannot delete");
   const del = await u.super.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version });
   assert.equal(del.status, 200);
   const content = (await u.author.get("/api/public/content")).data;
   assert.ok(!content.resources.some((x) => x.id === r.id), "deleted items are taken offline");
-  assert.ok(!(await u.main.get("/api/records/resources")).data.some((x) => x.id === r.id));
+  assert.ok(!(await u.super.get("/api/records/resources")).data.some((x) => x.id === r.id));
   const recovery = (await u.super.get("/api/recovery")).data;
   assert.ok(recovery.deleted.some((x) => x.id === r.id));
   const un = await u.super.post(`/api/records/resources/${r.id}/actions/undelete`, { version: rec(del).version });
   assert.equal(un.status, 200);
   // Version history and restore
-  const hist = (await u.main.get(`/api/records/resources/${r.id}/history`)).data;
-  assert.ok(hist.length >= 4);
+  const hist = (await u.super.get(`/api/records/resources/${r.id}/history`)).data;
+  assert.ok(hist.length >= 3);
   const first = hist[hist.length - 1];
-  const restored = await u.main.post(`/api/records/resources/${r.id}/history/${first.id}/restore`, { version: rec(un).version });
+  const restored = await u.super.post(`/api/records/resources/${r.id}/history/${first.id}/restore`, { version: rec(un).version });
   assert.equal(restored.status, 200);
-  const audit = (await u.main.get("/api/audit")).data;
+  const audit = (await u.super.get("/api/audit")).data;
   assert.ok(audit.some((a) => a.action === "delete" && a.record_id === r.id));
   cleanup();
 });
 
-test("events must reference an existing program", async () => {
+const event = (over = {}) => ({ title: "AI Workshop", summary: "Hands-on.", event_date: "2099-03-14", start_time: "13:00", end_time: "17:00", time_zone: "Asia/Manila", venue: "Makati City", registration_type: "none", visible: true, ...over });
+
+test("events: dates, time zone and the three registration destinations", async () => {
   const { u, cleanup } = await setup();
-  const ev = { title: "Workshop", slug: "workshop-test", summary: "A test.", event_status: "tba", cta_type: "notify", delivery_format: "online", time_zone: "Asia/Manila", date_label: "Soon", related_program_id: "prg_missing" };
-  const bad = await u.main.post("/api/records/events", { data: ev });
-  assert.equal(bad.status, 422);
-  const progs = (await u.main.get("/api/options/programs")).data;
-  const ok = await u.main.post("/api/records/events", { data: { ...ev, related_program_id: progs[0].id, start_time: "13:00", end_time: "12:00" } });
-  assert.equal(ok.status, 422, "end before start");
-  assert.equal((await u.main.post("/api/records/events", { data: { ...ev, related_program_id: progs[0].id } })).status, 201);
+  assert.equal((await u.author.post("/api/records/events", { data: event({ start_time: "13:00", end_time: "12:00" }) })).status, 422, "end before start");
+  for (const gone of ["related_program_id", "event_status", "delivery_format", "cta_type"]) assert.equal(rec(await u.author.post("/api/records/events", { data: event({ title: `No ${gone}`, [gone]: "x" }) }))[gone], undefined, `${gone} is not a field`);
+
+  // External link (GHL): needs the URL, no page needed
+  let ext = rec(await u.author.post("/api/records/events", { data: event({ title: "GHL event", registration_type: "external" }) }));
+  const missing = await u.author.post(`/api/records/events/${ext.id}/actions/publish`, { version: ext.version });
+  assert.equal(missing.status, 422);
+  assert.ok(missing.data.error.errors.registration_url);
+  ext = rec(await u.author.put(`/api/records/events/${ext.id}`, { version: ext.version, data: event({ title: "GHL event", registration_type: "external", registration_url: "https://faithph.ai/ghl-funnel" }) }));
+  ext = rec(await u.author.post(`/api/records/events/${ext.id}/actions/publish`, { version: ext.version }));
+  assert.equal(ext.body_html, "", "no page content is needed");
+
+  // No registration link: informational, the URL is never kept
+  let info = rec(await u.author.post("/api/records/events", { data: event({ title: "Community night", registration_url: "https://stale.example" }) }));
+  assert.equal(info.registration_url, "");
+  info = rec(await u.author.post(`/api/records/events/${info.id}/actions/publish`, { version: info.version }));
+
+  // CMS event page: page content is required only for this option
+  let pg = rec(await u.author.post("/api/records/events", { data: event({ title: "Masterclass", registration_type: "page" }) }));
+  assert.equal(pg.slug, "masterclass");
+  const empty = await u.author.post(`/api/records/events/${pg.id}/actions/publish`, { version: pg.version });
+  assert.ok(empty.data.error.errors.body_html, "a CMS event page needs content");
+  pg = rec(await u.author.put(`/api/records/events/${pg.id}`, { version: pg.version, data: event({ title: "Masterclass", registration_type: "page", slug: pg.slug, body_html: "<h1 data-cms-bind=\"title\">Masterclass</h1>", doc_version: 2 }) }));
+  pg = rec(await u.author.post(`/api/records/events/${pg.id}/actions/publish`, { version: pg.version }));
+
+  // Same title again (e.g. next month): a free address is chosen automatically
+  assert.equal(rec(await u.author.post("/api/records/events", { data: event({ title: "Masterclass", event_date: "2099-04-11" }) })).slug, "masterclass-2");
+
+  const content = (await u.author.get("/api/public/content")).data;
+  const byTitle = Object.fromEntries(content.events.map((e) => [e.title, e]));
+  assert.deepEqual([byTitle["GHL event"].registration_type, byTitle["GHL event"].registration_url], ["external", "https://faithph.ai/ghl-funnel"]);
+  assert.deepEqual([byTitle["Community night"].registration_type, byTitle["Community night"].registration_url], ["none", ""]);
+  assert.equal(byTitle.Masterclass.registration_type, "page");
+  assert.deepEqual([byTitle.Masterclass.event_date, byTitle.Masterclass.start_time, byTitle.Masterclass.end_time, byTitle.Masterclass.time_zone], ["2099-03-14", "13:00", "17:00", "Asia/Manila"]);
+  assert.equal(content.events.length, 3, "drafts are not public");
   cleanup();
+});
+
+test("events: hidden and draft events are not public", async () => {
+  const { u, cleanup } = await setup();
+  let e = rec(await u.author.post("/api/records/events", { data: event() }));
+  e = rec(await u.author.post(`/api/records/events/${e.id}/actions/publish`, { version: e.version }));
+  assert.equal((await u.author.get("/api/public/content")).data.events.length, 1);
+  e = rec(await u.author.put(`/api/records/events/${e.id}`, { version: e.version, data: event({ visible: false }) }));
+  assert.equal((await u.author.get("/api/public/content")).data.events.length, 1, "a draft change does not touch the live event");
+  e = rec(await u.author.post(`/api/records/events/${e.id}/actions/publish`, { version: e.version }));
+  assert.equal((await u.author.get("/api/public/content")).data.events.length, 0, "published as hidden: off the website");
+  const preview = (await u.author.get("/api/public/preview", { authorization: `Bearer ${"p".repeat(40)}` })).data;
+  assert.ok(!preview.events.some((x) => x.id === e.id), "hidden events stay out of staging previews too");
+  cleanup();
+});
+
+test("records from the earlier workflow are read in the new model, without rewriting them", async () => {
+  const t = testApp();
+  const u = await signedIn(t.app);
+  const stamp = "2026-10-01T00:00:00.000Z";
+  const base = { version: 3, write_id: "w-old", created_at: stamp, created_by: USERS.author, updated_at: stamp, updated_by: USERS.author, authors: [USERS.author], deleted_at: "" };
+  const raw = t.app.store; // the migrating store; insert writes rows as given
+  await raw.insert("events", { ...base, id: "evt_old1", status: "approved", title: "Old GHL event", slug: "old-ghl", event_date: "2099-05-01", time_zone: "Asia/Manila", cta_type: "external", registration_url: "https://faithph.ai/old", related_program_id: "prg_x", event_status: "open", approved_by: USERS.super });
+  await raw.insert("events", { ...base, id: "evt_old2", status: "in_review", title: "Old notify event", slug: "old-notify", time_zone: "Asia/Manila", cta_type: "notify", cta_label: "Get notified" });
+  await raw.insert("events", { ...base, id: "evt_old3", status: "draft", title: "Old internal event", slug: "old-internal", event_date: "2099-05-02", time_zone: "Asia/Manila", cta_type: "internal", registration_url: "/programs/ai-workforce-accelerator/", body_html: "<p>Page</p>" });
+  await raw.insert("testimonials", { ...base, id: "tst_old1", status: "rejected", display_name: "Old", quote: "Q", consent_status: "withdrawn", role_org: "CEO" });
+  await raw.insert("testimonials", { ...base, id: "tst_old2", status: "changes_requested", display_name: "Older", quote: "Q2", consent_status: "not_recorded" });
+  // A testimonial that was live but held back by the old consent check
+  await raw.insert("published", { id: "testimonials:tst_old2", record_id: "tst_old2", collection: "testimonials", slug: "", version: 2, state: "live", published_at: stamp, published_by: USERS.super, write_id: "w", payload: { id: "tst_old2", version: 2, display_name: "Older", quote: "Q2", consent_ok: false } });
+
+  const get = async (c, id) => (await u.author.get(`/api/records/${c}/${id}`)).data;
+  const e1 = (await get("events", "evt_old1")).record, e2 = (await get("events", "evt_old2")).record, e3 = (await get("events", "evt_old3")).record;
+  assert.deepEqual([e1.status, e1.registration_type, e1.registration_url, e1.visible], ["draft", "external", "https://faithph.ai/old", true], "Approved is read as Draft");
+  assert.deepEqual([e2.status, e2.registration_type, e2.cta_label], ["draft", "none", ""], "the old notify form becomes no registration link");
+  assert.deepEqual([e3.registration_type, e3.registration_url, e3.event_page], ["external", "/programs/ai-workforce-accelerator/", true], "a site path keeps its address; page content keeps the page");
+  const t1 = (await get("testimonials", "tst_old1")).record, t2 = (await get("testimonials", "tst_old2")).record;
+  assert.deepEqual([t1.status, t1.tone, t1.visible], ["draft", "pink", false], "withdrawn consent stays hidden");
+  assert.deepEqual([t2.status, t2.visible], ["draft", true]);
+  assert.ok(!(await u.author.get("/api/public/content")).data.testimonials.length, "a live copy held back for consent stays off the website");
+  const views = (await get("events", "evt_old1"));
+  assert.deepEqual(views.actions.sort(), ["archive", "publish"]);
+
+  // Saving writes the new fields; the retired values stay stored
+  const saved = rec(await u.author.put("/api/records/events/evt_old1", { version: 3, data: { ...e1, summary: "Now saved" } }));
+  assert.equal(saved.registration_type, "external");
+  const row = JSON.parse(readFileSync(join(t.dir, "store.json"), "utf8")).events.find((x) => x.id === "evt_old1");
+  assert.deepEqual([row.status, row.registration_type, row.related_program_id, row.cta_type], ["draft", "external", "prg_x", "external"], "nothing is deleted");
+  t.cleanup();
 });
 
 test("unsafe HTML is kept in the draft but never published", async () => {
   const { u, cleanup } = await setup();
   const html = `<h2 class="x">Title</h2><p onclick="steal()">Hi</p><script>alert(1)</script><a href="javascript:alert(1)">bad</a><img src="x.png" onerror="alert(1)" alt="">`;
-  let r = rec(await u.main.post("/api/records/resources", { data: article({ body_html: html }) }));
+  let r = rec(await u.super.post("/api/records/resources", { data: article({ body_html: html }) }));
   assert.equal(r.body_html, html, "draft keeps the original source");
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
-  await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   const pub = (await u.author.get("/api/public/content")).data.resources.find((x) => x.id === r.id);
   assert.equal(pub.body_html, `<h2 class="x">Title</h2><p>Hi</p><a>bad</a><img src="x.png" alt="">`);
   cleanup();
@@ -285,19 +456,18 @@ test("unsafe HTML is kept in the draft but never published", async () => {
 test("a publish whose second step fails is flagged and can be finished", async () => {
   const t = testApp();
   const u = await signedIn(t.app);
-  let r = rec(await u.main.post("/api/records/resources", { data: article() }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
+  const r = rec(await u.super.post("/api/records/resources", { data: article() }));
   const store = t.app.store;
   const original = store.update;
   store.update = async (tab, ...rest) => { if (tab === "resources") throw new Error("Simulated Google outage"); return original(tab, ...rest); };
-  const pub = await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  const pub = await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   store.update = original;
   assert.equal(pub.status, 200);
   assert.match(pub.data.warning, /live on the website/);
-  const view = (await u.main.get(`/api/records/resources/${r.id}`)).data;
+  const view = (await u.super.get(`/api/records/resources/${r.id}`)).data;
   assert.equal(view.needs_repair, true);
   assert.ok(view.actions.includes("reconcile"));
-  const fixed = await u.main.post(`/api/records/resources/${r.id}/actions/reconcile`, {});
+  const fixed = await u.super.post(`/api/records/resources/${r.id}/actions/reconcile`, {});
   assert.equal(rec(fixed).status, "published");
   assert.equal(fixed.data.needs_repair, false);
   t.cleanup();
@@ -306,15 +476,14 @@ test("a publish whose second step fails is flagged and can be finished", async (
 test("a failing first publish step changes nothing", async () => {
   const t = testApp();
   const u = await signedIn(t.app);
-  let r = rec(await u.main.post("/api/records/resources", { data: article() }));
-  r = rec(await u.main.post(`/api/records/resources/${r.id}/actions/approve`, { version: r.version }));
+  const r = rec(await u.super.post("/api/records/resources", { data: article() }));
   const original = t.app.store.insert;
   t.app.store.insert = async (tab, ...rest) => { if (tab === "published") throw Object.assign(new Error("Google Sheets is temporarily unavailable"), { status: 503 }); return original(tab, ...rest); };
-  const pub = await u.main.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  const pub = await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   t.app.store.insert = original;
   assert.equal(pub.status, 500);
-  const view = (await u.main.get(`/api/records/resources/${r.id}`)).data;
-  assert.equal(view.record.status, "approved");
+  const view = (await u.super.get(`/api/records/resources/${r.id}`)).data;
+  assert.equal(view.record.status, "draft");
   assert.equal(view.live, null);
   t.cleanup();
 });

@@ -1,6 +1,13 @@
 // Dashboard, content lists and admin screens (tags, users, activity, recovery).
 import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, roleLabel, icon } from "./dom.mjs";
-import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isAdmin } from "/shared/schema.mjs";
+import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin, CARD_TONES } from "/shared/schema.mjs";
+import { assetUrl } from "./fields.mjs";
+import { historyKind } from "./editor.mjs";
+
+// Activity rows: content steps in plain words (steps of the retired workflow shown generically);
+// account and settings actions (sign_in, user_save…) as recorded.
+const CONTENT_ACTIONS = new Set(["create", "save", "publish", "unpublish", "archive", "restore", "delete", "undelete", "reconcile", "restore_version", "submit", "withdraw", "approve", "request_changes", "reject"]);
+const actionLabel = (a) => (CONTENT_ACTIONS.has(a) ? historyKind(a) : a);
 import { selectBox, toggle } from "./controls.mjs";
 
 const pageHead = (title, sub, ...actions) => h("div", { class: "page-head" }, h("div", {}, h("h1", {}, title), sub ? h("p", {}, sub) : null), actions.length ? h("div", { class: "row" }, actions) : null);
@@ -9,16 +16,15 @@ const link = (collection, id, label) => h("a", { href: `#/c/${collection}/${enco
 /* ---- Dashboard ---- */
 export async function dashboardView(app) {
   const d = await api("GET", "/api/dashboard");
-  const admin = isAdmin(app.user.role);
+  const admin = isSuperAdmin(app.user.role);
   const alerts = [];
   if (d.repair.length) alerts.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing needs attention. "), `${d.repair.length} item(s) are live but their status was not updated: `), d.repair.map((r) => [link(r.collection, r.id, r.label), " "]))));
-  if (d.consent && admin) alerts.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, `${d.consent} testimonial(s) `), "have no recorded consent or display approval, so they cannot be published. ", h("a", { href: "#/c/testimonials" }, "Review testimonials")))));
   const icons = { programs: "book", events: "calendar", resources: "file", testimonials: "quote" };
   const stats = CONTENT_COLLECTIONS.map((c) => {
     const n = d.counts[c] || {};
     const total = Object.entries(n).filter(([k]) => k !== "live").reduce((a, [, v]) => a + v, 0);
     return h("a", { class: "card stat", href: `#/c/${c}` }, h("h3", { class: "row" }, icon(icons[c]), COLLECTIONS[c].label), h("p", { class: "num" }, String(total)),
-      h("div", { class: "row" }, n.live ? h("span", { class: "badge badge--live" }, `${n.live} live`) : null, n.in_review ? statusBadge("in_review") : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
+      h("div", { class: "row" }, n.live ? h("span", { class: "badge badge--live" }, `${n.live} live`) : null, n.hidden ? h("span", { class: "badge badge--yellow" }, `${n.hidden} hidden`) : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
   });
   const itemList = (items, empty) => items.length
     ? h("ul", { class: "list" }, items.map((r) => h("li", {}, statusBadge(r.status), h("div", {}, link(r.collection, r.id, r.label), h("div", { class: "small muted" }, `${COLLECTIONS[r.collection].singular} · ${when(r.updated_at)} by ${who(r.updated_by)}`)))))
@@ -29,12 +35,11 @@ export async function dashboardView(app) {
       admin && app.config.deployHook ? h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, async () => { try { const r = await api("POST", "/api/deploy", {}); toast(r.triggered ? "Website rebuild started." : r.error || r.reason, r.triggered ? "ok" : "error"); } catch (err) { toast(errorText(err), "error"); } }) }, icon("rocket"), "Rebuild website") : null),
     alerts,
     h("div", { class: "grid grid--4", style: "margin-bottom:16px" }, stats),
-    h("div", { class: "grid grid--2" },
-      h("div", { class: "card" }, h("h2", {}, admin ? "Waiting for your review" : "Submitted for review"), itemList(d.review, admin ? "Nothing is waiting for review." : "Nothing submitted right now.")),
-      h("div", { class: "card" }, h("h2", {}, admin ? "Your drafts" : "Your drafts and requested changes"), itemList(d.mine, "No drafts. Use “New” on any content type to start."))),
-    admin && d.recent.length ? h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, "Recent activity"),
-      h("ul", { class: "list" }, d.recent.map((a) => h("li", {}, h("span", { class: "mono small" }, a.action), h("span", {}, a.record_id && COLLECTIONS[a.collection] ? link(a.collection, a.record_id, `${COLLECTIONS[a.collection].singular} ${a.record_id}`) : a.detail), h("span", { class: "spacer" }), h("span", { class: "small muted" }, `${who(a.actor)} · ${when(a.at)}`)))),
-      h("p", { style: "margin:10px 0 0" }, h("a", { class: "icon-link", href: "#/activity" }, "All activity", icon("right")))) : null);
+    h("div", { class: "card" }, h("h2", {}, admin ? "Drafts" : "Your drafts"), h("p", { class: "small muted" }, "Saved but not on the website yet. Open one and press Publish when it is ready."),
+      itemList(d.mine, "No drafts. Use “New” on any content type to start.")),
+    d.recent.length ? h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, admin ? "Recent activity" : "Your recent activity"),
+      h("ul", { class: "list" }, d.recent.map((a) => h("li", {}, h("span", { class: "small muted", style: "min-width:120px" }, actionLabel(a.action)), h("span", {}, a.record_id && COLLECTIONS[a.collection] ? link(a.collection, a.record_id, `${COLLECTIONS[a.collection].singular} ${a.record_id}`) : a.detail), h("span", { class: "spacer" }), h("span", { class: "small muted" }, `${who(a.actor)} · ${when(a.at)}`)))),
+      admin ? h("p", { style: "margin:10px 0 0" }, h("a", { class: "icon-link", href: "#/activity" }, "All activity", icon("right"))) : null) : null);
 }
 
 /* ---- Content list ---- */
@@ -43,13 +48,14 @@ export async function listView(app, { collection }) {
   const tags = await api("GET", "/api/tags").catch(() => []);
   const q = h("input", { class: "input", type: "search", placeholder: `Search ${C.label.toLowerCase()}…`, "aria-label": "Search" });
   const params = new URLSearchParams(location.hash.split("?")[1] || "");
-  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, { value: "live", label: "Live on the website" }, ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
+  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, { value: "live", label: "Live on the website" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
+  const tagged = C.fields.some((fd) => fd.type === "tags");
   const tag = selectBox({ label: "Filter by tag", value: params.get("tag") || "", searchable: true, onChange: () => load(), options: [{ value: "", label: "All tags" }, ...tags.filter((t) => !t.archived).map((t) => ({ value: t.id, label: t.label }))] });
   const body = h("div", {}, h("p", { class: "loading" }, "Loading…"));
   q.value = params.get("q") || "";
   let timer;
   async function load() {
-    const qs = new URLSearchParams(Object.entries({ q: q.value, status: status.get(), tag: tag.get() }).filter(([, v]) => v));
+    const qs = new URLSearchParams(Object.entries({ q: q.value, status: status.get(), tag: tagged ? tag.get() : "" }).filter(([, v]) => v));
     history.replaceState(null, "", `#/c/${collection}${qs.toString() ? `?${qs}` : ""}`);
     try {
       const rows = await api("GET", `/api/records/${collection}?${qs}`);
@@ -57,7 +63,7 @@ export async function listView(app, { collection }) {
         h("thead", {}, h("tr", {}, h("th", {}, "Title"), h("th", {}, "Status"), h("th", {}, "Website"), h("th", {}, "Authors"), h("th", {}, "Last saved"))),
         h("tbody", {}, rows.map((r) => {
           const tr = h("tr", { onclick: (e) => { if (!e.target.closest("a")) location.hash = `#/c/${collection}/${encodeURIComponent(r.id)}`; } },
-            h("td", { class: "title" }, link(collection, r.id, r.label || "(untitled)"), r.slug ? h("small", {}, C.route ? C.route.replace("{slug}", r.slug) : r.slug) : null, (r.tags || []).length ? h("div", {}, r.tags.map((t) => h("span", { class: "tag" }, tags.find((x) => x.id === t)?.label || t))) : null),
+            h("td", { class: "title" }, h("div", { class: "row", style: "gap:10px;flex-wrap:nowrap" }, thumb(r), h("div", {}, link(collection, r.id, r.label || "(untitled)"), r.can_edit || r.status === "archived" ? null : h("span", { class: "badge badge--stone", title: "Only its authors and Super Admins can change this item" }, "View only"), subline(r), tagged && (r.tags || []).length ? h("div", {}, r.tags.map((t) => h("span", { class: "tag" }, tags.find((x) => x.id === t)?.label || t))) : null))),
             h("td", {}, statusBadge(r.status)),
             h("td", {}, r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : liveBadge(r.live) || h("span", { class: "muted small" }, "Not live")),
             h("td", { class: "small" }, r.byline || r.content_owner || h("span", { class: "muted" }, "—")),
@@ -67,10 +73,24 @@ export async function listView(app, { collection }) {
         : h("div", { class: "card empty" }, h("h3", {}, q.value || status.get() || tag.get() ? "Nothing matches these filters" : `No ${C.label.toLowerCase()} yet`), h("p", {}, q.value || status.get() || tag.get() ? "Try clearing the search or filters." : `Create the first ${C.singular.toLowerCase()} with the New button.`)));
     } catch (e) { clear(body, h("div", { class: "alert alert--error" }, h("div", {}, errorText(e)))); }
   }
+  // Testimonials: the photo (or the card colour) beside the name. Events: the date.
+  function thumb(r) {
+    if (collection !== "testimonials") return null;
+    const swatch = CARD_TONES.find((t) => t.value === r.tone)?.swatch || CARD_TONES[0].swatch;
+    const url = assetUrl(r.featured_image_url, app.config);
+    if (!url) return h("span", { class: "thumb", style: `background:${swatch}`, "aria-hidden": "true" });
+    const im = h("img", { class: "thumb", src: url, alt: "" });
+    im.addEventListener("error", () => im.replaceWith(h("span", { class: "thumb", style: `background:${swatch}`, "aria-hidden": "true" })));
+    return im;
+  }
+  function subline(r) {
+    if (collection === "events") return h("small", {}, r.event_date || "No date yet", r.event_page || r.registration_type === "page" ? ` · page ${C.route.replace("{slug}", r.slug)}` : "");
+    return r.slug ? h("small", {}, C.route ? C.route.replace("{slug}", r.slug) : r.slug) : null;
+  }
   q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(load, 250); });
   load();
   return h("div", {}, pageHead(C.label, C.description, h("a", { class: "btn", href: `#/c/${collection}/new` }, icon("plus"), `New ${C.singular.toLowerCase()}`)),
-    h("div", { class: "filters" }, q, status.el, tag.el), body);
+    h("div", { class: "filters" }, q, status.el, tagged ? tag.el : null), body);
 }
 
 /* ---- Tags ---- */
@@ -93,23 +113,26 @@ export async function tagsView(app) {
 /* ---- Users (Super Admin) ---- */
 export async function usersView(app) {
   const body = h("div", {});
-  const roleHelp = { super_admin: "Everything, including users, security settings and recovery.", main_admin: "Create, review, approve and publish all content; tags and ordinary settings.", author: "Create and edit any content and submit it for review. Cannot approve or publish." };
   async function load() {
     const users = await api("GET", "/api/users");
+    const review = users.filter((u) => u.needs_review);
     clear(body,
+      review.length ? h("div", { class: "alert alert--warn", style: "margin-bottom:16px" }, h("div", {}, h("p", {}, h("strong", {}, `${review.length} account(s) need a role. `),
+        "They were saved with a role this CMS does not have, so they cannot sign in until you choose Super Admin or Author for them."))) : null,
       h("div", { class: "table-wrap" }, h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", {}, "Person"), h("th", {}, "Role"), h("th", {}, "Access"), h("th", {}, ""))),
         h("tbody", {}, users.map((u) => h("tr", { style: "cursor:default" },
           h("td", {}, h("b", {}, u.name || u.email), h("div", { class: "small muted" }, u.email)),
-          h("td", {}, roleLabel(u.role), u.pinned ? h("div", { class: "small muted" }, "Set in deployment settings") : null),
+          h("td", {}, roleLabel(u.role), u.pinned ? h("div", { class: "small muted" }, "Set in deployment settings") : null,
+            u.needs_review ? h("div", {}, h("span", { class: "badge badge--yellow", style: "white-space:normal", title: "Choose a current role for this account" }, `Review: was ${u.stored_role}`)) : null),
           h("td", {}, u.active ? h("span", { class: "badge badge--green" }, "Active") : h("span", { class: "badge badge--stone" }, "No access")),
           h("td", {}, u.pinned || u.email === app.user.email ? null : h("button", { class: "btn btn--light btn--sm", type: "button", onclick: () => edit(u) }, "Change"))))))),
-      h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, "Roles"), h("dl", { class: "kv" }, Object.entries(ROLES).map(([k, r]) => [h("dt", {}, r.label), h("dd", {}, roleHelp[k])])),
+      h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, "Roles"), h("dl", { class: "kv" }, Object.values(ROLES).map((r) => [h("dt", {}, r.label), h("dd", {}, r.help)])),
         h("p", { class: "small muted", style: "margin-top:12px" }, "People sign in with their Google account; the CMS never stores passwords. Removing access takes effect within a minute.")));
   }
   async function edit(u) {
     const email = h("input", { class: "input", type: "email", value: u?.email || "", disabled: !!u, required: true, id: "u-email" });
     const name = h("input", { class: "input", type: "text", value: u?.name || "", id: "u-name" });
-    const role = selectBox({ id: "u-role", value: u?.role || "author", options: Object.entries(ROLES).map(([k, r]) => ({ value: k, label: r.label })) });
+    const role = selectBox({ id: "u-role", value: u?.role || "author", options: Object.entries(ROLES).map(([k, r]) => ({ value: k, label: r.label, note: r.help })) });
     const active = toggle({ checked: u ? u.active : true, label: "Can sign in" });
     const r = await dialog({ title: u ? `Change access for ${u.email}` : "Add a person", confirm: "Save", content: h("div", {},
       h("div", { class: "field" }, h("label", { for: "u-email" }, "Google account email"), email),
@@ -117,18 +140,19 @@ export async function usersView(app) {
       h("div", { class: "field" }, h("label", { for: "u-role" }, "Role"), role.el),
       h("div", { class: "field" }, active.el)) });
     if (!r.ok) return;
+    if (role.get() === "super_admin" && u?.role !== "super_admin" && !(await dialog({ title: "Make this person a Super Admin?", body: "Super Admins can manage users and roles, site settings, tags, recovery and backup, and edit, publish or delete any content.", confirm: "Make Super Admin" })).ok) return;
     try { await api("POST", "/api/users", { email: email.value, name: name.value, role: role.get(), active: active.get(), version: u?.version }); toast("Saved.", "ok"); load(); } catch (e) { toast(errorText(e), "error"); }
   }
   await load();
   return h("div", {}, pageHead("Users and roles", "Who can sign in to the CMS, and what they can do.", h("button", { class: "btn", type: "button", onclick: () => edit(null) }, icon("plus"), "Add a person")), body);
 }
 
-/* ---- Activity (admins) ---- */
+/* ---- Activity (Super Admin) ---- */
 export async function activityView() {
   const rows = await api("GET", "/api/audit");
   return h("div", {}, pageHead("Activity log", "Who did what, and when. Kept in the audit_log tab of the spreadsheet."),
     h("div", { class: "table-wrap" }, h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", {}, "When"), h("th", {}, "Who"), h("th", {}, "Action"), h("th", {}, "Item"), h("th", {}, "Details"))),
-      h("tbody", {}, rows.map((a) => h("tr", { style: "cursor:default" }, h("td", { class: "small" }, new Date(a.at).toLocaleString()), h("td", { class: "small" }, a.actor, h("div", { class: "muted" }, roleLabel(a.role))), h("td", { class: "mono small" }, a.action),
+      h("tbody", {}, rows.map((a) => h("tr", { style: "cursor:default" }, h("td", { class: "small" }, new Date(a.at).toLocaleString()), h("td", { class: "small" }, a.actor, h("div", { class: "muted" }, roleLabel(a.role))), h("td", { class: "small" }, actionLabel(a.action)),
         h("td", { class: "small" }, a.record_id && COLLECTIONS[a.collection] ? link(a.collection, a.record_id, `${COLLECTIONS[a.collection].singular} · ${a.record_id}`) : a.record_id || ""), h("td", { class: "small" }, a.version ? `v${a.version} ` : "", a.detail)))))));
 }
 

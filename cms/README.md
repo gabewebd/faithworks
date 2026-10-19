@@ -43,46 +43,80 @@ keeps serving the previous deploy.
 
 ## 2. Roles
 
-Every rule is checked in the API. Hiding a button is never the protection.
+Two roles: **Super Admin** and **Author**. Every rule is checked in the API (`cms/shared/workflow.mjs`
+and `cms/server/services/`). Hiding a button is never the protection.
 
-| | Super Admin | Main Admin | Author |
-| --- | :-: | :-: | :-: |
-| Create content, save drafts, preview | ✓ | ✓ | ✓ |
-| Edit content | all | all | all, except while under review |
-| Submit for review / withdraw | ✓ | ✓ | ✓ |
-| Approve, request changes, reject | ✓ | ✓ | – |
-| Publish, unpublish, archive, restore | ✓ (one-step *Publish*: approve + publish) | ✓ | – |
-| Change a live page's slug | ✓ (confirm) | ✓ (confirm) | – |
-| Tags, ordinary site settings, activity log | ✓ | ✓ | – |
-| Security settings (origin, staging, tracking IDs, kit-ready flag) | ✓ | – | – |
-| Delete / undelete, recovery, backups, users and roles | ✓ | – | – |
-| Display approval of a testimonial | ✓ | ✓ | – |
+| | Super Admin | Author |
+| --- | :-: | :-: |
+| Read content items (to link and reference them) | ✓ | ✓ |
+| Create content | ✓ | ✓ |
+| Edit, preview, publish (one step), unpublish, archive, restore to draft | any item | own items |
+| Show or hide an event or testimonial on the website | any item | own items |
+| Change a live page’s slug (with confirmation), restore earlier versions | any item | own items |
+| Tags, site settings (including launch and tracking), activity log, website rebuild | ✓ | – |
+| Delete / undelete, recovery, backups, users and roles | ✓ | – |
 
+- **Own items:** an Author owns an item they created or are listed on as an author. `created_by`
+  is set by the server only. The creator (or a Super Admin) manages the authors list; a co-author
+  may add people and take themselves off but cannot remove anyone else. Imported content has no
+  Author owner, so only Super Admins change it until they add authors to it.
 - Super Admins listed in `CMS_SUPER_ADMINS` are pinned. They cannot be changed or locked out from the UI.
-- Every signed-in CMS user can edit content; there is no per-item editor list. The **Authors** on an item (chosen from the user list) only say who wrote it and become the public byline (names, never emails). Review, approval and publishing rules are unchanged, so co-editing never bypasses them.
+- **Unknown roles.** The only roles are `super_admin` and `author`. A `users` row with any other
+  role cannot sign in and shows “Review: was …” on **Users and roles** until a Super Admin saves a
+  current role for it. Nothing is rewritten in the sheet automatically.
 - Other people are rows in the `users` tab, managed only from **Users and roles**. Nobody can change their own role.
 - Sign-in is **Google OAuth** (OpenID Connect with PKCE). The CMS never stores or sees a password.
 - A session is a signed HttpOnly cookie (8 hours by default). The role is re-read on every request, so removing someone takes effect within 30 seconds.
-- **Initial Super Admin setup:** set `CMS_SUPER_ADMINS=faith@…` in the hosting environment, deploy, and sign in with that Google account. Then add the team under *Users and roles*. There are no default credentials.
+- **First Super Admin:** set `CMS_SUPER_ADMINS=faith@…` in the hosting environment, deploy, and sign in with that Google account. Then add the team under *Users and roles*. There are no default credentials.
 
-## 3. Workflow, drafts and the live version
+## 3. Publishing, drafts and the live version
 
-Statuses: **Needed → Draft → Under Review → Approved → Published**, plus **Changes Requested**, **Rejected** and **Archived**. Tags are separate.
+Statuses: **Draft → Published**, plus **Archived**. There is no review or approval step and no
+publisher role: an item's owners (its creator and listed authors) and Super Admins publish it with
+one click. Tags are separate.
 
-- Only **Approved** content can be published, and only by an admin.
+- **Draft:** saved, not on the website. **Published:** on the website. **Archived:** kept for the record, off the website (*More → Restore to draft* brings it back).
+- **Show on the website** (events and testimonials): a published item with this switch off is not on the website but stays in the CMS, marked *Hidden*, so it can be shown again later. Change the switch and press **Publish**.
 - A record row is the **working copy**. What the website shows is the sanitized payload in the `published` tab.
-- Editing a live item creates a new draft; the website keeps showing the live version. The dashboard shows "Live · v5" next to the draft's status. The edit needs approval and publishing again.
+- Editing a live item makes it a Draft again; the website keeps showing the live version until **Publish** (which saves first). The dashboard shows "Live · v5" (or "Hidden") next to the draft's status.
 - **Concurrent edits:** every save sends the version it was based on. If someone saved in between, the save is refused with who and when, and nothing is overwritten. The storage layer double-checks with a per-row `write_id`.
-- **Slugs:** format-checked, unique per route type (including old slugs that now redirect). Changing a live page's slug needs an admin and a confirmation. The old URL then gets a redirect page (plus a Netlify `_redirects` 301 in deploy mode).
-- **Testimonials** cannot be approved or published without *Consent = Obtained*, written consent evidence, and an admin's *Approved for display* (decision D7). The public site re-checks this.
-- Every save and workflow step is copied to `history`, and every action is recorded in `audit_log`.
+- **Slugs:** format-checked, unique per route type (including old slugs that now redirect). A slug made from the title gets `-2`, `-3`… when it is taken (e.g. a monthly event with the same title). Changing a live page's slug needs a confirmation. The old URL then gets a redirect page (plus a Netlify `_redirects` 301 in deploy mode).
+- Every save and publishing step is copied to `history`, and every action is recorded in `audit_log`.
+
+### Testimonials
+
+Five things: the **testimonial** (the quote), the **person's name**, an optional **profile photo**
+(a small round image beside the name), a **card colour** from the brand palette (Faith Pink by
+default, AI Yellow, Stone, Charcoal) and **Show on the website**. No approval step. A card
+without a photo has no image element at all, and a photo that cannot load is removed in the browser.
+The home page shows published, visible testimonials in display order.
+
+### Events
+
+An event is information for the Workshops page and its calendar: **title**, optional **short
+description**, **start date** (needed to publish), start time, optional end date and end time, **time
+zone** (Asia/Manila by default; stored as entered, never converted), optional **location or meeting
+details**, optional **image**, **Show on the website**, and *Where should the registration button go?*
+
+| Choice | The card's button | Page on the website |
+| --- | --- | --- |
+| **External link** (GHL page, form or funnel, or any URL; the link is required) | opens the link in a new tab | none, unless *Also give this event its own page* is on (then the card also links to *Event details*) |
+| **CMS event page** | goes to `/events/{slug}/` | built with the page editor (*Event page* tab); content is required to publish |
+| **No registration link** | none (no empty button) | none, unless *Also give this event its own page* is on |
+
+The detail page and the registration destination are separate: an event can have its own page
+while its button still goes to a GHL funnel. Upcoming and past events are separated from the
+last day of the event in its own time zone; past events show no registration button. The Workshops
+page has a month **calendar** (drawn by `js/main.js` from data the build embeds) and the build also
+writes `/events/calendar.json` (published, visible events with a date: ISO start and end with the
+zone's offset, the page or registration link). Drafts and hidden events are never in either.
 
 ## 3a. Details and the page editor
 
-Programs, events and resources each have three tabs: **Details** (essential metadata: title, slug,
-summary, price or dates, featured image, SEO, authors, tags), the **page** itself (Visual editor and
-HTML mode, two views of one document), and **History**. Testimonials have a **Card template** instead
-of a page: the card shows the exact quote, name and role from Details and cannot change them.
+Programs and resources have three tabs: **Details** (essential metadata: title, slug, summary, price
+or dates, featured image, SEO, authors, tags), the **page** itself (Visual editor and HTML mode, two
+views of one document), and **History**. Events show the **Event page** tab only when the event has
+its own page. Testimonials have Details and History only (no page or card template).
 
 **One document, explicit connections.** The page (`body_html` + `body_css`) is the only place page
 content lives. Values Details controls are marked in the page and filled in by one shared module
@@ -134,14 +168,28 @@ Records saved before page documents have no `doc_version`. They are **upgraded w
 (`upgradeRecord()`), by the editor and by the website build alike: their structured fields (audience,
 outcomes, agenda, FAQ, inclusions…) become an equivalent page, and existing page HTML is kept
 verbatim inside it. Nothing is written until someone saves; the website renders the same pages as
-before (verified against the previous build output), and live content changes only through the usual
-approve → publish steps. Retired fields stay in storage as hidden *legacy* fields (their columns and
+before (verified against the previous build output), and live content changes only when it is
+published. Retired fields stay in storage as hidden *legacy* fields (their columns and
 values are never deleted, and saving keeps them), and every earlier version stays in History.
 
+### Migration to the simplified events, testimonials and statuses (no data deleted)
+
+Records and live copies saved by earlier versions are converted **when read** (`migrateRecord()` in
+`shared/schema.mjs`, applied by the server's store wrapper `server/store/migrate.mjs`, the public
+snapshot and the website build). Nothing is rewritten until someone saves the item:
+
+- **Statuses:** Needed, Under Review, Changes Requested, Approved and Rejected read as **Draft**. Whether an item is live is decided by the `published` tab, so live content stays live.
+- **Events:** the old *Registration destination* becomes the new choice. An external page, or a page on this website (a `/path`), becomes **External link** with the same address; the *Get notified* form and *No button* become **No registration link** (the Workshops page keeps its general *Get notified* form). Events with page content keep their page. *Related program*, event type, event status, delivery format, map and meeting links, capacity, registration deadline and the text shown without a date are retired.
+- **Testimonials:** Faith Pink card, shown, unless consent was recorded as declined or withdrawn, or the website was holding the live copy back for missing consent (those stay hidden until someone turns them on and publishes). Role, kind, source, consent fields, display approval and card templates are retired.
+
+**Retired fields** (`retired` in `shared/schema.mjs`) are read from older rows so they can be
+converted, and their stored values are written back unchanged, but new sheets do not get those
+columns and they are never published. `approved_*`, `submitted_*`, `reviewed_*` and `review_note`
+are no longer CMS columns; an older sheet keeps them (hand-added columns are always preserved).
+
 Google Sheets: run `npm run sheets:setup` once after deploying this version. It adds the new columns
-(`authors`, `byline`, `page_layout`, `doc_version`, `end_date`, `meeting_url`, and the testimonial card
-template) at the end of each tab without moving or deleting anything. Take a backup first
-(`npm run backup`).
+(`registration_type`, `event_page`, `visible`, `tone`…) at the end of each tab without moving or
+deleting anything. Take a backup first (`npm run backup`).
 
 ## 4. Spreadsheet design (Google Sheets)
 
@@ -158,6 +206,14 @@ never by row number.
 | `audit_log` | Who did what | `at`, `actor`, `role`, `action`, `record_id`, `version`, `detail` (no content, no secrets) |
 | `users` | Role assignments (no passwords) | `id = email`, `role`, `active` |
 | `tags` | Reusable tags | `id` (slug), `label`, `archived` |
+
+Current columns, after the system columns (`id, status, version, write_id, created_at, created_by,
+updated_at, updated_by, published_at, published_by, published_version, published_slug,
+previous_slugs, deleted_at, deleted_by`):
+
+- `events`: `title, summary, event_date, start_time, end_date, end_time, time_zone, venue, registration_type, registration_url, cta_label, event_page, featured_image_url, featured_image_alt, slug, seo_title, meta_description, social_image_url, body_html…body_html__6, body_css, body_css__2, page_layout, doc_version, visible, authors, byline, sort_order`
+- `testimonials`: `quote, display_name, featured_image_url, tone, visible, authors, sort_order`
+- `programs`, `resources`, `settings`: unchanged by this version.
 
 Encoding: lists are one item per line; tags are comma-separated ids; agenda, FAQ and social links are JSON; booleans are `TRUE` or `FALSE`. Dates use ISO 8601 (`2026-10-20`, `2026-10-16T08:00:00Z`).
 Every value is written with `valueInputOption=RAW`, so text that starts with `=` is never evaluated as a formula.
@@ -178,11 +234,11 @@ Columns added by hand are preserved but ignored.
 cd cms
 cp .env.example .env          # CMS_STORE=json and CMS_DEV_LOGIN=true are fine locally
 npm run dev                   # http://localhost:5174
-npm test                      # 38 tests: roles, workflow, publishing, sanitizer, Sheets adapter
+npm test                      # 60 tests: roles, workflow, publishing, sanitizer, Sheets adapter
 ```
 
 The JSON store lives at `cms/.data/store.json` (git-ignored) and is seeded from `cms/fixtures/seed.json`.
-The login screen offers the four `@example.test` users (one per role). The dev login is refused
+The login screen offers the three `@example.test` users (one Super Admin, two Authors). The dev login is refused
 unless the CMS is on localhost **and** not deployed (`VERCEL`/`NETLIFY` set) **and** not `NODE_ENV=production`.
 
 To see your local edits on the website: `node tools/build.mjs --content=local` from the repository root.
@@ -199,14 +255,15 @@ To see your local edits on the website: `node tools/build.mjs --content=local` f
    ```bash
    cd cms
    npm run sheets:setup    # creates tabs and header columns (never reorders or deletes)
-   npm run sheets:seed     # loads cms/fixtures/seed.json into empty tabs (dev users are skipped)
+   npm run sheets:seed     # adds missing cms/fixtures/seed.json rows by id; safe to rerun (dev users are skipped)
+   npm run sheets:seed -- --dry-run   # read-only: which seed rows are present / missing
    npm run sheets:check    # access, headers and row counts
    ```
 
 ### 5.3 Deploying the CMS
 
 **Vercel:** new project from this repository, Root Directory `cms`. `cms/vercel.json` sets the build, the `public/` output, the `/api` rewrite and security headers. Keep *Include files outside the Root Directory* enabled; the page preview imports the site templates from `../tools`.
-**Netlify:** new site, Base directory `cms`. `cms/netlify.toml` sets the functions and headers.
+**Netlify:** new site from this repository, Base directory `cms` (build command `node scripts/build-static.mjs`, publish directory `cms/public`, functions directory `cms/netlify/functions`; `cms/netlify.toml` sets all three plus headers). Every `/api/*` request goes to the one function `netlify/functions/api.mjs`. Set the environment variables in the Netlify UI with a scope that includes **Functions** (variables in `netlify.toml` do not reach functions), and redeploy after changing them.
 
 Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Development, Preview and Production environment variables. Point Production at the production spreadsheet. Do not reuse the production spreadsheet for preview deployments.
 
@@ -246,7 +303,7 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 - **API:** every protected route requires a session. State-changing requests need the `X-CMS-CSRF` header and a same-origin `Origin`, and cookies are `SameSite=Lax`. Inputs are validated on the server (types, URL schemes, slugs, lengths, references).
 - **Dashboard:** strict CSP (`script-src 'self'`), no inline scripts, `frame-ancestors 'none'`. All CMS data is rendered with DOM text APIs, never as HTML.
 - **Page HTML (stored XSS):** drafts keep exactly what was pasted. Editing previews run in sandboxed iframes without `allow-scripts` and with their own CSP, and active elements (scripts, meta, base, frames…) are replaced by inert placeholders while editing. Published HTML goes through the allowlist sanitizer on the server, and again in the website build. It removes scripts, event handlers, `javascript:`/`data:` URLs, forms and embeds from hosts that are not on the allowed list, and `<style>` cannot break out of its element. Page CSS is scoped to the page's content wrapper, so it cannot restyle the header, footer or other pages. The editor and preview list everything publishing will remove.
-- **Public endpoint:** returns only `published` payloads. Internal fields (owners, consent evidence, attribution, review notes, editors' emails) are never included; there is a test for this.
+- **Public endpoint:** returns only `published` payloads, without hidden events and testimonials. Internal and retired fields (owners, editors' emails, old consent and review data) are never included; there is a test for this.
 
 ## 8. Reliability, quotas and caching
 
@@ -261,7 +318,7 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 
 | Situation | What to do |
 | --- | --- |
-| Wrong edit | Open the item → **History** → *Restore this version* (it becomes a draft), then approve and publish. |
+| Wrong edit | Open the item → **History** → *Restore this version* (it becomes a draft), then publish. |
 | Accidental delete | Super Admin → **Recovery and backup** → *Restore*. Deletes are soft; the row stays in the sheet. |
 | Publish did not finish | Item banner or **Recovery** → *Finish publishing*. |
 | Bad content went live | *Unpublish* the item (it is removed at the next rebuild), or restore an earlier version and publish it. |
@@ -272,14 +329,14 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 
 **Backups:** weekly, and before any bulk change: `npm run backup` (writes to `cms/backups/`,
 git-ignored) or *Recovery → Download a full backup*. Store backups privately. They contain
-internal fields such as consent evidence. Google's own version history is a second line,
+internal fields (owners, editors' emails and any retired consent notes). Google's own version history is a second line,
 not a replacement.
 
 ## 10. What is tested, and what is not
 
-**Automated (`npm test`, 56 tests, all passing):** scoped Page CSS keeps its tokens; page documents (marker-based bindings that never match by text, nested and commented markup, empty-value placeholders, links removed when empty, generated components, card lists from the page); the read-time upgrade of older records without losing content; starter templates for all four types that publish with nothing removed and use only labelled placeholder images; reading time (reproduces every existing article’s value) and event duration; time-zone changes never moving an event; authors from the user list with a names-only byline; server-calculated reading time; hidden legacy values kept on save; event date ranges; preview following Details, custom layouts without the global navbar and footer, live-version preview; testimonial cards always showing the exact quote; and, as before: configuration fails closed; CSRF and authentication; the dev login is localhost-only; every role boundary; Author workflow; approve-before-publish; draft vs live separation; concurrent-edit conflicts; slug format, duplicates and live renames with redirects; testimonial consent gating; field-level permissions (admin-only, Super-Admin-only); user management; archive, delete, undelete, history restore and audit; event→program references; unsafe HTML kept in drafts but never published; both partial-publish failure paths; draft preview with the site templates; 45 XSS vectors; sanitizer stability and fidelity (all seven article bodies round-trip byte-for-byte); CSS sanitizing and scoping; and the Sheets adapter against an in-memory **mock** of the Sheets REST API (RS256 token exchange, header-name mapping, overflow cells, re-sorted rows, conflicts, retries, rate limits, duplicate-safe appends, actionable 403/key errors, a full create→approve→publish flow).
+**Automated (`npm test`, 65 tests, all passing).** Added for this version: one-step publishing with no approval actions (the old ones answer 404) and no approval columns; testimonials with and without a photo, colour changes, hide and show again (public output, Hidden filter and dashboard count) and Author boundaries; the three event registration destinations (external link required, informational events never keep a URL, CMS event page needs content), automatic free slugs; hidden and draft events kept out of public and staging output; event cards (button routing, separate *Event details* link, no empty buttons, past events without buttons, date order) and the calendar data; time zones (offsets with summer time, past decided in the event's zone); migration of records and live copies from the earlier workflow without rewriting them; and, on the Sheets adapter mock, new tabs without retired columns while an older sheet's retired and hand-added columns are read and preserved. Earlier coverage: scoped Page CSS keeps its tokens; page documents (marker-based bindings that never match by text, nested and commented markup, empty-value placeholders, links removed when empty, generated components, card lists from the page); the read-time upgrade of older records without losing content; starter templates for all four types that publish with nothing removed and use only labelled placeholder images; reading time (reproduces every existing article’s value) and event duration; time-zone changes never moving an event; authors from the user list with a names-only byline; server-calculated reading time; hidden legacy values kept on save; event date ranges; preview following Details, custom layouts without the global navbar and footer, live-version preview; testimonial cards always showing the exact quote; and, as before: configuration fails closed; CSRF and authentication; the dev login is localhost-only; every role boundary; Author workflow; draft vs live separation; concurrent-edit conflicts; slug format, duplicates and live renames with redirects; field-level permissions (Super-Admin-only); content ownership (Authors change only their own items, including direct API requests); retired-role accounts mapped to Author and flagged for review; user management; archive, delete, undelete, history restore and audit; unsafe HTML kept in drafts but never published; both partial-publish failure paths; draft preview with the site templates; 45 XSS vectors; sanitizer stability and fidelity (all seven article bodies round-trip byte-for-byte); CSS sanitizing and scoping; and the Sheets adapter against an in-memory **mock** of the Sheets REST API (RS256 token exchange, header-name mapping, overflow cells, re-sorted rows, conflicts, retries, rate limits, duplicate-safe appends, actionable 403/key errors, a full create→publish flow).
 
-**Manual in Chrome (local JSON store):** the full editor test from the brief. Paste a page with CSS → preview → edit a heading in place → change a button's label and URL → delete an element → save → reopen with styling intact → HTML mode shows the updated markup → preview with the site templates → the Author cannot publish → admin approves and publishes. The website build of the published view shows the edited content with scoped CSS and no script.
+**Manual in Chrome (local JSON store):** the full editor test from the brief. Paste a page with CSS → preview → edit a heading in place → change a button's label and URL → delete an element → save → reopen with styling intact → HTML mode shows the updated markup → preview with the site templates → publish. The website build of the published view shows the edited content with scoped CSS and no script.
 
 **Not yet tested (needs real credentials or access):** calls against **real Google Sheets** (including `sheets:setup` and `sheets:seed`); real Google sign-in; a deployed Vercel/Netlify function (including the preview importing `../tools`); the deploy hook; GHL hosting. Run `npm run sheets:check` and the checklist in section 12 when credentials exist.
 
@@ -298,7 +355,7 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 1. Sheet created, owned by Faith Works, shared only with the service account and the owner; tabs protected.
 2. `npm run sheets:setup`, `npm run sheets:seed`, `npm run sheets:check` pass against the production sheet.
 3. Hosted env vars set; `/api/health` shows `"configured": true`; dev login unavailable.
-4. First Super Admin signs in with Google; team added under *Users and roles*; a test Author cannot publish.
+4. First Super Admin signs in with Google; team added under *Users and roles*; a test Author can publish their own item but cannot edit another Author’s item or open Users and roles.
 5. Website project builds with `CONTENT_SOURCE=cms`; a test publish triggers the rebuild and appears within minutes; unpublish removes it.
 6. Secret scanning and push protection enabled; first backup taken and stored privately.
-7. Content team walked through: drafts, review notes, preview, HTML/visual editing, testimonials consent rules.
+7. Content team walked through: drafts, Publish, Show on the website, preview, HTML/visual editing, event registration choices. Testimonials are published only with the person's agreement to be quoted (the CMS no longer records consent; keep that record wherever the team keeps it).

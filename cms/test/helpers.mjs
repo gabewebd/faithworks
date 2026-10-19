@@ -7,7 +7,6 @@ import { createApp } from "../server/app.mjs";
 
 export const USERS = {
   super: "super.admin@example.test",
-  main: "main.admin@example.test",
   author: "author@example.test",
   author2: "second.author@example.test",
 };

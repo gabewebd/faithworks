@@ -1,11 +1,12 @@
 // Form widgets generated from the shared schema (shared/schema.mjs). Each widget returns
 // { el, key, get(), set(v), error(msg), focus() } and calls ctx.onChange(key) on every edit.
 // Dropdowns, multi-selects, dates and times use the CMS controls (controls.mjs), not the
-// browser's native widgets.
+// browser's native widgets. A select with widget "radio" or "swatches" is a group of real
+// radio buttons (one tab stop, arrow keys move the choice).
 import { h, clear, api, toast, dialog, errorText } from "./dom.mjs";
 import { selectBox, multiSelect, datePicker, timePicker, toggle } from "./controls.mjs";
 import { checkUrl, SLUG_RE, slugify } from "/shared/validate.mjs";
-import { publicPath, isAdmin } from "/shared/schema.mjs";
+import { publicPath, isSuperAdmin } from "/shared/schema.mjs";
 
 let uid = 0;
 const nextId = () => `f${++uid}`;
@@ -18,17 +19,17 @@ export function assetUrl(url, cfg) {
 }
 
 // Short fields sit two per row in the Details cards; long ones use the full width.
-const HALF_TYPES = new Set(["select", "ref", "date", "time", "number", "email", "boolean"]);
-const isHalf = (fd) => fd.half === true || HALF_TYPES.has(fd.type) || (fd.type === "text" && fd.max && fd.max <= 120 && !["title", "display_name"].includes(fd.key));
+const HALF_TYPES = new Set(["select", "date", "time", "number", "email"]);
+const isHalf = (fd) => fd.half === true || (HALF_TYPES.has(fd.type) && !fd.widget) || (fd.type === "text" && fd.max && fd.max <= 120 && !["title", "display_name"].includes(fd.key));
 
 export function renderField(fd, value, ctx) {
   const id = nextId();
-  const locked = ctx.readOnly || (fd.adminOnly && !isAdmin(ctx.user.role)) || (fd.superOnly && ctx.user.role !== "super_admin");
-  const lockNote = fd.superOnly ? "Super Admin only" : fd.adminOnly ? "admins only" : "";
+  const locked = ctx.readOnly || (fd.adminOnly && !isSuperAdmin(ctx.user.role));
+  const lockNote = fd.adminOnly ? "Super Admins only" : "";
   const errEl = h("p", { class: "error", id: `${id}-err`, hidden: true });
   const helpEl = fd.help ? h("p", { class: "help", id: `${id}-help` }, fd.help) : null;
   const describedBy = [fd.help ? `${id}-help` : "", `${id}-err`].filter(Boolean).join(" ");
-  const label = h("label", { for: id }, fd.label, fd.required ? h("span", { class: "req", title: "Required before review" }, " *") : null, locked && lockNote && !ctx.readOnly ? h("span", { class: "locked" }, `(${lockNote})`) : null);
+  const label = h("label", { for: id }, fd.label, fd.required ? h("span", { class: "req", title: "Required before publishing" }, " *") : null, locked && lockNote && !ctx.readOnly ? h("span", { class: "locked" }, `(${lockNote})`) : null);
   const changed = () => ctx.onChange?.(fd.key);
   let control, get, set, focusEl, extra = null, widget = null;
   const fieldErr = (msg) => { errEl.hidden = !msg; errEl.textContent = msg || ""; (widget ? widget.invalid(!!msg) : control?.setAttribute?.("aria-invalid", msg ? "true" : "false")); };
@@ -46,8 +47,9 @@ export function renderField(fd, value, ctx) {
       get = () => control.value.split(/\r?\n/).map((x) => x.trim()).filter(Boolean); set = (v) => { control.value = (v || []).join("\n"); };
       break;
     case "boolean": {
+      // A full-width row: the switch, then its label (the whole row is clickable), help below
       const t = toggle({ id, checked: !!value, disabled: locked, onChange: changed, describedBy, label: [fd.label, locked && lockNote && !ctx.readOnly ? h("span", { class: "locked" }, `(${lockNote})`) : null] });
-      return finish(h("div", { class: "field field--half", dataset: { key: fd.key } }, t.el, helpEl, errEl), { get: t.get, set: t.set, focus: t.focus });
+      return finish(h("div", { class: "field field--switch", dataset: { key: fd.key } }, t.el, helpEl, errEl), { get: t.get, set: t.set, focus: t.focus });
     }
     case "number":
       control = input("number", { min: 0, step: 1, inputmode: "numeric" });
@@ -57,17 +59,14 @@ export function renderField(fd, value, ctx) {
     case "time": fromWidget(timePicker({ id, value, disabled: locked, onChange: changed, describedBy })); break;
     case "email": control = input("email", { autocomplete: "off" }); get = () => control.value.trim(); set = (v) => { control.value = v || ""; }; break;
     case "select": {
+      if (fd.widget) return choiceField();
       const options = fd.options.some((o) => o.value === "") || fd.required ? fd.options : [{ value: "", label: "Not set" }, ...fd.options];
       fromWidget(selectBox({ id, options, value, searchable: fd.searchable, disabled: locked, onChange: changed, describedBy }));
       break;
     }
-    case "ref":
-      fromWidget(selectBox({ id, value, searchable: true, disabled: locked, onChange: changed, describedBy, placeholder: "None",
-        options: [{ value: "", label: "None" }, ...(ctx.refs?.[fd.ref] || []).map((o) => ({ value: o.id, label: o.label, note: o.live ? "" : "not live" }))] }));
-      break;
     case "tags": {
       const tagOptions = () => (ctx.tags || []).map((t) => ({ value: t.id, label: t.label, hidden: !!t.archived }));
-      const create = isAdmin(ctx.user.role) ? async (label) => {
+      const create = isSuperAdmin(ctx.user.role) ? async (label) => {
         try {
           const t = await api("POST", "/api/tags", { label });
           ctx.tags.push(t);
@@ -89,7 +88,7 @@ export function renderField(fd, value, ctx) {
       control = input("text", { spellcheck: "false", inputmode: "url", placeholder: "https://… or /path/" });
       get = () => control.value.trim(); set = (v) => { control.value = v || ""; };
       if (fd.image) {
-        const img = h("img", { class: "img-preview", alt: "", hidden: true });
+        const img = h("img", { class: `img-preview${fd.round ? " img-preview--round" : ""}`, alt: "", hidden: true });
         const show = () => { const u = assetUrl(get(), ctx.config); img.hidden = !u; if (u) img.src = u; };
         img.addEventListener("error", () => { img.hidden = true; });
         control.addEventListener("change", show);
@@ -152,6 +151,28 @@ export function renderField(fd, value, ctx) {
   }
   const wrap = h("div", { class: `field${isHalf(fd) ? " field--half" : ""}`, dataset: { key: fd.key } }, label, control, extra, helpEl, errEl);
   return finish(wrap);
+
+  // Radio buttons in a fieldset: plain cards with a note ("radio"), or colour swatches.
+  function choiceField() {
+    const swatches = fd.widget === "swatches";
+    const name = `${id}-choice`;
+    const inputs = fd.options.map((o, i) => {
+      const r = h("input", { type: "radio", name, value: o.value, id: `${id}-${i}`, class: "choice__input", disabled: locked, "aria-describedby": describedBy });
+      r.addEventListener("change", changed);
+      return r;
+    });
+    const items = fd.options.map((o, i) => h("label", { class: `choice${swatches ? " choice--swatch" : ""}`, for: `${id}-${i}` }, inputs[i],
+      swatches ? h("span", { class: "choice__swatch", style: `--swatch:${o.swatch}`, "aria-hidden": "true" }) : h("span", { class: "choice__dot", "aria-hidden": "true" }),
+      h("span", { class: "choice__text" }, h("span", { class: "choice__label" }, o.label), o.note ? h("span", { class: "choice__note" }, o.note) : null)));
+    const group = h("div", { class: `choices${swatches ? " choices--swatches" : ""}` }, items);
+    const legend = h("legend", { class: "label" }, fd.label, fd.required ? h("span", { class: "req", title: "Required before publishing" }, " *") : null);
+    const set = (v) => { const want = v || fd.options[0].value; inputs.forEach((r) => { r.checked = r.value === want; }); };
+    const get = () => inputs.find((r) => r.checked)?.value || "";
+    set(value);
+    const wrap = h("fieldset", { class: "field field--choices", dataset: { key: fd.key } }, legend, group, helpEl, errEl);
+    const choiceErr = (msg) => { errEl.hidden = !msg; errEl.textContent = msg || ""; group.toggleAttribute("data-invalid", !!msg); };
+    return { el: wrap, key: fd.key, get, set, error: choiceErr, focus: () => (inputs.find((r) => r.checked) || inputs[0]).focus(), hasTypingError: () => false };
+  }
 
   function finish(wrapEl, over = {}) {
     return {

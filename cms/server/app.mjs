@@ -14,10 +14,12 @@ import { createSheetsApi } from "./store/sheets-api.mjs";
 import { createAuth } from "./auth.mjs";
 import { createLog } from "./services/log.mjs";
 import { createRecords } from "./services/records.mjs";
+import { withMigrations } from "./store/migrate.mjs";
 import { createAdmin } from "./services/admin.mjs";
 import { createPublic } from "./services/public.mjs";
 import { createPreview } from "./services/preview.mjs";
 import { safeEqual } from "./session.mjs";
+import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
 
 export function createApp({ env = process.env, store: injectedStore, fetchImpl = globalThis.fetch, log = console } = {}) {
   const cfg = loadConfig(env);
@@ -27,6 +29,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
       ? createSheetsStore(createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }))
       : createJsonStore({ path: cfg.jsonPath, seedPath: cfg.seedPath });
   }
+  if (store) store = withMigrations(store); // records from earlier versions, converted on read
   const logSvc = store && createLog({ store, log });
   const auth = store && createAuth({ cfg, store, audit: logSvc, fetchImpl });
   const pub = store && createPublic({ store, cfg, log, fetchImpl });
@@ -64,7 +67,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("POST", "/api/auth/logout", async () => json({ ok: true }, 200, { "set-cookie": auth.clearSession() }), { auth: false });
   route("GET", "/api/auth/dev-users", async ({ request }) => {
     if (!cfg.devLogin || !["localhost", "127.0.0.1"].includes(new URL(request.url).hostname)) throw new HttpError(404, "Not found.", "not_found");
-    return json((await auth.userRows()).filter((u) => u.active).map((u) => ({ email: u.id, name: u.name, role: u.role })));
+    return json((await auth.userRows()).filter((u) => u.active && normalizeRole(u.role)).map((u) => ({ email: u.id, name: u.name, role: normalizeRole(u.role) })));
   }, { auth: false });
   route("POST", "/api/auth/dev-login", async ({ request }) => {
     const { email } = await readJson(request);
@@ -84,7 +87,6 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("GET", "/api/records/:collection/:id/history", async ({ user, params }) => json(await records.history(user, params.collection, params.id)));
   route("POST", "/api/records/:collection/:id/history/:hid/restore", async ({ user, params, request, rid }) => json(await records.restoreVersion(user, params.collection, params.id, params.hid, await readJson(request), { requestId: rid })));
   route("GET", "/api/authors", async () => json(await records.authors()));
-  route("GET", "/api/options/:collection", async ({ user, params }) => json((await records.list(user, params.collection)).map((r) => ({ id: r.id, label: r.label, status: r.status, live: !!r.live }))));
   route("POST", "/api/preview", async ({ user, request }) => {
     const body = await readJson(request);
     return json(await preview.render(user, body.collection, body));
@@ -103,7 +105,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     return json(data, 200, { "content-disposition": `attachment; filename="faithworks-cms-backup-${data.exported_at.slice(0, 10)}.json"` });
   });
   route("POST", "/api/deploy", async ({ user, rid }) => {
-    if (!["super_admin", "main_admin"].includes(user.role)) throw new HttpError(403, "Only admins can rebuild the website.", "forbidden");
+    if (!isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can rebuild the website.", "forbidden");
     const result = await pub.triggerDeploy("manual rebuild");
     await logSvc.log(user, "deploy", "", "", "", result.triggered ? "Rebuild started" : result.error || result.reason, rid);
     return json(result);

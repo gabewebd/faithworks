@@ -57,7 +57,7 @@ export function loadConfig(env = process.env) {
     if (cfg.sessionSecret.length < 32) errors.push("CMS_SESSION_SECRET must be at least 32 random characters.");
     if (!cfg.oauthClientId || !cfg.oauthClientSecret) errors.push("GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are required for sign-in.");
     if (!cfg.baseUrl) errors.push("CMS_BASE_URL is required (the CMS address, e.g. https://cms.faithph.ai).");
-    if (!cfg.superAdmins.length) errors.push("CMS_SUPER_ADMINS must list at least one Super Admin email address.");
+    if (!cfg.superAdmins.length) errors.push("CMS_SUPER_ADMINS must list at least one Super Admin email address (the pinned admins).");
   }
   if (env.CMS_DEV_LOGIN === "true" && production) errors.push("CMS_DEV_LOGIN cannot be enabled in production. Remove it.");
   if (cfg.previewToken && cfg.previewToken.length < 32) errors.push("CMS_PREVIEW_TOKEN must be at least 32 random characters (or unset).");
