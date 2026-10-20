@@ -354,7 +354,7 @@ The website's root `vercel.json` sets the build: `node tools/build.mjs --deploy 
 
 | Setting (website project) | Value |
 | --- | --- |
-| `CMS_CONTENT_URL` | `https://faithworks-cms.netlify.app` (the CMS address; required, the build stops without it) |
+| `CMS_CONTENT_URL` | `(the CMS address; required, the build stops without it) |
 | `CONTENT_SOURCE` | `cms` (optional: `vercel.json` already passes `--content=cms`) |
 | `CMS_PREVIEW_TOKEN` | **never on production.** Staging site only, with its own build command using `--view=preview` |
 
