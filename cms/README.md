@@ -385,7 +385,7 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 | Purpose | Variables |
 | --- | --- |
 | CMS content (Supabase) | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (`sb_secret_…`; legacy `SUPABASE_SERVICE_ROLE_KEY` still read if unset); `CMS_STORE=supabase` (the hosted default) |
-| Sign-in (Google OAuth) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `CMS_BASE_URL` (callback `{CMS_BASE_URL}/api/auth/google/callback`) |
+| Sign-in (Google OAuth) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | Session and access | `CMS_SESSION_SECRET` (32+ random characters), `CMS_SUPER_ADMINS`; optional `CMS_SESSION_HOURS`, `CMS_ALLOWED_EMAIL_DOMAINS` |
 
 Kept for the Google Sheets integration (required only with `CMS_STORE=sheets`, otherwise optional):
