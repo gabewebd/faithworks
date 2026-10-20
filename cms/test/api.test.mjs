@@ -16,10 +16,13 @@ const rec = (r) => r.data.record;
 test("configuration fails closed on hosted deployments", () => {
   const cfg = loadConfig({ VERCEL: "1", CMS_DEV_LOGIN: "true" });
   assert.ok(cfg.errors.some((e) => e.includes("CMS_SESSION_SECRET")));
-  assert.ok(cfg.errors.some((e) => e.includes("GOOGLE_SHEETS_SPREADSHEET_ID")));
+  assert.equal(cfg.store, "supabase", "hosted deployments store content in Supabase by default");
+  assert.ok(cfg.errors.some((e) => e.includes("SUPABASE_URL")));
+  assert.ok(cfg.errors.some((e) => e.includes("SUPABASE_SECRET_KEY")));
   assert.ok(cfg.errors.some((e) => e.includes("CMS_DEV_LOGIN cannot be enabled")));
   assert.equal(cfg.devLogin, false);
-  assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "json" }).errors.some((e) => e.includes("must use the Google Sheets store")));
+  assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "json" }).errors.some((e) => e.includes("must use the Supabase store")));
+  assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "sheets" }).errors.some((e) => e.includes("GOOGLE_SHEETS_SPREADSHEET_ID")), "the Sheets store (rollback) still needs its settings");
 });
 
 test("misconfigured deployment refuses every API call except health", async () => {

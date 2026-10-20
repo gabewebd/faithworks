@@ -1,9 +1,27 @@
 // Test helpers: an app on a temporary JSON store (seeded from the fixtures) and a small
 // client that signs in through the development login.
-import { mkdtempSync, rmSync } from "node:fs";
+//
+// Opt-in: with CMS_TEST_SUPABASE_URL, CMS_TEST_SUPABASE_KEY (sb_secret_… or legacy service role) and
+// CMS_TEST_SUPABASE_RESET (a shell command that empties the cms_* tables of a THROWAWAY
+// database), every test app uses the Supabase store instead, reset and seeded from the fixtures.
+import { mkdtempSync, rmSync, readFileSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../server/app.mjs";
+import { createSupabaseStore, SUPABASE_TABS } from "../server/store/supabase-store.mjs";
+
+function supabaseTestStore() {
+  const { CMS_TEST_SUPABASE_URL: url, CMS_TEST_SUPABASE_KEY: serviceKey, CMS_TEST_SUPABASE_RESET: reset } = process.env;
+  const store = createSupabaseStore({ url, serviceKey, log: { error() {} } });
+  let ready = null;
+  const prepare = () => (ready ||= (async () => {
+    execSync(reset, { stdio: "ignore" });
+    const seed = JSON.parse(readFileSync(new URL("../fixtures/seed.json", import.meta.url), "utf8"));
+    for (const tab of SUPABASE_TABS) if (seed[tab]?.length) await store.importMissing(tab, seed[tab]);
+  })());
+  return Object.fromEntries(Object.entries(store).map(([k, v]) => [k, typeof v === "function" ? async (...a) => { await prepare(); return v(...a); } : v]));
+}
 
 export const USERS = {
   super: "super.admin@example.test",
@@ -16,7 +34,7 @@ export function testApp({ env = {}, store, fetchImpl } = {}) {
   const logs = [];
   const app = createApp({
     env: { CMS_STORE: "json", CMS_JSON_PATH: join(dir, "store.json"), CMS_DEV_LOGIN: "true", CMS_PREVIEW_TOKEN: "p".repeat(40), PUBLIC_SITE_URL: "https://faithph.ai", ...env },
-    store, fetchImpl, log: { error: (m) => logs.push(m) },
+    store: store || (process.env.CMS_TEST_SUPABASE_URL ? supabaseTestStore() : undefined), fetchImpl, log: { error: (m) => logs.push(m) },
   });
   return { app, dir, logs, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
 }

@@ -2,8 +2,12 @@
 
 A separate, headless content management system for faithph.ai. Staff manage **programs, events,
 resources/articles, testimonials, tags and site settings** in a dashboard. Content is stored in
-**Google Sheets** through a server-side integration. The public website is rebuilt from the
-**published** content only.
+**Supabase (Postgres)**, the single source of truth for CMS content, through a server-side
+integration. The public website is rebuilt from the **published** content only.
+
+Sign-in stays **Google OAuth**. The earlier **Google Sheets** integration (code, scripts, spreadsheet
+and credentials) is kept, unchanged, for future data workflows (form submissions, inquiries,
+registrations) and as an explicit rollback store. It is not used for CMS content.
 
 - No runtime dependencies (Node 20+ built-ins only): nothing to `npm install`, no supply-chain surface.
 - Runs on Vercel or Netlify (serverless functions + static dashboard), or locally with `npm run dev`.
@@ -18,10 +22,13 @@ resources/articles, testimonials, tags and site settings** in a dashboard. Conte
                         │  same-origin JSON API, session cookie, CSRF header
                         ▼
                    CMS API (cms/server, serverless function)
-                        │  service-account JWT (server only)
+                        │  service-role key (server only), Supabase Data API over HTTPS
                         ▼
-                   Google Sheets  ── tabs: programs, events, resources, testimonials, settings,
-                                          tags, users, published, history, audit_log
+                   Supabase Postgres ── tables cms_programs, cms_events, cms_resources,
+                                        cms_testimonials, cms_settings, cms_tags, cms_users,
+                                        cms_published, cms_history, cms_audit_log (RLS on)
+                        │
+                   (Google Sheets: separate, kept for future workflows; not CMS content)
                         │
      GET /api/public/content (published copies only, cached)
                         ▼
@@ -34,11 +41,12 @@ resources/articles, testimonials, tags and site settings** in a dashboard. Conte
 | Workflow | `cms/shared/workflow.mjs`, `cms/server/services/records.mjs` | Statuses, transitions, role rules. Enforced on the server. |
 | Public projection | `cms/shared/public.mjs` | The only code that decides what leaves the CMS. |
 | Sanitizer | `cms/shared/sanitize-html.mjs`, `sanitize-css.mjs` | Allowlist tokenizer that re-serializes the markup, plus CSS neutralization and scoping. |
-| Storage adapters | `cms/server/store/` | `sheets-store.mjs` (production), `json-store.mjs` (local development and tests). Same interface. |
+| Storage adapters | `cms/server/store/` | `supabase-store.mjs` (production), `json-store.mjs` (local development and tests), `sheets-store.mjs` (kept; rollback only). Same interface. Chosen by `CMS_STORE`; never a silent fallback. |
+| Database schema | `cms/supabase/migrations/` | SQL migrations for the Supabase tables, privileges and Row Level Security. |
 | Website content interface | `tools/content.mjs` | `fixtures`, `local` or `cms` source; `published` or `preview` view; same output shape. |
 
 **The public website does not depend on the CMS being online.** It is static. It reads the CMS
-only while it is being built. If the CMS or Google is unavailable, the build stops and the host
+only while it is being built. If the CMS or its database is unavailable, the build stops and the host
 keeps serving the previous deploy.
 
 ## 2. Roles
@@ -63,8 +71,8 @@ and `cms/server/services/`). Hiding a button is never the protection.
 - Super Admins listed in `CMS_SUPER_ADMINS` are pinned. They cannot be changed or locked out from the UI.
 - **Unknown roles.** The only roles are `super_admin` and `author`. A `users` row with any other
   role cannot sign in and shows “Review: was …” on **Users and roles** until a Super Admin saves a
-  current role for it. Nothing is rewritten in the sheet automatically.
-- Other people are rows in the `users` tab, managed only from **Users and roles**. Nobody can change their own role.
+  current role for it. Nothing is rewritten in the database automatically.
+- Other people are rows in the `cms_users` table (the `users` tab with the Sheets store), managed only from **Users and roles**. Nobody can change their own role.
 - Sign-in is **Google OAuth** (OpenID Connect with PKCE). The CMS never stores or sees a password.
 - A session is a signed HttpOnly cookie (8 hours by default). The role is re-read on every request, so removing someone takes effect within 30 seconds.
 - **First Super Admin:** set `CMS_SUPER_ADMINS=faith@…` in the hosting environment, deploy, and sign in with that Google account. Then add the team under *Users and roles*. There are no default credentials.
@@ -191,7 +199,48 @@ Google Sheets: run `npm run sheets:setup` once after deploying this version. It 
 (`registration_type`, `event_page`, `visible`, `tone`…) at the end of each tab without moving or
 deleting anything. Take a backup first (`npm run backup`).
 
-## 4. Spreadsheet design (Google Sheets)
+## 4. Database design (Supabase)
+
+Migration: `cms/supabase/migrations/20261020000000_cms_content.sql` (idempotent; safe to run again).
+One table per CMS collection and system tab, named `cms_<tab>`, all in the `public` schema.
+
+| Table | Holds | Columns |
+| --- | --- | --- |
+| `cms_programs`, `cms_events`, `cms_resources` | Working copies (drafts) of page collections | `id` (PK), `slug`, workflow columns (below), `fields` jsonb |
+| `cms_testimonials`, `cms_settings` | Working copies without a page | `id` (PK), workflow columns, `fields` jsonb |
+| `cms_published` | The live, sanitized copy of each published item | `id` = `{collection}:{record_id}`, `record_id`, `collection`, `slug`, `version`, `state` (live / unpublished), `published_at/by`, `write_id`, `payload` jsonb |
+| `cms_history` | Full copy of a record after every change (append-only) | `id`, `record_id`, `collection`, `version`, `kind`, `status`, `at`, `by`, `write_id`, `data` jsonb |
+| `cms_audit_log` | Who did what, when (append-only) | `id`, `at`, `actor`, `role`, `action`, `collection`, `record_id`, `version`, `detail`, `request_id` |
+| `cms_users` | CMS user records and roles (sign-in itself is Google OAuth) | `id` = lower-case email, `email`, `name`, `role`, `active`, `version`, `write_id`, created/updated |
+| `cms_tags` | Tags | `id` (slug), `label`, `description`, `archived`, `version`, `write_id`, created/updated |
+
+- **Workflow columns** (typed): `status`, `version`, `write_id`, `created_at/by`, `updated_at/by`,
+  `published_at/by`, `published_version`, `published_slug`, `previous_slugs`, `deleted_at/by`.
+- **`fields` (jsonb)** holds the collection's content fields exactly as defined in
+  `cms/shared/schema.mjs` (title, summary, page HTML and CSS, tags, authors…), including legacy and
+  retired values. Adding a field to the content model needs no migration. The adapter merges
+  `fields` and the columns back into one flat record, so the services are store-independent.
+- **Relationships** (authors → users, tags → tags, published/history → records) are checked by the
+  CMS server, as before; there are no foreign keys, so a history row outlives its record.
+- **Concurrency:** a save is one `UPDATE … WHERE id = … AND write_id = <the version you opened>`. If
+  someone saved in between, nothing matches and the save is refused (no lost updates).
+- **Access:** Row Level Security is enabled on every table with **no policies**, and the `anon` and
+  `authenticated` roles have no privileges, so the public Data API (publishable/anon key) can read
+  or write nothing. Only the CMS server, with the service-role key, has access: `select, insert,
+  update` on content, users and tags; `select, insert` on `cms_history` and `cms_audit_log`. No role
+  can delete rows (deletes are soft), and triggers reject any change to history or the audit log.
+- Roles are not constrained in the database on purpose: a row with a retired role is kept,
+  refused at sign-in and flagged for review (section 2).
+
+## 4a. Spreadsheet design (Google Sheets: kept, not the content store)
+
+The spreadsheet below is the earlier CMS content store. Its tabs, rows and credentials are left
+exactly as they were. The CMS does not read or write it while `CMS_STORE=supabase`. It can be
+read by `npm run supabase:import -- --from-sheets`, maintained with the `sheets:*` scripts, and
+used again only by setting `CMS_STORE=sheets` deliberately (rollback). Future form, inquiry or
+registration workflows can reuse `cms/server/store/sheets-api.mjs` (service-account client) with
+their own tabs; do not route CMS content through it as well.
+
 
 One spreadsheet, one tab per collection, plus system tabs. Row 1 holds the column headers.
 **Columns are found by header name, not position.** Rows are found by the immutable `id`,
@@ -228,13 +277,13 @@ Columns added by hand are preserved but ignored.
 
 ## 5. Setup
 
-### 5.1 Local development (no Google needed)
+### 5.1 Local development (no Google or Supabase needed)
 
 ```bash
 cd cms
 cp .env.example .env          # CMS_STORE=json and CMS_DEV_LOGIN=true are fine locally
 npm run dev                   # http://localhost:5174
-npm test                      # 60 tests: roles, workflow, publishing, sanitizer, Sheets adapter
+npm test                      # roles, workflow, publishing, sanitizer, Supabase and Sheets adapters
 ```
 
 The JSON store lives at `cms/.data/store.json` (git-ignored) and is seeded from `cms/fixtures/seed.json`.
@@ -243,7 +292,31 @@ unless the CMS is on localhost **and** not deployed (`VERCEL`/`NETLIFY` set) **a
 
 To see your local edits on the website: `node tools/build.mjs --content=local` from the repository root.
 
-### 5.2 Google Cloud and the spreadsheet
+### 5.2 Supabase (CMS content)
+
+1. **Project:** create a Supabase project owned by a Faith Works account (not a personal developer account). Use a separate project (or at least a separate database) for preview/staging.
+2. **Schema:** run the migration once. Either paste `cms/supabase/migrations/20261020000000_cms_content.sql` into *SQL Editor → New query → Run*, or with the Supabase CLI: `supabase link --project-ref <ref>` then `supabase db push` (run from `cms/`). It is idempotent.
+3. **Keys:** *Project Settings → API Keys*. Copy the project URL into `SUPABASE_URL` and a **secret** key (`sb_secret_…`, *Secret keys* section) into `SUPABASE_SECRET_KEY`, in the CMS host's environment only. The CMS refuses to start with a publishable/anon key. The legacy `SUPABASE_SERVICE_ROLE_KEY` (the `service_role` JWT) is still accepted while `SUPABASE_SECRET_KEY` is unset, so existing deployments keep working; when both are set, `SUPABASE_SECRET_KEY` wins. To migrate: set `SUPABASE_SECRET_KEY`, redeploy, confirm `/api/health` shows `"supabaseKey":"secret"`, then delete `SUPABASE_SERVICE_ROLE_KEY`. The public website needs no Supabase key at all.
+4. **Data API:** leave the Data API on (the CMS uses it with the secret key). The `cms_*` tables are closed to the public keys by the migration, so nothing is exposed.
+5. **Load the content** (every command only adds missing rows, never changes or deletes, and is safe to rerun):
+   ```bash
+   cd cms
+   npm run supabase:import -- --from-sheets --dry-run   # what would be copied from the Google Sheet
+   npm run supabase:import -- --from-sheets             # copy the CMS tabs of the Sheet (the Sheet is only read)
+   npm run supabase:seed                                # or: start from cms/fixtures/seed.json instead
+   npm run supabase:check                               # access, tables and row counts
+   ```
+   `supabase:import -- <backup.json>` loads a backup file instead. Imports keep ids, versions,
+   timestamps, publishing state and history, and verify every row afterwards.
+
+**Status of the existing spreadsheet (checked 20 Oct 2026, read only):** it held 4 programs, 4
+events, 9 resources, 8 testimonials, the Site settings row and its live copy, and no users, tags,
+history or audit rows. Every row was identical (same `write_id`) to `cms/fixtures/seed.json`,
+so there was no editorial content beyond the seed. Its `settings` tab is also missing the four
+newest columns (`booking_url`, `featured_video_*`), so `sheets:check` currently stops there; the
+import reads the sheet without that check, and the missing values are empty.
+
+### 5.3 Google Cloud: sign-in and the spreadsheet
 
 1. **Spreadsheet:** create a blank Google Sheet owned by a Faith Works Google account (not a personal developer account). Keep sharing *Restricted*; never "Anyone with the link". Copy its ID from the URL (`/d/<ID>/edit`).
 2. **Google Cloud project** (owned by the same organization): enable the **Google Sheets API**.
@@ -251,7 +324,7 @@ To see your local edits on the website: `node tools/build.mjs --content=local` f
 4. **Share the spreadsheet** with the service account's email as **Editor**, and with nobody else who does not need it.
 5. **OAuth client for sign-in:** *APIs & Services → OAuth consent screen* (Internal if you use Google Workspace, otherwise External with test users), then *Credentials → Create OAuth client ID → Web application*.
    Authorized redirect URI: `https://<cms-domain>/api/auth/google/callback` (and `http://localhost:5174/api/auth/google/callback` for local tests).
-6. Set the environment variables (section 6), then create the tabs and load the starting content:
+6. **Sheets integration (optional, kept):** set the `GOOGLE_SHEETS_*` / service-account variables only if a workflow uses the spreadsheet (or for `supabase:import -- --from-sheets`). These scripts maintain the CMS tabs of the sheet, which are no longer the content store:
    ```bash
    cd cms
    npm run sheets:setup    # creates tabs and header columns (never reorders or deletes)
@@ -260,14 +333,16 @@ To see your local edits on the website: `node tools/build.mjs --content=local` f
    npm run sheets:check    # access, headers and row counts
    ```
 
-### 5.3 Deploying the CMS
+### 5.4 Deploying the CMS
 
 **Vercel:** new project from this repository, Root Directory `cms`. `cms/vercel.json` sets the build, the `public/` output, the `/api` rewrite and security headers. Keep *Include files outside the Root Directory* enabled; the page preview imports the site templates from `../tools`.
 **Netlify:** new site from this repository, Base directory `cms` (build command `node scripts/build-static.mjs`, publish directory `cms/public`, functions directory `cms/netlify/functions`; `cms/netlify.toml` sets all three plus headers). Every `/api/*` request goes to the one function `netlify/functions/api.mjs`. Set the environment variables in the Netlify UI with a scope that includes **Functions** (variables in `netlify.toml` do not reach functions), and redeploy after changing them.
 
-Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Development, Preview and Production environment variables. Point Production at the production spreadsheet. Do not reuse the production spreadsheet for preview deployments.
+Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Development, Preview and Production environment variables. Point Production at the production Supabase project. Do not reuse the production database for preview deployments.
 
-### 5.4 Connecting the website
+**Netlify, when switching an existing CMS site to Supabase:** add `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (scope: Functions), set `CMS_STORE=supabase` or remove `CMS_STORE` (the hosted default is `supabase`; a leftover `CMS_STORE=sheets` keeps using Sheets), keep every Google variable, and redeploy. `/api/health` then shows `"store":"supabase"` and `"supabaseKey":"secret"`.
+
+### 5.5 Connecting the website
 
 | Setting (website project) | Value |
 | --- | --- |
@@ -287,19 +362,26 @@ so new content is usually live **within about 3 minutes** of *Publish*.
 ## 6. Environment variables (server-side only)
 
 See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to start without them):
-`CMS_STORE=sheets`, `GOOGLE_SHEETS_SPREADSHEET_ID`, the service-account credentials
-(`GOOGLE_SERVICE_ACCOUNT_EMAIL` + `GOOGLE_PRIVATE_KEY`, or `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`),
-`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `CMS_BASE_URL`, `CMS_SESSION_SECRET`
-(32+ random characters) and `CMS_SUPER_ADMINS`. Optional: `CMS_ALLOWED_EMAIL_DOMAINS`,
-`PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL`, `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`,
-`CMS_SESSION_HOURS`.
+
+| Purpose | Variables |
+| --- | --- |
+| CMS content (Supabase) | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (`sb_secret_…`; legacy `SUPABASE_SERVICE_ROLE_KEY` still read if unset); `CMS_STORE=supabase` (the hosted default) |
+| Sign-in (Google OAuth) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `CMS_BASE_URL` (callback `{CMS_BASE_URL}/api/auth/google/callback`) |
+| Session and access | `CMS_SESSION_SECRET` (32+ random characters), `CMS_SUPER_ADMINS`; optional `CMS_SESSION_HOURS`, `CMS_ALLOWED_EMAIL_DOMAINS` |
+
+Kept for the Google Sheets integration (required only with `CMS_STORE=sheets`, otherwise optional):
+`GOOGLE_SHEETS_SPREADSHEET_ID` and the service-account credentials (`GOOGLE_SERVICE_ACCOUNT_EMAIL` +
+`GOOGLE_PRIVATE_KEY`, or `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`). Optional website settings:
+`PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL`, `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
+
+The public website (Vercel) needs none of these; it only reads `/api/public/content` from the CMS.
 
 None of these is ever sent to the browser. `/api/session` exposes only non-secret settings.
 
 ## 7. Security
 
 - **Credentials:** only in the host's environment variables. `.env` files are git-ignored (`cms/.gitignore` and the repository `.gitignore`). Turn on GitHub *secret scanning* and *push protection* for the repository (Settings → Code security). Repository access does not grant spreadsheet access.
-- **If a secret leaks:** service-account key → delete the key in Google Cloud, create a new one, update the host env, redeploy. OAuth client secret → reset it in Google Cloud. `CMS_SESSION_SECRET` → change it (everyone is signed out). `CMS_PREVIEW_TOKEN` or a deploy hook → regenerate. Then check `audit_log` and the sheet's version history.
+- **If a secret leaks:** Supabase service-role/secret key → rotate it in *Project Settings → API Keys* (create a new secret key and delete the old one, or roll the JWT secret for legacy keys), update the host env, redeploy. Service-account key → delete the key in Google Cloud, create a new one, update the host env, redeploy. OAuth client secret → reset it in Google Cloud. `CMS_SESSION_SECRET` → change it (everyone is signed out). `CMS_PREVIEW_TOKEN` or a deploy hook → regenerate. Then check the audit log (`cms_audit_log`).
 - **API:** every protected route requires a session. State-changing requests need the `X-CMS-CSRF` header and a same-origin `Origin`, and cookies are `SameSite=Lax`. Inputs are validated on the server (types, URL schemes, slugs, lengths, references).
 - **Dashboard:** strict CSP (`script-src 'self'`), no inline scripts, `frame-ancestors 'none'`. All CMS data is rendered with DOM text APIs, never as HTML.
 - **Page HTML (stored XSS):** drafts keep exactly what was pasted. Editing previews run in sandboxed iframes without `allow-scripts` and with their own CSP, and active elements (scripts, meta, base, frames…) are replaced by inert placeholders while editing. Published HTML goes through the allowlist sanitizer on the server, and again in the website build. It removes scripts, event handlers, `javascript:`/`data:` URLs, forms and embeds from hosts that are not on the allowed list, and `<style>` cannot break out of its element. Page CSS is scoped to the page's content wrapper, so it cannot restyle the header, footer or other pages. The editor and preview list everything publishing will remove.
@@ -307,11 +389,12 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 
 ## 8. Reliability, quotas and caching
 
-- Google calls have an 8-second timeout. Reads and full-row writes retry 429, 5xx and network errors with exponential backoff and jitter, honouring `Retry-After`. Appends are never blindly retried: after a failure the tab is re-read, and the row is appended again only if it is missing (no duplicates).
+- **Supabase store:** every call has an 8-second timeout; reads and updates retry 429, 5xx and network errors with backoff (an update recognises its own earlier attempt by its `write_id`). Inserts and log entries are retried only after checking that the first attempt did not land, so there are no duplicates. A database failure is reported to the user ("The CMS database (Supabase) could not be reached…"); the CMS never falls back to Google Sheets or local data. Publishing still writes the live copy first and the record second (see below).
+- *The rest of this section describes the Google Sheets store (rollback only).* Google calls have an 8-second timeout. Reads and full-row writes retry 429, 5xx and network errors with exponential backoff and jitter, honouring `Retry-After`. Appends are never blindly retried: after a failure the tab is re-read, and the row is appended again only if it is missing (no duplicates).
 - A save is reported as successful only after the row is read back with its new `write_id`.
 - **Quotas:** Google Sheets allows about 300 read and 300 write requests per minute per project, and 60 per minute per user. All CMS traffic counts as one user, the service account. A save costs about 2 reads and 3 writes; a dashboard load costs 1 batched read. That is comfortable for a team of a few editors. On a rate limit, users see "Google Sheets is busy, wait a minute", and nothing is half-saved.
 - **No cross-tab transactions:** publishing writes the live copy first, then the record. If the second write fails, the item is live but flagged; *Finish publishing* (or *Recovery*) completes it. If the first write fails, nothing changed.
-- **Public cache:** 60 seconds in memory per server instance, plus a CDN copy (`s-maxage=60, stale-while-revalidate=600, stale-if-error=86400`). If Google is down, the last good snapshot is served with `x-content-stale: 1`. A failed edit is never shown as saved. The cache is not a backup.
+- **Public cache:** 60 seconds in memory per server instance, plus a CDN copy (`s-maxage=60, stale-while-revalidate=600, stale-if-error=86400`). If the database is down, the last good snapshot is served with `x-content-stale: 1`. A failed edit is never shown as saved. The cache is not a backup.
 - **Growth:** about 10 million cells per spreadsheet. `history` grows with every save, so archive old rows yearly (copy them to an archive spreadsheet, then delete them from `history`) once it passes about 20,000 rows.
 
 ## 9. Backup, recovery and rollback
@@ -319,16 +402,18 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 | Situation | What to do |
 | --- | --- |
 | Wrong edit | Open the item → **History** → *Restore this version* (it becomes a draft), then publish. |
-| Accidental delete | Super Admin → **Recovery and backup** → *Restore*. Deletes are soft; the row stays in the sheet. |
+| Accidental delete | Super Admin → **Recovery and backup** → *Restore*. Deletes are soft; the row stays in the database. |
 | Publish did not finish | Item banner or **Recovery** → *Finish publishing*. |
 | Bad content went live | *Unpublish* the item (it is removed at the next rebuild), or restore an earlier version and publish it. |
 | Sheet damaged by hand | Google Sheets *File → Version history* → restore a version from before the change. Then `npm run sheets:check`. |
-| Full restore | `npm run restore -- backups/<file>.json` into a **new, empty** spreadsheet (the script refuses to overwrite data). Share it with the service account, update `GOOGLE_SHEETS_SPREADSHEET_ID`, redeploy. |
+| Full restore (Supabase) | Supabase *Database → Backups* (daily on paid plans; point-in-time recovery if enabled), or `npm run supabase:import -- backups/<file>.json` into an empty project after running the migration. |
+| Full restore (Sheets store) | `npm run restore -- backups/<file>.json` into a **new, empty** spreadsheet (the script refuses to overwrite data). Share it with the service account, update `GOOGLE_SHEETS_SPREADSHEET_ID`, redeploy. |
 | Website deploy broke | Roll back to the previous deploy in Netlify/Vercel (*Deploys → Publish deploy* / *Promote to production*). The CMS is not affected. |
-| CMS deploy broke | Roll back the CMS project's deploy the same way. Content in the sheet is unaffected. |
+| CMS deploy broke | Roll back the CMS project's deploy the same way. Content in the database is unaffected. |
+| Roll back to the Sheets store | Only deliberately: `npm run supabase:backup`, set `CMS_STORE=sheets`, redeploy. Edits made in Supabase since the switch are **not** in the sheet; copy them by hand, or load the backup with `npm run restore` into a new, empty spreadsheet. |
 
-**Backups:** weekly, and before any bulk change: `npm run backup` (writes to `cms/backups/`,
-git-ignored) or *Recovery → Download a full backup*. Store backups privately. They contain
+**Backups:** weekly, and before any bulk change: `npm run supabase:backup` (writes to `cms/backups/`,
+git-ignored; `npm run backup` is the Sheets equivalent) or *Recovery → Download a full backup*. Store backups privately. They contain
 internal fields (owners, editors' emails and any retired consent notes). Google's own version history is a second line,
 not a replacement.
 
@@ -338,7 +423,9 @@ not a replacement.
 
 **Manual in Chrome (local JSON store):** the full editor test from the brief. Paste a page with CSS → preview → edit a heading in place → change a button's label and URL → delete an element → save → reopen with styling intact → HTML mode shows the updated markup → preview with the site templates → publish. The website build of the published view shows the edited content with scoped CSS and no script.
 
-**Not yet tested (needs real credentials or access):** calls against **real Google Sheets** (including `sheets:setup` and `sheets:seed`); real Google sign-in; a deployed Vercel/Netlify function (including the preview importing `../tools`); the deploy hook; GHL hosting. Run `npm run sheets:check` and the checklist in section 12 when credentials exist.
+**Supabase (20 Oct 2026).** `npm test` includes `test/supabase.test.mjs`: configuration (service-role key required, anon/publishable keys refused, Google settings still loaded), record ↔ row mapping, database-side conflict detection, duplicate-safe inserts after a dropped connection, retries and error reporting, insert-only imports, and a create → publish → unpublish → history → audit flow. Against a **real Postgres 16 + PostgREST** (a local Supabase-equivalent with the `anon`/`authenticated`/`service_role` roles and Supabase's default grants, in Docker): the migration applies and re-applies cleanly; anon and key-less requests are refused on every table; the service role cannot delete rows or change history/audit (triggers also stop the table owner); `test/api.test.mjs` and `test/pages.test.mjs` pass on the Supabase store (44 of 45; the other test reads the JSON file directly, and the same check was confirmed in SQL); `supabase:import -- --from-sheets` copied the real spreadsheet, a rerun added nothing, and all 27 records compared field by field were identical. To repeat: set `CMS_TEST_SUPABASE_URL`, `CMS_TEST_SUPABASE_KEY` and `CMS_TEST_SUPABASE_RESET` (see `test/helpers.mjs`; use a throwaway database) and run `node --test --test-concurrency=1 test/api.test.mjs test/pages.test.mjs`.
+
+**Not yet tested (needs real credentials or access):** a hosted **Supabase project** (no project or keys were available: the migration and adapter were verified on Postgres + PostgREST, not on supabase.co); writes to **real Google Sheets** (including `sheets:setup` and `sheets:seed`; reading it was verified); real Google sign-in; a deployed Vercel/Netlify function (including the preview importing `../tools`); the deploy hook; GHL hosting. Run `npm run sheets:check` and the checklist in section 12 when credentials exist.
 
 ## 11. GoHighLevel (GHL)
 
@@ -352,9 +439,9 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 
 ## 12. Go-live checklist (CMS)
 
-1. Sheet created, owned by Faith Works, shared only with the service account and the owner; tabs protected.
-2. `npm run sheets:setup`, `npm run sheets:seed`, `npm run sheets:check` pass against the production sheet.
-3. Hosted env vars set; `/api/health` shows `"configured": true`; dev login unavailable.
+1. Supabase project owned by Faith Works; migration run; `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (`sb_secret_…`) set only in the CMS host's environment; no `SUPABASE_SERVICE_ROLE_KEY` left behind.
+2. `npm run supabase:import -- --from-sheets` (or `supabase:seed`) and `npm run supabase:check` pass against the production project; the spreadsheet stays shared only with the service account and the owner.
+3. Hosted env vars set; `/api/health` shows `"store": "supabase"`, `"configured": true` and `"supabaseKey": "secret"`; dev login unavailable.
 4. First Super Admin signs in with Google; team added under *Users and roles*; a test Author can publish their own item but cannot edit another Author’s item or open Users and roles.
 5. Website project builds with `CONTENT_SOURCE=cms`; a test publish triggers the rebuild and appears within minutes; unpublish removes it.
 6. Secret scanning and push protection enabled; first backup taken and stored privately.

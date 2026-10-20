@@ -150,7 +150,7 @@ export async function usersView(app) {
 /* ---- Activity (Super Admin) ---- */
 export async function activityView() {
   const rows = await api("GET", "/api/audit");
-  return h("div", {}, pageHead("Activity log", "Who did what, and when. Kept in the audit_log tab of the spreadsheet."),
+  return h("div", {}, pageHead("Activity log", "Who did what, and when. Kept in the CMS audit log."),
     h("div", { class: "table-wrap" }, h("table", { class: "table" }, h("thead", {}, h("tr", {}, h("th", {}, "When"), h("th", {}, "Who"), h("th", {}, "Action"), h("th", {}, "Item"), h("th", {}, "Details"))),
       h("tbody", {}, rows.map((a) => h("tr", { style: "cursor:default" }, h("td", { class: "small" }, new Date(a.at).toLocaleString()), h("td", { class: "small" }, a.actor, h("div", { class: "muted" }, roleLabel(a.role))), h("td", { class: "small" }, actionLabel(a.action)),
         h("td", { class: "small" }, a.record_id && COLLECTIONS[a.collection] ? link(a.collection, a.record_id, `${COLLECTIONS[a.collection].singular} · ${a.record_id}`) : a.record_id || ""), h("td", { class: "small" }, a.version ? `v${a.version} ` : "", a.detail)))))));

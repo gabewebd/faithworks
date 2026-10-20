@@ -1,6 +1,8 @@
 // CMS configuration from environment variables (see cms/.env.example). Fails closed: on a
-// hosted deployment (Vercel/Netlify) every security-relevant setting must be present, the
-// Google Sheets store is mandatory and the development login cannot be switched on.
+// hosted deployment (Vercel/Netlify) every security-relevant setting must be present, content
+// is stored in Supabase (the source of truth for CMS content) and the development login cannot
+// be switched on. The Google Sheets settings are still read: the Sheets integration is kept for
+// other workflows and as an explicit rollback store (CMS_STORE=sheets), never as a fallback.
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { DEFAULT_IFRAME_HOSTS } from "../shared/sanitize-html.mjs";
@@ -13,7 +15,7 @@ export function loadConfig(env = process.env) {
   const hosted = !!(env.VERCEL || env.NETLIFY);
   const production = hosted || env.NODE_ENV === "production";
   const errors = [];
-  const store = (env.CMS_STORE || (hosted ? "sheets" : "json")).toLowerCase();
+  const store = (env.CMS_STORE || (hosted ? "supabase" : "json")).toLowerCase();
 
   // Private keys pasted into env UIs usually arrive with literal "\n".
   let privateKey = env.GOOGLE_PRIVATE_KEY ? env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n") : "";
@@ -26,11 +28,18 @@ export function loadConfig(env = process.env) {
     } catch { errors.push("GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 is not valid base64 JSON."); }
   }
 
+  // SUPABASE_SECRET_KEY (sb_secret_…) is the current name; SUPABASE_SERVICE_ROLE_KEY is still read
+  // for existing deployments and is ignored when both are set.
+  const supabaseKeyVar = env.SUPABASE_SECRET_KEY?.trim() || !env.SUPABASE_SERVICE_ROLE_KEY?.trim() ? "SUPABASE_SECRET_KEY" : "SUPABASE_SERVICE_ROLE_KEY";
+
   const cfg = {
     hosted, production, store,
     cmsRoot: CMS_ROOT,
     jsonPath: env.CMS_JSON_PATH || join(CMS_ROOT, ".data", "store.json"),
     seedPath: join(CMS_ROOT, "fixtures", "seed.json"),
+    supabaseUrl: (env.SUPABASE_URL || "").replace(/\/$/, ""),
+    supabaseKeyVar,
+    supabaseServiceKey: (env[supabaseKeyVar] || "").trim(),
     spreadsheetId: env.GOOGLE_SHEETS_SPREADSHEET_ID || "",
     clientEmail, privateKey,
     oauthClientId: env.GOOGLE_OAUTH_CLIENT_ID || "",
@@ -47,12 +56,17 @@ export function loadConfig(env = process.env) {
     iframeHosts: env.CMS_IFRAME_HOSTS ? list(env.CMS_IFRAME_HOSTS) : DEFAULT_IFRAME_HOSTS,
   };
 
-  if (!["json", "sheets"].includes(store)) errors.push(`CMS_STORE must be "sheets" or "json" (got "${store}").`);
+  if (!["supabase", "sheets", "json"].includes(store)) errors.push(`CMS_STORE must be "supabase", "sheets" or "json" (got "${store}").`);
+  if (store === "supabase") {
+    if (!/^https:\/\/|^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(cfg.supabaseUrl)) errors.push("SUPABASE_URL is required for the Supabase store (https://<project-ref>.supabase.co).");
+    const keyProblem = serviceKeyProblem(cfg.supabaseServiceKey, supabaseKeyVar);
+    if (keyProblem) errors.push(keyProblem);
+  }
   if (store === "sheets") {
     if (!cfg.spreadsheetId) errors.push("GOOGLE_SHEETS_SPREADSHEET_ID is required for the Google Sheets store.");
     if (!cfg.clientEmail || !cfg.privateKey) errors.push("Google service-account credentials are required (GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY, or GOOGLE_SERVICE_ACCOUNT_JSON_BASE64).");
   }
-  if (hosted && store !== "sheets") errors.push("Hosted deployments must use the Google Sheets store (CMS_STORE=sheets). The JSON store is for local development only.");
+  if (hosted && store === "json") errors.push("Hosted deployments must use the Supabase store (CMS_STORE=supabase). The JSON store is for local development only.");
   if (production || !cfg.devLogin) {
     if (cfg.sessionSecret.length < 32) errors.push("CMS_SESSION_SECRET must be at least 32 random characters.");
     if (!cfg.oauthClientId || !cfg.oauthClientSecret) errors.push("GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are required for sign-in.");
@@ -65,6 +79,24 @@ export function loadConfig(env = process.env) {
 
   cfg.errors = errors;
   return Object.freeze(cfg);
+}
+
+// The kind of Supabase key, never the key itself: "secret" (sb_secret_…), "service_role" (legacy
+// JWT), "publishable", another JWT role, or null when unset/unrecognised.
+export function supabaseKeyKind(key) {
+  if (!key) return null;
+  if (key.startsWith("sb_secret_")) return "secret";
+  if (key.startsWith("sb_publishable_")) return "publishable";
+  try { return JSON.parse(Buffer.from(key.split(".")[1], "base64url").toString("utf8")).role || null; } catch { return null; }
+}
+
+// The CMS needs a secret (or legacy service-role) key: the tables are closed to the public keys.
+function serviceKeyProblem(key, name) {
+  if (!key) return `${name} is required for the Supabase store: a secret key (sb_secret_…), server-side only; never expose it to a browser.`;
+  const kind = supabaseKeyKind(key);
+  if (kind === "secret" || kind === "service_role") return null;
+  if (kind === "publishable") return `${name} is a publishable key. Use a secret key (sb_secret_…).`;
+  return kind ? `${name} has the "${kind}" role. Use a secret key (sb_secret_…).` : `${name} is not a Supabase secret key (sb_secret_…) or legacy service-role key.`;
 }
 
 // Settings safe to show in the dashboard (no secrets).

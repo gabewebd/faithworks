@@ -2,7 +2,7 @@
 //
 // /api/public/content returns ONLY live content (the `published` tab), without hidden events and
 // testimonials: never drafts, internal fields or editors' emails (see shared/public.mjs). It is cached in memory
-// for CACHE_MS; if Google Sheets is unavailable the last good snapshot is served (marked
+// for CACHE_MS; if the database is unavailable the last good snapshot is served (marked
 // stale) rather than an error, and the CDN may serve its own copy (stale-if-error).
 // The public website itself is static: it only calls this endpoint while being built.
 import { buildSnapshot } from "../../shared/public.mjs";

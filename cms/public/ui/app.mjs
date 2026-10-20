@@ -79,7 +79,7 @@ function shell(content, active) {
   const sidebar = h("aside", { class: "sidebar", id: "sidebar" }, h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")), nav,
     h("div", { class: "me" }, h("b", {}, app.user.name), h("span", { class: "role" }, roleLabel(app.user.role)), h("div", { class: "small", style: "opacity:.7;overflow:hidden;text-overflow:ellipsis" }, app.user.email), logout));
   const topbar = h("div", { class: "topbar" }, h("button", { type: "button", "aria-controls": "sidebar", "aria-label": "Open menu", onclick: () => shellEl.classList.toggle("nav-open") }, icon("menu")), h("b", {}, "Faith Works CMS"));
-  const envNote = app.config.store === "json" ? h("div", { class: "env-note" }, "Development mode: content is saved to a local JSON file, not Google Sheets.") : null;
+  const envNote = app.config.store === "json" ? h("div", { class: "env-note" }, "Development mode: content is saved to a local JSON file, not the Supabase database.") : null;
   const shellEl = h("div", { class: "shell" }, sidebar, h("div", { class: "main" }, topbar, envNote, h("main", { class: "page", id: "page", tabindex: "-1" }, content)));
   return shellEl;
 }

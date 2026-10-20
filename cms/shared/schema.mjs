@@ -85,8 +85,8 @@ const PAGE = (label) => [
 
 // Card colours from the brand palette (css/style.css: .quote--…). Faith Pink is the default.
 export const CARD_TONES = [
-  { value: "pink", label: "Faith Pink", swatch: "#fbe3e9" }, { value: "yellow", label: "AI Yellow", swatch: "#fff1c2" },
-  { value: "stone", label: "Stone", swatch: "#eeeae5" }, { value: "ink", label: "Charcoal", swatch: "#1a1e24" },
+  { value: "pink", label: "Faith Pink", swatch: "#f7e5e6" }, { value: "yellow", label: "AI Yellow", swatch: "#faebc0" },
+  { value: "stone", label: "Works White", swatch: "#f1efeb" }, { value: "ink", label: "Soft Charcoal", swatch: "#1a1a1a" },
 ];
 // An event has its own page when the registration button goes to it, or when the author asks for one.
 export const eventHasPage = (r) => r?.registration_type === "page" || r?.event_page === true;
@@ -210,7 +210,7 @@ export const COLLECTIONS = {
   settings: {
     label: "Site settings", singular: "Site settings", prefix: "set", labelField: "brand", route: null, singleton: "site",
     description: "Logo, contacts, social links, global calls to action, footer, legal links and tracking IDs.",
-    groups: { main: "Brand and contact", social: "Social and community", cta: "Global call to action", footer: "Footer and legal", system: "Launch and tracking" },
+    groups: { main: "Brand and contact", social: "Social and community", cta: "Global call to action", media: "Homepage media", footer: "Footer and legal", system: "Launch and tracking" },
     fields: [
       f("brand", "Brand name", "text", { group: "main", required: true, max: 80 }),
       f("logo_url", "Logo URL", "url", { group: "main", image: true }),
@@ -223,6 +223,10 @@ export const COLLECTIONS = {
       f("community_url", "Community group URL", "url", { group: "social" }),
       f("primary_cta_label", "Header button label", "text", { group: "cta", max: 80 }),
       f("primary_cta_url", "Header button destination", "url", { group: "cta" }),
+      f("booking_url", "Booking link (Calendly)", "url", { group: "cta", help: "Your Calendly event link, e.g. https://calendly.com/your-name/discovery-call. Shows a 'Book a call' option on Contact and For Business. Leave empty to hide it." }),
+      f("featured_video_url", "Homepage video (YouTube or Vimeo link)", "url", { group: "media", help: "A real Faith Works video. It loads only when a visitor presses play. Leave empty to hide the video block." }),
+      f("featured_video_title", "Homepage video title", "text", { group: "media", max: 120 }),
+      f("featured_video_poster_url", "Homepage video cover image", "url", { group: "media", image: true, help: "Optional. A session photo works well. Defaults to a photo from a past session." }),
       f("footer_tagline", "Footer line", "text", { group: "footer", max: 160 }),
       f("footer_motto", "Footer tagline", "text", { group: "footer", max: 80 }),
       f("privacy_url", "Privacy Notice URL", "url", { group: "footer" }),

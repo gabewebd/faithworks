@@ -5,12 +5,13 @@
 // Every protected route resolves the signed-in user on the server and every service method
 // checks that user's role and the record's state. State-changing requests must also carry
 // the X-CMS-CSRF header and come from this origin (cookies are SameSite=Lax as well).
-import { loadConfig, publicConfig } from "./config.mjs";
+import { loadConfig, publicConfig, supabaseKeyKind } from "./config.mjs";
 import { securityHeaders } from "./security.mjs";
 import { HttpError, json, readJson, randomId } from "./http.mjs";
 import { createJsonStore } from "./store/json-store.mjs";
 import { createSheetsStore } from "./store/sheets-store.mjs";
 import { createSheetsApi } from "./store/sheets-api.mjs";
+import { createSupabaseStore } from "./store/supabase-store.mjs";
 import { createAuth } from "./auth.mjs";
 import { createLog } from "./services/log.mjs";
 import { createRecords } from "./services/records.mjs";
@@ -25,8 +26,9 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   const cfg = loadConfig(env);
   let store = injectedStore;
   if (!store && !cfg.errors.length) {
-    store = cfg.store === "sheets"
-      ? createSheetsStore(createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }))
+    // Supabase is the content store; Sheets only when explicitly chosen (rollback), JSON only locally.
+    store = cfg.store === "supabase" ? createSupabaseStore({ url: cfg.supabaseUrl, serviceKey: cfg.supabaseServiceKey, fetchImpl, log })
+      : cfg.store === "sheets" ? createSheetsStore(createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }))
       : createJsonStore({ path: cfg.jsonPath, seedPath: cfg.seedPath });
   }
   if (store) store = withMigrations(store); // records from earlier versions, converted on read
@@ -46,7 +48,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   };
 
   /* ---- Public (no session) ---- */
-  route("GET", "/api/health", async () => json({ ok: true, store: cfg.store, configured: !cfg.errors.length }), { auth: false });
+  route("GET", "/api/health", async () => json({ ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}) }), { auth: false });
   route("GET", "/api/public/content", async () => {
     const { snap, stale } = await pub.published();
     return json(snap, 200, {
