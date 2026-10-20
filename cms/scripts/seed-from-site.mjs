@@ -101,9 +101,9 @@ const guides = data("resources.json").resources.map((r, i) => {
 });
 
 /* ---- Testimonials ---- */
-// The card colours rotate as on the staging home page.
+// No card colours: the website picks them from the brand palette by position.
 const testimonials = data("success-stories.json").stories.map((s, i) => record("testimonials", {
-  quote: s.quote, display_name: s.name, tone: ["pink", "stone", "yellow"][i % 3], visible: true, sort_order: (i + 1) * 10,
+  quote: s.quote, display_name: s.name, role: "", visible: true, sort_order: (i + 1) * 10,
 }, { id: id("tst", s.id), status: "draft" }));
 
 /* ---- Site settings ---- */

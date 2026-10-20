@@ -243,21 +243,25 @@ test("slugs: format, duplicates and live slug changes", async () => {
   cleanup();
 });
 
-test("testimonials: quote, name, optional photo, card colour and a visibility switch", async () => {
+test("testimonials: quote, name, optional role and photo, and a visibility switch; no card colour", async () => {
   const { u, cleanup } = await setup();
-  const data = { quote: "It helped my whole team.", display_name: "Ana Cruz", tone: "yellow", visible: true };
+  const data = { quote: "It helped my whole team.", display_name: "Ana Cruz", role: "HR Manager", visible: true };
   let t = rec(await u.author.post("/api/records/testimonials", { data }));
   assert.equal(t.featured_image_url, "", "the photo is optional");
   assert.equal(t.status, "draft");
   for (const gone of ["consent_status", "display_approved", "attribution", "role_org", "kind", "body_html"]) assert.ok(!(gone in t), `no ${gone}`);
-  assert.equal((await u.author.post("/api/records/testimonials", { data: { ...data, tone: "neon" } })).status, 422, "only brand colours");
+  assert.ok(!("tone" in t), "card colours are not stored");
+  const coloured = rec(await u.author.post("/api/records/testimonials", { data: { ...data, tone: "neon" } }));
+  assert.ok(!("tone" in coloured), "a card colour sent by a client is dropped, not saved");
+  assert.equal((await u.author.post("/api/records/testimonials", { data: { ...data, role: "x".repeat(121) } })).status, 422, "role has a length limit");
   t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
   let pub = (await u.author.get("/api/public/content")).data.testimonials.find((x) => x.id === t.id);
-  assert.deepEqual([pub.quote, pub.display_name, pub.tone, pub.visible, pub.featured_image_url], ["It helped my whole team.", "Ana Cruz", "yellow", true, ""]);
+  assert.deepEqual([pub.quote, pub.display_name, pub.role, pub.visible, pub.featured_image_url], ["It helped my whole team.", "Ana Cruz", "HR Manager", true, ""]);
+  assert.ok(!("tone" in pub), "no card colour in the public content");
   assert.equal(pub.authors, undefined, "owners stay internal");
 
-  // Photo and colour change; hide it: still saved in the CMS, off the website
-  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: false } }));
+  // Photo and role change; hide it: still saved in the CMS, off the website
+  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, role: "", featured_image_url: "/assets/images/ana.jpg", visible: false } }));
   t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
   let content = (await u.author.get("/api/public/content")).data;
   assert.ok(!content.testimonials.some((x) => x.id === t.id), "hidden testimonials are not public");
@@ -265,11 +269,11 @@ test("testimonials: quote, name, optional photo, card colour and a visibility sw
   assert.ok(list.some((x) => x.id === t.id && x.live.hidden), "and listed as hidden in the CMS");
   assert.equal((await u.author.get("/api/dashboard")).data.counts.testimonials.hidden, 1);
   // Show it again
-  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: true } }));
+  t = rec(await u.author.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, role: "", featured_image_url: "/assets/images/ana.jpg", visible: true } }));
   t = rec(await u.author.post(`/api/records/testimonials/${t.id}/actions/publish`, { version: t.version }));
   content = (await u.author.get("/api/public/content")).data;
   pub = content.testimonials.find((x) => x.id === t.id);
-  assert.equal(pub.tone, "ink");
+  assert.equal(pub.role, "", "the role is optional");
   assert.equal(pub.featured_image_url, "/assets/images/ana.jpg");
   // Another author cannot hide it
   assert.equal((await u.author2.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, visible: false } })).status, 403);
@@ -431,7 +435,7 @@ test("records from the earlier workflow are read in the new model, without rewri
   assert.deepEqual([e2.status, e2.registration_type, e2.cta_label], ["draft", "none", ""], "the old notify form becomes no registration link");
   assert.deepEqual([e3.registration_type, e3.registration_url, e3.event_page], ["external", "/programs/ai-workforce-accelerator/", true], "a site path keeps its address; page content keeps the page");
   const t1 = (await get("testimonials", "tst_old1")).record, t2 = (await get("testimonials", "tst_old2")).record;
-  assert.deepEqual([t1.status, t1.tone, t1.visible], ["draft", "pink", false], "withdrawn consent stays hidden");
+  assert.deepEqual([t1.status, t1.visible], ["draft", false], "withdrawn consent stays hidden");
   assert.deepEqual([t2.status, t2.visible], ["draft", true]);
   assert.ok(!(await u.author.get("/api/public/content")).data.testimonials.length, "a live copy held back for consent stays off the website");
   const views = (await get("events", "evt_old1"));

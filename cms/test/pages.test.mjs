@@ -201,20 +201,39 @@ test("preview: the page follows Details, custom layouts drop the global chrome, 
   cleanup();
 });
 
-test("testimonial cards: the quote, the name, an optional round photo and the card colour", async () => {
+test("testimonial cards: the quote, the name and role, an optional round photo; colour from the palette", async () => {
   const { u, cleanup } = await setup();
   const t = seed.testimonials[0];
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  const plain = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, tone: "yellow", featured_image_url: "" } });
+  const plain = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, tone: "ink", role: "", featured_image_url: "" } });
   assert.equal(plain.status, 200);
   assert.ok(plain.data.html.includes(esc(t.quote)), "the quote as written");
-  assert.match(plain.data.html, /<figure class="quote quote--yellow">/);
+  assert.match(plain.data.html, /<figure class="quote quote--pink">/, "a stored or sent card colour is ignored");
   assert.match(plain.data.html, new RegExp(`<span class="quote__name">${esc(t.display_name)}</span>`));
   assert.ok(!plain.data.html.includes("quote__photo"), "no image element without a photo");
-  const photo = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, tone: "ink", featured_image_url: "/assets/images/ana.jpg", visible: false } });
-  assert.match(photo.data.html, /<figure class="quote quote--ink">/);
+  const photo = await u.author.post("/api/preview", { collection: "testimonials", id: t.id, data: { ...t, role: "HR & People", featured_image_url: "/assets/images/ana.jpg", visible: false } });
+  assert.match(photo.data.html, new RegExp(`<span class="quote__name">${esc(t.display_name)}</span><span class="quote__role">HR &amp; People</span>`), "the role below the name");
   assert.match(photo.data.html, /<img class="quote__photo" src="\/assets\/images\/ana\.jpg" alt=""/, "a round photo beside the name");
   cleanup();
+});
+
+test("home testimonial deck: brand colours by position, never charcoal; role below the name; a progress line", async () => {
+  const R = await import("../../tools/render.mjs");
+  const { toRenderData } = await import("../../tools/content.mjs");
+  const { buildSnapshot } = await import("../shared/public.mjs");
+  const base = { status: "draft", version: 1, visible: true };
+  const people = ["A", "B", "C", "D", "E", "F", "G"]; // 7: the last card sits beside the first
+  const records = { settings: seed.settings, testimonials: people.map((name, i) => ({ ...base, id: `t${i}`, display_name: name, quote: `Quote ${name}`, role: i === 0 ? "HR Manager" : "", sort_order: i, tone: "ink" })) };
+  R.init(toRenderData(buildSnapshot({ records, view: "preview" })));
+  const html = R.voices();
+  const tones = [...html.matchAll(/class="voice voice--(\w+)"/g)].map((m) => m[1]);
+  assert.deepEqual(tones, ["pink", "yellow", "white", "pink", "yellow", "white", "yellow"], "a stored colour is ignored");
+  tones.forEach((c, i) => assert.notEqual(c, tones[(i + 1) % tones.length], "neighbours differ, round the loop too"));
+  assert.match(html, /<b class="voice__name">A<\/b><span class="voice__role">HR Manager<\/span>/);
+  assert.match(html, /<b class="voice__name">B<\/b><span class="voice__role">Faith Works participant<\/span>/, "no role: the standard line");
+  assert.match(html, /class="voices__progress" aria-hidden="true"><span data-carousel-progress><\/span>/);
+  R.init(toRenderData(buildSnapshot({ records: { ...records, testimonials: records.testimonials.slice(0, 1) }, view: "preview" })));
+  assert.ok(!R.voices().includes("voices__progress"), "one card: no autoplay, so no line");
 });
 
 test("event cards: registration buttons follow the destination; no empty buttons", async () => {

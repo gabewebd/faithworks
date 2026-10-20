@@ -373,14 +373,14 @@
 
     <!-- PROOF: participants' own words (exactly as written), and recent sessions with their venues (CMS events) -->
     <section class="section proof" id="proof" aria-labelledby="proof-title">
-      <div class="wrap proof__grid">
-        <div class="proof__head" data-reveal>
-          <p class="eyebrow">In their words</p>
-          <h2 id="proof-title" data-split>Hands-on, even if<br>you’re not techy.</h2>
-          <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
-          {{sessionsRun:3}}
-        </div>
-        {{voices}}
+      <div class="wrap proof__head" data-reveal>
+        <p class="eyebrow">In their words</p>
+        <h2 id="proof-title" data-split>Hands-on, even if<br>you’re not techy.</h2>
+        <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
+      </div>
+      {{voices}}
+      <div class="wrap proof__sessions">
+        {{sessionsRun:3}}
       </div>
     </section>
 

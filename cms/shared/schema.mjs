@@ -83,11 +83,6 @@ const PAGE = (label) => [
   f("doc_version", "Page document version", "number", { hidden: true }),
 ];
 
-// Card colours from the brand palette (css/style.css: .quote--…). Faith Pink is the default.
-export const CARD_TONES = [
-  { value: "pink", label: "Faith Pink", swatch: "#f7e5e6" }, { value: "yellow", label: "AI Yellow", swatch: "#faebc0" },
-  { value: "stone", label: "Works White", swatch: "#f1efeb" }, { value: "ink", label: "Soft Charcoal", swatch: "#1a1a1a" },
-];
 // An event has its own page when the registration button goes to it, or when the author asks for one.
 export const eventHasPage = (r) => r?.registration_type === "page" || r?.event_page === true;
 
@@ -187,18 +182,20 @@ export const COLLECTIONS = {
   testimonials: {
     label: "Testimonials", singular: "Testimonial", prefix: "tst", labelField: "display_name", route: null,
     description: "Quotes from participants and clients. Published testimonials set to “Show on the website” appear on the home page.",
-    groups: { main: "Testimonial", look: "Card", visibility: "Visibility" },
+    groups: { main: "Testimonial", look: "Photo", visibility: "Visibility" },
     fields: [
       f("quote", "Testimonial", "textarea", { group: "main", required: true, max: 2000, rows: 5, help: "The quote or feedback, as the person gave it." }),
       f("display_name", "Person’s name", "text", { group: "main", required: true, max: 120 }),
+      f("role", "Role or title", "text", { group: "main", max: 120, help: "Optional. Shown below the name, e.g. HR Manager." }),
       f("featured_image_url", "Profile photo", "url", { group: "look", image: true, round: true, help: "Optional. A small round photo beside the name. Paste https://… or /assets/images/…" }),
-      f("tone", "Card colour", "select", { group: "look", required: true, widget: "swatches", options: CARD_TONES }),
       f("visible", "Show on the website", "boolean", { group: "visibility", help: "Turn off to hide it from the website. It stays saved here, so you can show it again later. Press Publish to apply the change." }),
       f("authors", "Authors", "authors", { hidden: true, public: false }),
       f("sort_order", "Display order", "number", { hidden: true }),
     ],
-    // Earlier versions: role line, kind, source and consent tracking, display approval and card templates.
+    // Earlier versions: role line, kind, source and consent tracking, display approval, card templates
+    // and the card colour (the website now picks card colours from the brand palette by position).
     retired: [
+      f("tone", "Card colour"),
       f("role_org", "Role or organization shown"), f("kind", "Kind"), f("attribution", "Attribution"), f("source", "Source"), f("source_ref", "Source link"),
       f("consent_status", "Consent"), f("consent_evidence", "Consent evidence", "textarea"), f("consent_date", "Consent date", "date"),
       f("display_approved", "Approved for display", "boolean"), f("featured_image_alt", "Photo description"),
@@ -317,7 +314,7 @@ export function blankRecord(collection) {
   if (collection === "events") { rec.time_zone = "Asia/Manila"; rec.registration_type = "none"; rec.visible = true; }
   if (collection === "programs") { rec.enrollment_status = "waitlist"; rec.tone = "stone"; }
   if (collection === "resources") { rec.resource_type = "article"; }
-  if (collection === "testimonials") { rec.tone = "pink"; rec.visible = true; }
+  if (collection === "testimonials") { rec.visible = true; }
   return rec;
 }
 
@@ -329,8 +326,9 @@ export function blankRecord(collection) {
 //                 website (a /path), becomes External link with the same address; the
 //                 "Get notified" form and No button become No registration link. Events with
 //                 page content keep their page (event_page). Shown on the website.
-//   testimonials  Faith Pink card. Shown, unless consent was declined or withdrawn or (live
-//                 copies) the website was holding the live copy back for missing consent.
+//   testimonials  from before "Show on the website" (no card colour, no role field): shown,
+//                 unless consent was declined or withdrawn or (live copies) the website was
+//                 holding the live copy back for missing consent.
 export function migrateRecord(collection, rec) {
   if (!rec || typeof rec !== "object") return rec;
   const out = { ...rec };
@@ -343,8 +341,8 @@ export function migrateRecord(collection, rec) {
     if (out.cta_type === "notify") out.cta_label = "";
     out.visible = true;
   }
-  if (collection === "testimonials" && !out.tone) {
-    out.tone = "pink";
+  // Every save since then stores `role` (even empty); copies saved while cards had a colour keep it
+  if (collection === "testimonials" && !out.tone && !("role" in out)) {
     out.visible = "consent_ok" in out ? out.consent_ok === true : !["declined", "withdrawn"].includes(out.consent_status);
   }
   return out;

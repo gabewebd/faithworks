@@ -325,58 +325,54 @@ export function resourcePage(r) {
 // A renderer with nothing to show returns this marker; tools/build.mjs then removes the
 // enclosing <section> so no empty heading is published (brief §2: hide empty sections).
 export const EMPTY_SECTION = "<!--fw:empty-section-->";
-// Published testimonials set to "Show on the website", each in its chosen card colour.
+// Card colours are a presentation rule, never stored in the CMS: cards take the brand colours in
+// turn by position, so neighbours always differ and every build gives the same result. In a loop
+// the last card also sits beside the first, so when the count would put two of the same colour
+// together there, the last card takes the middle colour instead.
+const toneAt = (tones, i, n) => (n > 1 && i === n - 1 && n % tones.length === 1 ? tones[1] : tones[i % tones.length]);
+
+// Published testimonials set to "Show on the website": Faith Pink, AI Yellow and Works White cards.
+const QUOTE_TONES = ["pink", "yellow", "stone"];
 export function testimonials(limit) {
   const pick = D.stories.filter((s) => s.quote && s.name).slice(0, Number(limit) || 3);
   if (!pick.length) return EMPTY_SECTION;
-  return `<div class="quotes">${pick.map((s) => `
-      ${storyCard(s)}`).join("")}
+  return `<div class="quotes">${pick.map((s, i) => `
+      ${storyCard(s, QUOTE_TONES[i % QUOTE_TONES.length])}`).join("")}
     </div>`;
 }
-const TONES = new Set(["pink", "yellow", "stone", "ink"]);
-export function storyCard(s) {
-  const tone = TONES.has(s.tone) ? s.tone : "pink";
+export function storyCard(s, tone = QUOTE_TONES[0]) {
   // The name is right beside the photo, so the photo itself needs no description (alt="").
   const photo = s.photo ? `<img class="quote__photo" src="${esc(s.photo)}" alt="" width="48" height="48" loading="lazy" decoding="async">` : "";
   return `<figure class="quote quote--${tone}">
         <blockquote><p>${esc(s.quote)}</p></blockquote>
-        <figcaption class="quote__by">${photo}<span class="quote__name">${esc(s.name)}</span></figcaption>
+        <figcaption class="quote__by">${photo}<span class="quote__who"><span class="quote__name">${esc(s.name)}</span>${s.role ? `<span class="quote__role">${esc(s.role)}</span>` : ""}</span></figcaption>
       </figure>`;
 }
 
-// Home: every published testimonial in a looping, stacked carousel (js/main.js §12). Without JS
-// the cards sit in a row you can scroll. The speaker is named exactly as given; "Faith Works
-// participant" is all that is claimed about them (they wrote it after a session).
-// Faith Pink is this section's one accent, so the stack alternates light pink and white cards
-// (both with Pink quote marks) whatever colour a story has elsewhere. No grey or charcoal slabs.
-const voiceTone = (i) => (i % 2 ? "white" : "pink");
-const initials = (name) => String(name || "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+// Home: every published testimonial as a looping deck of cards (js/main.js §12). The active card
+// sits upright in the centre; the others turn away behind it, smaller and softer, like cards being
+// dealt. It advances on its own at a relaxed pace, with a thin line under the deck filling up for
+// the time the card has left, and follows a swipe or drag; there are no arrows or dots. Without JS
+// the cards stay a native scroll-snap row. The speaker is named exactly as given, with the role
+// from the CMS below; without one, "Faith Works participant" is all that is claimed about them (they
+// wrote it after a session). No photos here: the quote is the picture.
+// Cards take Faith Pink, AI Yellow and Works White in turn (see toneAt above).
+const VOICE_TONES = ["pink", "yellow", "white"];
 export function voices() {
   const pick = D.stories.filter((s) => s.quote && s.name);
   if (!pick.length) return EMPTY_SECTION;
   const n = pick.length;
-  const slides = pick.map((s, i) => {
-    const tone = voiceTone(i);
-    const face = s.photo
-      ? `<img class="voice__photo" src="${esc(s.photo)}" alt="" width="44" height="44" loading="lazy" decoding="async">`
-      : `<span class="voice__initials" aria-hidden="true">${esc(initials(s.name))}</span>`;
-    return `
-        <figure class="voice voice--${tone}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${n}" data-pos="${i}">
-          <blockquote><p>${esc(s.quote)}</p></blockquote>
-          <figcaption>${face}<span><b class="voice__name">${esc(s.name)}</b><span class="voice__role">Faith Works participant</span></span></figcaption>
-        </figure>`;
-  }).join("");
-  const dots = pick.map((s, i) => `<button type="button" class="voices__dot" data-carousel-dot aria-current="${i === 0}" aria-label="Show testimonial ${i + 1}: ${esc(s.name)}"></button>`).join("");
-  return `<div class="voices" data-carousel role="region" aria-roledescription="carousel" aria-label="What participants said">
-      <div class="voices__stage">${slides}
-      </div>
-      <div class="voices__controls">
-        <button type="button" class="voices__btn" data-carousel-prev aria-label="Previous testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <div class="voices__dots">${dots}</div>
-        <button type="button" class="voices__btn" data-carousel-next aria-label="Next testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
-        <button type="button" class="voices__btn voices__btn--toggle" data-carousel-toggle aria-pressed="false" aria-label="Pause the testimonials"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
-      </div>
-      <p class="sr-only" aria-live="polite" data-carousel-live></p>
+  const slides = pick.map((s, i) => `
+          <figure class="voice voice--${toneAt(VOICE_TONES, i, n)}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${n}" data-slide>
+            <blockquote><p>${esc(s.quote)}</p></blockquote>
+            <figcaption><b class="voice__name">${esc(s.name)}</b><span class="voice__role">${esc(s.role || "Faith Works participant")}</span></figcaption>
+          </figure>`).join("");
+  const extras = n < 2 ? "" : `
+      <div class="voices__progress" aria-hidden="true"><span data-carousel-progress></span></div>
+      <p class="sr-only" aria-live="polite" aria-atomic="true" data-carousel-live></p>`;
+  return `<div class="voices${n < 2 ? " voices--single" : ""}" data-carousel role="region" aria-roledescription="carousel" aria-label="What participants said">
+      <div class="voices__track" id="voices-track" tabindex="0" role="group" aria-label="Testimonials. Use the left and right arrow keys to move.">${slides}
+      </div>${extras}
     </div>`;
 }
 

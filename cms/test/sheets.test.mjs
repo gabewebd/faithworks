@@ -221,7 +221,7 @@ test("new sheets get only the current columns; older sheets keep their retired c
   const { columnsFor } = await import("../shared/schema.mjs");
   for (const old of ["related_program_id", "cta_type", "event_status", "delivery_format", "approved_by", "review_note"]) assert.ok(!columnsFor("events").includes(old), `events: no ${old}`);
   for (const old of ["consent_status", "display_approved", "role_org", "kind", "attribution", "body_html"]) assert.ok(!columnsFor("testimonials").includes(old), `testimonials: no ${old}`);
-  assert.deepEqual(columnsFor("testimonials").slice(-7), ["quote", "display_name", "featured_image_url", "tone", "visible", "authors", "sort_order"]);
+  assert.deepEqual(columnsFor("testimonials").slice(-7), ["quote", "display_name", "role", "featured_image_url", "visible", "authors", "sort_order"]);
 
   // An older sheet: retired columns are still there, with values
   const g = fakeGoogle();

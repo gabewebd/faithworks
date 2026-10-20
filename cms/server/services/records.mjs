@@ -20,7 +20,7 @@ import { toPublic } from "../../shared/public.mjs";
 import { readingTime, bylineOf } from "../../shared/page-doc.mjs";
 import { HttpError, randomId, now } from "../http.mjs";
 
-const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "registration_type", "event_page", "visible", "tone", "featured_image_url", "display_name"];
+const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "registration_type", "event_page", "visible", "role", "featured_image_url", "display_name"];
 
 export function createRecords({ store, cfg, log, onPublicChange = async () => ({}) }) {
   const assertCollection = (c) => { if (!COLLECTIONS[c]) throw new HttpError(404, "Unknown content type.", "not_found"); };

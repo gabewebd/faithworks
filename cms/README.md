@@ -93,11 +93,15 @@ one click. Tags are separate.
 
 ### Testimonials
 
-Five things: the **testimonial** (the quote), the **person's name**, an optional **profile photo**
-(a small round image beside the name), a **card colour** from the brand palette (Faith Pink by
-default, AI Yellow, Stone, Charcoal) and **Show on the website**. No approval step. A card
-without a photo has no image element at all, and a photo that cannot load is removed in the browser.
-The home page shows published, visible testimonials in display order.
+Five things: the **testimonial** (the quote), the **person's name**, an optional **role or title**
+(shown below the name, e.g. *HR Manager*), an optional **profile photo** (a small round image
+beside the name) and **Show on the website**. No approval step. A card without a photo has no image
+element at all, and a photo that cannot load is removed in the browser.
+The home page shows published, visible testimonials in display order. Card colours are not stored:
+the website gives the cards Faith Pink, AI Yellow and Works White in turn by position, so
+neighbouring cards always differ. Older records may still hold a `tone` value; it is ignored, and
+`supabase/manual/20261020120000_testimonials_drop_card_colour.sql` removes it once approved (run
+by hand after a backup; it is not applied by `supabase db push`).
 
 ### Events
 
@@ -261,7 +265,7 @@ updated_at, updated_by, published_at, published_by, published_version, published
 previous_slugs, deleted_at, deleted_by`):
 
 - `events`: `title, summary, event_date, start_time, end_date, end_time, time_zone, venue, registration_type, registration_url, cta_label, event_page, featured_image_url, featured_image_alt, slug, seo_title, meta_description, social_image_url, body_html…body_html__6, body_css, body_css__2, page_layout, doc_version, visible, authors, byline, sort_order`
-- `testimonials`: `quote, display_name, featured_image_url, tone, visible, authors, sort_order`
+- `testimonials`: `quote, display_name, role, featured_image_url, visible, authors, sort_order` (an older sheet's `tone` column is kept but no longer used)
 - `programs`, `resources`, `settings`: unchanged by this version.
 
 Encoding: lists are one item per line; tags are comma-separated ids; agenda, FAQ and social links are JSON; booleans are `TRUE` or `FALSE`. Dates use ISO 8601 (`2026-10-20`, `2026-10-16T08:00:00Z`).
@@ -344,20 +348,35 @@ Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Developm
 
 ### 5.5 Connecting the website
 
+The website's root `vercel.json` sets the build: `node tools/build.mjs --deploy --content=cms
+--view=published --out=dist`, served from `dist/`. That folder holds only the generated pages, `css/`,
+`js/` and `assets/` (not `assets/data`); `cms/`, `src/`, `tools/` and `docs/` are never served.
+
 | Setting (website project) | Value |
 | --- | --- |
-| Build command | `node tools/build.mjs --deploy` |
-| `CONTENT_SOURCE` | `cms` |
-| `CMS_CONTENT_URL` | `https://cms.faithph.ai` |
-| `CMS_PREVIEW_TOKEN` | **staging site only:** builds drafts (requires `staging` on in Site settings) |
+| `CMS_CONTENT_URL` | `https://faithworks-cms.netlify.app` (the CMS address; required, the build stops without it) |
+| `CONTENT_SOURCE` | `cms` (optional: `vercel.json` already passes `--content=cms`) |
+| `CMS_PREVIEW_TOKEN` | **never on production.** Staging site only, with its own build command using `--view=preview` |
 
-In the CMS, set `PUBLIC_SITE_DEPLOY_HOOK_URL` to the website's build hook. Every publish,
-unpublish, archive or delete then starts a rebuild, and admins also get a *Rebuild website* button.
-**Timing:** the public endpoint caches for 60 seconds, and a static build takes about 1–2 minutes,
-so new content is usually live **within about 3 minutes** of *Publish*.
+The website project needs **no** Supabase, Google or CMS secrets.
 
-> Exclude `cms/` from the **website** deploy (it is source code and fixtures, not site pages). With a
-> publish directory or `.vercelignore`/Netlify settings, serve only the generated site files.
+**Failures:** if the CMS cannot be reached, answers an error, or has never published Site settings, the
+build stops with an error and Vercel keeps serving the previous deployment. A Vercel build never falls
+back to the fixtures (it refuses any source other than `cms`).
+
+**The CMS must be publicly reachable at `/api/public/content`.** Netlify *Visitor access* (password or
+team-login protection) blocks every request, including the website build's (HTTP 401). Set it to protect
+**non-production deploys only**, or turn it off. That is safe because the CMS protects itself: every
+route except `/api/health`, `/api/public/content`, `/api/session` and the Google sign-in routes needs a
+signed-in user on the CMS user list (there is a test for this), drafts need `CMS_PREVIEW_TOKEN`, and
+the dashboard page itself holds no data until you sign in.
+
+In the CMS, set `PUBLIC_SITE_DEPLOY_HOOK_URL` to the website's build hook (Vercel: *Settings → Git →
+Deploy Hooks*, branch `main`). Every publish, unpublish, archive or delete then starts a rebuild, admins
+also get a *Rebuild website* button, and `netlify/functions/daily-rebuild.mjs` rebuilds the site every
+day at 00:05 Manila time so that finished events move from *Upcoming* to *Past* without an edit.
+**Timing:** the public endpoint is not cached by the CDN (at most 10 seconds in memory), and a static
+build takes about 1–2 minutes, so new content is usually live **within about 2 minutes** of *Publish*.
 
 ## 6. Environment variables (server-side only)
 
@@ -372,9 +391,10 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 Kept for the Google Sheets integration (required only with `CMS_STORE=sheets`, otherwise optional):
 `GOOGLE_SHEETS_SPREADSHEET_ID` and the service-account credentials (`GOOGLE_SERVICE_ACCOUNT_EMAIL` +
 `GOOGLE_PRIVATE_KEY`, or `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`). Optional website settings:
-`PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL`, `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
+`PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild), `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
 
-The public website (Vercel) needs none of these; it only reads `/api/public/content` from the CMS.
+The public website (Vercel) needs none of these; it only reads `/api/public/content` from the CMS
+(its one setting is `CMS_CONTENT_URL`, see §5.5).
 
 None of these is ever sent to the browser. `/api/session` exposes only non-secret settings.
 
@@ -394,7 +414,7 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 - A save is reported as successful only after the row is read back with its new `write_id`.
 - **Quotas:** Google Sheets allows about 300 read and 300 write requests per minute per project, and 60 per minute per user. All CMS traffic counts as one user, the service account. A save costs about 2 reads and 3 writes; a dashboard load costs 1 batched read. That is comfortable for a team of a few editors. On a rate limit, users see "Google Sheets is busy, wait a minute", and nothing is half-saved.
 - **No cross-tab transactions:** publishing writes the live copy first, then the record. If the second write fails, the item is live but flagged; *Finish publishing* (or *Recovery*) completes it. If the first write fails, nothing changed.
-- **Public cache:** 60 seconds in memory per server instance, plus a CDN copy (`s-maxage=60, stale-while-revalidate=600, stale-if-error=86400`). If the database is down, the last good snapshot is served with `x-content-stale: 1`. A failed edit is never shown as saved. The cache is not a backup.
+- **Public cache:** 10 seconds in memory per server instance and `cache-control: no-store` (no CDN copy), so a build started by *Publish* always reads the new content. If the database is down, an instance that has a snapshot serves it with `x-content-stale: 1` (the website build logs a warning). A failed edit is never shown as saved. The cache is not a backup.
 - **Growth:** about 10 million cells per spreadsheet. `history` grows with every save, so archive old rows yearly (copy them to an archive spreadsheet, then delete them from `history`) once it passes about 20,000 rows.
 
 ## 9. Backup, recovery and rollback

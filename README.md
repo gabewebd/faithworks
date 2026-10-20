@@ -9,8 +9,9 @@ Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 
 Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
 that the header, footer and repeated content (programs, events, articles) come from one place.
 
-**Content is managed in the Faith Works CMS** (`cms/`, a separate app backed by Google Sheets; see
-[`cms/README.md`](cms/README.md)). The website stays static: it reads CMS content only while it is built.
+**Content is managed in the Faith Works CMS** (`cms/`, a separate app backed by Supabase, with the
+Google Sheets integration kept; see [`cms/README.md`](cms/README.md)). The website stays static: it
+reads CMS content only while it is built.
 
 ## Run it locally
 
@@ -32,6 +33,12 @@ For production on a host that serves this folder at the domain root, build with 
 ```bash
 node tools/build.mjs --deploy                # root-relative links: /learn/, /css/style.css
 ```
+
+**Vercel (production):** `vercel.json` runs `node tools/build.mjs --deploy --content=cms --view=published
+--out=dist` and serves `dist/`, which holds only the generated pages, `css/`, `js/` and `assets/`
+(never `cms/`, `src/`, `tools/` or `docs/`). Set `CMS_CONTENT_URL=https://faithworks-cms.netlify.app` in
+the Vercel project. If the CMS cannot be reached the build fails and Vercel keeps the previous deployment;
+it never falls back to the fixtures. See `cms/README.md` §5.5.
 
 ## Where things live
 

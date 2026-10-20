@@ -2,7 +2,7 @@
 // know where it is stored. Two sources, one shape:
 //
 //   fixtures  cms/fixtures/seed.json (default; or cms/.data/store.json with --content=local)
-//   cms       the CMS public endpoint (Google Sheets behind it): CMS_CONTENT_URL
+//   cms       the CMS public endpoint (Supabase behind it): CMS_CONTENT_URL
 //
 // and two views:
 //
@@ -33,6 +33,9 @@ async function fetchSnapshot(view) {
     try {
       const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
       if (!res.ok) throw new Error(`${url} answered HTTP ${res.status}`);
+      // The CMS serves its last good snapshot when the database is unreachable: still published
+      // content, but possibly missing the newest changes.
+      if (res.headers.get("x-content-stale")) console.warn("WARNING: the CMS database was unreachable; the CMS served its last good snapshot. Newer changes may be missing.");
       return await res.json();
     } catch (e) {
       lastError = e;
@@ -150,9 +153,10 @@ export function toRenderData(snap) {
     };
   });
 
-  // Testimonials: the quote, the name, an optional round photo and the card colour.
+  // Testimonials: the quote, the name, an optional role and round photo. Card colours are not
+  // content: tools/render.mjs picks them from the brand palette by position.
   const stories = snap.testimonials.map((t) => ({
-    id: t.id, name: t.display_name, quote: t.quote, photo: nz(t.featured_image_url), tone: t.tone || "pink",
+    id: t.id, name: t.display_name, role: nz(t.role), quote: t.quote, photo: nz(t.featured_image_url),
   }));
 
   const s = snap.settings;

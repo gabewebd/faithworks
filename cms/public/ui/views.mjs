@@ -1,6 +1,6 @@
 // Dashboard, content lists and admin screens (tags, users, activity, recovery).
 import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, roleLabel, icon } from "./dom.mjs";
-import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin, CARD_TONES } from "/shared/schema.mjs";
+import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin } from "/shared/schema.mjs";
 import { assetUrl } from "./fields.mjs";
 import { historyKind } from "./editor.mjs";
 
@@ -73,10 +73,11 @@ export async function listView(app, { collection }) {
         : h("div", { class: "card empty" }, h("h3", {}, q.value || status.get() || tag.get() ? "Nothing matches these filters" : `No ${C.label.toLowerCase()} yet`), h("p", {}, q.value || status.get() || tag.get() ? "Try clearing the search or filters." : `Create the first ${C.singular.toLowerCase()} with the New button.`)));
     } catch (e) { clear(body, h("div", { class: "alert alert--error" }, h("div", {}, errorText(e)))); }
   }
-  // Testimonials: the photo (or the card colour) beside the name. Events: the date.
+  // Testimonials: the photo (or a plain Faith Pink disc) beside the name, and the role under it.
+  // Events: the date. Card colours are not stored: the website picks them by position.
   function thumb(r) {
     if (collection !== "testimonials") return null;
-    const swatch = CARD_TONES.find((t) => t.value === r.tone)?.swatch || CARD_TONES[0].swatch;
+    const swatch = "#f7e5e6";
     const url = assetUrl(r.featured_image_url, app.config);
     if (!url) return h("span", { class: "thumb", style: `background:${swatch}`, "aria-hidden": "true" });
     const im = h("img", { class: "thumb", src: url, alt: "" });
@@ -84,6 +85,7 @@ export async function listView(app, { collection }) {
     return im;
   }
   function subline(r) {
+    if (collection === "testimonials") return r.role ? h("small", {}, r.role) : null;
     if (collection === "events") return h("small", {}, r.event_date || "No date yet", r.event_page || r.registration_type === "page" ? ` · page ${C.route.replace("{slug}", r.slug)}` : "");
     return r.slug ? h("small", {}, C.route ? C.route.replace("{slug}", r.slug) : r.slug) : null;
   }

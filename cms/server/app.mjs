@@ -51,8 +51,10 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("GET", "/api/health", async () => json({ ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}) }), { auth: false });
   route("GET", "/api/public/content", async () => {
     const { snap, stale } = await pub.published();
+    // Not cached by the CDN: a publish starts a website build at once, and that build must read
+    // the new content, not a CDN copy from before the publish. (services/public.mjs caches briefly.)
     return json(snap, 200, {
-      "cache-control": "public, max-age=0, s-maxage=60, stale-while-revalidate=600, stale-if-error=86400",
+      "cache-control": "no-store",
       "access-control-allow-origin": "*", ...(stale ? { "x-content-stale": "1" } : {}),
     });
   }, { auth: false });

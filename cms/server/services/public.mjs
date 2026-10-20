@@ -3,12 +3,14 @@
 // /api/public/content returns ONLY live content (the `published` tab), without hidden events and
 // testimonials: never drafts, internal fields or editors' emails (see shared/public.mjs). It is cached in memory
 // for CACHE_MS; if the database is unavailable the last good snapshot is served (marked
-// stale) rather than an error, and the CDN may serve its own copy (stale-if-error).
+// stale) rather than an error. The CDN does not cache it (see app.mjs).
 // The public website itself is static: it only calls this endpoint while being built.
 import { buildSnapshot } from "../../shared/public.mjs";
 import { HttpError } from "../http.mjs";
 
-const CACHE_MS = 60_000;
+// Short, because each server instance has its own copy and only the instance that handled a
+// publish clears it: the website build that the publish starts must not read an older copy.
+const CACHE_MS = 10_000;
 
 export function createPublic({ store, cfg, log = console, fetchImpl = globalThis.fetch }) {
   let cached = null; // { at, snap }
