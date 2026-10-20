@@ -42,13 +42,13 @@ const pageFrame = (item) => ({ chrome: item.doc.layout !== "custom" });
 const ctaFor = (p) => programCtaLabel(p.rec);
 
 // Home: the open-track programs as static horizontal cards, each on its own filled surface
-// (Charcoal, Faith Pink, AI Yellow) with a cover plate in a contrasting brand colour. Each cover
+// (White outlined in Charcoal, Faith Pink, AI Yellow) with a cover plate in a contrasting brand colour. Each cover
 // is drawn for its program: what a learner builds, as one composed picture. The caption on the
 // plate names those steps in plain words.
 const PROGRAM_COVER = {
   // One task picked from the pile, designed into an AI-assisted workflow, then tested and refined
   "ai-workforce-accelerator": {
-    tone: "ink", steps: "Map · Design · Prototype",
+    tone: "white", steps: "Map · Design · Prototype",
     svg: `<rect class="pc__ln" x="20" y="54" width="96" height="22" rx="6"/><path class="pc__ln pc__soft" d="M31 65 H74"/>
       <rect class="pc__ink" x="20" y="86" width="96" height="22" rx="6"/><path class="pc__ln pc__ln--on" d="M31 97 H70"/><circle class="pc__yel" cx="103" cy="97" r="5"/>
       <rect class="pc__ln" x="20" y="118" width="96" height="22" rx="6"/><path class="pc__ln pc__soft" d="M31 129 H80"/>
@@ -341,6 +341,140 @@ export function storyCard(s) {
   return `<figure class="quote quote--${tone}">
         <blockquote><p>${esc(s.quote)}</p></blockquote>
         <figcaption class="quote__by">${photo}<span class="quote__name">${esc(s.name)}</span></figcaption>
+      </figure>`;
+}
+
+// Home: every published testimonial in a looping, stacked carousel (js/main.js §12). Without JS
+// the cards sit in a row you can scroll. The speaker is named exactly as given; "Faith Works
+// participant" is all that is claimed about them (they wrote it after a session).
+// Faith Pink is this section's one accent, so the stack alternates light pink and white cards
+// (both with Pink quote marks) whatever colour a story has elsewhere. No grey or charcoal slabs.
+const voiceTone = (i) => (i % 2 ? "white" : "pink");
+const initials = (name) => String(name || "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+export function voices() {
+  const pick = D.stories.filter((s) => s.quote && s.name);
+  if (!pick.length) return EMPTY_SECTION;
+  const n = pick.length;
+  const slides = pick.map((s, i) => {
+    const tone = voiceTone(i);
+    const face = s.photo
+      ? `<img class="voice__photo" src="${esc(s.photo)}" alt="" width="44" height="44" loading="lazy" decoding="async">`
+      : `<span class="voice__initials" aria-hidden="true">${esc(initials(s.name))}</span>`;
+    return `
+        <figure class="voice voice--${tone}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${n}" data-pos="${i}">
+          <blockquote><p>${esc(s.quote)}</p></blockquote>
+          <figcaption>${face}<span><b class="voice__name">${esc(s.name)}</b><span class="voice__role">Faith Works participant</span></span></figcaption>
+        </figure>`;
+  }).join("");
+  const dots = pick.map((s, i) => `<button type="button" class="voices__dot" data-carousel-dot aria-current="${i === 0}" aria-label="Show testimonial ${i + 1}: ${esc(s.name)}"></button>`).join("");
+  return `<div class="voices" data-carousel role="region" aria-roledescription="carousel" aria-label="What participants said">
+      <div class="voices__stage">${slides}
+      </div>
+      <div class="voices__controls">
+        <button type="button" class="voices__btn" data-carousel-prev aria-label="Previous testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="voices__dots">${dots}</div>
+        <button type="button" class="voices__btn" data-carousel-next aria-label="Next testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button type="button" class="voices__btn voices__btn--toggle" data-carousel-toggle aria-pressed="false" aria-label="Pause the testimonials"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
+      </div>
+      <p class="sr-only" aria-live="polite" data-carousel-live></p>
+    </div>`;
+}
+
+// Where Faith Works has taught: past events that name a venue, newest first, straight from the
+// CMS (so a session appears here once it is published there). Only what the record says: the
+// session, the date and the place. Hidden when there are none.
+export function sessionsRun(limit) {
+  const past = D.events.filter((e) => isPast(e) && e.venue && e.date).sort((a, b) => byStart(b, a)).slice(0, Number(limit) || 4);
+  if (!past.length) return "";
+  return `<div class="sessions"><p class="sessions__label" id="sessions-label">Recent sessions</p><ul class="sessions__list" aria-labelledby="sessions-label">${past.map((e) => `
+        <li class="sessions__item">
+          <time datetime="${e.date}">${fmt(eventDate(e), { day: "numeric", month: "short", year: "numeric" })}</time>
+          <b>${esc(e.title)}</b>
+          <span>${esc(e.venue)}</span>
+        </li>`).join("")}
+      </ul></div>`;
+}
+
+// The homepage video: a real Faith Works video set in Site settings (YouTube or Vimeo). It shows
+// as a still with a play button and loads the privacy-friendly player only on press
+// (js/main.js §13). No video set: the section is removed, never a placeholder.
+export function videoEmbedUrl(raw) {
+  let u;
+  try { u = new URL(raw); } catch { return null; }
+  const host = u.hostname.replace(/^www\./, "");
+  let id = null;
+  if (host === "youtu.be") id = u.pathname.slice(1);
+  else if (/^(m\.)?youtube(-nocookie)?\.com$/.test(host)) id = u.searchParams.get("v") || (u.pathname.match(/\/(embed|shorts|live)\/([\w-]{6,})/) || [])[2];
+  if (id && /^[\w-]{6,20}$/.test(id)) return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+  if (host === "vimeo.com" || host === "player.vimeo.com") {
+    const m = u.pathname.match(/(\d{6,})(?:\/([0-9a-f]{6,}))?/);
+    if (m) return `https://player.vimeo.com/video/${m[1]}?autoplay=1&dnt=1${m[2] ? `&h=${m[2]}` : ""}`;
+  }
+  return null;
+}
+export function featuredVideo() {
+  const v = D.site.video;
+  const src = v && videoEmbedUrl(v.url);
+  if (!src) return EMPTY_SECTION;
+  const title = v.title || "Faith Works in action";
+  const poster = v.poster || "/assets/images/masterclass-room-960.webp";
+  return `<div class="video" data-reveal>
+        <button type="button" class="video__play" data-video-embed="${esc(src)}" data-video-title="${esc(title)}">
+          <img src="${esc(poster)}" alt="" loading="lazy" decoding="async">
+          <span class="video__badge"><span class="video__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span>Play video<span class="sr-only">: ${esc(title)}</span></span></span>
+        </button>
+        <p class="video__note">Plays from ${/vimeo/.test(src) ? "Vimeo" : "YouTube"} when you press play.</p>
+      </div>`;
+}
+
+// "Book a call" (Calendly). Only when Site settings has a booking link. A Calendly link opens the
+// scheduler in a dialog, loaded on demand (js/main.js §13); any other link opens in a new tab.
+// The form beside it stays the main way to reach us.
+let bookingDialogs = 0;
+export function bookingCall(context) {
+  const url = D.site.bookingUrl;
+  if (!url) return "";
+  let u;
+  try { u = new URL(url); } catch { return ""; }
+  const label = context === "business" ? "Prefer to talk first? Book a discovery call" : "Prefer to talk? Book a call";
+  if (!/(^|\.)calendly\.com$/.test(u.hostname)) {
+    return `<p class="booking"><a class="text-link" href="${esc(url)}" target="_blank" rel="noopener" data-track="booking_open">${label} <span class="link-arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a></p>`;
+  }
+  const id = `booking-${++bookingDialogs}`;
+  u.searchParams.set("embed_type", "Inline");
+  u.searchParams.set("hide_gdpr_banner", "1");
+  return `<div class="booking">
+        <a class="btn btn--light booking__open" href="${esc(url)}" target="_blank" rel="noopener" data-booking="${esc(u.toString())}" aria-controls="${id}" aria-haspopup="dialog">${label} <span class="btn__arrow" aria-hidden="true">↗</span></a>
+        <p class="booking__note">Scheduling is handled by Calendly. Read our <a class="inline" href="${esc(D.site.privacyUrl || "/privacy/")}">Privacy Notice</a>.</p>
+        <dialog class="booking__dialog" id="${id}" aria-label="Book a call">
+          <div class="booking__head"><p>Book a call</p><button type="button" class="booking__close" data-booking-close aria-label="Close">×</button></div>
+          <div class="booking__slot" data-booking-slot></div>
+        </dialog>
+      </div>`;
+}
+
+// AI agents, coordinated: one process in the middle, the agents that each take one part of it,
+// and the person who approves before anything goes out. Static SVG + CSS; signals travel the
+// wires only with motion allowed. `variant` "faith-ai" uses the Build page's own examples.
+export function agentNetwork(variant) {
+  const nodes = variant === "faith-ai"
+    ? [["Inquiry tracking", "Logs each new lead", "a"], ["Follow-up", "Drafts the next message", "b"], ["Internal answers", "Finds it in your notes", "c"]]
+    : [["Research", "Gathers approved sources", "a"], ["Draft", "Writes a first version", "b"], ["Follow-up", "Prepares the next step", "c"]];
+  const hub = variant === "faith-ai" ? "Your business process" : "Your workflow";
+  const wires = ["M300 180 C 230 180, 200 64, 128 64", "M300 180 H128", "M300 180 C 230 180, 200 296, 128 296"];
+  return `<figure class="agents" data-reveal>
+        <div class="agents__canvas" role="img" aria-label="Diagram: ${esc(hub)} in the centre coordinates three AI agents (${nodes.map((n) => esc(n[0])).join(", ")}). Their work meets at a human review step before anything is sent.">
+          <svg class="agents__wires" viewBox="0 0 600 360" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            ${wires.map((d) => `<path class="agents__wire" d="${d}"/>`).join("")}
+            <path class="agents__wire agents__wire--out" d="M300 180 H472"/>
+            ${wires.map((d, i) => `<circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="${(i * 1.2).toFixed(1)}s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="${d}"/></circle>`).join("")}
+            <circle class="agents__signal agents__signal--out" r="4.5"><animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" path="M300 180 H472"/></circle>
+          </svg>
+          ${nodes.map(([name, job, tone], i) => `<div class="agents__node agents__node--${tone}" style="--n:${i}"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>${esc(name)}</b><small>${esc(job)}</small></span></div>`).join("\n          ")}
+          <div class="agents__hub"><span class="agents__pulse" aria-hidden="true"></span><small>Coordinates</small><b>${esc(hub)}</b></div>
+          <div class="agents__human"><span class="agents__seal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5 10 17.5 19 7"/></svg></span><span class="agents__txt"><b>You approve</b><small>before anything is sent</small></span></div>
+        </div>
+        <figcaption class="agents__cap">Illustrative. Each agent takes one part of the work; a person stays in charge of the result.</figcaption>
       </figure>`;
 }
 

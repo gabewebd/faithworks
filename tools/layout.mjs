@@ -14,7 +14,7 @@ const NAV = [
   ["about", "/about/", "About"],
 ];
 
-const VERSION = "14";
+const VERSION = "15";
 
 // Site settings come from the CMS (tools/content.mjs). Each has a default equal to the
 // approved copy, so an unset value never blanks the header or footer.
@@ -45,7 +45,7 @@ function head({ title, description, path, site, image, noindex }) {
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
   ${site.staging || noindex ? '<meta name="robots" content="noindex,nofollow">\n  ' : ""}<link rel="canonical" href="${esc(canonical)}">
-  <meta name="theme-color" content="#1A1E24">
+  <meta name="theme-color" content="#1A1A1A">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Faith Works PH">
   <meta property="og:title" content="${esc(title)}">
@@ -55,7 +55,7 @@ function head({ title, description, path, site, image, noindex }) {
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="/css/style.css?v=${VERSION}">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */

@@ -8,7 +8,7 @@
   <meta name="description" content="Stop collecting AI tools. Start with one useful workflow. Get the free Faith Works AI Workflow Starter Kit: choose a task, organize your inputs and plan a first version you can test.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="canonical" href="https://faithph.ai/free-ai-starter-kit/">
-  <meta name="theme-color" content="#1A1E24">
+  <meta name="theme-color" content="#1A1A1A">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Faith Works PH">
   <meta property="og:title" content="Free AI Workflow Starter Kit · Faith Works">
@@ -18,8 +18,8 @@
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="../css/style.css?v=14">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="../css/style.css?v=15">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -29,9 +29,9 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="../js/config.js?v=14" defer></script>
-  <script src="../js/main.js?v=14" defer></script>
-  <script src="../js/forms.js?v=14" defer></script>
+  <script src="../js/config.js?v=15" defer></script>
+  <script src="../js/main.js?v=15" defer></script>
+  <script src="../js/forms.js?v=15" defer></script>
 </head>
 <body class="page-campaign" data-page="/free-ai-starter-kit/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -46,7 +46,7 @@
       <div class="wrap kit-hero__grid">
         <div class="kit-hero__copy">
           <div class="notice notice--draft" role="note"><strong>Kit in production.</strong> This page shows the planned kit. It must not receive public traffic until the final kit, Privacy Notice and delivery email are ready.</div>
-          <p class="kit-hero__eyebrow">Free practical guide for nontechnical founders and professionals</p>
+          <p class="kit-hero__eyebrow">Free practical guide for non-technical founders and professionals</p>
           <h1 id="kit-title">Stop collecting AI tools. Start with one useful workflow.</h1>
           <p class="phero__lead">Get the Faith Works AI Workflow Starter Kit to choose a recurring task, organize your inputs, and plan a first version you can test, with a person reviewing the result.</p>
           <ul class="ticks kit-hero__benefits">
@@ -55,6 +55,15 @@
             <li>Adapt a reusable prompt starter and explore three worked examples.</li>
             <li>Plan a small test before applying the workflow more widely.</li>
           </ul>
+          <!-- Privacy, stated on the page before the form (same wording as the form and its consent box) -->
+          <aside class="kit-privacy" aria-labelledby="kit-privacy-title">
+            <span class="kit-privacy__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></span>
+            <div>
+              <h2 id="kit-privacy-title">Your privacy</h2>
+              <p>We will use your details to deliver the kit you requested. Marketing emails are optional: you get them only if you tick the updates box, and you can unsubscribe anytime.</p>
+              <a class="text-link" href="../privacy/index.html">Read our Privacy Notice <span class="link-arrow" aria-hidden="true">↗</span></a>
+            </div>
+          </aside>
         </div>
 
         <div class="kit-card" id="get-the-kit">
@@ -70,13 +79,13 @@
       <button class="btn btn--full form__submit" type="submit"><span class="form__label">Send Me the Free Starter Kit</span><span class="btn__arrow" aria-hidden="true">↗</span></button>
       <div class="form__status" role="status" aria-live="polite"></div>
     </form>
-          <p class="kit-card__reassure">Free download. No card required. Designed for nontechnical learners.</p>
+          <p class="kit-card__reassure">Free download. No card required. Designed for non-technical learners.</p>
         </div>
 
         <!-- Kit preview, built from the planned contents (brief §11). Replace with real cover and sample-page images when the PDF is final. -->
         <div class="kit-preview" data-ui role="img" aria-label="Preview of the planned kit: a yellow cover titled AI Workflow Starter Kit, and a task selector worksheet comparing three recurring tasks by frequency, effort, risk and ease of review.">
           <div class="kit-preview__cover">
-            <p class="kit-preview__brand">Faith Works PH</p>
+            <img class="kit-preview__brand" src="../assets/icons/wordmark.svg" alt="Faith Works" width="104" height="21">
             <p class="kit-preview__title">AI Workflow Starter Kit</p>
             <p class="kit-preview__sub">Choose one recurring task and map your first useful AI workflow.</p>
             <span class="kit-preview__arrow" aria-hidden="true">↗</span>
@@ -124,22 +133,42 @@
       </div>
     </section>
 
-    <section class="section wrap kit-founder" aria-labelledby="by-title">
-      <figure>
-        <picture>
-          <source type="image/webp" srcset="../assets/images/founder-portrait-480.webp 480w" sizes="200px">
-          <img src="../assets/images/founder-portrait-480.jpg" width="480" height="720" alt="Portrait of Faith Natividad." loading="lazy" decoding="async">
-        </picture>
-      </figure>
-      <div>
-        <h2 id="by-title" class="h3">Created by Faith Works PH</h2>
-        <p>Founded by Faith Natividad, an AI business coach and future-of-work strategist focused on practical learning for nontechnical leaders and professionals.</p>
+    <!-- Who made the kit: the founder, the rooms Faith Works teaches in, and recent sessions (CMS events) -->
+    <section class="section wrap kit-by" aria-labelledby="by-title">
+      <div class="kit-founder">
+        <figure>
+          <picture>
+            <source type="image/webp" srcset="../assets/images/founder-portrait-480.webp 480w" sizes="200px">
+            <img src="../assets/images/founder-portrait-480.jpg" width="480" height="720" alt="Portrait of Faith Natividad." loading="lazy" decoding="async">
+          </picture>
+        </figure>
+        <div>
+          <h2 id="by-title" class="h3">Created by Faith Works PH</h2>
+          <p>Founded by Faith Natividad, an AI business coach and future-of-work strategist focused on practical learning for non-technical leaders and professionals.</p>
+          <p class="kit-by__more">The kit follows the same approach as Faith Works’ hands-on workshops: one real task, worked through with a person checking the result.</p>
+          <div class="sessions"><p class="sessions__label" id="sessions-label">Recent sessions</p><ul class="sessions__list" aria-labelledby="sessions-label">
+        <li class="sessions__item">
+          <time datetime="2026-09-30">Sep 30, 2026</time>
+          <b>AI + LinkedIn B2B Growth Accelerator</b>
+          <span>House of Transformation, Ayala Malls The 30th, Pasig City</span>
+        </li>
+        <li class="sessions__item">
+          <time datetime="2026-09-25">Sep 25, 2026</time>
+          <b>AI for Business: Hands-On Workshop</b>
+          <span>RK Bistro PH, Pampanga</span>
+        </li>
+      </ul></div>
+        </div>
+      </div>
+      <div class="kit-by__photos">
+        <figure><img src="../assets/images/masterclass-batch3-960.webp" srcset="../assets/images/masterclass-batch3-480.webp 480w, ../assets/images/masterclass-batch3-960.webp 960w" sizes="(min-width: 900px) 30vw, 100vw" width="960" height="540" alt="Participants of the Faith Works AI &amp; Claude Masterclass, Batch 3, posing together in the session room." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 3</figcaption></figure>
+        <figure><img src="../assets/images/participants-laptop-508.webp" width="508" height="499" alt="Two participants working through an exercise on a laptop." loading="lazy" decoding="async"><figcaption>Hands-on, on real tasks</figcaption></figure>
       </div>
     </section>
 
     <section class="section section--rule wrap" aria-labelledby="kfaq-title">
       <div class="faq">
-        <div class="faq__head"><h2 id="kfaq-title">Questions</h2></div>
+        <div class="faq__head"><h2 id="kfaq-title">Before you request the kit</h2></div>
         <div class="faq__items">
           <details><summary>Is it really free?</summary><p>Yes. No card is required.</p></details>
           <details><summary>Do I need coding skills?</summary><p>No. The kit focuses on choosing and planning a workflow.</p></details>

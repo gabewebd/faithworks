@@ -6,6 +6,7 @@
 }-->
     <!-- HERO: the task (left) becomes the result (right), around the message (brief §3 hero copy) -->
     <section class="hero" id="home" aria-labelledby="hero-title" data-reveal>
+      <div class="hero__glow" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="hero__stage wrap">
         <div class="hero__copy">
           <p class="eyebrow hero__eyebrow"><span class="dot" aria-hidden="true"></span>Human first. AI empowered.</p>
@@ -25,21 +26,21 @@
           <p class="small hero__small">Learn. Implement. Scale.</p>
         </div>
 
-        <div class="hero__input" data-ui role="img" aria-label="Illustration: less overwhelm, more possibility. One task, turning a topic into a content plan, with its inputs.">
-          <div class="visual">
+        <div class="hero__input" data-ui data-tilt role="img" aria-label="Illustration: less overwhelm, more possibility. One task, turning a topic into a content plan, with its inputs.">
+          <div class="visual" data-depth="0.6">
             <p class="visual__label">LESS OVERWHELM. MORE POSSIBILITY.</p>
             <div class="visual__arrow" aria-hidden="true">↗</div>
             <p class="visual__bottom">A LITTLE LEARNING.<br>A REAL NEXT STEP.</p>
           </div>
-          <div class="h-prompt">
+          <div class="h-prompt" data-depth="1.5">
             <p class="h-prompt__label"><span class="dot" aria-hidden="true"></span>THE TASK</p>
             <p class="h-prompt__text"><span class="h-prompt__typed">Turn a topic into a content plan.</span><span class="h-prompt__caret"></span></p>
             <div class="h-prompt__chips"><span>Audience</span><span>Objective</span><span>Source notes</span></div>
           </div>
         </div>
 
-        <div class="hero__output" data-ui role="img" aria-label="Illustration: from where do I start, to I built this. A clearer workflow, a useful first prototype and the confidence to keep going.">
-          <div class="work-card">
+        <div class="hero__output" data-ui data-tilt role="img" aria-label="Illustration: from where do I start, to I built this. A clearer workflow, a useful first prototype and the confidence to keep going.">
+          <div class="work-card" data-depth="1">
             <small>YOUR NEXT CHAPTER</small>
             <p class="work-card__title">From “where do I start?”<br>to “I built this.”</p>
             <ul class="work-card__tasks">
@@ -48,7 +49,7 @@
               <li style="--n:2"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> The confidence to keep going</li>
             </ul>
           </div>
-          <div class="pink-card">
+          <div class="pink-card" data-depth="1.7">
             <small>THE FAITH WORKS APPROACH</small>
             <strong>Upgrade the human.<br>Then the tools.</strong>
           </div>
@@ -62,7 +63,7 @@
         <li>Business owners</li>
         <li>Professionals</li>
         <li>Teams &amp; organizations</li>
-        <li>Nontechnical leaders</li>
+        <li>Non-technical leaders</li>
       </ul>
     </div>
 
@@ -137,7 +138,7 @@
             <p class="eyebrow">Make it concrete</p>
             <h2 id="examples-title" data-split>One real task.<br>A better way to work.</h2>
           </div>
-          <p>Illustrative learning projects, not claims of customer results. See how AI can support a task while you stay in control.</p>
+          <p>AI drafts. You check. The work gets done. Illustrative examples, not customer results.</p>
         </div>
 
         <div class="flow" data-reveal>
@@ -332,7 +333,7 @@
           <p class="eyebrow">Learn by doing</p>
           <h2 id="programs-title" data-split>Practical skills.<br>Useful outputs.</h2>
         </div>
-        <p>Hands-on sessions designed to help you create useful outputs, from content systems and landing pages to workflow prototypes. Each program explains the tools, preparation, and support included.</p>
+        <p>Every session ends with something you can use: a content plan, a landing page, a workflow prototype.</p>
       </div>
       {{programRowsHome}}
       <div class="programs__foot">
@@ -348,7 +349,7 @@
         <div class="business__copy">
           <p class="eyebrow">For your organization</p>
           <h2 id="business-title" data-split>Future-ready starts<br>with your people.</h2>
-          <p>Help your team move from AI awareness to practical adoption. Faith Works designs learning experiences around your people, priorities, and workflows, with guided practice and clear next steps.</p>
+          <p>Move your team from AI awareness to practical adoption, with training built around your people, priorities and workflows.</p>
           <ol class="business__ways" aria-label="How corporate training runs">
             <li><b>Align</b> on your team’s priorities</li>
             <li><b>Learn</b> through relevant use cases</li>
@@ -370,28 +371,51 @@
       </div>
     </section>
 
-    <!-- PROOF: participants' own words, quoted exactly (consent evidence to be confirmed, docs/03) -->
-    <section class="section wrap" id="proof" aria-labelledby="proof-title">
-      <div class="section-head" data-reveal>
-        <div>
+    <!-- PROOF: participants' own words (exactly as written), and recent sessions with their venues (CMS events) -->
+    <section class="section proof" id="proof" aria-labelledby="proof-title">
+      <div class="wrap proof__grid">
+        <div class="proof__head" data-reveal>
           <p class="eyebrow">In their words</p>
           <h2 id="proof-title" data-split>Hands-on, even if<br>you’re not techy.</h2>
+          <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
+          {{sessionsRun:3}}
         </div>
-        <p>What participants said after Faith Works sessions, quoted as they wrote it.</p>
+        {{voices}}
       </div>
-      {{testimonials:3}}
     </section>
 
-    <!-- GALLERY: real Faith Works sessions only (no stock) -->
-    <section class="gallery wrap" aria-labelledby="gallery-title">
-      <h2 id="gallery-title" class="gallery__title">Made for real-world work.</h2>
-      <ul class="mosaic">
-        <li class="mosaic__a"><img src="/assets/images/masterclass-batch2-960.webp" srcset="/assets/images/masterclass-batch2-480.webp 480w, /assets/images/masterclass-batch2-960.webp 960w, /assets/images/masterclass-batch2-1440.webp 1440w" sizes="(min-width: 900px) 50vw, 100vw" width="960" height="540" alt="Participants of a Faith Works AI &amp; Claude Masterclass waving together in the session room." loading="lazy" decoding="async"></li>
-        <li class="mosaic__b"><img src="/assets/images/speaker-pink-blazer-453.webp" width="453" height="670" alt="Faith Natividad speaking to a workshop audience." loading="lazy" decoding="async"></li>
-        <li class="mosaic__c"><img src="/assets/images/participants-laptop-508.webp" width="508" height="499" alt="Two participants working through an exercise on a laptop." loading="lazy" decoding="async"></li>
-        <li class="mosaic__d"><img src="/assets/images/workshop-qa-672.webp" srcset="/assets/images/workshop-qa-480.webp 480w, /assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 900px) 25vw, 50vw" width="672" height="549" alt="A participant asking a question during a workshop Q&amp;A." loading="lazy" decoding="async"></li>
-        <li class="mosaic__e"><img src="/assets/images/workshop-slides-960.webp" srcset="/assets/images/workshop-slides-480.webp 480w, /assets/images/workshop-slides-960.webp 960w" sizes="(min-width: 900px) 40vw, 100vw" width="960" height="430" alt="A Faith Works facilitator presenting slides to a seated group." loading="lazy" decoding="async"></li>
-      </ul>
+    <!-- VIDEO: a real Faith Works video from Site settings; removed when none is set -->
+    <section class="section section--flush-top wrap" id="video" aria-labelledby="video-title">
+      <div class="section-head section-head--compact">
+        <h2 id="video-title" class="h3">See a session in action.</h2>
+      </div>
+      {{featuredVideo}}
+    </section>
+
+    <!-- GALLERY: real Faith Works sessions only (no stock), as a slow looping strip (js/main.js §11) -->
+    <section class="gallery" data-marquee aria-labelledby="gallery-title">
+      <div class="wrap gallery__head">
+        <h2 id="gallery-title" class="gallery__title">Made for real-world work.</h2>
+        <div class="marquee__controls" role="group" aria-label="Photo slideshow controls">
+          <button type="button" class="voices__btn" data-marquee-prev aria-controls="gallery-set" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button type="button" class="voices__btn" data-marquee-next aria-controls="gallery-set" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
+          <button type="button" class="voices__btn voices__btn--toggle" data-marquee-toggle aria-pressed="false" aria-label="Pause the photo slideshow"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
+        </div>
+      </div>
+      <div class="marquee">
+        <div class="marquee__viewport" tabindex="0" role="region" aria-label="Photos from Faith Works sessions. Use the left and right arrow keys to move.">
+          <div class="marquee__track">
+            <ul class="marquee__set" id="gallery-set">
+              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/masterclass-batch3-1440.webp" srcset="/assets/images/masterclass-batch3-480.webp 480w, /assets/images/masterclass-batch3-960.webp 960w, /assets/images/masterclass-batch3-1440.webp 1440w" sizes="(min-width: 900px) 520px, 80vw" width="1440" height="810" alt="Participants of the Faith Works AI &amp; Claude Masterclass, Batch 3, posing together in the session room." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 3</figcaption></figure></li>
+              <li class="marquee__item marquee__item--tall"><figure><img src="/assets/images/speaker-pink-blazer-453.webp" srcset="/assets/images/speaker-pink-blazer-453.webp 453w" sizes="(min-width: 900px) 520px, 80vw" width="453" height="670" alt="Faith Natividad speaking to a workshop audience." loading="lazy" decoding="async" style="object-position:50% 22%"><figcaption>On stage</figcaption></figure></li>
+              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/workshop-slides-960.webp" srcset="/assets/images/workshop-slides-480.webp 480w, /assets/images/workshop-slides-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="430" alt="A Faith Works facilitator presenting slides to a seated group." loading="lazy" decoding="async"><figcaption>Learning on real examples</figcaption></figure></li>
+              <li class="marquee__item marquee__item--square"><figure><img src="/assets/images/participants-laptop-508.webp" srcset="/assets/images/participants-laptop-480.webp 480w, /assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 900px) 520px, 80vw" width="508" height="499" alt="Two participants working through an exercise on a laptop." loading="lazy" decoding="async"><figcaption>Hands-on, on real tasks</figcaption></figure></li>
+              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/masterclass-room-960.webp" srcset="/assets/images/masterclass-room-480.webp 480w, /assets/images/masterclass-room-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="555" alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 1</figcaption></figure></li>
+              <li class="marquee__item marquee__item--square"><figure><img src="/assets/images/workshop-qa-672.webp" srcset="/assets/images/workshop-qa-480.webp 480w, /assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 900px) 520px, 80vw" width="672" height="549" alt="A participant asking a question during a workshop Q&amp;A." loading="lazy" decoding="async" style="object-position:80% 50%"><figcaption>Open Q&amp;A</figcaption></figure></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ABOUT: founder and ecosystem (brief §3; only active destinations at launch) -->
@@ -407,7 +431,7 @@
           <div class="founder__text">
             <p class="founder__label">Founder</p>
             <strong>Meet Faith Natividad</strong>
-            <p>AI business coach and future-of-work strategist helping nontechnical leaders and professionals apply AI with confidence.</p>
+            <p>AI business coach and future-of-work strategist helping non-technical leaders and professionals apply AI with confidence.</p>
             <div class="founder__links">
               <a class="text-link" href="/about/">Faith’s story <span class="link-arrow" aria-hidden="true">↗</span></a>
               <a class="text-link" href="/speaking/">Invite Faith to speak <span class="link-arrow" aria-hidden="true">↗</span></a>
@@ -421,10 +445,13 @@
           </figure>
         </div>
       </div>
-      <div class="ecosystem__list" data-reveal>
-        <a href="/learn/"><h3>Faith Works</h3><p>Faith Works teaches: practical education, workshops, coaching and strategy.</p></a>
-        <a href="/build/#faith-ai"><h3>Faith AI</h3><p>Faith AI supports business systems, starting with your use case.</p></a>
-        <a href="/community/"><h3>Faith Works Community</h3><p>Brings people together to keep learning and applying.</p></a>
+      <div class="ecosystem">
+        {{agentNetwork}}
+        <div class="ecosystem__list" data-reveal>
+          <a href="/learn/"><span class="ecosystem__tag">Learn</span><h3>Faith Works</h3><p>Practical education, workshops, coaching and strategy.</p></a>
+          <a href="/build/#faith-ai"><span class="ecosystem__tag">Build</span><h3>Faith AI</h3><p>AI-supported business systems, starting with your use case.</p></a>
+          <a href="/community/"><span class="ecosystem__tag">Keep going</span><h3>Faith Works Community</h3><p>People who keep learning and applying together.</p></a>
+        </div>
       </div>
     </section>
 
@@ -436,7 +463,7 @@
           <h2 id="faq-title" data-split>Good questions.<br>Clear next steps.</h2>
         </div>
         <div class="faq__items">
-          <details><summary>Do I need a technical background?</summary><p>Many introductory programs are designed for nontechnical learners. Check each program’s prerequisites before registering.</p></details>
+          <details><summary>Do I need a technical background?</summary><p>Many introductory programs are designed for non-technical learners. Check each program’s prerequisites before registering.</p></details>
           <details><summary>What do I need to bring?</summary><p>Hands-on sessions may require a laptop, internet access and tool accounts. The event page will list the exact requirements and any paid subscriptions.</p></details>
           <details><summary>Can you train our company?</summary><p>Yes. Submit your team size, goals and preferred schedule through the <a class="inline" href="/business/#proposal">corporate inquiry form</a>.</p></details>
           <details><summary>Will I leave with a finished system?</summary><p>Outcomes vary by program. Each program page specifies whether you are building a prototype, learning a workflow, or receiving implementation support.</p></details>
@@ -452,7 +479,7 @@
           <h2 id="kit-title" data-split>Start with one<br>useful workflow.</h2>
           <p>The free AI Workflow Starter Kit helps you choose one recurring task, organize your inputs, and plan a first version you can test, with a person reviewing the result.</p>
           <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
-          <p class="small">Free. No card required. Designed for nontechnical learners.</p>
+          <p class="small">Free. No card required. Designed for non-technical learners.</p>
         </div>
         <div class="kitart" data-ui aria-label="What is inside the kit">
           <div class="kitart__stack">

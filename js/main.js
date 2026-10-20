@@ -3,9 +3,11 @@
    1. Helpers  2. Motion setup (split headings, draw paths, reveals)
    3. Header + navigation  4. Tablists (home: examples, journey)
    5. Program selector (learn)  6. Starter kit thank-you  7. Analytics events
-   8. Events calendar (workshops)  9. Testimonial photos
+   8. Events calendar (workshops)  9. Testimonial photos  10. Hero floating cards
+   11. Looping gallery  12. Testimonial carousel  13. Video (click to load) and booking
    Each module checks that its elements exist, so one file serves every page.
-   Motion lives in CSS; this file only adds/removes state classes.
+   Motion lives in CSS; this file adds/removes state classes, except the pointer-driven hero
+   and the gallery strip, which need per-frame values.
    ========================================================================== */
 (function () {
   "use strict";
@@ -315,6 +317,246 @@
   $$(".quote__photo").forEach(function (img) {
     var drop = function () { img.remove(); };
     if (img.complete && img.naturalWidth === 0) drop(); else img.addEventListener("error", drop);
+  });
+
+  /* ---- 10. Hero: floating cards ------------------------------------------- */
+  // The card groups tilt toward the cursor and each card drifts by its depth (data-depth), with
+  // a spring so movement trails the pointer slightly instead of snapping. A slow breathing float
+  // keeps them alive while idle. Mouse/trackpad only: touch and reduced motion stay still.
+  // Runs only while the hero is on screen.
+  var hero = $(".hero");
+  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (hero && !reduceMotion && finePointer && "IntersectionObserver" in window) {
+    var tiltGroups = $$("[data-tilt]", hero);
+    var depthLayers = $$("[data-depth]", hero).map(function (el) { return { el: el, d: parseFloat(el.getAttribute("data-depth")) || 1 }; });
+    var lit = $(".work-card", hero);
+    var aim = { x: 0, y: 0 }, pos = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
+    var heroOn = false, raf = 0, born = performance.now(), prev = 0;
+    var loop = function (now) {
+      // A slightly under-damped spring (ω 7, ζ 0.8), stepped in real time so it feels the same at any frame rate
+      var dt = Math.min(0.1, (now - (prev || now)) / 1000);
+      prev = now;
+      for (var s = 0; s < 4; s++) {
+        ["x", "y"].forEach(function (k) { vel[k] += (49 * (aim[k] - pos[k]) - 11.2 * vel[k]) * dt / 4; pos[k] += vel[k] * dt / 4; });
+      }
+      var t = (now - born) / 1000;
+      tiltGroups.forEach(function (g) {
+        g.style.setProperty("--rx", (-pos.y * 6).toFixed(2) + "deg");
+        g.style.setProperty("--ry", (pos.x * 8).toFixed(2) + "deg");
+      });
+      depthLayers.forEach(function (l, i) {
+        var bob = Math.sin(t * 0.8 + i * 1.7) * 3.2 * Math.min(l.d, 1.2);
+        l.el.style.translate = (pos.x * 12 * l.d).toFixed(2) + "px " + (pos.y * 9 * l.d + bob).toFixed(2) + "px";
+      });
+      if (lit) {
+        lit.style.setProperty("--gx", (50 + pos.x * 50).toFixed(1) + "%");
+        lit.style.setProperty("--gy", (50 + pos.y * 60).toFixed(1) + "%");
+      }
+      raf = heroOn ? requestAnimationFrame(loop) : 0;
+      if (!raf) prev = 0;
+    };
+    var setAim = function (e) {
+      var r = hero.getBoundingClientRect();
+      aim.x = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
+      aim.y = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height - 0.5) * 2));
+    };
+    hero.addEventListener("pointermove", setAim, { passive: true });
+    hero.addEventListener("pointerleave", function () { aim.x = 0; aim.y = 0; });
+    new IntersectionObserver(function (entries) {
+      heroOn = entries[0].isIntersecting;
+      if (heroOn && !raf) raf = requestAnimationFrame(loop);
+    }).observe(hero);
+  }
+
+  /* ---- 11. Looping gallery ------------------------------------------------- */
+  // A continuous, seamless strip of real session photos. The list is rendered twice (the copy is
+  // aria-hidden and unfocusable) and the offset wraps at one set's width, so it never jumps.
+  // Pauses on hover, keyboard focus, when off screen, and with the pause button; Previous/Next
+  // glide one photo; dragging scrubs. Reduced motion: no auto-advance, buttons still work.
+  $$("[data-marquee]").forEach(function (box) {
+    var track = $(".marquee__track", box);
+    var set = $(".marquee__set", box);
+    if (!track || !set) return;
+    var copy = set.cloneNode(true);
+    copy.setAttribute("aria-hidden", "true");
+    copy.removeAttribute("id");
+    $$("a, button, [tabindex]", copy).forEach(function (n) { n.tabIndex = -1; });
+    track.appendChild(copy);
+    var toggle = $("[data-marquee-toggle]", box);
+    var offset = 0, width = 0, speed = 34; // px per second
+    var playing = !reduceMotion, hover = false, focus = false, visible = false, drag = null, glide = null, last = 0, frameId = 0;
+    var measure = function () { width = set.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0); };
+    var wrap = function () { if (width) { offset = ((offset % width) + width) % width; } };
+    var paint = function () { track.style.transform = "translate3d(" + (-offset).toFixed(2) + "px,0,0)"; };
+    var tick = function (now) {
+      var dt = Math.min(0.25, (now - (last || now)) / 1000);
+      last = now;
+      if (glide) {
+        var k = Math.max(0, Math.min(1, (now - glide.t0) / 650));
+        var e = 1 - Math.pow(1 - k, 3);
+        offset = glide.from + glide.by * e;
+        if (k === 1) glide = null;
+      } else if (playing && !hover && !focus && !drag) {
+        offset += speed * dt;
+      }
+      wrap(); paint();
+      frameId = visible ? requestAnimationFrame(tick) : 0;
+    };
+    var run = function () { if (visible && !frameId) { last = 0; frameId = requestAnimationFrame(tick); } };
+    var step = function (dir) {
+      var item = $(".marquee__item", set);
+      var gap = parseFloat(getComputedStyle(set).columnGap || 0);
+      glide = { from: offset, by: dir * (item ? item.getBoundingClientRect().width + gap : 300), t0: performance.now() };
+      run();
+    };
+    var setPlaying = function (on) {
+      playing = on;
+      if (toggle) {
+        toggle.setAttribute("aria-pressed", String(!on));
+        toggle.setAttribute("aria-label", on ? "Pause the photo slideshow" : "Play the photo slideshow");
+        box.classList.toggle("is-paused", !on);
+      }
+    };
+    setPlaying(playing);
+    if (toggle) toggle.addEventListener("click", function () { setPlaying(!playing); });
+    var prev = $("[data-marquee-prev]", box), nextBtn = $("[data-marquee-next]", box);
+    if (prev) prev.addEventListener("click", function () { step(-1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { step(1); });
+    var viewport = $(".marquee__viewport", box);
+    viewport.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") hover = true; });
+    viewport.addEventListener("pointerleave", function () { hover = false; });
+    box.addEventListener("focusin", function () { focus = true; });
+    box.addEventListener("focusout", function (e) { if (!box.contains(e.relatedTarget)) focus = false; });
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); step(1); }
+    });
+    viewport.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0) return;
+      drag = { x: e.clientX, from: offset, moved: false };
+      glide = null;
+      viewport.setPointerCapture(e.pointerId);
+    });
+    viewport.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x;
+      if (Math.abs(dx) > 4) drag.moved = true;
+      offset = drag.from - dx;
+      if (!frameId) { wrap(); paint(); }
+    });
+    var endDrag = function () { setTimeout(function () { drag = null; }, 0); };
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+    // A drag should not also open a linked photo
+    viewport.addEventListener("click", function (e) { if (drag && drag.moved) e.preventDefault(); }, true);
+    $$("img", set).forEach(function (img) { if (!img.complete) img.addEventListener("load", measure); });
+    window.addEventListener("resize", measure);
+    measure();
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      if (visible) { measure(); run(); }
+    }).observe(box);
+  });
+
+  /* ---- 12. Testimonial carousel -------------------------------------------- */
+  // One card in focus with its neighbours stacked behind; advances slowly (long quotes stay
+  // readable), loops, pauses on hover/focus/off screen and with its pause button. Arrow keys,
+  // the dots and swipes move it. Reduced motion: no auto-advance and no slide transition.
+  $$("[data-carousel]").forEach(function (box) {
+    var slides = $$(".voice", box);
+    if (slides.length < 2) return;
+    var dots = $$("[data-carousel-dot]", box);
+    var live = $("[data-carousel-live]", box);
+    var toggle = $("[data-carousel-toggle]", box);
+    var i = 0, timer = 0, playing = !reduceMotion, hold = false, onScreen = false;
+    var DWELL = 7000;
+    var show = function (n, announce) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach(function (s, k) {
+        var rel = (k - i + slides.length) % slides.length;
+        s.setAttribute("data-pos", rel === 0 ? "0" : rel === 1 ? "1" : rel === 2 ? "2" : rel === slides.length - 1 ? "-1" : "out");
+        s.setAttribute("aria-hidden", String(rel !== 0));
+        s.inert = rel !== 0;
+      });
+      dots.forEach(function (d, k) { d.setAttribute("aria-current", String(k === i)); });
+      if (announce && live) live.textContent = "Testimonial " + (i + 1) + " of " + slides.length;
+      schedule();
+    };
+    var schedule = function () {
+      clearTimeout(timer);
+      if (playing && !hold && onScreen) timer = setTimeout(function () { show(i + 1); }, DWELL);
+    };
+    var setPlaying = function (on) {
+      playing = on;
+      if (toggle) {
+        toggle.setAttribute("aria-pressed", String(!on));
+        toggle.setAttribute("aria-label", on ? "Pause the testimonials" : "Play the testimonials");
+        box.classList.toggle("is-paused", !on);
+      }
+      schedule();
+    };
+    $("[data-carousel-prev]", box).addEventListener("click", function () { show(i - 1, true); });
+    $("[data-carousel-next]", box).addEventListener("click", function () { show(i + 1, true); });
+    dots.forEach(function (d, k) { d.addEventListener("click", function () { show(k, true); }); });
+    if (toggle) toggle.addEventListener("click", function () { setPlaying(!playing); });
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1, true); }
+      if (e.key === "ArrowRight") { e.preventDefault(); show(i + 1, true); }
+    });
+    box.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") { hold = true; schedule(); } });
+    box.addEventListener("pointerleave", function () { hold = false; schedule(); });
+    box.addEventListener("focusin", function () { hold = true; schedule(); });
+    box.addEventListener("focusout", function (e) { if (!box.contains(e.relatedTarget)) { hold = false; schedule(); } });
+    var sx = null;
+    var stage = $(".voices__stage", box);
+    stage.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (sx === null) return;
+      var dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1), true);
+      sx = null;
+    });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) { onScreen = entries[0].isIntersecting; schedule(); }, { threshold: 0.4 }).observe(box);
+    }
+    setPlaying(playing);
+    box.classList.add("is-ready");
+    show(0);
+  });
+
+  /* ---- 13. Video (click to load) and booking ------------------------------- */
+  // Nothing from YouTube, Vimeo or Calendly loads until the visitor asks for it.
+  $$("[data-video-embed]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var frame = doc.createElement("iframe");
+      frame.src = btn.getAttribute("data-video-embed");
+      frame.title = btn.getAttribute("data-video-title") || "Video";
+      frame.allow = "autoplay; fullscreen; picture-in-picture";
+      frame.allowFullscreen = true;
+      frame.loading = "lazy";
+      frame.className = "video__frame";
+      btn.replaceWith(frame);
+      track("video_play", { video: frame.src });
+    });
+  });
+  $$("[data-booking]").forEach(function (link) {
+    var dialog = doc.getElementById(link.getAttribute("aria-controls"));
+    if (!dialog || typeof dialog.showModal !== "function") return; // the plain link still works
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      var slot = $("[data-booking-slot]", dialog);
+      if (slot && !slot.firstChild) {
+        var frame = doc.createElement("iframe");
+        frame.src = link.getAttribute("data-booking");
+        frame.title = "Book a call with Faith Works";
+        frame.className = "booking__frame";
+        slot.appendChild(frame);
+      }
+      dialog.showModal();
+      track("booking_open", { link_url: link.getAttribute("href") });
+    });
+    $$("[data-booking-close]", dialog).forEach(function (b) { b.addEventListener("click", function () { dialog.close(); }); });
+    dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
   });
 
   window.__fwReady = true;

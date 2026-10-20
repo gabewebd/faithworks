@@ -161,6 +161,8 @@ export function toRenderData(snap) {
     responseTime: nz(s.response_time), social: list(s.social), community: { name: s.community_name, url: s.community_url },
     starterKitReady: s.starter_kit_ready === true, logo: nz(s.logo_url), logoReversed: nz(s.logo_reversed_url),
     primaryCta: { label: nz(s.primary_cta_label), url: nz(s.primary_cta_url) }, footerTagline: nz(s.footer_tagline), footerMotto: nz(s.footer_motto),
+    // Booking link (Calendly) and the homepage video: both optional; nothing renders until set
+    bookingUrl: nz(s.booking_url), video: s.featured_video_url ? { url: s.featured_video_url, title: nz(s.featured_video_title), poster: nz(s.featured_video_poster_url) } : null,
     privacyUrl: nz(s.privacy_url), termsUrl: nz(s.terms_url), tracking: { ga4: nz(s.ga4_id), gtm: nz(s.gtm_id), metaPixel: nz(s.meta_pixel_id) },
   };
   return { site, programs, events, resources, articles, stories, redirects: snap.redirects || [] };
