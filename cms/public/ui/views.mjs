@@ -1,5 +1,5 @@
 // Dashboard, content lists and admin screens (tags, users, activity, recovery).
-import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, roleLabel, icon } from "./dom.mjs";
+import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, roleLabel, icon, skeleton } from "./dom.mjs";
 import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin } from "/shared/schema.mjs";
 import { assetUrl } from "./fields.mjs";
 import { historyKind } from "./editor.mjs";
@@ -51,12 +51,13 @@ export async function listView(app, { collection }) {
   const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, { value: "live", label: "Live on the website" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
   const tagged = C.fields.some((fd) => fd.type === "tags");
   const tag = selectBox({ label: "Filter by tag", value: params.get("tag") || "", searchable: true, onChange: () => load(), options: [{ value: "", label: "All tags" }, ...tags.filter((t) => !t.archived).map((t) => ({ value: t.id, label: t.label }))] });
-  const body = h("div", {}, h("p", { class: "loading" }, "Loading…"));
+  const body = h("div", { class: "list-body" }, skeleton("table"));
   q.value = params.get("q") || "";
   let timer;
   async function load() {
     const qs = new URLSearchParams(Object.entries({ q: q.value, status: status.get(), tag: tagged ? tag.get() : "" }).filter(([, v]) => v));
     history.replaceState(null, "", `#/c/${collection}${qs.toString() ? `?${qs}` : ""}`);
+    body.setAttribute("aria-busy", "true");
     try {
       const rows = await api("GET", `/api/records/${collection}?${qs}`);
       clear(body, rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
@@ -72,6 +73,7 @@ export async function listView(app, { collection }) {
         }))))
         : h("div", { class: "card empty" }, h("h3", {}, q.value || status.get() || tag.get() ? "Nothing matches these filters" : `No ${C.label.toLowerCase()} yet`), h("p", {}, q.value || status.get() || tag.get() ? "Try clearing the search or filters." : `Create the first ${C.singular.toLowerCase()} with the New button.`)));
     } catch (e) { clear(body, h("div", { class: "alert alert--error" }, h("div", {}, errorText(e)))); }
+    body.removeAttribute("aria-busy");
   }
   // Testimonials: the photo (or a plain Faith Pink disc) beside the name, and the role under it.
   // Events: the date. Card colours are not stored: the website picks them by position.

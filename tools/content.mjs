@@ -19,6 +19,8 @@ import { sanitizeHtml } from "../cms/shared/sanitize-html.mjs";
 import { sanitizeCss, scopeCss } from "../cms/shared/sanitize-css.mjs";
 import { upgradeRecord, isDoc, extractList, extractText, readingTime, featuredImage, bylineOf, timeRange, eventInstant } from "../cms/shared/page-doc.mjs";
 import { eventHasPage } from "../cms/shared/schema.mjs";
+import { resolveImage } from "./gallery.mjs";
+import { eventGalleryEntries } from "./event-gallery.mjs";
 
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 
@@ -107,6 +109,15 @@ function accessOf(r) {
   return "open";
 }
 
+// The card button says what the resource is, from its Type in the CMS; a file the button
+// downloads says "Download" instead.
+const TYPE_NAMES = { article: "article", guide: "guide", worksheet: "worksheet", template: "template", checklist: "checklist", playbook: "playbook", tool: "tool", other: "resource" };
+const TYPE_VERBS = { article: "Read", guide: "Read", playbook: "Read", tool: "Try" };
+export function resourceButton(type, access) {
+  const t = TYPE_NAMES[type] ? type : "other";
+  return `${access === "download" ? "Download" : TYPE_VERBS[t] || "Open"} ${TYPE_NAMES[t]}`;
+}
+
 export function toRenderData(snap) {
   const programs = snap.programs.map((p) => {
     const doc = pageDoc("programs", p);
@@ -134,22 +145,35 @@ export function toRenderData(snap) {
       start: eventInstant(e.event_date, e.start_time, tz), end: eventInstant(e.end_date || e.event_date, e.end_time, tz),
       venue: nz(e.venue), registration: { type: e.registration_type || "none", url: nz(e.registration_url), label: nz(e.cta_label) },
       image: im ? { src: im.url, width: im.width ?? null, height: im.height ?? null, alt: im.alt } : null,
+      // Event images (cover first): the Events gallery shows the ones marked for it
+      gallery: eventGalleryEntries(e.gallery),
       doc, hasPage: !!doc, rec: e, ...seo(e),
     };
   });
 
   const isArticle = (r) => (r.resource_type || "article") === "article";
+  // A cover that points at a retired image (or at a registered photo) is pointed at that photo's
+  // web files on the record itself, so cards, the article's own cover block and its link preview
+  // all show the same picture (tools/gallery.mjs, src/data/gallery.json "replaces").
+  const covered = (r) => {
+    const im = featuredImage("resources", r), photo = resolveImage(im);
+    if (!im || photo === im) return r;
+    const { alt, social, ...meta } = photo;
+    return { ...r, cover_image_url: `/${photo.base}-1280.webp`, cover_image_alt: alt, cover_image_meta: meta };
+  };
+  snap = { ...snap, resources: snap.resources.map(covered) };
   const articles = snap.resources.filter(isArticle).map((a) => ({
     id: a.slug, rid: a.id, slug: a.slug, title: a.title, category: a.category, topics: list(a.tags), date: a.publish_date, author: bylineOf(a),
     readTime: readingTime(a.body_html) || a.read_time || "", featured: !!a.featured, excerpt: a.summary,
-    image: featuredImage("resources", a), doc: pageDoc("resources", a), rec: a, status: a.status, ...seo(a),
+    image: resolveImage(featuredImage("resources", a)), doc: pageDoc("resources", a), rec: a, status: a.status, ...seo(a),
   }));
   const resources = snap.resources.filter((r) => !isArticle(r)).map((r) => {
     const doc = pageDoc("resources", r);
+    const access = accessOf(r);
     return {
-      id: r.slug, rid: r.id, slug: r.slug, title: r.title, kind: r.category, summary: r.summary, access: accessOf(r),
-      accessLabel: !isDoc(r) ? nz(r.access_label) : null, url: r.file_url, ctaLabel: r.cta_label || "Open the resource", featured: !!r.featured,
-      image: featuredImage("resources", r), doc, hasPage: !!doc, rec: r, ...seo(r),
+      id: r.slug, rid: r.id, slug: r.slug, title: r.title, kind: r.category, summary: r.summary, access,
+      accessLabel: !isDoc(r) ? nz(r.access_label) : null, url: r.file_url, ctaLabel: resourceButton(r.resource_type, doc ? "open" : access), featured: !!r.featured,
+      image: resolveImage(featuredImage("resources", r)), doc, hasPage: !!doc, rec: r, ...seo(r),
     };
   });
 

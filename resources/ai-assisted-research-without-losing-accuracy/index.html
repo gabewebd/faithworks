@@ -14,12 +14,12 @@
   <meta property="og:title" content="How to Research Faster With AI Without Losing Accuracy · Faith Works">
   <meta property="og:description" content="AI can cut hours of reading down to minutes. The risk is speed without accuracy. A five-step workflow keeps the sources attached and the final check human.">
   <meta property="og:url" content="https://faithph.ai/resources/ai-assisted-research-without-losing-accuracy/">
-  <meta property="og:image" content="https://faithph.ai/assets/images/temp-research-workflow-1440.jpg">
+  <meta property="og:image" content="https://faithph.ai/assets/images/web/slides-poll-1200.jpg">
   <link rel="icon" href="../../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="../../css/style.css?v=15">
+  <link rel="stylesheet" href="../../css/style.css?v=23">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -29,9 +29,13 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="../../js/config.js?v=15" defer></script>
-  <script src="../../js/main.js?v=15" defer></script>
-  <script src="../../js/forms.js?v=15" defer></script>
+  <script src="../../js/config.js?v=23" defer></script>
+  <script src="../../js/vendor/gsap-3.15.0.min.js" defer></script>
+  <script src="../../js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
+  <script src="../../js/vendor/lenis-1.3.26.min.js" defer></script>
+  <script src="../../js/main.js?v=23" defer></script>
+  <script src="../../js/motion.js?v=23" defer></script>
+  <script src="../../js/forms.js?v=23" defer></script>
 </head>
 <body data-page="/resources/ai-assisted-research-without-losing-accuracy/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,10 +46,11 @@
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       <a href="../../learn/index.html">Learn AI</a>
       <a href="../../build/index.html">Build with AI</a>
+      <a href="../../professionals/index.html">For Professionals</a>
       <a href="../../business/index.html">For Business</a>
       <a href="../../resources/index.html" aria-current="page">Resources</a>
       <a href="../../about/index.html">About</a>
-      <a class="btn btn--yellow" href="../../free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit</a>
+      <a class="btn btn--yellow" href="../../free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
@@ -56,35 +61,57 @@
     <p class="article__lead" data-cms-bind="summary">AI can cut hours of reading down to minutes. The risk is speed without accuracy. A five-step workflow keeps the sources attached and the final check human.</p>
     <p class="article__meta" data-cms-component="article-meta">Faith Works · <time datetime="2026-09-15">September 15, 2026</time> · 4 min read</p>
   </header>
-  <div class="article__cover wrap" data-cms-component="featured-image"><picture><source type="image/webp" srcset="../../assets/images/temp-research-workflow-480.webp 480w, ../../assets/images/temp-research-workflow-960.webp 960w, ../../assets/images/temp-research-workflow-1440.webp 1440w, ../../assets/images/temp-research-workflow-1800.webp 1800w" sizes="(min-width: 1200px) 1200px, 100vw"><img src="../../assets/images/temp-research-workflow-960.jpg" srcset="../../assets/images/temp-research-workflow-480.jpg 480w, ../../assets/images/temp-research-workflow-960.jpg 960w, ../../assets/images/temp-research-workflow-1440.jpg 1440w, ../../assets/images/temp-research-workflow-1800.jpg 1800w" sizes="(min-width: 1200px) 1200px, 100vw" width="1800" height="1201" alt="A person taking notes with a pencil beside an open laptop" loading="lazy" decoding="async" style="object-position:50% 50%"></picture></div>
-  <div class="article__body">
+  <div class="article__cover wrap" data-cms-component="featured-image"><picture><img src="../../assets/images/web/slides-poll-1280.webp" srcset="../../assets/images/web/slides-poll-640.webp 640w, ../../assets/images/web/slides-poll-1280.webp 1280w" sizes="(min-width: 1200px) 1200px, 100vw" width="1280" height="720" alt="A Faith Works facilitator presenting live poll results on screen to a seated group." loading="lazy" decoding="async" style="object-position:50% 40%"></picture></div>
+  <div class="article__layout wrap"><aside class="article__aside"><details class="toc" open data-toc>
+      <summary class="toc__label">On this page</summary>
+      <nav class="toc__nav" aria-label="On this page">
+        <ol class="toc__list"><li><a class="toc__link" href="#step-1-research-gather-sources-not-answers">Step 1 · Research: gather sources, not answers</a></li><li><a class="toc__link" href="#step-2-organize-group-findings-by-theme">Step 2 · Organize: group findings by theme</a></li><li><a class="toc__link" href="#step-3-analyze-compare-spot-patterns-list-open-questions">Step 3 · Analyze: compare, spot patterns, list open questions</a></li><li><a class="toc__link" href="#step-4-draft-in-your-structure-not-the-tool-s">Step 4 · Draft: in your structure, not the tool’s</a></li><li><a class="toc__link" href="#step-5-review-this-step-stays-human">Step 5 · Review: this step stays human</a></li><li><a class="toc__link" href="#the-review-checklist">The review checklist</a></li><li><a class="toc__link" href="#where-this-workflow-helps-most-and-where-to-be-careful">Where this workflow helps most, and where to be careful</a></li><li><a class="toc__link" href="#from-one-off-to-repeatable">From one-off to repeatable</a></li><li><a class="toc__link" href="#start-with-one-useful-workflow">Start with one useful workflow</a></li></ol>
+      </nav>
+      <div class="toc__progress" aria-hidden="true"><span data-toc-progress></span></div>
+    </details></aside><div class="article__body">
 <p>Market scans, competitor notes, proposal research, briefing papers: a lot of professional work means reading a great deal to write a little. It’s exactly the kind of work AI speeds up well, and exactly the kind where a confident mistake can travel a long way.</p>
 <p>The answer isn’t to avoid AI for research. It’s to use a workflow that keeps every claim traceable to a source, and keeps the final check with a person. Here is the five-step version we use and teach.</p>
-<h2>Step 1 · Research: gather sources, not answers</h2>
+<h2 id="step-1-research-gather-sources-not-answers">Step 1 · Research: gather sources, not answers</h2>
 <p>Start by collecting material, not conclusions. Use an AI search tool that shows citations, or pull together the reports, articles and notes you already trust. Ask for sources and summaries, and keep the links to the originals.</p>
 <aside class="callout"><p class="callout__label">Prompt to adapt</p><p>“I’m researching [topic] for [audience]. Find recent, credible sources on [specific question]. For each one, give the title, publisher, date, link and a two-sentence summary. Flag anything older than [time frame].”</p></aside>
-<h2>Step 2 · Organize: group findings by theme</h2>
+<h2 id="step-2-organize-group-findings-by-theme">Step 2 · Organize: group findings by theme</h2>
 <p>Once you have material, ask AI to sort it into themes, and keep a note of which source each point came from. This is where tools that work only from your uploaded documents are useful: answers stay grounded in what you gave them.</p>
 <p>A simple table is enough: theme, finding, source. If a finding has no source, it doesn’t go in the table.</p>
-<h2>Step 3 · Analyze: compare, spot patterns, list open questions</h2>
+<h2 id="step-3-analyze-compare-spot-patterns-list-open-questions">Step 3 · Analyze: compare, spot patterns, list open questions</h2>
 <p>Now ask the harder questions. Where do sources agree? Where do they disagree? What’s missing? Asking AI for open questions and counter-arguments is often more useful than asking for a conclusion.</p>
 <ul><li>“Which findings appear in more than one independent source?”</li><li>“Where do these sources contradict each other, and why might that be?”</li><li>“What would someone who disagrees with this conclusion point to?”</li><li>“What don’t we know yet that would change the recommendation?”</li></ul>
-<h2>Step 4 · Draft: in your structure, not the tool’s</h2>
+<h2 id="step-4-draft-in-your-structure-not-the-tool-s">Step 4 · Draft: in your structure, not the tool’s</h2>
 <p>Decide the structure yourself: the question, what you found, what it means, what you recommend. Then ask AI to draft into that structure from your organized notes. You’ll get something closer to what you need, and it’s much easier to check.</p>
 <aside class="callout"><p class="callout__label">Example</p><h3>A one-page competitor brief</h3><p>Instead of “write a competitor analysis”, give the outline: <em>who the three competitors are, what each offers, how they price, where we differ, and two open questions</em>. Paste the organized findings underneath. Ask for one page, plain language, with sources in brackets after each point.</p></aside>
-<h2>Step 5 · Review: this step stays human</h2>
+<h2 id="step-5-review-this-step-stays-human">Step 5 · Review: this step stays human</h2>
 <p>Before anything leaves your desk, check it yourself. AI can state things confidently that aren’t true, mix up figures, or attach a real source to a claim the source never made.</p>
-<aside class="takeaway"><h2>The review checklist</h2><ul class="ticks"><li>Open the source for every number, date, name and quote. Does it say what the draft says it says?</li><li>Is each source recent enough and credible enough for this audience?</li><li>Is anything stated as fact that is really an opinion or an estimate?</li><li>Would you be comfortable if the reader checked every link?</li><li>Is any confidential information in the draft that shouldn’t be?</li></ul></aside>
-<h2>Where this workflow helps most, and where to be careful</h2>
+<aside class="takeaway"><h2 id="the-review-checklist">The review checklist</h2><ul class="ticks"><li>Open the source for every number, date, name and quote. Does it say what the draft says it says?</li><li>Is each source recent enough and credible enough for this audience?</li><li>Is anything stated as fact that is really an opinion or an estimate?</li><li>Would you be comfortable if the reader checked every link?</li><li>Is any confidential information in the draft that shouldn’t be?</li></ul></aside>
+<h2 id="where-this-workflow-helps-most-and-where-to-be-careful">Where this workflow helps most, and where to be careful</h2>
 <p>It works best for tasks with lots of reading and a short output: briefs, summaries, proposals, background notes. Be more careful with legal, financial, medical or regulatory questions. Use AI to find and organize material there, but rely on qualified people and primary sources for the conclusions.</p>
-<h2>From one-off to repeatable</h2>
+<h2 id="from-one-off-to-repeatable">From one-off to repeatable</h2>
 <p>The first time through, the workflow will feel slower than just asking a question. By the third time, you’ll have prompts you reuse, a table format you like, and a review habit that takes minutes. That’s when it stops being an experiment and becomes a system your team can share.</p>
-<aside class="article__cta"><h2>Start with one useful workflow</h2><p>The free AI Workflow Starter Kit helps you choose one recurring task, map the work and plan a small test.</p><a class="btn" href="../../free-ai-starter-kit/index.html">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a></aside>
-  </div>
+<aside class="article__cta"><h2 id="start-with-one-useful-workflow">Start with one useful workflow</h2><p>The free AI Workflow Starter Kit helps you choose one recurring task, map the work and plan a small test.</p><a class="btn" href="../../free-ai-starter-kit/index.html">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a></aside>
+  <div class="share" data-share-bar data-url="https://faithph.ai/resources/ai-assisted-research-without-losing-accuracy/" data-title="How to Research Faster With AI Without Losing Accuracy">
+      <p class="share__label">Share this</p>
+      <div class="share__list"><a class="share__btn" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Ffaithph.ai%2Fresources%2Fai-assisted-research-without-losing-accuracy%2F" target="_blank" rel="noopener" data-share="facebook" aria-label="Share on Facebook (opens in a new tab)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.5h2.6l.4-3.1h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.2c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H7.8v3.1h2.6V21h3.1Z"/></svg></a><a class="share__btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Ffaithph.ai%2Fresources%2Fai-assisted-research-without-losing-accuracy%2F" target="_blank" rel="noopener" data-share="linkedin" aria-label="Share on LinkedIn (opens in a new tab)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 9H4v11h3V9Zm-1.5-5.2a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5ZM10 9h2.9v1.5c.5-.9 1.6-1.7 3.1-1.7 2.8 0 4 1.8 4 5V20h-3v-5.6c0-1.6-.5-2.7-1.9-2.7-1.5 0-2.1 1.1-2.1 2.7V20h-3V9Z"/></svg></a><button type="button" class="share__btn" data-share="instagram" aria-label="Share on Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" class="share__btn" data-share="copy" aria-label="Copy link"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.2 4.2 0 0 0-6-6l-1 1"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.2 4.2 0 0 0 6 6l1-1"/></svg></button></div>
+      <p class="share__note small" role="status" aria-live="polite" data-share-note></p>
+    </div></div></div>
 </article>
 <section class="section wrap" aria-labelledby="related-title">
-  <h2 id="related-title" class="h3">Keep reading</h2>
-  <ul class="more" data-cms-component="related-articles"><li><a href="../../resources/ai-is-not-another-niche-skill/index.html"><span>AI Is Not Another Niche Skill. It Is Becoming a Foundational One.</span><span class="small">4 min read</span></a></li><li><a href="../../resources/your-day-is-already-full/index.html"><span>Your Day Is Already Full. AI Keeps Getting Bookmarked.</span><span class="small">3 min read</span></a></li><li><a href="../../resources/from-learning-to-doing/index.html"><span>From Learning to Doing: Why Applied Practice Matters</span><span class="small">3 min read</span></a></li></ul>
+  <div class="related-head"><h2 id="related-title" class="h3">Keep reading</h2><a class="btn btn--light" href="../../resources/index.html"><span aria-hidden="true">←</span> Back to resources</a></div>
+  <ul class="more" data-cms-component="related-articles"><li><a class="kr" href="../../resources/ai-is-not-another-niche-skill/index.html">
+        <picture class="kr__img"><img src="../../assets/images/web/bgc-laptops-1280.webp" srcset="../../assets/images/web/bgc-laptops-640.webp 640w, ../../assets/images/web/bgc-laptops-1280.webp 1280w" sizes="(min-width: 900px) 33vw, 100vw" width="1280" height="960" alt="Workshop participants working on their laptops during a hands-on Faith Works session." loading="lazy" decoding="async" style="object-position:50% 60%"></picture>
+        <span class="kr__meta">AI · 4 min read</span>
+        <span class="kr__title">AI Is Not Another Niche Skill. It Is Becoming a Foundational One.</span>
+      </a></li><li><a class="kr" href="../../resources/your-day-is-already-full/index.html">
+        <picture class="kr__img"><img src="../../assets/images/web/hotel-laptops-1280.webp" srcset="../../assets/images/web/hotel-laptops-640.webp 640w, ../../assets/images/web/hotel-laptops-1280.webp 1280w" sizes="(min-width: 900px) 33vw, 100vw" width="1280" height="1707" alt="Participants following along on laptops in a warmly lit hotel function room." loading="lazy" decoding="async" style="object-position:50% 55%"></picture>
+        <span class="kr__meta">AI · Productivity · 3 min read</span>
+        <span class="kr__title">Your Day Is Already Full. AI Keeps Getting Bookmarked.</span>
+      </a></li><li><a class="kr" href="../../resources/from-learning-to-doing/index.html">
+        <picture class="kr__img"><img src="../../assets/images/web/room-hotel-1280.webp" srcset="../../assets/images/web/room-hotel-640.webp 640w, ../../assets/images/web/room-hotel-1280.webp 1280w" sizes="(min-width: 900px) 33vw, 100vw" width="1280" height="720" alt="Participants at tables with laptops facing the screen during a Faith Works session." loading="lazy" decoding="async" style="object-position:50% 55%"></picture>
+        <span class="kr__meta">Business · Leadership · 3 min read</span>
+        <span class="kr__title">From Learning to Doing: Why Applied Practice Matters</span>
+      </a></li></ul>
 </section>
 </div>
   </main>
@@ -102,7 +129,7 @@
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="../../learn/index.html">Learn AI</a><a href="../../workshops/index.html">Workshops</a><a href="../../resources/index.html">Resources</a><a href="../../free-ai-starter-kit/index.html">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="../../business/index.html">For Business</a><a href="../../build/index.html">Build with AI</a><a href="../../speaking/index.html">Speaking &amp; partnerships</a><a href="../../about/index.html">About Faith Works</a></div>
+          <div><h2>Work with us</h2><a href="../../professionals/index.html">For Professionals</a><a href="../../business/index.html">For Business</a><a href="../../build/index.html">Build with AI</a><a href="../../speaking/index.html">Speaking &amp; partnerships</a><a href="../../about/index.html">About Faith Works</a></div>
           <div><h2>Follow</h2><a href="https://www.facebook.com/profile.php?id=61580485384062" target="_blank" rel="noopener" aria-label="Faith Works PH on Facebook (opens in a new tab)">Facebook <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.instagram.com/faithworksph_/" target="_blank" rel="noopener" aria-label="Faith Works on Instagram (opens in a new tab)">Instagram <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/faithnatividad/" target="_blank" rel="noopener" aria-label="Faith Natividad on LinkedIn (opens in a new tab)">LinkedIn <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/g/1DGeoshBNh/" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

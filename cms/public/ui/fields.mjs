@@ -5,6 +5,7 @@
 // radio buttons (one tab stop, arrow keys move the choice).
 import { h, clear, api, toast, dialog, errorText } from "./dom.mjs";
 import { selectBox, multiSelect, datePicker, timePicker, toggle } from "./controls.mjs";
+import { imageGallery } from "./image-gallery.mjs";
 import { checkUrl, SLUG_RE, slugify } from "/shared/validate.mjs";
 import { publicPath, isSuperAdmin } from "/shared/schema.mjs";
 
@@ -118,6 +119,7 @@ export function renderField(fd, value, ctx) {
       queueMicrotask(update);
       break;
     }
+    case "images": fromWidget(imageGallery({ id, value, disabled: locked, onChange: changed, describedBy, max: fd.max, src: (u) => assetUrl(u, ctx.config) })); break;
     case "pairs": {
       const rows = h("div", { class: "pairs", id });
       const subs = fd.subfields;

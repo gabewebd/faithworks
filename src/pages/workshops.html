@@ -14,19 +14,14 @@
             <a class="btn" href="#notify">Get notified about new dates <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></a>
           </div>
         </div>
-        <figure class="phero__photo">
-          <picture>
-            <source type="image/webp" srcset="/assets/images/masterclass-batch3-480.webp 480w, /assets/images/masterclass-batch3-960.webp 960w" sizes="(min-width: 900px) 40vw, 100vw">
-            <img src="/assets/images/masterclass-batch3-960.jpg" width="960" height="540" alt="Participants of a Faith Works masterclass posing together in the session room." decoding="async" style="object-position:0% 50%">
-          </picture>
-        </figure>
+        {{gallery:workshops.hero}}
       </div>
     </section>
 
     <section class="section wrap" id="calendar" aria-labelledby="cal-title">
       <div class="section-head">
-        <h2 id="cal-title">Calendar</h2>
-        <p>Choose an event to see its details or register.</p>
+        <h2 id="cal-title">Event Calendar</h2>
+        <p>Pick a day to see what is on, or jump straight to the next event. Times show their time zone.</p>
       </div>
       {{eventCalendar}}
     </section>
@@ -47,6 +42,15 @@
         </div>
         {{notifyForm}}
       </div>
+    </section>
+
+    <!-- EVENTS GALLERY: every photo from the Events gallery (tools/event-gallery.mjs) -->
+    <section class="section wrap egallery" id="gallery" aria-labelledby="gallery-title">
+      <div class="section-head">
+        <h2 id="gallery-title">From past sessions</h2>
+        <p>Photos from Faith Works masterclasses, workshops, talks and community gatherings.</p>
+      </div>
+      {{eventGallery:all}}
     </section>
 
     <section class="section wrap" id="past" aria-labelledby="past-title">

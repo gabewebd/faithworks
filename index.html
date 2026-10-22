@@ -14,12 +14,12 @@
   <meta property="og:title" content="Faith Works · Work Better with AI, without becoming a tech expert">
   <meta property="og:description" content="Practical workshops, guided programs and business support that help founders, professionals and teams turn AI learning into work they can use.">
   <meta property="og:url" content="https://faithph.ai/">
-  <meta property="og:image" content="https://faithph.ai/assets/images/masterclass-batch3-1440.jpg">
+  <meta property="og:image" content="https://faithph.ai/assets/images/web/speaking-faith-screen-1200.jpg">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=23">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -29,9 +29,13 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="js/config.js?v=15" defer></script>
-  <script src="js/main.js?v=15" defer></script>
-  <script src="js/forms.js?v=15" defer></script>
+  <script src="js/config.js?v=23" defer></script>
+  <script src="js/vendor/gsap-3.15.0.min.js" defer></script>
+  <script src="js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
+  <script src="js/vendor/lenis-1.3.26.min.js" defer></script>
+  <script src="js/main.js?v=23" defer></script>
+  <script src="js/motion.js?v=23" defer></script>
+  <script src="js/forms.js?v=23" defer></script>
 </head>
 <body data-page="/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,16 +46,64 @@
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       <a href="learn/index.html">Learn AI</a>
       <a href="build/index.html">Build with AI</a>
+      <a href="professionals/index.html">For Professionals</a>
       <a href="business/index.html">For Business</a>
       <a href="resources/index.html">Resources</a>
       <a href="about/index.html">About</a>
-      <a class="btn btn--yellow" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit</a>
+      <a class="btn btn--yellow" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
-<!-- HERO: the task (left) becomes the result (right), around the message (brief §3 hero copy) -->
+<!-- HERO: the message at the centre of a network of AI agents and the everyday apps they work with.
+         Wide screens: two half-networks frame the copy from the viewport edges (.hnet--wide, behind it). Tablet and phone: a simpler
+         network sits below the CTAs (.hnet--compact), so nothing ever overlaps the headline or buttons. -->
     <section class="hero" id="home" aria-labelledby="hero-title" data-reveal>
-      <div class="hero__glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="hnet hnet--wide" role="img" aria-label="Illustration: AI agents such as Claude, ChatGPT, OpenAI Codex, Grok, Hermes Agent, OpenClaw, Obsidian and NotebookLM, connected to everyday work in Gmail, Google Drive, Google Docs, Google Calendar and Google Sheets.">
+        <div class="hnet__layer hnet__half hnet__half--l">
+          <svg class="hnet__lines" viewBox="0 0 440 760" focusable="false" aria-hidden="true">
+          <g class="hnet__side hnet__side--l">
+            <path class="hnet__link hnet__link--bus" style="--i:0" pathLength="1" d="M230 130H328Q340 130 340 142V503"/>
+            <path class="hnet__link hnet__link--agent" style="--i:1" pathLength="1" d="M110 257H400"/>
+            <path class="hnet__link hnet__link--agent" style="--i:2" pathLength="1" d="M220 380H400"/>
+            <path class="hnet__link hnet__link--agent" style="--i:3" pathLength="1" d="M120 503H400"/>
+            <path class="hnet__link hnet__link--app" style="--i:8" d="M260 620V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:9" d="M120 660V503"/>
+          </g>
+          <circle class="hnet__port hnet__port--l" style="--i:0" cx="400" cy="257" r="3.5"/>
+          <circle class="hnet__port hnet__port--l" style="--i:2" cx="400" cy="503" r="3.5"/>
+          </svg>
+          <span class="hnode hnode--agent hnode--lead hnode--float" style="--x:50%;--y:50%;--s:86px;--i:0;--d:0.6;--fd:7s"><img src="assets/icons/tools/claude-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l hnode--float" style="--x:27.27%;--y:66.18%;--s:66px;--i:2;--d:0.4;--fd:9s"><img src="assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l" style="--x:52.27%;--y:17.11%;--s:52px;--i:4;--d:0.3"><img src="assets/icons/tools/hermes-agent.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l hnode--float" style="--x:25%;--y:33.82%;--s:54px;--i:6;--d:0.3;--fd:10.5s"><img src="assets/icons/tools/grok.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--you hnode--l" style="--x:90.91%;--y:50%;--s:44px;--i:4;--d:0.7"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg><span class="hnode__label">You</span></span>
+          <span class="hnode hnode--app" style="--x:59.09%;--y:81.58%;--s:46px;--i:8;--d:0.3"><img src="assets/icons/tools/gmail.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app" style="--x:27.27%;--y:86.84%;--s:44px;--i:11;--d:0.2"><img src="assets/icons/tools/google-calendar.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+        </div>
+        <div class="hnet__layer hnet__half hnet__half--r">
+          <svg class="hnet__lines" viewBox="1000 0 440 760" focusable="false" aria-hidden="true">
+          <g class="hnet__side hnet__side--r">
+            <path class="hnet__link hnet__link--bus" style="--i:4" pathLength="1" d="M1210 130H1112Q1100 130 1100 142V503"/>
+            <path class="hnet__link hnet__link--agent" style="--i:5" pathLength="1" d="M1320 257H1040"/>
+            <path class="hnet__link hnet__link--agent" style="--i:6" pathLength="1" d="M1220 380H1040"/>
+            <path class="hnet__link hnet__link--agent" style="--i:7" pathLength="1" d="M1330 503H1040"/>
+            <path class="hnet__link hnet__link--app" style="--i:10" d="M1160 620V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:11" d="M1330 640V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:12" d="M1245 700H1172Q1160 700 1160 688V620"/>
+          </g>
+          <circle class="hnet__port hnet__port--r" style="--i:3" cx="1040" cy="257" r="3.5"/>
+          <circle class="hnet__port hnet__port--r" style="--i:5" cx="1040" cy="503" r="3.5"/>
+          </svg>
+          <span class="hnode hnode--agent hnode--r" style="--x:72.73%;--y:33.82%;--s:70px;--i:1;--d:0.5"><img src="assets/icons/tools/codex-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r hnode--float" style="--x:50%;--y:50%;--s:64px;--i:3;--d:0.5;--fd:8s"><img src="assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r" style="--x:75%;--y:66.18%;--s:56px;--i:5;--d:0.4"><img src="assets/icons/tools/obsidian.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r hnode--float" style="--x:47.73%;--y:17.11%;--s:54px;--i:7;--d:0.4;--fd:9.5s"><img src="assets/icons/tools/openclaw.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--you hnode--r" style="--x:9.09%;--y:50%;--s:44px;--i:5;--d:0.7"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg><span class="hnode__label">You</span></span>
+          <span class="hnode hnode--app" style="--x:36.36%;--y:81.58%;--s:46px;--i:9;--d:0.3"><img src="assets/icons/tools/google-drive.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app hnode--float" style="--x:75%;--y:84.21%;--s:44px;--i:10;--d:0.2;--fd:11s"><img src="assets/icons/tools/google-docs.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app" style="--x:55.68%;--y:92.11%;--s:44px;--i:12;--d:0.3"><img src="assets/icons/tools/google-sheets.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+        </div>
+      </div>
       <div class="hero__stage wrap">
         <div class="hero__copy">
           <p class="eyebrow hero__eyebrow"><span class="dot" aria-hidden="true"></span>Human first. AI empowered.</p>
@@ -65,41 +117,87 @@
           </h1>
           <p class="intro hero__intro">Practical workshops, guided programs, and business support that help founders, professionals, and teams turn AI learning into work they can use.</p>
           <div class="actions hero__actions">
-            <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
             <a class="btn btn--light" href="business/index.html">Train My Team</a>
           </div>
           <p class="small hero__small">Learn. Implement. Scale.</p>
         </div>
-
-        <div class="hero__input" data-ui data-tilt role="img" aria-label="Illustration: less overwhelm, more possibility. One task, turning a topic into a content plan, with its inputs.">
-          <div class="visual" data-depth="0.6">
-            <p class="visual__label">LESS OVERWHELM. MORE POSSIBILITY.</p>
-            <div class="visual__arrow" aria-hidden="true">↗</div>
-            <p class="visual__bottom">A LITTLE LEARNING.<br>A REAL NEXT STEP.</p>
-          </div>
-          <div class="h-prompt" data-depth="1.5">
-            <p class="h-prompt__label"><span class="dot" aria-hidden="true"></span>THE TASK</p>
-            <p class="h-prompt__text"><span class="h-prompt__typed">Turn a topic into a content plan.</span><span class="h-prompt__caret"></span></p>
-            <div class="h-prompt__chips"><span>Audience</span><span>Objective</span><span>Source notes</span></div>
-          </div>
-        </div>
-
-        <div class="hero__output" data-ui data-tilt role="img" aria-label="Illustration: from where do I start, to I built this. A clearer workflow, a useful first prototype and the confidence to keep going.">
-          <div class="work-card" data-depth="1">
-            <small>YOUR NEXT CHAPTER</small>
-            <p class="work-card__title">From “where do I start?”<br>to “I built this.”</p>
-            <ul class="work-card__tasks">
-              <li style="--n:0"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> A clearer workflow</li>
-              <li style="--n:1"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> A useful first prototype</li>
-              <li style="--n:2"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> The confidence to keep going</li>
-            </ul>
-          </div>
-          <div class="pink-card" data-depth="1.7">
-            <small>THE FAITH WORKS APPROACH</small>
-            <strong>Upgrade the human.<br>Then the tools.</strong>
+        <div class="hnet hnet--compact" role="img" aria-label="Illustration: AI agents such as Claude, ChatGPT, OpenAI Codex, Grok, Hermes Agent, OpenClaw, Obsidian and NotebookLM, connected to everyday work in Gmail, Google Drive, Google Docs, Google Calendar and Google Sheets.">
+          <div class="hnet__layer">
+            <span class="hnet__hub" aria-hidden="true"></span>
+            <svg class="hnet__lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+            <path class="hnet__link hnet__link--agent" style="--i:0" pathLength="1" vector-effect="non-scaling-stroke" d="M50 3V44"/>
+            <path class="hnet__link hnet__link--agent" style="--i:1" pathLength="1" vector-effect="non-scaling-stroke" d="M50 16H27V34"/>
+            <path class="hnet__link hnet__link--agent" style="--i:2" pathLength="1" vector-effect="non-scaling-stroke" d="M50 16H73V34"/>
+            <path class="hnet__link hnet__link--agent is-t2" style="--i:3" pathLength="1" vector-effect="non-scaling-stroke" d="M27 16H7V30"/>
+            <path class="hnet__link hnet__link--agent is-t2" style="--i:4" pathLength="1" vector-effect="non-scaling-stroke" d="M73 16H93V30"/>
+            <path class="hnet__link hnet__link--peer" style="--i:5" pathLength="1" vector-effect="non-scaling-stroke" d="M27 34V50H14V64"/>
+            <path class="hnet__link hnet__link--peer" style="--i:6" pathLength="1" vector-effect="non-scaling-stroke" d="M73 34V50H86V64"/>
+            <path class="hnet__link hnet__link--peer is-t2" style="--i:7" pathLength="1" vector-effect="non-scaling-stroke" d="M50 58H36V72"/>
+            <path class="hnet__link hnet__link--app" style="--i:8" vector-effect="non-scaling-stroke" d="M27 50V90"/>
+            <path class="hnet__link hnet__link--app" style="--i:9" vector-effect="non-scaling-stroke" d="M50 44V88"/>
+            <path class="hnet__link hnet__link--app" style="--i:10" vector-effect="non-scaling-stroke" d="M73 50V90"/>
+            <path class="hnet__link hnet__link--app is-t2" style="--i:11" vector-effect="non-scaling-stroke" d="M14 64V90"/>
+            <path class="hnet__link hnet__link--app is-t2" style="--i:12" vector-effect="non-scaling-stroke" d="M86 64V90"/>
+            </svg>
+            <span class="hnode hnode--agent hnode--lead hnode--float is-t1" style="--x:50%;--y:44%;--s:66px;--i:0;--fd:7s"><img src="assets/icons/tools/claude-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:27%;--y:30%;--s:54px;--i:1;--fd:9s"><img src="assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:73%;--y:30%;--s:54px;--i:2;--fd:8.5s"><img src="assets/icons/tools/codex-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t1" style="--x:14%;--y:64%;--s:46px;--i:3"><img src="assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:86%;--y:64%;--s:46px;--i:4;--fd:10s"><img src="assets/icons/tools/obsidian.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:7%;--y:26%;--s:40px;--i:5"><img src="assets/icons/tools/grok.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:93%;--y:26%;--s:40px;--i:6"><img src="assets/icons/tools/openclaw.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:36%;--y:72%;--s:40px;--i:7"><img src="assets/icons/tools/hermes-agent.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:27%;--y:90%;--s:38px;--i:8"><img src="assets/icons/tools/gmail.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:52%;--y:88%;--s:36px;--i:9"><img src="assets/icons/tools/google-sheets.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:73%;--y:90%;--s:38px;--i:10"><img src="assets/icons/tools/google-drive.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t2" style="--x:14%;--y:90%;--s:34px;--i:11"><img src="assets/icons/tools/google-calendar.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t2" style="--x:86%;--y:90%;--s:34px;--i:12"><img src="assets/icons/tools/google-docs.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- TRUSTED BY: a quiet logo strip (src/data/trusted-by.json). Placeholders until approved
+         client logos are supplied. The loop is CSS only (css/style.css §10b); js/main.js §11
+         adds the pause button. -->
+    <section class="trusted" aria-labelledby="trusted-title">
+      <div class="wrap trusted__head">
+        <h2 id="trusted-title" class="trusted__title">Trusted by</h2>
+        <button type="button" class="trusted__toggle" data-logo-toggle aria-pressed="false" hidden><span class="trusted__toggle-pause">Pause</span><span class="trusted__toggle-play">Play</span><span class="sr-only"> the logo strip</span></button>
+      </div>
+      <div class="trusted__marquee" data-logo-marquee>
+        <div class="trusted__track"><ul class="trusted__set" role="list" aria-label="Trusted by teams and institutions"><li class="logo logo--caps"><span class="logo__mark logo__mark--circle" aria-hidden="true"></span><span class="logo__name">Client Logo 01</span></li><li class="logo logo--wide"><span class="logo__mark logo__mark--square" aria-hidden="true"></span><span class="logo__name">Client Logo 02</span></li><li class="logo logo--bold"><span class="logo__name">Client Logo 03</span></li><li class="logo logo--light"><span class="logo__mark logo__mark--diamond" aria-hidden="true"></span><span class="logo__name">Client Logo 04</span></li><li class="logo logo--caps"><span class="logo__mark logo__mark--bars" aria-hidden="true"></span><span class="logo__name">Client Logo 05</span></li><li class="logo logo--bold"><span class="logo__mark logo__mark--ring" aria-hidden="true"></span><span class="logo__name">Client Logo 06</span></li><li class="logo logo--wide"><span class="logo__name">Client Logo 07</span></li><li class="logo logo--light"><span class="logo__mark logo__mark--square" aria-hidden="true"></span><span class="logo__name">Client Logo 08</span></li></ul><ul class="trusted__set" role="list" aria-hidden="true"><li class="logo logo--caps"><span class="logo__mark logo__mark--circle" aria-hidden="true"></span><span class="logo__name">Client Logo 01</span></li><li class="logo logo--wide"><span class="logo__mark logo__mark--square" aria-hidden="true"></span><span class="logo__name">Client Logo 02</span></li><li class="logo logo--bold"><span class="logo__name">Client Logo 03</span></li><li class="logo logo--light"><span class="logo__mark logo__mark--diamond" aria-hidden="true"></span><span class="logo__name">Client Logo 04</span></li><li class="logo logo--caps"><span class="logo__mark logo__mark--bars" aria-hidden="true"></span><span class="logo__name">Client Logo 05</span></li><li class="logo logo--bold"><span class="logo__mark logo__mark--ring" aria-hidden="true"></span><span class="logo__name">Client Logo 06</span></li><li class="logo logo--wide"><span class="logo__name">Client Logo 07</span></li><li class="logo logo--light"><span class="logo__mark logo__mark--square" aria-hidden="true"></span><span class="logo__name">Client Logo 08</span></li></ul></div>
+      </div>
+    </section>
+
+    <!-- EVENTS GALLERY: real Faith Works sessions only (no stock), as an editorial masonry grid.
+         Photos: CMS event images marked for the gallery, then src/data/events.json (tools/event-gallery.mjs).
+         Full bleed: the section is not a .wrap, so the grid runs edge to edge; only the heading
+         sits on the page grid. -->
+    <section class="section egallery egallery--bleed" id="gallery" aria-labelledby="gallery-title">
+      <div class="wrap section-head" data-reveal>
+        <div>
+          <p class="eyebrow">Events</p>
+          <h2 id="gallery-title" data-split>Made for<br>real-world work.</h2>
+        </div>
+        <div class="egallery__intro">
+          <p>Masterclasses, hands-on workshops, keynotes and community gatherings, with real people working on real tasks.</p>
+          <a class="text-link" href="workshops/index.html#gallery">View all events</a>
+        </div>
+      </div>
+      <ul class="mgrid" role="list" aria-label="Photos from Faith Works events">
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="assets/images/web/group-community-1280.webp" srcset="assets/images/web/group-community-640.webp 640w, assets/images/web/group-community-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="960" alt="A large community of participants posing together at a Faith Works event." loading="lazy" decoding="async" style="object-position:50% 72%"><figcaption>Community, in person</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="assets/images/web/presenter-qr-1280.webp" srcset="assets/images/web/presenter-qr-640.webp 640w, assets/images/web/presenter-qr-1280.webp 706w" sizes="(min-width: 1000px) 25vw, 50vw" width="706" height="1260" alt="A facilitator presenting beside a QR code on screen while participants follow along on their laptops." loading="lazy" decoding="async" style="object-position:50% 78%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="assets/images/web/stage-notebook-1280.webp" srcset="assets/images/web/stage-notebook-640.webp 640w, assets/images/web/stage-notebook-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad on a conference stage, pointing to a live AI notebook demo on the big screen." loading="lazy" decoding="async" style="object-position:35% 50%"><figcaption>Conference keynotes</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="assets/images/web/coaching-at-tables-1280.webp" srcset="assets/images/web/coaching-at-tables-640.webp 640w, assets/images/web/coaching-at-tables-1280.webp 847w" sizes="(min-width: 1000px) 25vw, 50vw" width="847" height="1152" alt="Faith Natividad with a microphone among participants working on their laptops." loading="lazy" decoding="async" style="object-position:50% 40%"><figcaption>Coaching at every table</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="assets/images/web/open-qa-1280.webp" srcset="assets/images/web/open-qa-640.webp 640w, assets/images/web/open-qa-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="Faith Natividad and a participant, both with microphones, discussing a slide during an open Q&amp;A." loading="lazy" decoding="async" style="object-position:45% 45%"><figcaption>Open Q&amp;A</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="assets/images/web/speaking-five-steps-1280.webp" srcset="assets/images/web/speaking-five-steps-640.webp 640w, assets/images/web/speaking-five-steps-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad smiling as she presents a five-step AI framework on screen." loading="lazy" decoding="async" style="object-position:55% 40%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="assets/images/web/hotel-laptops-1280.webp" srcset="assets/images/web/hotel-laptops-640.webp 640w, assets/images/web/hotel-laptops-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="1707" alt="Participants following along on laptops in a warmly lit hotel function room." loading="lazy" decoding="async" style="object-position:50% 55%"><figcaption>Hands-on, on real tasks</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="assets/images/web/certificates-stage-1280.webp" srcset="assets/images/web/certificates-stage-640.webp 640w, assets/images/web/certificates-stage-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="960" alt="Participants on stage holding their certificates after completing a Faith Works program." loading="lazy" decoding="async" style="object-position:50% 45%"><figcaption>Every batch, certified</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="assets/images/web/masterclass-cheer-1280.webp" srcset="assets/images/web/masterclass-cheer-640.webp 640w, assets/images/web/masterclass-cheer-1280.webp 706w" sizes="(min-width: 1000px) 25vw, 50vw" width="706" height="569" alt="Masterclass participants cheering with their arms raised on stage." loading="lazy" decoding="async" style="object-position:50% 45%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="assets/images/web/roundtable-1280.webp" srcset="assets/images/web/roundtable-640.webp 640w, assets/images/web/roundtable-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="Leaders around a boardroom table smiling after a Faith Works roundtable." loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption>Leadership roundtables</figcaption></figure></li>
+        </ul>
     </section>
 
     <div class="strip">
@@ -123,15 +221,14 @@
       </div>
       <ol class="routes" data-reveal>
         <li class="route route--stone" style="--n:0">
-          <a class="route__link" href="learn/index.html">
-            <span class="route__top">
-              <span class="route__num">For professionals</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <path class="route__track" d="M14 28 H106"/>
-                <circle class="route__dot route__dot--done" cx="14" cy="28" r="7"/>
-                <circle class="route__dot route__dot--done" cx="50" cy="28" r="7"/>
-                <circle class="route__dot" cx="86" cy="28" r="7"/>
-                <path class="route__check" d="M10.5 28 L13 30.5 L17.5 25.5 M46.5 28 L49 30.5 L53.5 25.5"/>
+          <a class="route__link" href="professionals/index.html">
+            <span class="route__num">For professionals</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__ring" cx="24" cy="24" r="17"/>
+                <path class="route__line" d="M24 5.5v3.5M24 39v3.5M5.5 24h3.5M39 24h3.5"/>
+                <path class="route__needle route__needle--lead" d="M30.4 17.6 26.1 26.1 21.9 21.9Z"/>
+                <path class="route__needle" d="M17.6 30.4 21.9 21.9 26.1 26.1Z"/>
               </svg>
             </span>
             <h3 class="route__title">I want to learn AI.</h3>
@@ -141,13 +238,13 @@
         </li>
         <li class="route route--pink" style="--n:1">
           <a class="route__link" href="build/index.html">
-            <span class="route__top">
-              <span class="route__num">For founders</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <rect class="route__box" x="4" y="6" width="30" height="18" rx="5"/>
-                <rect class="route__box" x="4" y="32" width="30" height="18" rx="5"/>
-                <path class="route__track" d="M34 15 H48 Q56 15 56 23 V28 H70 M34 41 H48 Q56 41 56 33 V28"/>
-                <rect class="route__box route__box--accent" x="70" y="14" width="44" height="28" rx="7"/>
+            <span class="route__num">For founders</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <rect class="route__node" x="6" y="8" width="13" height="13" rx="3.5"/>
+                <rect class="route__node" x="6" y="27" width="13" height="13" rx="3.5"/>
+                <path class="route__line" d="M19 14.5h3.5a3.5 3.5 0 0 1 3.5 3.5v12a3.5 3.5 0 0 1-3.5 3.5H19M26 24h3"/>
+                <rect class="route__node route__node--lead" x="29" y="17.5" width="13" height="13" rx="3.5"/>
               </svg>
             </span>
             <h3 class="route__title">I want to build with AI.</h3>
@@ -157,14 +254,15 @@
         </li>
         <li class="route route--yellow" style="--n:2">
           <a class="route__link" href="business/index.html">
-            <span class="route__top">
-              <span class="route__num">For organizations</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <circle class="route__person" cx="30" cy="28" r="14"/>
-                <circle class="route__person" cx="54" cy="28" r="14"/>
-                <circle class="route__person" cx="78" cy="28" r="14"/>
-                <circle class="route__badge" cx="104" cy="16" r="10"/>
-                <path class="route__check route__check--badge" d="M99.5 16 L102.5 19 L108.5 12.5"/>
+            <span class="route__num">For organizations</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__head route__head--lead" cx="24" cy="9.5" r="4.5"/>
+                <path class="route__line" d="M16.5 22a7.5 7.5 0 0 1 15 0M24 25v4M11 29h26M11 29v3.5M24 29v3.5M37 29v3.5"/>
+                <circle class="route__head" cx="11" cy="37" r="3"/>
+                <circle class="route__head" cx="24" cy="37" r="3"/>
+                <circle class="route__head" cx="37" cy="37" r="3"/>
+                <path class="route__line" d="M6 45.5a5 5 0 0 1 10 0M19 45.5a5 5 0 0 1 10 0M32 45.5a5 5 0 0 1 10 0"/>
               </svg>
             </span>
             <h3 class="route__title">I want my team ready.</h3>
@@ -175,7 +273,7 @@
       </ol>
     </section>
 
-    <!-- MAKE IT CONCRETE: task → AI assists → human check → output -->
+    <!-- MAKE IT CONCRETE: three cards, task → AI assists → you review -->
     <section class="section band band--stone" id="examples" aria-labelledby="examples-title">
       <div class="wrap">
         <div class="section-head" data-reveal>
@@ -187,38 +285,62 @@
         </div>
 
         <div class="flow" data-reveal>
-          <div class="flow__tabs" role="tablist" aria-label="Explore example projects">
+          <div class="flow__tabs" role="tablist" aria-label="Choose an example task">
             <button type="button" role="tab" id="ex-tab-0" aria-controls="ex-panel" aria-selected="true" data-example="0"><span class="flow__tab-num">01</span><span class="flow__tab-name">Content planning</span></button>
-            <button type="button" role="tab" id="ex-tab-1" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="1"><span class="flow__tab-num">02</span><span class="flow__tab-name">Lead follow-up</span></button>
+            <button type="button" role="tab" id="ex-tab-1" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="1"><span class="flow__tab-num">02</span><span class="flow__tab-name">Lead follow‑up</span></button>
             <button type="button" role="tab" id="ex-tab-2" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="2"><span class="flow__tab-num">03</span><span class="flow__tab-name">Team knowledge</span></button>
           </div>
 
-          <div class="flow__canvas is-playing" data-ui id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
-            <article class="flow__stage flow__stage--task">
-              <p class="flow__kicker">THE TASK</p>
-              <h3 id="example-task">Turn a topic into a content plan.</h3>
-              <p id="example-input">Start with your audience, one business objective and approved source notes.</p>
-              <ul class="flow__chips" id="example-chips" aria-label="Starting inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
+          <!-- Three cards, one per step: the task → AI assists → you review. js/main.js swaps the copy per task -->
+          <div class="flow__cards is-playing" id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
+            <article class="fcard fcard--task">
+              <div class="fcard__art" aria-hidden="true">
+                <ul class="fpills" id="ex-inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>01</span>The task</p>
+                <h3 id="ex-task-title">Start with the right context</h3>
+                <p id="ex-task-copy">Turn a topic into a content plan. Begin with your audience, one business objective and approved source notes.</p>
+              </div>
             </article>
-            <article class="flow__stage flow__stage--ai">
-              <p class="flow__kicker">AI ASSISTS</p>
-              <div class="flow__tools" aria-hidden="true"><span class="flow__tool"><img class="tool" src="assets/icons/tools/claude.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="assets/icons/tools/chatgpt.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="assets/icons/tools/gemini.svg" alt="" width="18" height="18"></span></div>
-              <p class="flow__status"><span class="flow__status-dot" aria-hidden="true"></span>Drafts a first version</p>
-              <span class="flow__bar" aria-hidden="true"><span></span></span>
-              <p class="flow__note">Example tools only. Any capable assistant works.</p>
+            <article class="fcard fcard--ai">
+              <div class="fcard__art">
+                <div class="fdraft" aria-hidden="true">
+                  <p class="fdraft__top"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.5Q13 10.9 21.5 12 13 13.1 12 21.5 11 13.1 2.5 12 11 10.9 12 2.5Z"/></svg>Drafting</p>
+                  <p class="fdraft__label" id="ex-draft">Three content angles</p>
+                  <span class="fdraft__bar"><span></span></span>
+                  <span class="fdraft__line"></span>
+                  <span class="fdraft__line fdraft__line--short"></span>
+                </div>
+                <ul class="ftools" aria-label="Example AI tools">
+                  <li><img src="assets/icons/tools/notebooklm.svg" alt="NotebookLM" width="24" height="24"></li>
+                  <li><img src="assets/icons/tools/chatgpt.svg" alt="ChatGPT" width="24" height="24"></li>
+                  <li><img src="assets/icons/tools/grok.svg" alt="Grok" width="24" height="24"></li>
+                  <li><img src="assets/icons/tools/claude-color.svg" alt="Claude" width="24" height="24"></li>
+                </ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>02</span>AI assists</p>
+                <h3 id="ex-ai-title">Turn notes into a first draft</h3>
+                <p id="ex-ai-copy">AI drafts three content angles from your approved source notes, ready for you to choose from.</p>
+              </div>
             </article>
-            <article class="flow__stage flow__stage--check">
-              <p class="flow__kicker">YOU STAY IN CONTROL</p>
-              <span class="flow__seal" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></span>
-              <p id="example-review">Check accuracy, voice and whether every claim is supported.</p>
-            </article>
-            <article class="flow__stage flow__stage--output">
-              <p class="flow__kicker">ILLUSTRATIVE OUTPUT</p>
-              <h3 id="example-title">A simple content planning workflow</h3>
-              <ol id="example-list" class="flow__list"><li>Choose one useful audience question</li><li>Draft three angles from your source notes</li><li>Review and turn one angle into a publishable draft</li></ol>
-              <a class="text-link" href="learn/index.html">Find a learning pathway <span class="link-arrow" aria-hidden="true">↗</span></a>
+            <article class="fcard fcard--review">
+              <div class="fcard__art" aria-hidden="true">
+                <div class="fout">
+                  <p class="fout__head" id="ex-out">Content plan</p>
+                  <ul class="fout__rows" id="ex-output"><li>Answer one audience question</li><li>Share a practical how-to</li><li>Tell a real example</li></ul>
+                  <span class="fout__seal"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 12.5 10 16.5 18 8"/></svg></span>
+                </div>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>03</span>You review</p>
+                <h3 id="ex-review-title">Review before it goes live</h3>
+                <p id="ex-review-copy">Check accuracy, voice and whether every claim is supported, then publish one angle.</p>
+              </div>
             </article>
           </div>
+          <p class="flow__foot"><a class="text-link" href="learn/index.html">Find a learning pathway</a></p>
         </div>
       </div>
     </section>
@@ -381,106 +503,177 @@
         <p>Every session ends with something you can use: a content plan, a landing page, a workflow prototype.</p>
       </div>
       <ol class="pstack">
-      <li class="prog prog--white" style="--i:0" data-reveal>
+      <li class="prog prog--pink prog--feature" style="--i:0" data-reveal>
         <article class="prog__card" aria-labelledby="prog-ai-workforce-accelerator">
-          <div class="prog__cover">
-            <svg viewBox="0 0 320 240" aria-hidden="true" focusable="false"><rect class="pc__ln" x="20" y="54" width="96" height="22" rx="6"/><path class="pc__ln pc__soft" d="M31 65 H74"/>
-      <rect class="pc__ink" x="20" y="86" width="96" height="22" rx="6"/><path class="pc__ln pc__ln--on" d="M31 97 H70"/><circle class="pc__yel" cx="103" cy="97" r="5"/>
-      <rect class="pc__ln" x="20" y="118" width="96" height="22" rx="6"/><path class="pc__ln pc__soft" d="M31 129 H80"/>
-      <rect class="pc__ln" x="20" y="150" width="96" height="22" rx="6"/><path class="pc__ln pc__soft" d="M31 161 H66"/>
-      <path class="pc__ln" d="M116 97 H150"/>
-      <rect class="pc__ink" x="150" y="28" width="150" height="184" rx="16"/>
-      <text class="pc__type pc__type--yel" x="225" y="100" text-anchor="middle">[ AI ]</text>
-      <path class="pc__ln pc__ln--on pc__soft" d="M191 148 H214 M236 148 H259"/>
-      <circle class="pc__ln pc__ln--on" cx="180" cy="148" r="11"/>
-      <circle class="pc__pink" cx="225" cy="148" r="11"/>
-      <circle class="pc__yel" cx="270" cy="148" r="11"/><path class="pc__ln pc__ln--ink" d="M265 148.5 L268.5 152 L275 145"/>
-      <path class="pc__ln pc__ln--on pc__soft" d="M270 167 Q270 186 251 186 H199 Q180 186 180 167 M174.5 173 L180 166.5 L185.5 173"/></svg>
-            <p class="prog__steps">Map&nbsp;· Design&nbsp;· Prototype</p>
+          <div class="prog__art">
+            <svg viewBox="0 0 640 420" aria-hidden="true" focusable="false"><defs><filter id="wf-lift" x="-30%" y="-30%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="14" result="b1"/><feFlood flood-color="#1A1A1A" flood-opacity="0.16"/><feComposite in2="b1" operator="in" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/><feOffset dy="1.5" result="b2"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="wf-lift-s" x="-30%" y="-30%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="5" result="b1"/><feFlood flood-color="#1A1A1A" flood-opacity="0.2"/><feComposite in2="b1" operator="in" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/><feOffset dy="1.5" result="b2"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="wf-satin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FAF8F4"/></linearGradient>
+      <radialGradient id="wf-shine" cx="0.35" cy="0.3" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.85"/><stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+      <linearGradient id="wf-hub" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#333333"/><stop offset="0.4" stop-color="#1A1A1A"/></linearGradient></defs>
+      <g class="art__float">
+        <rect x="58" y="92" width="164" height="56" rx="10" fill="url(#wf-satin)" opacity="0.55" transform="rotate(-7 140 120)"/>
+        <g transform="rotate(4 131 177)">
+          <rect x="46" y="148" width="170" height="58" rx="10" fill="url(#wf-satin)" opacity="0.85" filter="url(#wf-lift-s)"/>
+          <path d="M66 170 H150 M66 184 H120" stroke="#1A1A1A" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <rect x="56" y="272" width="160" height="54" rx="10" fill="url(#wf-satin)" opacity="0.62" transform="rotate(-3 136 299)"/>
+        <g filter="url(#wf-lift)">
+          <rect x="36" y="204" width="188" height="66" rx="12" fill="url(#wf-satin)"/>
+          <rect x="36.5" y="204.5" width="187" height="65" rx="11.5" fill="none" stroke="#1A1A1A" stroke-opacity="0.08"/>
+        </g>
+        <rect x="54" y="226" width="22" height="22" rx="6" fill="#EFACBA"/>
+        <path d="M90 230 H190" stroke="#1A1A1A" stroke-width="3.2" stroke-linecap="round"/><path d="M90 245 H150" stroke="#1A1A1A" stroke-opacity="0.3" stroke-width="3.2" stroke-linecap="round"/>
+      </g>
+      <path d="M224 237 C 258 237, 254 190, 288 190" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="224" cy="237" r="4.5" fill="#1A1A1A"/>
+      <g class="art__float art__float--b">
+        <g filter="url(#wf-lift)"><rect x="288" y="96" width="148" height="188" rx="16" fill="url(#wf-hub)"/></g>
+        <rect x="296" y="104" width="132" height="172" rx="10" fill="none" stroke="#FFFFFF" stroke-opacity="0.1"/>
+        <path d="M304 96.8 H420" stroke="#FFFFFF" stroke-opacity="0.3" stroke-linecap="round"/>
+        <circle cx="312" cy="122" r="2.6" fill="#FFFFFF" fill-opacity="0.4"/><circle cx="322" cy="122" r="2.6" fill="#FFFFFF" fill-opacity="0.2"/><circle cx="332" cy="122" r="2.6" fill="#FFFFFF" fill-opacity="0.2"/>
+        <g fill="#FFFFFF"><rect x="318" y="136" width="40" height="40" rx="10"/><rect x="366" y="136" width="40" height="40" rx="10"/><rect x="318" y="182" width="40" height="40" rx="10"/><rect x="366" y="182" width="40" height="40" rx="10"/></g>
+        <path transform="translate(326 144) scale(1)" d="M11.999 3.201C5.372 3.201 0 8.528 0 15.101V20.8h2.212v-.568c0-2.666 2.178-4.827 4.866-4.827 2.688 0 4.866 2.16 4.866 4.827v.568h2.212v-.568c0-3.877-3.17-7.019-7.078-7.019A7.075 7.075 0 0 0 2.992 14.5a7.355 7.355 0 0 1 6.568-4.016c4.057 0 7.347 3.264 7.347 7.287V20.8h2.212V17.77c0-5.235-4.28-9.481-9.56-9.481a9.563 9.563 0 0 0-6.217 2.28A9.795 9.795 0 0 1 12 5.393c5.406 0 9.788 4.346 9.788 9.707V20.8H24V15.1c-.001-6.573-5.373-11.9-12.001-11.9Z" fill="#000000"/><path transform="translate(374 144) scale(1)" d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" fill="#000000"/><path transform="translate(326 190) scale(1)" d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815" fill="#000000" fill-rule="evenodd"/><path transform="translate(374 190) scale(1)" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" fill="#D97757"/>
+        <rect x="314" y="232" width="96" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.14"/><rect x="314" y="232" width="64" height="6" rx="3" fill="#EFACBA"/>
+        <path d="M314 254 H382" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <path d="M436 190 H478" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><path d="M472 184 L480 190 L472 196" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <g class="art__float art__float--c">
+        <g filter="url(#wf-lift)"><rect x="490" y="118" width="128" height="144" rx="12" fill="url(#wf-satin)"/></g>
+        <path d="M506 140 H570" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="554" cy="186" r="20" fill="#EFACBA"/><circle cx="554" cy="186" r="20" fill="url(#wf-shine)"/>
+        <path d="M545 186.5 l6 6 l11.5 -12" fill="none" stroke="#1A1A1A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M506 226 H602 M506 242 H572" stroke="#1A1A1A" stroke-opacity="0.2" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <path d="M130 334 V352 M362 290 V352 M554 268 V352" stroke="#1A1A1A" stroke-opacity="0.35" stroke-dasharray="2 5" stroke-linecap="round"/>
+      <path d="M60 366 H612" stroke="#1A1A1A" stroke-opacity="0.22" stroke-width="1.2"/>
+      <path d="M130 366 H362" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/>
+      <g filter="url(#wf-lift-s)">
+        <circle cx="130" cy="366" r="13" fill="#1A1A1A"/><circle cx="362" cy="366" r="13" fill="#1A1A1A"/>
+        <circle cx="554" cy="366" r="13" fill="#EFACBA" stroke="#FAF8F4" stroke-width="3"/>
+      </g>
+      <circle cx="554" cy="366" r="13" fill="url(#wf-shine)"/>
+      <path d="M124.5 366.5 l4 4 l7 -7.5 M356.5 366.5 l4 4 l7 -7.5" fill="none" stroke="#FAF8F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="554" cy="366" r="4" fill="#1A1A1A"/>
+      <g class="art__label" text-anchor="middle"><text x="130" y="404">Map</text><text x="362" y="404">Design</text><text x="554" y="404">Prototype</text></g></svg>
           </div>
-          <div class="prog__main">
-            <p class="prog__cat">Workflow &amp; productivity</p>
+          <div class="prog__body">
             <h3 class="prog__title" id="prog-ai-workforce-accelerator"><a href="programs/ai-workforce-accelerator/index.html" data-track="program_click">AI Workforce Masterclass &amp; Accelerator</a></h3>
-            <p class="prog__summary">Find a high-impact process in your work, design a workflow around it, and build a first prototype with guidance.</p>
-          </div>
-          <div class="prog__side">
-            <p class="prog__leave">You leave with</p>
-            <ul class="prog__outs"><li>A workflow readiness map</li><li>A documented workflow design</li><li>A first working prototype to test and refine</li></ul>
+            <p class="prog__summary">Turn everyday processes into practical AI workflows.</p>
+            <p class="prog__notice">Next intake to be announced</p>
             <div class="prog__actions">
               <a class="btn prog__btn" href="programs/ai-workforce-accelerator/index.html" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
               <a class="text-link" href="programs/ai-workforce-accelerator/index.html#register" data-track="program_click">Join the waitlist <span class="link-arrow" aria-hidden="true">↗</span></a>
             </div>
-            <p class="prog__status">Next intake to be announced</p>
           </div>
         </article>
       </li>
-      <li class="prog prog--pink" style="--i:1" data-reveal>
+      <li class="prog prog--white" style="--i:1" data-reveal>
         <article class="prog__card" aria-labelledby="prog-ai-linkedin-b2b-growth">
-          <div class="prog__cover">
-            <svg viewBox="0 0 320 240" aria-hidden="true" focusable="false"><path class="pc__ln pc__ln--on pc__faint" d="M156 124 L232 58 M156 124 L222 128 M156 124 L284 164 M156 124 L238 196 M156 124 L190 204"/>
-      <path class="pc__ln pc__ln--pink" d="M156 124 L276 94"/>
-      <circle class="pc__ln pc__ln--on pc__node" cx="232" cy="58" r="6"/><circle class="pc__ln pc__ln--on pc__node" cx="222" cy="128" r="5"/>
-      <circle class="pc__ln pc__ln--on pc__node" cx="284" cy="164" r="6"/><circle class="pc__ln pc__ln--on pc__node" cx="238" cy="196" r="5"/>
-      <circle class="pc__ln pc__ln--on pc__node" cx="190" cy="204" r="4"/>
-      <circle class="pc__pink" cx="276" cy="94" r="11"/>
-      <rect class="pc__white" x="34" y="66" width="122" height="122" rx="22"/>
-      <text class="pc__type pc__type--in" x="95" y="160" text-anchor="middle">in</text>
-      <circle class="pc__yel pc__cut" cx="152" cy="68" r="30"/>
-      <text class="pc__type pc__type--ai" x="152" y="76" text-anchor="middle">AI</text></svg>
-            <p class="prog__steps">Position&nbsp;· Publish&nbsp;· Follow up</p>
+          <div class="prog__art">
+            <svg viewBox="0 0 560 300" aria-hidden="true" focusable="false"><defs><filter id="li-lift" x="-30%" y="-30%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="14" result="b1"/><feFlood flood-color="#1A1A1A" flood-opacity="0.13"/><feComposite in2="b1" operator="in" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/><feOffset dy="1.5" result="b2"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="li-lift-s" x="-30%" y="-30%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="5" result="b1"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b1" operator="in" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/><feOffset dy="1.5" result="b2"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="li-satin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FAF8F4"/></linearGradient>
+      <radialGradient id="li-shine" cx="0.35" cy="0.3" r="0.75"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.7"/><stop offset="0.6" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+      <clipPath id="li-avatar"><circle cx="440" cy="132" r="30"/></clipPath></defs>
+      <circle cx="300" cy="150" r="132" fill="#EFACBA" fill-opacity="0.2"/>
+      <circle cx="300" cy="150" r="148" fill="none" stroke="#1A1A1A" stroke-opacity="0.08"/>
+      <g class="art__float">
+        <rect x="104" y="44" width="196" height="204" rx="16" fill="#FFFFFF" fill-opacity="0.6" stroke="#1A1A1A" stroke-opacity="0.07" transform="rotate(5 202 146)"/>
+        <g filter="url(#li-lift)"><rect x="92" y="54" width="200" height="204" rx="16" fill="url(#li-satin)"/></g>
+        <rect x="92.5" y="54.5" width="199" height="203" rx="15.5" fill="none" stroke="#1A1A1A" stroke-opacity="0.08"/>
+        <rect x="110" y="72" width="164" height="88" rx="10" fill="#EFACBA"/><rect x="110" y="72" width="164" height="88" rx="10" fill="url(#li-shine)"/>
+        <rect x="110" y="178" width="132" height="10" rx="5" fill="#1A1A1A"/><rect x="110" y="196" width="90" height="10" rx="5" fill="#1A1A1A"/>
+        <path d="M110 228 H232" stroke="#1A1A1A" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+        <g filter="url(#li-lift-s)"><circle cx="288" cy="60" r="24" fill="url(#li-satin)"/></g>
+        <g transform="translate(275 47) scale(1.0833333333333333)"><rect width="24" height="24" rx="4.5" fill="#0A66C2"/><path transform="translate(3.6 3.6) scale(0.7)" fill="#FFFFFF" d="M7 9H4v11h3V9Zm-1.5-5.2a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5ZM10 9h2.9v1.5c.5-.9 1.6-1.7 3.1-1.7 2.8 0 4 1.8 4 5V20h-3v-5.6c0-1.6-.5-2.7-1.9-2.7-1.5 0-2.1 1.1-2.1 2.7V20h-3V9Z"/></g>
+        <g filter="url(#li-lift-s)"><rect x="66" y="210" width="48" height="48" rx="13" fill="url(#li-satin)"/></g>
+        <path transform="translate(77 221) scale(1.0833333333333333)" d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" fill="#000000"/>
+      </g>
+      <path d="M292 160 C 340 160, 352 132, 396 132" fill="none" stroke="#EFACBA" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="292" cy="160" r="5" fill="#EFACBA" stroke="#1A1A1A" stroke-width="1.5"/>
+      <g class="art__float art__float--b">
+        <circle cx="440" cy="132" r="58" fill="none" stroke="#1A1A1A" stroke-opacity="0.12"/>
+        <g filter="url(#li-lift)"><circle cx="440" cy="132" r="44" fill="url(#li-satin)"/></g>
+        <g clip-path="url(#li-avatar)">
+          <circle cx="440" cy="132" r="30" fill="#EFACBA"/>
+          <circle cx="440" cy="124" r="10" fill="#1A1A1A"/><path d="M418 164 C 420 146, 460 146, 462 164 Z" fill="#1A1A1A"/>
+        </g>
+        <g filter="url(#li-lift-s)"><circle cx="474" cy="166" r="12" fill="#1A1A1A"/></g>
+        <path d="M468.5 166.5 l4 4 l7 -7.5" fill="none" stroke="#EFACBA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </g></svg>
           </div>
-          <div class="prog__main">
-            <p class="prog__cat">Authority &amp; business growth</p>
+          <div class="prog__body">
             <h3 class="prog__title" id="prog-ai-linkedin-b2b-growth"><a href="programs/ai-linkedin-b2b-growth/index.html" data-track="program_click">AI + LinkedIn B2B Growth</a></h3>
-            <p class="prog__summary">Connect your positioning, content and AI-assisted workflows with the clients you want to reach.</p>
-          </div>
-          <div class="prog__side">
-            <p class="prog__leave">You leave with</p>
-            <ul class="prog__outs"><li>A positioning statement</li><li>A four-week content plan</li><li>A follow-up workflow you review before anything is sent</li></ul>
+            <p class="prog__summary">Connect your positioning, content, and client follow-up.</p>
+            
             <div class="prog__actions">
               <a class="btn prog__btn" href="programs/ai-linkedin-b2b-growth/index.html" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
               <a class="text-link" href="programs/ai-linkedin-b2b-growth/index.html#register" data-track="program_click">Ask about the next run <span class="link-arrow" aria-hidden="true">↗</span></a>
             </div>
-            
           </div>
         </article>
       </li>
       <li class="prog prog--yellow" style="--i:2" data-reveal>
         <article class="prog__card" aria-labelledby="prog-ai-websites-workflow-building">
-          <div class="prog__cover">
-            <svg viewBox="0 0 320 240" aria-hidden="true" focusable="false"><rect class="pc__paper" x="18" y="30" width="176" height="160" rx="12"/>
-      <path class="pc__ln" d="M18 52 H194"/><circle class="pc__pink" cx="32" cy="41" r="3.5"/><circle class="pc__yel" cx="44" cy="41" r="3.5"/><circle class="pc__ln" cx="56" cy="41" r="3"/>
-      <rect class="pc__ink" x="34" y="68" width="104" height="13" rx="3"/>
-      <path class="pc__ln pc__soft" d="M34 94 H150 M34 105 H124"/>
-      <rect class="pc__ln" x="34" y="120" width="92" height="16" rx="4"/>
-      <rect class="pc__pink" x="34" y="146" width="62" height="22" rx="6"/><path class="pc__ln" d="M44 157 H76"/>
-      <path class="pc__ln" d="M96 157 C 128 157, 138 108, 166 108"/><path class="pc__ln" d="M160 102 L167 108 L160 114"/>
-      <rect class="pc__ink" x="176" y="66" width="128" height="148" rx="14"/>
-      <text class="pc__label" x="192" y="94">Leads</text>
-      <rect class="pc__yel" x="186" y="104" width="108" height="24" rx="6"/><path class="pc__ln pc__ln--ink" d="M196 116 H236"/><circle class="pc__ink" cx="280" cy="116" r="4"/>
-      <path class="pc__ln pc__ln--on pc__soft" d="M196 146 H240 M196 172 H232 M196 198 H246"/>
-      <rect class="pc__pink" x="262" y="140" width="24" height="12" rx="6"/><rect class="pc__white" x="262" y="166" width="24" height="12" rx="6"/><rect class="pc__pink" x="262" y="192" width="24" height="12" rx="6"/></svg>
-            <p class="prog__steps">Page&nbsp;· Tracker&nbsp;· Review</p>
+          <div class="prog__art">
+            <svg viewBox="0 0 560 300" aria-hidden="true" focusable="false"><defs><filter id="ws-lift" x="-30%" y="-30%" width="160%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="12" result="b1"/><feFlood flood-color="#1A1A1A" flood-opacity="0.18"/><feComposite in2="b1" operator="in" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/><feOffset dy="1.5" result="b2"/><feFlood flood-color="#1A1A1A" flood-opacity="0.14"/><feComposite in2="b2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="ws-satin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FAF8F4"/></linearGradient></defs>
+      <text x="34" y="32" class="art__mono" fill="#1A1A1A">PAGE</text>
+      <g class="art__float">
+        <g filter="url(#ws-lift)"><rect x="34" y="44" width="292" height="214" rx="10" fill="url(#ws-satin)"/></g>
+        <path d="M34 68.5 H326" stroke="#1A1A1A" stroke-opacity="0.12"/>
+        <circle cx="50" cy="56" r="3.4" fill="#1A1A1A" fill-opacity="0.3"/><circle cx="62" cy="56" r="3.4" fill="#1A1A1A" fill-opacity="0.18"/><circle cx="74" cy="56" r="3.4" fill="#1A1A1A" fill-opacity="0.18"/>
+        <rect x="52" y="88" width="140" height="14" rx="3" fill="#1A1A1A"/>
+        <path d="M52 118 H178 M52 130 H150" stroke="#1A1A1A" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+        <rect x="52.5" y="150.5" width="128" height="22" rx="5" fill="none" stroke="#1A1A1A" stroke-opacity="0.28"/>
+        <rect x="52" y="184" width="74" height="26" rx="6" fill="#1A1A1A"/><path d="M64 197 H100" stroke="#FAF8F4" stroke-width="2.4" stroke-linecap="round"/>
+        <rect x="206" y="88" width="102" height="84" rx="6" fill="#FBC522" fill-opacity="0.4"/>
+        <path d="M212 164 L238 132 L258 152 L272 140 L302 164" fill="none" stroke="#1A1A1A" stroke-opacity="0.4" stroke-width="2" stroke-linejoin="round"/><circle cx="284" cy="110" r="7" fill="#1A1A1A" fill-opacity="0.35"/>
+        <path d="M52 232.5 H190" stroke="#1A1A1A" stroke-opacity="0.12"/>
+      </g>
+      <path d="M126 197 C 190 197, 214 232, 290 222" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="126" cy="197" r="4" fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2"/>
+      <g class="art__float art__float--b">
+        <g filter="url(#ws-lift)"><rect x="290" y="112" width="232" height="164" rx="12" fill="#1A1A1A"/></g>
+        <path d="M302 112.8 H510" stroke="#FFFFFF" stroke-opacity="0.25" stroke-linecap="round"/>
+        <text x="308" y="140" class="art__mono" fill="#FAF8F4">LEADS</text>
+        <path d="M290 152.5 H522 M308 196.5 H504 M308 236.5 H504" stroke="#FFFFFF" stroke-opacity="0.12"/>
+        <g stroke="#FAF8F4" stroke-width="3" stroke-linecap="round"><path d="M308 176 H376"/><path d="M308 216 H360" stroke-opacity="0.5"/><path d="M308 256 H384" stroke-opacity="0.5"/></g>
+        <rect x="452" y="168" width="52" height="16" rx="8" fill="#FBC522"/><rect x="452.5" y="208.5" width="51" height="15" rx="7.5" fill="none" stroke="#FAF8F4" stroke-opacity="0.5"/><rect x="452" y="248" width="52" height="16" rx="8" fill="#FBC522"/>
+      </g>
+      <path d="M478 108 V90" stroke="#1A1A1A" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"/>
+      <g class="art__float art__float--c">
+        <g filter="url(#ws-lift)"><rect x="396" y="24" width="140" height="62" rx="9" fill="url(#ws-satin)"/></g>
+        <text x="410" y="48" class="art__mono" fill="#1A1A1A">REVIEW</text>
+        <path d="M410 66 H460" stroke="#1A1A1A" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+        <rect x="486" y="54" width="34" height="18" rx="9" fill="#1A1A1A"/><circle cx="511" cy="63" r="6" fill="#FBC522"/>
+      </g></svg>
           </div>
-          <div class="prog__main">
-            <p class="prog__cat">Building &amp; implementation</p>
+          <div class="prog__body">
             <h3 class="prog__title" id="prog-ai-websites-workflow-building"><a href="programs/ai-websites-workflow-building/index.html" data-track="program_click">AI Websites &amp; Workflow Building</a></h3>
-            <p class="prog__summary">Hands-on learning for landing pages, simple lead trackers and workflow prototypes, built with AI tools and guided practice.</p>
-          </div>
-          <div class="prog__side">
-            <p class="prog__leave">You leave with</p>
-            <ul class="prog__outs"><li>A first landing page or lead tracker</li><li>A checklist of what to review before real-world use</li></ul>
+            <p class="prog__summary">Build landing pages, trackers, and AI-powered workflows.</p>
+            
             <div class="prog__actions">
               <a class="btn prog__btn" href="programs/ai-websites-workflow-building/index.html" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
               <a class="text-link" href="programs/ai-websites-workflow-building/index.html#register" data-track="program_click">Register your interest <span class="link-arrow" aria-hidden="true">↗</span></a>
             </div>
-            <p class="prog__status">Program details being confirmed</p>
           </div>
         </article>
       </li>
     </ol>
       <div class="programs__foot">
-        <a class="btn btn--light" href="learn/index.html">See all programs <span class="btn__arrow" aria-hidden="true">↗</span></a>
+        <a class="btn btn--light" href="learn/index.html">See all programs</a>
         <a class="text-link" href="workshops/index.html">Upcoming workshops <span class="link-arrow" aria-hidden="true">↗</span></a>
         <p class="small">New schedules, fees and enrollment details are announced on each program page once confirmed.</p>
       </div>
@@ -506,15 +699,12 @@
           </div>
         </div>
         <figure class="business__photo">
-          <picture>
-            <source type="image/webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w" sizes="(min-width: 901px) 42vw, 100vw">
-            <img src="assets/images/masterclass-room-960.jpg" width="960" height="555" alt="A full room of participants learning together at a Faith Works session." loading="lazy" decoding="async">
-          </picture>
+          <img src="assets/images/web/room-full-1280.webp" srcset="assets/images/web/room-full-640.webp 640w, assets/images/web/room-full-1280.webp 1280w" sizes="(min-width: 901px) 42vw, 100vw" width="1280" height="720" alt="A full room of participants learning together at a Faith Works session." loading="lazy" decoding="async" style="object-position:50% 60%">
         </figure>
       </div>
     </section>
 
-    <!-- PROOF: participants' own words (exactly as written), and recent sessions with their venues (CMS events) -->
+    <!-- PROOF: participants' own words (exactly as written) -->
     <section class="section proof" id="proof" aria-labelledby="proof-title">
       <div class="wrap proof__head" data-reveal>
         <p class="eyebrow">In their words</p>
@@ -559,49 +749,9 @@
       <div class="voices__progress" aria-hidden="true"><span data-carousel-progress></span></div>
       <p class="sr-only" aria-live="polite" aria-atomic="true" data-carousel-live></p>
     </div>
-      <div class="wrap proof__sessions">
-        <div class="sessions"><p class="sessions__label" id="sessions-label">Recent sessions</p><ul class="sessions__list" aria-labelledby="sessions-label">
-        <li class="sessions__item">
-          <time datetime="2026-09-30">Sep 30, 2026</time>
-          <b>AI + LinkedIn B2B Growth Accelerator</b>
-          <span>House of Transformation, Ayala Malls The 30th, Pasig City</span>
-        </li>
-        <li class="sessions__item">
-          <time datetime="2026-09-25">Sep 25, 2026</time>
-          <b>AI for Business: Hands-On Workshop</b>
-          <span>RK Bistro PH, Pampanga</span>
-        </li>
-      </ul></div>
-      </div>
     </section>
 
     
-
-    <!-- GALLERY: real Faith Works sessions only (no stock), as a slow looping strip (js/main.js §11) -->
-    <section class="gallery" data-marquee aria-labelledby="gallery-title">
-      <div class="wrap gallery__head">
-        <h2 id="gallery-title" class="gallery__title">Made for real-world work.</h2>
-        <div class="marquee__controls" role="group" aria-label="Photo slideshow controls">
-          <button type="button" class="voices__btn" data-marquee-prev aria-controls="gallery-set" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <button type="button" class="voices__btn" data-marquee-next aria-controls="gallery-set" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
-          <button type="button" class="voices__btn voices__btn--toggle" data-marquee-toggle aria-pressed="false" aria-label="Pause the photo slideshow"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
-        </div>
-      </div>
-      <div class="marquee">
-        <div class="marquee__viewport" tabindex="0" role="region" aria-label="Photos from Faith Works sessions. Use the left and right arrow keys to move.">
-          <div class="marquee__track">
-            <ul class="marquee__set" id="gallery-set">
-              <li class="marquee__item marquee__item--wide"><figure><img src="assets/images/masterclass-batch3-1440.webp" srcset="assets/images/masterclass-batch3-480.webp 480w, assets/images/masterclass-batch3-960.webp 960w, assets/images/masterclass-batch3-1440.webp 1440w" sizes="(min-width: 900px) 520px, 80vw" width="1440" height="810" alt="Participants of the Faith Works AI &amp; Claude Masterclass, Batch 3, posing together in the session room." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 3</figcaption></figure></li>
-              <li class="marquee__item marquee__item--tall"><figure><img src="assets/images/speaker-pink-blazer-453.webp" srcset="assets/images/speaker-pink-blazer-453.webp 453w" sizes="(min-width: 900px) 520px, 80vw" width="453" height="670" alt="Faith Natividad speaking to a workshop audience." loading="lazy" decoding="async" style="object-position:50% 22%"><figcaption>On stage</figcaption></figure></li>
-              <li class="marquee__item marquee__item--wide"><figure><img src="assets/images/workshop-slides-960.webp" srcset="assets/images/workshop-slides-480.webp 480w, assets/images/workshop-slides-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="430" alt="A Faith Works facilitator presenting slides to a seated group." loading="lazy" decoding="async"><figcaption>Learning on real examples</figcaption></figure></li>
-              <li class="marquee__item marquee__item--square"><figure><img src="assets/images/participants-laptop-508.webp" srcset="assets/images/participants-laptop-480.webp 480w, assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 900px) 520px, 80vw" width="508" height="499" alt="Two participants working through an exercise on a laptop." loading="lazy" decoding="async"><figcaption>Hands-on, on real tasks</figcaption></figure></li>
-              <li class="marquee__item marquee__item--wide"><figure><img src="assets/images/masterclass-room-960.webp" srcset="assets/images/masterclass-room-480.webp 480w, assets/images/masterclass-room-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="555" alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 1</figcaption></figure></li>
-              <li class="marquee__item marquee__item--square"><figure><img src="assets/images/workshop-qa-672.webp" srcset="assets/images/workshop-qa-480.webp 480w, assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 900px) 520px, 80vw" width="672" height="549" alt="A participant asking a question during a workshop Q&amp;A." loading="lazy" decoding="async" style="object-position:80% 50%"><figcaption>Open Q&amp;A</figcaption></figure></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ABOUT: founder and ecosystem (brief §3; only active destinations at launch) -->
     <section class="section wrap" id="about" aria-labelledby="about-title">
@@ -623,35 +773,14 @@
             </div>
           </div>
           <figure class="founder__photo">
-            <picture>
-              <source type="image/webp" srcset="assets/images/founder-portrait-480.webp 480w, assets/images/founder-portrait-960.webp 960w" sizes="260px">
-              <img src="assets/images/founder-portrait-480.jpg" alt="Portrait of Faith Natividad, founder of Faith Works PH." width="480" height="720" loading="lazy" decoding="async">
-            </picture>
+            <img src="assets/images/web/founder-studio-1280.webp" srcset="assets/images/web/founder-studio-640.webp 640w, assets/images/web/founder-studio-1280.webp 1280w" sizes="260px" width="1280" height="1600" alt="Portrait of Faith Natividad, founder of Faith Works PH." loading="lazy" decoding="async" style="object-position:50% 30%">
           </figure>
         </div>
       </div>
-      <div class="ecosystem">
-        <figure class="agents" data-reveal>
-        <div class="agents__canvas" role="img" aria-label="Diagram: Your workflow in the centre coordinates three AI agents (Research, Draft, Follow-up). Their work meets at a human review step before anything is sent.">
-          <svg class="agents__wires" viewBox="0 0 600 360" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path class="agents__wire" d="M300 180 C 230 180, 200 64, 128 64"/><path class="agents__wire" d="M300 180 H128"/><path class="agents__wire" d="M300 180 C 230 180, 200 296, 128 296"/>
-            <path class="agents__wire agents__wire--out" d="M300 180 H472"/>
-            <circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="0.0s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 C 230 180, 200 64, 128 64"/></circle><circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="1.2s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 H128"/></circle><circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="2.4s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 C 230 180, 200 296, 128 296"/></circle>
-            <circle class="agents__signal agents__signal--out" r="4.5"><animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" path="M300 180 H472"/></circle>
-          </svg>
-          <div class="agents__node agents__node--a" style="--n:0"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Research</b><small>Gathers approved sources</small></span></div>
-          <div class="agents__node agents__node--b" style="--n:1"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Draft</b><small>Writes a first version</small></span></div>
-          <div class="agents__node agents__node--c" style="--n:2"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Follow-up</b><small>Prepares the next step</small></span></div>
-          <div class="agents__hub"><span class="agents__pulse" aria-hidden="true"></span><small>Coordinates</small><b>Your workflow</b></div>
-          <div class="agents__human"><span class="agents__seal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5 10 17.5 19 7"/></svg></span><span class="agents__txt"><b>You approve</b><small>before anything is sent</small></span></div>
-        </div>
-        <figcaption class="agents__cap">Illustrative. Each agent takes one part of the work; a person stays in charge of the result.</figcaption>
-      </figure>
-        <div class="ecosystem__list" data-reveal>
-          <a href="learn/index.html"><span class="ecosystem__tag">Learn</span><h3>Faith Works</h3><p>Practical education, workshops, coaching and strategy.</p></a>
-          <a href="build/index.html#faith-ai"><span class="ecosystem__tag">Build</span><h3>Faith AI</h3><p>AI-supported business systems, starting with your use case.</p></a>
-          <a href="community/index.html"><span class="ecosystem__tag">Keep going</span><h3>Faith Works Community</h3><p>People who keep learning and applying together.</p></a>
-        </div>
+      <div class="ecosystem__list" data-reveal>
+        <a href="learn/index.html"><h3 class="ecosystem__brand"><img class="brandmark" src="assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385" loading="lazy" decoding="async"></h3><p>Practical education, workshops, coaching and strategy.</p></a>
+        <a href="build/index.html#faith-ai"><h3 class="ecosystem__brand"><img class="brandmark brandmark--ai" src="assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3><p>AI-supported business systems, starting with your use case.</p></a>
+        <a href="community/index.html"><h3 class="ecosystem__brand"><img class="brandmark brandmark--community" src="assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3><p>People who keep learning and applying together.</p></a>
       </div>
     </section>
 
@@ -678,7 +807,7 @@
           <p class="eyebrow">A useful place to begin</p>
           <h2 id="kit-title" data-split>Start with one<br>useful workflow.</h2>
           <p>The free AI Workflow Starter Kit helps you choose one recurring task, organize your inputs, and plan a first version you can test, with a person reviewing the result.</p>
-          <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <p class="small">Free. No card required. Designed for non-technical learners.</p>
         </div>
         <div class="kitart" data-ui aria-label="What is inside the kit">
@@ -723,7 +852,7 @@
         <h2 id="cta-title" data-split>You don’t have to figure<br>out AI on your own.</h2>
         <p>Bring your curiosity. Let’s turn it into something useful.</p>
         <div class="actions actions--center">
-          <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn" href="free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <a class="btn btn--light" href="contact/index.html">Talk to us</a>
         </div>
       </div>
@@ -744,7 +873,7 @@
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="learn/index.html">Learn AI</a><a href="workshops/index.html">Workshops</a><a href="resources/index.html">Resources</a><a href="free-ai-starter-kit/index.html">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="business/index.html">For Business</a><a href="build/index.html">Build with AI</a><a href="speaking/index.html">Speaking &amp; partnerships</a><a href="about/index.html">About Faith Works</a></div>
+          <div><h2>Work with us</h2><a href="professionals/index.html">For Professionals</a><a href="business/index.html">For Business</a><a href="build/index.html">Build with AI</a><a href="speaking/index.html">Speaking &amp; partnerships</a><a href="about/index.html">About Faith Works</a></div>
           <div><h2>Follow</h2><a href="https://www.facebook.com/profile.php?id=61580485384062" target="_blank" rel="noopener" aria-label="Faith Works PH on Facebook (opens in a new tab)">Facebook <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.instagram.com/faithworksph_/" target="_blank" rel="noopener" aria-label="Faith Works on Instagram (opens in a new tab)">Instagram <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/faithnatividad/" target="_blank" rel="noopener" aria-label="Faith Natividad on LinkedIn (opens in a new tab)">LinkedIn <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/g/1DGeoshBNh/" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

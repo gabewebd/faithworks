@@ -14,7 +14,7 @@
 // If step 2 fails, nothing changed. If step 3 fails, the item is live but still marked
 // Draft; the dashboard flags it and "Finish publishing" (reconcile) completes it.
 import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin, hasSlug, publicPath, migrateRecord, eventHasPage } from "../../shared/schema.mjs";
-import { normalize, validate, slugify } from "../../shared/validate.mjs";
+import { normalize, validate, slugify, syncEventCover } from "../../shared/validate.mjs";
 import { ACTIONS, canEdit, canView, canManage, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
 import { toPublic } from "../../shared/public.mjs";
 import { readingTime, bylineOf } from "../../shared/page-doc.mjs";
@@ -78,6 +78,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
   async function prepare(collection, input, data, current) {
     const fields = COLLECTIONS[collection].fields;
     if (current) for (const fd of fields) if ((fd.hidden || fd.legacy || fd.computed) && !(fd.key in (input || {}))) data[fd.key] = current[fd.key] ?? data[fd.key];
+    if (collection === "events") syncEventCover(data, input); // the cover, after hidden fields are restored
     if (fields.some((fd) => fd.key === "byline")) {
       const dir = await authorDirectory();
       data.byline = Array.isArray(data.authors) && data.authors.length ? bylineOf({ authors: data.authors }, Object.fromEntries(dir)) : data.author || ""; // older articles: their stored author name

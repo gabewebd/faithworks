@@ -33,7 +33,9 @@ export const SITE_ORIGIN_DEFAULT = "https://faithph.ai";
 
 /* ---- Field helpers ---------------------------------------------------------
    type: text | textarea | slug | url | email | date | time | number | boolean | select |
-         tags | authors | ref | list | pairs | html | css | json
+         tags | authors | ref | list | pairs | images | html | css | json
+   images: an ordered list of { url, alt, primary, featured }: exactly one primary (the cover)
+           whenever the list is not empty; featured = also shown in the website's Events gallery
    required: needed to publish (drafts may be incomplete)
    public: false keeps the field out of the published snapshot (internal data)
    adminOnly: field-level write permission (enforced on the server)
@@ -83,6 +85,9 @@ const PAGE = (label) => [
   f("doc_version", "Page document version", "number", { hidden: true }),
 ];
 
+// Most photos one event may hold (the dashboard and the server both enforce it).
+export const MAX_EVENT_IMAGES = 24;
+
 // An event has its own page when the registration button goes to it, or when the author asks for one.
 export const eventHasPage = (r) => r?.registration_type === "page" || r?.event_page === true;
 
@@ -117,7 +122,7 @@ export const COLLECTIONS = {
   events: {
     label: "Events", singular: "Event", prefix: "evt", labelField: "title", route: "/events/{slug}/", page: "Event page",
     description: "Events on the Workshops page and its calendar. Upcoming and past are separated automatically from the dates.",
-    groups: { main: "Event", when: "Date and time", where: "Location", reg: "Registration", media: "Event image", page: "Event page", visibility: "Visibility and authors" },
+    groups: { main: "Event", when: "Date and time", where: "Location", reg: "Registration", media: "Event images", page: "Event page", visibility: "Visibility and authors" },
     fields: [
       f("title", "Event title", "text", { group: "main", required: true, max: 160, help: "Shown on the event card and the calendar." }),
       f("summary", "Short description", "textarea", { group: "main", max: 500, rows: 3, help: "Optional. One or two sentences for the event card." }),
@@ -135,8 +140,11 @@ export const COLLECTIONS = {
       f("registration_url", "Registration link", "url", { group: "reg", showIf: (r) => r.registration_type === "external", help: "The existing registration page, e.g. the GHL funnel. It opens in a new tab." }),
       f("cta_label", "Button text", "text", { group: "reg", max: 60, showIf: (r) => r.registration_type !== "none", help: "Optional. Leave empty for “Register”." }),
       f("event_page", "Also give this event its own page on the website", "boolean", { group: "reg", showIf: (r) => r.registration_type !== "page", help: "Optional. The card then links to “Event details”, while the button still goes to the registration link." }),
-      f("featured_image_url", "Image URL", "url", { group: "media", image: true, help: "Optional. Shown on the event card (and on the event page, if it has one). Paste https://… or /assets/images/…" }),
-      f("featured_image_alt", "Image description (alt text)", "text", { group: "media", max: 200, help: "Describe what the image shows, for screen readers. Needed when an image is set." }),
+      f("gallery", "Event images", "images", { group: "media", long: 2, max: MAX_EVENT_IMAGES, help: "Optional. Upload or add one or more photos. The cover shows on the event card (and the event page); “Show in the events gallery” also puts a photo in the gallery on the homepage and the Workshops page. Drag or use the arrows to change the order." }),
+      // The cover image, kept in step with the gallery on every save, for the event card, link
+      // previews and anything that still reads the single-image fields
+      f("featured_image_url", "Cover image URL", "url", { hidden: true, computed: true }),
+      f("featured_image_alt", "Cover image description", "text", { hidden: true, computed: true }),
       f("slug", "Page address (URL slug)", "slug", { group: "page", required: true, showIf: (r) => eventHasPage(r), help: "Created from the title. Only used when the event has its own page." }),
       ...SEO.map((x) => (x.hidden ? x : { ...x, group: "page", showIf: (r) => eventHasPage(r) })),
       ...PAGE("Event page"),
@@ -168,8 +176,9 @@ export const COLLECTIONS = {
       f("publish_date", "Publish date", "date", { group: "main", required: true }),
       f("read_time", "Reading time", "text", { group: "main", computed: true, showIf: (r) => r.resource_type === "article", help: "Calculated from the article text whenever it changes." }),
       f("featured", "Feature this resource", "boolean", { group: "main" }),
-      f("file_url", "Destination URL", "url", { group: "dest", showIf: (r) => r.resource_type !== "article", help: "Where the card’s button goes: the file, the sign-up page or the external site." }),
-      f("cta_label", "Button label", "text", { group: "dest", max: 80, showIf: (r) => r.resource_type !== "article" }),
+      f("file_url", "Destination URL", "url", { group: "dest", showIf: (r) => r.resource_type !== "article", help: "Where the card’s button goes: the file, the sign-up page or the external site. The button’s label follows the Type, e.g. “Read guide” (“Download …” for a file)." }),
+      // The button label now follows the Type (tools/content.mjs resourceButton); kept for older records.
+      f("cta_label", "Button label", "text", { group: "dest", max: 80, showIf: () => false }),
       ...PAGE("Resource page"),
       f("cover_image_url", "Featured image URL", "url", { group: "media", image: true, help: "Optional. Shown on article cards and at the top of the article." }),
       f("cover_image_alt", "Image description (alt text)", "text", { group: "media", max: 200 }),
@@ -298,7 +307,7 @@ export function publicPath(collection, slug) {
 // Empty value for a field type (used for new records and missing cells).
 export function emptyValue(fieldDef) {
   switch (fieldDef.type) {
-    case "list": case "tags": case "authors": case "pairs": return [];
+    case "list": case "tags": case "authors": case "pairs": case "images": return [];
     case "boolean": return false;
     case "number": return null;
     case "json": return null;
@@ -326,6 +335,9 @@ export function blankRecord(collection) {
 //                 website (a /path), becomes External link with the same address; the
 //                 "Get notified" form and No button become No registration link. Events with
 //                 page content keep their page (event_page). Shown on the website.
+//   events        from before event galleries (one featured image): that image becomes the
+//                 gallery's cover. It is not added to the website's Events gallery (featured
+//                 false): card images were never chosen for it, and some are posters.
 //   testimonials  from before "Show on the website" (no card colour, no role field): shown,
 //                 unless consent was declined or withdrawn or (live copies) the website was
 //                 holding the live copy back for missing consent.
@@ -340,6 +352,10 @@ export function migrateRecord(collection, rec) {
     if (out.event_page !== true) out.event_page = !!String(out.body_html || "").trim();
     if (out.cta_type === "notify") out.cta_label = "";
     out.visible = true;
+  }
+  if (collection === "events" && (!Array.isArray(out.gallery) || !out.gallery.length)) {
+    const url = String(out.featured_image_url || "").trim();
+    out.gallery = url ? [{ url, alt: String(out.featured_image_alt || "").trim(), primary: true, featured: false }] : [];
   }
   // Every save since then stores `role` (even empty); copies saved while cards had a colour keep it
   if (collection === "testimonials" && !out.tone && !("role" in out)) {

@@ -1,20 +1,22 @@
 // Shared page chrome: <head>, header (full or campaign), footer, staging bar.
-// Brief §2: launch navigation Learn AI | Build with AI | For Business | Resources | About,
+// Brief §2: launch navigation Learn AI | Build with AI | For Professionals | For Business | Resources | About,
 // logo → Home, persistent CTA → /free-ai-starter-kit. Community and Contact live in the footer,
 // as its two most visible links (under the brand line).
 // The campaign landing page uses a reduced header: logo and privacy access only.
+import { defaultSocialImage } from "./gallery.mjs";
 
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 const NAV = [
   ["learn", "/learn/", "Learn AI"],
   ["build", "/build/", "Build with AI"],
+  ["professionals", "/professionals/", "For Professionals"],
   ["business", "/business/", "For Business"],
   ["resources", "/resources/", "Resources"],
   ["about", "/about/", "About"],
 ];
 
-const VERSION = "15";
+const VERSION = "23";
 
 // Site settings come from the CMS (tools/content.mjs). Each has a default equal to the
 // approved copy, so an unset value never blanks the header or footer.
@@ -38,7 +40,7 @@ function tracking(site) {
 function head({ title, description, path, site, image, noindex }) {
   const origin = site.origin.replace(/\/$/, "");
   const canonical = origin + (path === "/404.html" ? "/" : path);
-  const ogImage = /^https?:\/\//i.test(image || "") ? image : origin + (image || "/assets/images/masterclass-batch3-1440.jpg");
+  const ogImage = /^https?:\/\//i.test(image || "") ? image : origin + (image || defaultSocialImage());
   return `<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -67,7 +69,11 @@ function head({ title, description, path, site, image, noindex }) {
     })(document.documentElement);
   </script>
   <script src="/js/config.js?v=${VERSION}" defer></script>
+  <script src="/js/vendor/gsap-3.15.0.min.js" defer></script>
+  <script src="/js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
+  <script src="/js/vendor/lenis-1.3.26.min.js" defer></script>
   <script src="/js/main.js?v=${VERSION}" defer></script>
+  <script src="/js/motion.js?v=${VERSION}" defer></script>
   <script src="/js/forms.js?v=${VERSION}" defer></script>${tracking(site)}
 </head>`;
 }
@@ -91,7 +97,7 @@ function header(nav, variant, site) {
     <button class="menu" type="button" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false"><span class="menu__bars" aria-hidden="true"></span></button>
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       ${links}
-      <a class="btn btn--yellow" href="${esc(site.primaryCta?.url || "/free-ai-starter-kit/")}" data-track="starter_kit_click">${esc(site.primaryCta?.label || "Get the Free AI Starter Kit")}</a>
+      <a class="btn btn--yellow" href="${esc(site.primaryCta?.url || "/free-ai-starter-kit/")}" data-track="starter_kit_click">${esc(site.primaryCta?.label || "Start Your AI Journey")}</a>
     </nav>
   </header>`;
 }
@@ -120,7 +126,7 @@ function footer(site, variant) {
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="/learn/">Learn AI</a><a href="/workshops/">Workshops</a><a href="/resources/">Resources</a><a href="/free-ai-starter-kit/">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="/business/">For Business</a><a href="/build/">Build with AI</a><a href="/speaking/">Speaking &amp; partnerships</a><a href="/about/">About Faith Works</a></div>
+          <div><h2>Work with us</h2><a href="/professionals/">For Professionals</a><a href="/business/">For Business</a><a href="/build/">Build with AI</a><a href="/speaking/">Speaking &amp; partnerships</a><a href="/about/">About Faith Works</a></div>
           <div><h2>Follow</h2>${social}<a href="${esc(site.community.url)}" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

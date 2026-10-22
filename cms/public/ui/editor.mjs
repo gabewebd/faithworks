@@ -4,7 +4,7 @@
 // Details and the page are kept consistent through explicit markers (shared/page-doc.mjs):
 // Details values are written into marked elements of the page, and the marked title and
 // summary write back to Details when they are edited in the page.
-import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, icon, ApiError } from "./dom.mjs";
+import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, icon, skeleton, ApiError } from "./dom.mjs";
 import { renderField, computedField } from "./fields.mjs";
 import { createHtmlEditor } from "./html-editor.mjs";
 import { COLLECTIONS, STATUSES, blankRecord, isSuperAdmin, eventHasPage, statusOf } from "/shared/schema.mjs";
@@ -22,7 +22,7 @@ export async function editorView(app, { collection, id }) {
   const isNew = !id;
   const hasPage = C.fields.some((fd) => fd.type === "html");
   const TABS = [["details", "Details"], ...(hasPage ? [["page", C.page || "Page"]] : []), ["history", "History"]];
-  const root = h("div", {}, h("p", { class: "loading" }, "Loading…"));
+  const root = h("div", {}, skeleton("editor"));
   let view = null, fields = new Map(), computed = {}, htmlEd = null, baseline = "", dirty = false, tab = "details", bindTimer, lastHtml = "";
   const ctx = { user: app.user, config: app.config, collection, tags: [], authors: [], onChange: (key) => fieldChanged(key), getTitle: () => fields.get("title")?.get() };
 
@@ -188,7 +188,7 @@ export async function editorView(app, { collection, id }) {
     const tabButtons = TABS.filter(([k]) => (k === "history" ? !isNew : true)).map(([k, label]) =>
       h("button", { type: "button", role: "tab", id: `tabbtn-${k}`, "aria-selected": String(k === tab), "aria-controls": `tab-${k}`, dataset: { tab: k }, onclick: () => showTab(k) }, label, h("span", { class: "err", hidden: true }, " •")));
     if (!tabButtons.some((b) => b.dataset.tab === tab)) tab = "details";
-    if (!isNew) panels.history.append(h("p", { class: "loading" }, "Loading history…"));
+    if (!isNew) panels.history.append(skeleton("rows", "Loading history"));
 
     clear(root,
       head(rec, readOnly),
@@ -425,14 +425,16 @@ export async function editorView(app, { collection, id }) {
       which = kind;
       if (viewBtns) { viewBtns.draft.setAttribute("aria-pressed", String(kind === "draft")); viewBtns.live.setAttribute("aria-pressed", String(kind === "live")); }
       status.textContent = "Loading the preview…";
+      stage.classList.add("is-loading");
       clear(notes);
       try {
         const res = await api("POST", "/api/preview", kind === "live" ? { collection, id: view.record.id, live: true } : { collection, id: view.record.id || null, data: collect() });
         if (which !== kind) return;
+        frame.addEventListener("load", () => stage.classList.remove("is-loading"), { once: true });
         frame.srcdoc = res.html;
         status.textContent = kind === "live" ? `The live version (v${view.live.version}) as the website shows it now.` : `Your draft${dirty || isNew ? ", including unsaved changes" : ""}. Not saved or published.`;
         if (res.report?.length) notes.append(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Removed for safety when published: "), res.report.join("; ")))));
-      } catch (e) { status.textContent = errorText(e); }
+      } catch (e) { status.textContent = errorText(e); stage.classList.remove("is-loading"); }
     }
     function shut() {
       document.removeEventListener("keydown", keydown, true);

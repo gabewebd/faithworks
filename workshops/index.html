@@ -14,12 +14,12 @@
   <meta property="og:title" content="Workshops and events · Faith Works">
   <meta property="og:description" content="Upcoming and past Faith Works workshops, masterclasses and community events, with a calendar, dates, times and how to register.">
   <meta property="og:url" content="https://faithph.ai/workshops/">
-  <meta property="og:image" content="https://faithph.ai/assets/images/masterclass-batch3-1440.jpg">
+  <meta property="og:image" content="https://faithph.ai/assets/images/web/speaking-faith-screen-1200.jpg">
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="../css/style.css?v=15">
+  <link rel="stylesheet" href="../css/style.css?v=23">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -29,9 +29,13 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="../js/config.js?v=15" defer></script>
-  <script src="../js/main.js?v=15" defer></script>
-  <script src="../js/forms.js?v=15" defer></script>
+  <script src="../js/config.js?v=23" defer></script>
+  <script src="../js/vendor/gsap-3.15.0.min.js" defer></script>
+  <script src="../js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
+  <script src="../js/vendor/lenis-1.3.26.min.js" defer></script>
+  <script src="../js/main.js?v=23" defer></script>
+  <script src="../js/motion.js?v=23" defer></script>
+  <script src="../js/forms.js?v=23" defer></script>
 </head>
 <body data-page="/workshops/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,10 +46,11 @@
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       <a href="../learn/index.html" aria-current="page">Learn AI</a>
       <a href="../build/index.html">Build with AI</a>
+      <a href="../professionals/index.html">For Professionals</a>
       <a href="../business/index.html">For Business</a>
       <a href="../resources/index.html">Resources</a>
       <a href="../about/index.html">About</a>
-      <a class="btn btn--yellow" href="../free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit</a>
+      <a class="btn btn--yellow" href="../free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
@@ -59,30 +64,40 @@
             <a class="btn" href="#notify">Get notified about new dates <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></a>
           </div>
         </div>
-        <figure class="phero__photo">
-          <picture>
-            <source type="image/webp" srcset="../assets/images/masterclass-batch3-480.webp 480w, ../assets/images/masterclass-batch3-960.webp 960w" sizes="(min-width: 900px) 40vw, 100vw">
-            <img src="../assets/images/masterclass-batch3-960.jpg" width="960" height="540" alt="Participants of a Faith Works masterclass posing together in the session room." decoding="async" style="object-position:0% 50%">
-          </picture>
-        </figure>
+        <div class="hstack">
+          <figure class="phero__photo hstack__main"><img src="../assets/images/web/masterclass-certificates-1280.webp" srcset="../assets/images/web/masterclass-certificates-640.webp 640w, ../assets/images/web/masterclass-certificates-1280.webp 1280w" sizes="(min-width: 900px) 40vw, 100vw" width="1280" height="800" alt="AI &amp; Claude Masterclass graduates holding their certificates in the session room." fetchpriority="high" decoding="async" style="object-position:50% 50%"></figure>
+          <figure class="hstack__card hstack__card--1" data-depth style="--depth: 34"><img src="../assets/images/web/certificates-stage-1280.webp" srcset="../assets/images/web/certificates-stage-640.webp 640w, ../assets/images/web/certificates-stage-1280.webp 1280w" sizes="(min-width: 900px) 220px, 40vw" width="1280" height="960" alt="" loading="lazy" decoding="async" style="object-position:50% 45%"><figcaption>Every batch, certified</figcaption></figure>
+          <figure class="hstack__card hstack__card--2" data-depth style="--depth: -26"><img src="../assets/images/web/hotel-laptops-1280.webp" srcset="../assets/images/web/hotel-laptops-640.webp 640w, ../assets/images/web/hotel-laptops-1280.webp 1280w" sizes="(min-width: 900px) 220px, 40vw" width="1280" height="1707" alt="" loading="lazy" decoding="async" style="object-position:50% 55%"></figure>
+        </div>
       </div>
     </section>
 
     <section class="section wrap" id="calendar" aria-labelledby="cal-title">
       <div class="section-head">
-        <h2 id="cal-title">Calendar</h2>
-        <p>Choose an event to see its details or register.</p>
+        <h2 id="cal-title">Event Calendar</h2>
+        <p>Pick a day to see what is on, or jump straight to the next event. Times show their time zone.</p>
       </div>
       <div class="cal" data-fw-calendar>
-        <div class="cal__head">
-          <button class="cal__nav" type="button" data-cal-prev aria-label="Previous month">‹</button>
-          <h3 class="cal__title" data-cal-title aria-live="polite"></h3>
-          <button class="cal__nav" type="button" data-cal-next aria-label="Next month">›</button>
+        <div class="cal__main">
+          <div class="cal__head">
+            <h3 class="cal__title" data-cal-title aria-live="polite"></h3>
+            <div class="cal__controls">
+              <button class="cal__today" type="button" data-cal-today>Today</button>
+              <button class="cal__nav" type="button" data-cal-prev aria-label="Previous month"><span aria-hidden="true">‹</span></button>
+              <button class="cal__nav" type="button" data-cal-next aria-label="Next month"><span aria-hidden="true">›</span></button>
+            </div>
+          </div>
+          <div class="cal__grid" data-cal-grid></div>
+          <ul class="cal__legend small" aria-label="Legend">
+            <li><span class="cal__key cal__key--up" aria-hidden="true"></span>Upcoming</li>
+            <li><span class="cal__key cal__key--past" aria-hidden="true"></span>Past</li>
+            <li><span class="cal__key cal__key--today" aria-hidden="true"></span>Today</li>
+          </ul>
+          <p class="cal__hint small" data-cal-hint hidden>Use the arrow keys to move between days; Page Up and Page Down change the month.</p>
         </div>
-        <div class="cal__grid" data-cal-grid></div>
-        <p class="cal__empty small" data-cal-empty hidden>No events this month.</p>
+        <aside class="cal__panel" data-cal-panel aria-live="polite" aria-label="Selected day"></aside>
         <noscript><p class="small">The calendar needs JavaScript. Every event is listed below.</p></noscript>
-        <script type="application/json" data-cal-data>[{"id":"ai-for-business-2026-09-25","title":"AI for Business: Hands-On Workshop","start":"2026-09-25","end":"2026-09-25","timeZone":"Asia/Manila","allDay":true,"time":null,"location":"RK Bistro PH, Pampanga","url":"/workshops/#event-ai-for-business-2026-09-25","external":false,"past":true},{"id":"ai-linkedin-b2b-growth-accelerator-2026","title":"AI + LinkedIn B2B Growth Accelerator","start":"2026-09-30T13:00:00+08:00","end":"2026-09-30T18:00:00+08:00","timeZone":"Asia/Manila","allDay":false,"time":"1:00–6:00 PM PHT","location":"House of Transformation, Ayala Malls The 30th, Pasig City","url":"/workshops/#event-ai-linkedin-b2b-growth-accelerator-2026","external":false,"past":true}]</script>
+        <script type="application/json" data-cal-data>[{"id":"ai-for-business-2026-09-25","title":"AI for Business: Hands-On Workshop","summary":"Practical AI workflows for marketing, sales and operations, built and tested on participants' own laptops.","start":"2026-09-25","end":"2026-09-25","timeZone":"Asia/Manila","allDay":true,"time":null,"location":"RK Bistro PH, Pampanga","url":"/workshops/#event-ai-for-business-2026-09-25","external":false,"past":true,"cta":null},{"id":"ai-linkedin-b2b-growth-accelerator-2026","title":"AI + LinkedIn B2B Growth Accelerator","summary":"Positioning, content and follow-up systems for B2B growth, with Faith Works PH and CAP Hernandez.","start":"2026-09-30T13:00:00+08:00","end":"2026-09-30T18:00:00+08:00","timeZone":"Asia/Manila","allDay":false,"time":"1:00–6:00 PM PHT","location":"House of Transformation, Ayala Malls The 30th, Pasig City","url":"/workshops/#event-ai-linkedin-b2b-growth-accelerator-2026","external":false,"past":true,"cta":null}]</script>
       </div>
     </section>
 
@@ -134,6 +149,46 @@
       </div>
     </section>
 
+    <!-- EVENTS GALLERY: every photo from the Events gallery (tools/event-gallery.mjs) -->
+    <section class="section wrap egallery" id="gallery" aria-labelledby="gallery-title">
+      <div class="section-head">
+        <h2 id="gallery-title">From past sessions</h2>
+        <p>Photos from Faith Works masterclasses, workshops, talks and community gatherings.</p>
+      </div>
+      <ul class="mgrid" role="list" aria-label="All photos from Faith Works events">
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/group-community-1280.webp" srcset="../assets/images/web/group-community-640.webp 640w, ../assets/images/web/group-community-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="960" alt="A large community of participants posing together at a Faith Works event." loading="lazy" decoding="async" style="object-position:50% 72%"><figcaption>Community, in person</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/presenter-qr-1280.webp" srcset="../assets/images/web/presenter-qr-640.webp 640w, ../assets/images/web/presenter-qr-1280.webp 706w" sizes="(min-width: 1000px) 25vw, 50vw" width="706" height="1260" alt="A facilitator presenting beside a QR code on screen while participants follow along on their laptops." loading="lazy" decoding="async" style="object-position:50% 78%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/stage-notebook-1280.webp" srcset="../assets/images/web/stage-notebook-640.webp 640w, ../assets/images/web/stage-notebook-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad on a conference stage, pointing to a live AI notebook demo on the big screen." loading="lazy" decoding="async" style="object-position:35% 50%"><figcaption>Conference keynotes</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/coaching-at-tables-1280.webp" srcset="../assets/images/web/coaching-at-tables-640.webp 640w, ../assets/images/web/coaching-at-tables-1280.webp 847w" sizes="(min-width: 1000px) 25vw, 50vw" width="847" height="1152" alt="Faith Natividad with a microphone among participants working on their laptops." loading="lazy" decoding="async" style="object-position:50% 40%"><figcaption>Coaching at every table</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/open-qa-1280.webp" srcset="../assets/images/web/open-qa-640.webp 640w, ../assets/images/web/open-qa-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="Faith Natividad and a participant, both with microphones, discussing a slide during an open Q&amp;A." loading="lazy" decoding="async" style="object-position:45% 45%"><figcaption>Open Q&amp;A</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/speaking-five-steps-1280.webp" srcset="../assets/images/web/speaking-five-steps-640.webp 640w, ../assets/images/web/speaking-five-steps-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad smiling as she presents a five-step AI framework on screen." loading="lazy" decoding="async" style="object-position:55% 40%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/hotel-laptops-1280.webp" srcset="../assets/images/web/hotel-laptops-640.webp 640w, ../assets/images/web/hotel-laptops-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="1707" alt="Participants following along on laptops in a warmly lit hotel function room." loading="lazy" decoding="async" style="object-position:50% 55%"><figcaption>Hands-on, on real tasks</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/certificates-stage-1280.webp" srcset="../assets/images/web/certificates-stage-640.webp 640w, ../assets/images/web/certificates-stage-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="960" alt="Participants on stage holding their certificates after completing a Faith Works program." loading="lazy" decoding="async" style="object-position:50% 45%"><figcaption>Every batch, certified</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/masterclass-cheer-1280.webp" srcset="../assets/images/web/masterclass-cheer-640.webp 640w, ../assets/images/web/masterclass-cheer-1280.webp 706w" sizes="(min-width: 1000px) 25vw, 50vw" width="706" height="569" alt="Masterclass participants cheering with their arms raised on stage." loading="lazy" decoding="async" style="object-position:50% 45%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/roundtable-1280.webp" srcset="../assets/images/web/roundtable-640.webp 640w, ../assets/images/web/roundtable-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="Leaders around a boardroom table smiling after a Faith Works roundtable." loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption>Leadership roundtables</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/room-hotel-1280.webp" srcset="../assets/images/web/room-hotel-640.webp 640w, ../assets/images/web/room-hotel-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="720" alt="Participants at tables with laptops facing the screen during a Faith Works session." loading="lazy" decoding="async" style="object-position:50% 55%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/talk-laptops-1280.webp" srcset="../assets/images/web/talk-laptops-640.webp 640w, ../assets/images/web/talk-laptops-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad demonstrating an AI tool on screen while participants follow on their laptops." loading="lazy" decoding="async" style="object-position:40% 40%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/group-gala-1280.webp" srcset="../assets/images/web/group-gala-640.webp 640w, ../assets/images/web/group-gala-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="Participants gathered in front of a glittering stage backdrop at a Faith Works event." loading="lazy" decoding="async" style="object-position:50% 60%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/bgc-laptops-1280.webp" srcset="../assets/images/web/bgc-laptops-640.webp 640w, ../assets/images/web/bgc-laptops-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="Workshop participants working on their laptops during a hands-on Faith Works session." loading="lazy" decoding="async" style="object-position:50% 60%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/community-house-of-creatives-1280.webp" srcset="../assets/images/web/community-house-of-creatives-640.webp 640w, ../assets/images/web/community-house-of-creatives-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="A Faith Works community gathering at House of Creatives, everyone smiling for a group photo." loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption>House of Creatives</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/room-chart-1280.webp" srcset="../assets/images/web/room-chart-640.webp 640w, ../assets/images/web/room-chart-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="A corporate team on laptops during a Faith Works training, with a poll chart on screen." loading="lazy" decoding="async" style="object-position:50% 50%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/speaking-faith-screen-1280.webp" srcset="../assets/images/web/speaking-faith-screen-640.webp 640w, ../assets/images/web/speaking-faith-screen-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad speaking with a microphone beside a screen showing the Faith Works name." loading="lazy" decoding="async" style="object-position:38% 35%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/group-orchestrator-1280.webp" srcset="../assets/images/web/group-orchestrator-640.webp 640w, ../assets/images/web/group-orchestrator-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="720" alt="Participants of the Operator to Orchestrator session posing together in front of the event screen." loading="lazy" decoding="async" style="object-position:50% 55%"><figcaption>Operator to Orchestrator</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/talk-generations-1280.webp" srcset="../assets/images/web/talk-generations-640.webp 640w, ../assets/images/web/talk-generations-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Participants watching a slide on how different generations bring different strengths to AI learning." loading="lazy" decoding="async" style="object-position:50% 45%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/group-office-1280.webp" srcset="../assets/images/web/group-office-640.webp 640w, ../assets/images/web/group-office-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="A company team seated together in their office after a Faith Works AI training." loading="lazy" decoding="async" style="object-position:50% 60%"><figcaption>In-company training</figcaption></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/room-wide-1280.webp" srcset="../assets/images/web/room-wide-640.webp 640w, ../assets/images/web/room-wide-1280.webp 1276w" sizes="(min-width: 1000px) 50vw, 100vw" width="1276" height="946" alt="A wide view of a Faith Works session: rows of participants at tables facing the presentation screen." loading="lazy" decoding="async" style="object-position:50% 55%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/stage-prompting-1280.webp" srcset="../assets/images/web/stage-prompting-640.webp 640w, ../assets/images/web/stage-prompting-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad on a conference stage beside a giant slide titled What Is Prompt Engineering?" loading="lazy" decoding="async" style="object-position:50% 50%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/hotel-session-1280.webp" srcset="../assets/images/web/hotel-session-640.webp 640w, ../assets/images/web/hotel-session-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="Participants with laptops at round tables in a hotel function room, facing the screen at the front." loading="lazy" decoding="async" style="object-position:50% 60%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:5;--cm:1;--rm:5"><figure><img src="../assets/images/web/bgc-room-1280.webp" srcset="../assets/images/web/bgc-room-640.webp 640w, ../assets/images/web/bgc-room-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="Participants working on laptops in a bright training room during a Faith Works workshop." loading="lazy" decoding="async" style="object-position:50% 55%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:3;--cm:1;--rm:3"><figure><img src="../assets/images/web/talk-big-screen-1280.webp" srcset="../assets/images/web/talk-big-screen-640.webp 640w, ../assets/images/web/talk-big-screen-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad presenting a framework on a large screen to a seated audience." loading="lazy" decoding="async" style="object-position:60% 45%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/masterclass-stage-group-1280.webp" srcset="../assets/images/web/masterclass-stage-group-640.webp 640w, ../assets/images/web/masterclass-stage-group-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="960" alt="Masterclass participants posing together on and around the stage." loading="lazy" decoding="async" style="object-position:50% 55%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/speaking-whiteboard-1280.webp" srcset="../assets/images/web/speaking-whiteboard-640.webp 640w, ../assets/images/web/speaking-whiteboard-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="853" alt="Faith Natividad speaking beside a whiteboard of workshop notes." loading="lazy" decoding="async" style="object-position:38% 30%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--large" style="--c:6;--r:8;--ct:6;--rt:5;--cm:2;--rm:4"><figure><img src="../assets/images/web/group-selfie-1280.webp" srcset="../assets/images/web/group-selfie-640.webp 640w, ../assets/images/web/group-selfie-1280.webp 1280w" sizes="(min-width: 1000px) 50vw, 100vw" width="1280" height="612" alt="A large group of Faith Works participants gathered for a celebratory photo after a session." loading="lazy" decoding="async" style="object-position:50% 45%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--tall" style="--c:3;--r:5;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/slides-poll-1280.webp" srcset="../assets/images/web/slides-poll-640.webp 640w, ../assets/images/web/slides-poll-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="720" alt="A Faith Works facilitator presenting live poll results on screen to a seated group." loading="lazy" decoding="async" style="object-position:50% 40%"></figure></li>
+          <li class="mgrid__tile mgrid__tile--small" style="--c:3;--r:3;--ct:3;--rt:4;--cm:1;--rm:4"><figure><img src="../assets/images/web/masterclass-certificates-1280.webp" srcset="../assets/images/web/masterclass-certificates-640.webp 640w, ../assets/images/web/masterclass-certificates-1280.webp 1280w" sizes="(min-width: 1000px) 25vw, 50vw" width="1280" height="800" alt="AI &amp; Claude Masterclass graduates holding their certificates in the session room." loading="lazy" decoding="async" style="object-position:50% 50%"><figcaption>AI &amp; Claude Masterclass</figcaption></figure></li>
+        </ul>
+    </section>
+
     <section class="section wrap" id="past" aria-labelledby="past-title">
       <div class="section-head">
         <h2 id="past-title">Past events</h2>
@@ -177,7 +232,7 @@
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="../learn/index.html">Learn AI</a><a href="../workshops/index.html">Workshops</a><a href="../resources/index.html">Resources</a><a href="../free-ai-starter-kit/index.html">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="../business/index.html">For Business</a><a href="../build/index.html">Build with AI</a><a href="../speaking/index.html">Speaking &amp; partnerships</a><a href="../about/index.html">About Faith Works</a></div>
+          <div><h2>Work with us</h2><a href="../professionals/index.html">For Professionals</a><a href="../business/index.html">For Business</a><a href="../build/index.html">Build with AI</a><a href="../speaking/index.html">Speaking &amp; partnerships</a><a href="../about/index.html">About Faith Works</a></div>
           <div><h2>Follow</h2><a href="https://www.facebook.com/profile.php?id=61580485384062" target="_blank" rel="noopener" aria-label="Faith Works PH on Facebook (opens in a new tab)">Facebook <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.instagram.com/faithworksph_/" target="_blank" rel="noopener" aria-label="Faith Works on Instagram (opens in a new tab)">Instagram <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/faithnatividad/" target="_blank" rel="noopener" aria-label="Faith Natividad on LinkedIn (opens in a new tab)">LinkedIn <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/g/1DGeoshBNh/" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

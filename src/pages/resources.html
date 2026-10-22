@@ -13,17 +13,34 @@
       </div>
     </section>
 
-    <section class="section wrap" aria-labelledby="guides-title">
-      <h2 id="guides-title" class="sr-only">Guides and worksheets</h2>
-      {{resourceList}}
+    <section class="section wrap" aria-labelledby="none-title">
+      <h2 id="none-title" class="sr-only">Resources</h2>
+      {{resourcesEmpty}}
     </section>
 
-    <section class="section section--flush-top wrap" aria-labelledby="articles-title">
-      <div class="section-head">
-        <h2 id="articles-title">Practical articles</h2>
-        <p>Short reads on applying AI with judgment, written for non-technical professionals.</p>
+    <!-- FEATURED INSIGHT: the newest featured article on a full-width Faith Pink band -->
+    <section class="insight" aria-labelledby="insight-title">
+      {{featuredInsight}}
+    </section>
+
+    <!-- LATEST INSIGHTS: the other articles as editorial rows, filterable by topic -->
+    <section class="section wrap insights" aria-labelledby="articles-title">
+      <div class="insights__head">
+        <div>
+          <p class="eyebrow">Latest insights</p>
+          <h2 id="articles-title">Read something<br>useful today.</h2>
+        </div>
       </div>
-      {{articleCards}}
+      {{insightList}}
+    </section>
+
+    <!-- GUIDES: featured guides as large cards, then the rest -->
+    <section class="section section--flush-top wrap" aria-labelledby="guides-title">
+      <div class="section-head">
+        <h2 id="guides-title">Guides and worksheets</h2>
+        <p>Tools you can use on your own work. Each card says how you get it.</p>
+      </div>
+      {{guides}}
     </section>
 
     <section class="section section--flush-top wrap">
@@ -32,6 +49,6 @@
           <h2 class="h3">Keep learning with others</h2>
           <p>The Faith Works Community is a place to share what you are applying and stay connected between events.</p>
         </div>
-        <a class="btn btn--light" href="/community/">About the community <span class="btn__arrow" aria-hidden="true">↗</span></a>
+        <a class="btn btn--light" href="/community/">About the community</a>
       </div>
     </section>

@@ -74,6 +74,11 @@ and `cms/server/services/`). Hiding a button is never the protection.
   current role for it. Nothing is rewritten in the database automatically.
 - Other people are rows in the `cms_users` table (the `users` tab with the Sheets store), managed only from **Users and roles**. Nobody can change their own role.
 - Sign-in is **Google OAuth** (OpenID Connect with PKCE). The CMS never stores or sees a password.
+  Scopes are `openid email` only. The ID token's RS256 signature is verified with Google's published
+  keys (`https://www.googleapis.com/oauth2/v3/certs`, cached), then its issuer, audience, `azp`,
+  expiry, nonce and `email_verified` are checked before the allowlist (`CMS_SUPER_ADMINS`, then
+  active `users` rows) is consulted. The Google access token is discarded. Session and OAuth-state
+  cookies are separately typed signed tokens; rotating `CMS_SESSION_SECRET` signs everyone out.
 - A session is a signed HttpOnly cookie (8 hours by default). The role is re-read on every request, so removing someone takes effect within 30 seconds.
 - **First Super Admin:** set `CMS_SUPER_ADMINS=faith@…` in the hosting environment, deploy, and sign in with that Google account. Then add the team under *Users and roles*. There are no default credentials.
 
@@ -108,7 +113,7 @@ by hand after a backup; it is not applied by `supabase db push`).
 An event is information for the Workshops page and its calendar: **title**, optional **short
 description**, **start date** (needed to publish), start time, optional end date and end time, **time
 zone** (Asia/Manila by default; stored as entered, never converted), optional **location or meeting
-details**, optional **image**, **Show on the website**, and *Where should the registration button go?*
+details**, optional **event images** (a gallery; see below), **Show on the website**, and *Where should the registration button go?*
 
 | Choice | The card's button | Page on the website |
 | --- | --- | --- |
@@ -122,6 +127,25 @@ last day of the event in its own time zone; past events show no registration but
 page has a month **calendar** (drawn by `js/main.js` from data the build embeds) and the build also
 writes `/events/calendar.json` (published, visible events with a date: ISO start and end with the
 zone's offset, the page or registration link). Drafts and hidden events are never in either.
+
+**Event images (gallery).** An event holds up to 24 photos in display order (`gallery` in the
+record: `{ url, alt, primary, featured }`). Editors upload JPEG/PNG/WebP files (5 MB each; the
+server checks the file itself, never only its name), pick photos already on the website (the photo
+registry, `src/data/gallery.json`) or paste an address; they describe each photo (alt text, needed
+to publish), choose exactly one **Cover image**, tick **Show in the events gallery**, reorder by
+dragging or with the arrow buttons, and remove photos. The cover is copied into
+`featured_image_url` / `featured_image_alt` on every save, so event cards, link previews and older
+readers keep working; an event saved before galleries is read as a one-image gallery (its image is
+the cover, not shown in the Events gallery) until someone saves it. Event pages can show the other
+photos with the **Event photos** block (`data-cms-component="event-gallery"`). The website's Events
+gallery (homepage and Workshops, `tools/event-gallery.mjs`) shows the images marked for it from
+published, visible events, followed by the archive in `src/data/events.json`. Uploads go to the
+public Supabase Storage bucket `event-images` (local JSON store: `assets/images/uploads/`, or
+`CMS_UPLOAD_DIR`); only their addresses are stored. The database enforces the gallery's shape (one
+cover, no duplicate addresses, at most 24) with
+`supabase/migrations/20261022000000_event_galleries.sql` (undo:
+`supabase/manual/20261022000000_event_galleries_down.sql`). Uploaded files that end up on no event
+are kept in the bucket (nothing deletes files automatically).
 
 ## 3a. Details and the page editor
 
@@ -392,6 +416,9 @@ Kept for the Google Sheets integration (required only with `CMS_STORE=sheets`, o
 `GOOGLE_SHEETS_SPREADSHEET_ID` and the service-account credentials (`GOOGLE_SERVICE_ACCOUNT_EMAIL` +
 `GOOGLE_PRIVATE_KEY`, or `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`). Optional website settings:
 `PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild), `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
+Website form submissions (all optional; the endpoint stays off without `FORMS_ALLOWED_ORIGINS`):
+`FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT`, `RESEND_API_KEY`, `FORMS_EMAIL_FROM`, `FORMS_NOTIFY_TO`,
+`FORMS_NOTIFY_TO_<FORM_ID>`, `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB`, `NETLIFY_FORMS_WEBHOOK_SECRET` (§13).
 
 The public website (Vercel) needs none of these; it only reads `/api/public/content` from the CMS
 (its one setting is `CMS_CONTENT_URL`, see §5.5).
@@ -466,3 +493,164 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 5. Website project builds with `CONTENT_SOURCE=cms`; a test publish triggers the rebuild and appears within minutes; unpublish removes it.
 6. Secret scanning and push protection enabled; first backup taken and stored privately.
 7. Content team walked through: drafts, Publish, Show on the website, preview, HTML/visual editing, event registration choices. Testimonials are published only with the person's agreement to be quoted (the CMS no longer records consent; keep that record wherever the team keeps it).
+8. Form submissions (§13): migration run; one labelled test per form appears under *Form submissions*; the alert arrives at the right recipients; an Author cannot open the page.
+
+## 13. Website form submissions
+
+Every website form (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
+general contact, event notify) can send its submissions to the CMS. Super Admins see them under
+**Inbox → Form submissions**. This replaces the earlier plan of native GHL forms (docs/04, docs/06)
+for capture. GHL itself is untouched; a GHL forwarder could later be added as another delivery
+channel.
+
+### 13.1 Architecture
+
+```
+ Website form (js/forms.js, any host) ── POST JSON + request id ──► CMS /api/forms/submit
+                                                                     │  validate (shared/forms.mjs),
+ Netlify Forms (future, optional) ── signed webhook ──► /api/forms/netlify   classify, rate-limit
+                                                                     ▼
+                                        Supabase cms_form_submissions   ◄── canonical record
+                                                                     │  then, each with its own state:
+                                       ┌─────────────────────────────┴───────────────┐
+                                       ▼                                             ▼
+                          Team email alert (Resend)                 Copy in the Sheet's own
+                                                                    "form_submissions" tab (optional)
+          retried by netlify/functions/forms-retry.mjs (every 10 min) and by "Retry now" in the CMS
+```
+
+| Piece | Where |
+| --- | --- |
+| Form definitions (fields, options, limits), one source for the website markup and the server | `shared/forms.mjs` (used by `tools/render.mjs`) |
+| Provider adapters (the hosting boundary) | `server/forms/adapters.mjs`: `cms_endpoint` (website forms, any host), `netlify_forms` (Netlify webhook) |
+| Capture, delivery, retries, CMS operations | `server/forms/submissions.mjs` |
+| Email alert | `server/forms/notify.mjs` (Resend over HTTPS, no SDK) |
+| Sheets copy | `server/forms/sheets-mirror.mjs` (reuses `server/store/sheets-api.mjs`) |
+| Dashboard screens | `public/ui/submissions.mjs` |
+| Database | `supabase/migrations/20261021000000_form_submissions.sql` |
+
+**One source of truth.** The row in `cms_form_submissions` is the submission. The email and the
+Sheets row are notifications/copies; the CMS never reads them back, so the Submissions page works
+while Resend or Google is down. Each row is keyed by provider + provider id (the browser's request
+id, reused on retries, or Netlify's submission id), so a retry, double click or webhook redelivery
+never creates a second row or a second alert.
+
+**Order of work.** Validate → store → only then email and copy. The visitor sees success as soon
+as the row is stored, never before. If email or Sheets fails, the row keeps the error
+(`notify_state` / `sheets_state` = failed, with the message), the list shows *Delivery failed*,
+and the retry job tries again (up to 6 automatic attempts; a Super Admin can always press *Retry
+now*). Resend receives the submission id as its Idempotency-Key, and the Sheets copy looks for the
+id in the tab before appending, so retries do not duplicate.
+
+### 13.2 Security
+
+- **Public endpoint** `POST /api/forms/submit`: off until `FORMS_ALLOWED_ORIGINS` is set; accepts
+  only requests whose `Origin` is listed (CORS answers only that origin); JSON up to 64 KB; every
+  field is validated and normalised on the server against `shared/forms.mjs` (unknown fields
+  dropped, control characters removed, select values checked, lengths limited).
+- **Spam:** the honeypot field and the 2.5-second time trap are re-checked on the server. Spam is
+  stored as *Spam* (reviewable and reclassifiable), answered like a success so bots learn
+  nothing, and never emailed or copied. **Test records** (addresses at `example.com/.org/.net` or
+  `*.test`, or a name starting with "Test"/"[TEST]") are labelled *Test*, and their alert subject
+  starts with `[TEST]`.
+- **Rate limit:** `FORMS_RATE_LIMIT` (default 5) per connection per 10 minutes, counted in the
+  database with a keyed hash of the visitor's address (HMAC with `CMS_SESSION_SECRET`). The
+  address itself is never stored.
+- **Access:** Super Admins only (API-enforced: 403 for Authors, 401 without a session). The table
+  has RLS on, no policies, no privileges for `anon`/`authenticated`, and no DELETE for anyone.
+  Status and type changes go to the audit log (no personal data in the entry).
+- **Email content:** form type, the person's name, the time (Manila), the form's answers (option
+  labels; free text over 300 characters shortened), the offer and source page, and a link into the
+  CMS. Never the email address, phone or consent record: those stay behind the sign-in. Spam is
+  never emailed; tests are marked `[TEST]`.
+- **Recipient:** `projects@digitalgrowthscale.com` for every form, built in
+  (`DEFAULT_NOTIFY_TO`, server/config.mjs). `FORMS_NOTIFY_TO` replaces it only if set; an invalid
+  value switches alerts off rather than falling back.
+- **Netlify webhook:** `X-Webhook-Signature` (JWS, HS256) is verified with
+  `NETLIFY_FORMS_WEBHOOK_SECRET`, including the issuer and the SHA-256 of the exact body, before
+  anything is read. Without the secret the route answers 404.
+- **Secrets** (`RESEND_API_KEY`, `NETLIFY_FORMS_WEBHOOK_SECRET`, Supabase and Google keys) exist
+  only in the CMS host's environment. The website has none: `js/config.js` holds only the endpoint
+  URL. Logs contain submission ids and error codes, never answers or addresses.
+
+### 13.3 Google Sheets coexistence
+
+The spreadsheet holds only the earlier CMS-content tabs (rollback store, §4a). No form, report or
+trigger tabs were found (read-only check, 20 Oct 2026). With `FORMS_SHEETS_MIRROR=true` the CMS
+writes **only** the tab named by `FORMS_SHEETS_TAB` (`form_submissions`). It creates the tab with a
+header row if it is missing. If the tab exists, its own header row is used as-is: columns are
+matched by name, extra columns are left empty, nothing is reordered or overwritten, and rows are
+only appended (values RAW). The CMS-content tabs, credentials, sharing and `sheets:*` scripts are
+unchanged. Note: `npm run sheets:check` already reported a missing `role` column on the
+`testimonials` tab before this change; that is a separate, pre-existing item (`npm run
+sheets:setup`, after a backup).
+
+### 13.4 Setup (needs credentials and approval)
+
+1. **Database** (additive: one new table): run `supabase/migrations/20261021000000_form_submissions.sql`
+   in the Supabase SQL editor, or `supabase db push`. Check: `/api/health` shows `"forms": {…}` and
+   the Submissions page loads.
+2. **Email:** a Resend account owned by Faith Works; verify the sending domain (Resend lists the
+   SPF/DKIM DNS records to add; faithph.ai's DNS is on Cloudflare in front of GHL); create an API
+   key with *sending access* only; set `RESEND_API_KEY` and `FORMS_EMAIL_FROM`. Leave
+   `FORMS_NOTIFY_TO` empty to use projects@digitalgrowthscale.com. Then send one labelled test
+   per form and confirm each alert arrives there before calling alerts live.
+3. **Sheets copy:** `FORMS_SHEETS_MIRROR=true`. The service account already has access.
+4. **Switch on the endpoint:** `FORMS_ALLOWED_ORIGINS=https://<website origin>` (staging first).
+   Set every variable in the Netlify UI with the **Functions** scope and redeploy. The retry
+   function (`netlify/functions/forms-retry.mjs`) runs on published production deploys only.
+5. **Website:** in `js/config.js` set `forms.mode = "endpoint"` and
+   `forms.endpoint = "https://<cms-domain>/api/forms/submit"`; rebuild and deploy. Send one
+   labelled test per form (`[TEST]` name, an `@example.test` address) and check the CMS, the alert
+   and the Sheets tab.
+
+| Variable (CMS host, Functions scope) | Purpose |
+| --- | --- |
+| `FORMS_ALLOWED_ORIGINS` | Website origins allowed to submit; empty = endpoint off |
+| `FORMS_RATE_LIMIT` | Per connection per 10 minutes (default 5) |
+| `RESEND_API_KEY`, `FORMS_EMAIL_FROM` | Alert sending (sender on a verified domain) |
+| `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>` | Optional overrides of the built-in recipient (projects@digitalgrowthscale.com) |
+| `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB` | Optional copy to the spreadsheet |
+| `NETLIFY_FORMS_WEBHOOK_SECRET` | Only with native Netlify Forms (§13.5) |
+
+Problems with these settings never stop the CMS. They are listed on the Submissions page (and
+counted on `/api/health`), and only the affected part stays off.
+
+### 13.5 Moving the website from Vercel to Netlify
+
+The CMS and its submission history do not move or change.
+
+- **A. Keep the website's own forms (recommended; nothing to rebuild).** Deploy the website to
+  Netlify (build `node tools/build.mjs --deploy --content=cms --view=published --out=dist`,
+  publish `dist`, `CMS_CONTENT_URL` as today; `_redirects` is already generated). Add the new
+  origin to `FORMS_ALLOWED_ORIGINS`, keeping the Vercel origin until the switch is complete. The
+  forms keep posting to the same CMS endpoint. In the new Netlify site turn *Forms → Form
+  detection* off, so Netlify does not collect them a second time.
+- **B. Native Netlify Forms.** Each form needs `data-netlify="true"`, a `name` equal to its form id
+  (`general_contact`…), a hidden `form-name` input and static markup in the built HTML (it already
+  is), and js/forms.js must post url-encoded to the page instead of JSON to the CMS. In Netlify add
+  an outgoing webhook *Form submission → https://<cms-domain>/api/forms/netlify* with a JWS
+  secret, and set the same secret as `NETLIFY_FORMS_WEBHOOK_SECRET` on the CMS. Submissions then
+  appear in the same CMS list (marked *Netlify Forms*), stored once under Netlify's id.
+  **Not built:** the markup and js/forms.js changes for B. The webhook receiver is built and tested
+  with signatures made to Netlify's documented format, not against a live Netlify site.
+
+After a move, test: one labelled submission per form, a duplicate, an alert, the Sheets row, and a
+signed-out request to `/api/submissions` (must answer 401). DNS and the production host change
+only with approval.
+
+### 13.6 Tested
+
+`npm test` (102 tests) includes `test/forms.test.mjs` and a Supabase-adapter test: the website
+renders exactly the fields the server accepts; server validation; endpoint off by default; CORS;
+storage before alerting; duplicates (one row, one email); honeypot and time-trap spam; test-record
+labelling; rate limits; Resend HTTP and network failures, the 6-attempt cap, manual retry with the
+same idempotency key; an interrupted send; a status change during a send; the database unavailable
+(no false success; the browser's retry succeeds); the Sheets copy (own tab only, existing header
+order kept, Google failure and a lost reply without duplicate rows); Netlify signatures (wrong
+secret, body, issuer) and redelivery; Super-Admin-only access; search, filters (type, Manila dates,
+status, spam/test) and audited status changes. In Chrome (local JSON store, no email key): a test
+contact submission from the built website reached the CMS list and detail screens and its status
+was changed. **Not yet tested** (needs credentials or access): the migration on the hosted
+Supabase project, a real Resend send and domain verification, writes to the real spreadsheet, the
+deployed Netlify functions including the scheduled retry, and a live Netlify Forms webhook.

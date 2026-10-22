@@ -5,10 +5,12 @@
    forms.mode
      "preview"  : staging. Forms validate and show what would be recorded,
                   but nothing is sent or stored, and no false success is shown.
-     "endpoint" : forms POST JSON to forms.endpoint, a server-side handler that
-                  holds the CRM credentials (e.g. a serverless function that
-                  creates/updates the GoHighLevel contact). Success is shown only
-                  when it answers 2xx with { ok: true }.
+     "endpoint" : forms POST JSON to forms.endpoint: the CMS submission API,
+                  https://<cms-domain>/api/forms/submit (cms/README.md §13). It
+                  stores the submission in Supabase, then alerts the team. Its
+                  credentials stay on the CMS server. Success is shown only when
+                  it answers 2xx with { ok: true }. The website's origin must be
+                  listed in the CMS setting FORMS_ALLOWED_ORIGINS.
      If native GHL forms are embedded instead (the recommended launch path),
      the designed forms are replaced and this setting is unused.
    starterKit.downloadUrl : the approved kit file. null until the PDF is final.

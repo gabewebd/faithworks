@@ -1,0 +1,36 @@
+{
+  "_readme": "Faith Works Events gallery: photos from past sessions (masterclasses, workshops, talks, community gatherings). Separate from Resources. Each entry names a photo from the registry (src/data/gallery.json: file, alt, crop, focal point) and says how it shows in the gallery: id (stable, never reused), image (registry id), order (lower first), featured (true: also on the homepage; the homepage shows the first 10 featured photos), alt / position (optional overrides for this gallery), caption (optional, a short label shown on hover) and eventId (optional: the CMS event record this photo belongs to, e.g. evt_c0e615cab7). Photos an editor attaches to an event in the CMS (Events > Event images) are the authoritative gallery for that event; the ones marked 'Show in the events gallery' are added to these galleries automatically at the next build. This file holds the archive of earlier sessions that have no CMS event record. Layout: the gallery is laid out in bands of five tiles: large, tall, small, tall, small, then mirrored small, tall, large, tall, small. Keep the count a multiple of 5 and give the large (1st, 8th, 11th, 18th…) and tall (2nd, 4th, 7th, 9th…) places photos that crop well to those shapes. To add a photo: register it in gallery.json, run python tools/images.py, add an entry here, then node tools/build.mjs.",
+  "gallery": [
+    { "id": "evg-01", "image": "group-community", "order": 1, "featured": true, "position": "50% 72%", "caption": "Community, in person" },
+    { "id": "evg-02", "image": "presenter-qr", "order": 2, "featured": true, "position": "50% 78%" },
+    { "id": "evg-03", "image": "stage-notebook", "order": 3, "featured": true, "caption": "Conference keynotes" },
+    { "id": "evg-04", "image": "coaching-at-tables", "order": 4, "featured": true, "caption": "Coaching at every table" },
+    { "id": "evg-05", "image": "open-qa", "order": 5, "featured": true, "caption": "Open Q&A" },
+    { "id": "evg-06", "image": "speaking-five-steps", "order": 6, "featured": true },
+    { "id": "evg-07", "image": "hotel-laptops", "order": 7, "featured": true, "caption": "Hands-on, on real tasks" },
+    { "id": "evg-08", "image": "certificates-stage", "order": 8, "featured": true, "caption": "Every batch, certified" },
+    { "id": "evg-09", "image": "masterclass-cheer", "order": 9, "featured": true, "position": "50% 45%" },
+    { "id": "evg-10", "image": "roundtable", "order": 10, "featured": true, "caption": "Leadership roundtables" },
+
+    { "id": "evg-11", "image": "room-hotel", "order": 11, "featured": false },
+    { "id": "evg-12", "image": "talk-laptops", "order": 12, "featured": false },
+    { "id": "evg-13", "image": "group-gala", "order": 13, "featured": false },
+    { "id": "evg-14", "image": "bgc-laptops", "order": 14, "featured": false },
+    { "id": "evg-15", "image": "community-house-of-creatives", "order": 15, "featured": false, "caption": "House of Creatives" },
+    { "id": "evg-16", "image": "room-chart", "order": 16, "featured": false },
+    { "id": "evg-17", "image": "speaking-faith-screen", "order": 17, "featured": false },
+    { "id": "evg-18", "image": "group-orchestrator", "order": 18, "featured": false, "caption": "Operator to Orchestrator" },
+    { "id": "evg-19", "image": "talk-generations", "order": 19, "featured": false },
+    { "id": "evg-20", "image": "group-office", "order": 20, "featured": false, "caption": "In-company training" },
+    { "id": "evg-21", "image": "room-wide", "order": 21, "featured": false },
+    { "id": "evg-22", "image": "stage-prompting", "order": 22, "featured": false },
+    { "id": "evg-23", "image": "hotel-session", "order": 23, "featured": false },
+    { "id": "evg-24", "image": "bgc-room", "order": 24, "featured": false },
+    { "id": "evg-25", "image": "talk-big-screen", "order": 25, "featured": false },
+    { "id": "evg-26", "image": "masterclass-stage-group", "order": 26, "featured": false },
+    { "id": "evg-27", "image": "speaking-whiteboard", "order": 27, "featured": false },
+    { "id": "evg-28", "image": "group-selfie", "order": 28, "featured": false },
+    { "id": "evg-29", "image": "slides-poll", "order": 29, "featured": false },
+    { "id": "evg-30", "image": "masterclass-certificates", "order": 30, "featured": false, "caption": "AI & Claude Masterclass" }
+  ]
+}

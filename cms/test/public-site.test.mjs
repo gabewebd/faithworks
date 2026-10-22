@@ -10,17 +10,19 @@ test("anonymous requests reach only the public endpoints", async () => {
   const { app, cleanup } = testApp();
   const anon = client(app, "");
   for (const p of ["/api/dashboard", "/api/records/programs", "/api/records/resources", "/api/records/settings", "/api/records/testimonials/x",
-    "/api/records/events/x/history", "/api/authors", "/api/tags", "/api/users", "/api/audit", "/api/recovery", "/api/backup"]) {
+    "/api/records/events/x/history", "/api/authors", "/api/tags", "/api/users", "/api/audit", "/api/recovery", "/api/backup", "/api/submissions", "/api/submissions/sub_x"]) {
     assert.equal((await anon.get(p)).status, 401, `GET ${p} needs a session`);
   }
-  for (const p of ["/api/records/resources", "/api/records/resources/x/actions/publish", "/api/preview", "/api/tags", "/api/users", "/api/deploy"]) {
+  for (const p of ["/api/records/resources", "/api/records/resources/x/actions/publish", "/api/preview", "/api/tags", "/api/users", "/api/deploy", "/api/submissions/sub_x/retry"]) {
     assert.equal((await anon.post(p, {})).status, 401, `POST ${p} needs a session`);
   }
   assert.equal((await anon.get("/api/public/preview")).status, 401, "drafts need the preview token");
 
   const health = await anon.get("/api/health");
   assert.equal(health.status, 200);
-  assert.deepEqual(Object.keys(health.data).sort(), ["configured", "ok", "store"]);
+  assert.deepEqual(Object.keys(health.data).sort(), ["configured", "forms", "ok", "store"]);
+  assert.deepEqual(Object.keys(health.data.forms).sort(), ["email", "endpoint", "netlify", "problems", "sheets"], "forms setup as booleans and a count only");
+  assert.equal((await anon.put("/api/submissions/sub_x", { status: "completed" })).status, 401, "PUT /api/submissions/:id needs a session");
 
   const pub = await anon.get("/api/public/content");
   assert.equal(pub.status, 200);

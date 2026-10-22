@@ -24,7 +24,7 @@ export function encodeValue(type, v) {
   switch (type) {
     case "list": return Array.isArray(v) ? v.join("\n") : String(v);
     case "tags": case "authors": return Array.isArray(v) ? v.join(", ") : String(v);
-    case "pairs": case "json": return (Array.isArray(v) && !v.length) || v === "" ? "" : JSON.stringify(v);
+    case "pairs": case "images": case "json": return (Array.isArray(v) && !v.length) || v === "" ? "" : JSON.stringify(v);
     case "boolean": return v === true ? "TRUE" : "FALSE";
     case "number": return v === "" ? "" : String(v);
     default: return String(v);
@@ -36,7 +36,7 @@ export function decodeValue(type, s) {
   switch (type) {
     case "list": return v ? v.split("\n").map((x) => x.trim()).filter(Boolean) : [];
     case "tags": case "authors": return v ? v.split(",").map((x) => x.trim()).filter(Boolean) : [];
-    case "pairs": try { return v ? JSON.parse(v) : []; } catch { return []; }
+    case "pairs": case "images": try { return v ? JSON.parse(v) : []; } catch { return []; }
     case "json": try { return v ? JSON.parse(v) : null; } catch { return null; }
     case "boolean": return v.toUpperCase() === "TRUE";
     case "number": return v === "" || Number.isNaN(Number(v)) ? null : Number(v);

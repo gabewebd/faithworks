@@ -69,10 +69,10 @@ export function createPreview({ store, cfg }) {
         else if (r) { d.resources = [r]; page = { title: rec.title, description: rec.summary, path: "/resources/", nav: "resources", body: `<section class="section wrap"><p class="eyebrow">This resource has no page of its own (no page content). How its card appears on /resources/</p>${R.resourceList()}</section>` }; }
       } else if (collection === "testimonials") {
         const s = d.stories.find((x) => x.id === rid);
-        page = { title: "Testimonial preview", description: "", path: "/", nav: "", body: `<section class="section wrap"><p class="eyebrow">How this testimonial card appears on the website</p><div class="quotes">${s ? R.storyCard(s) : "<p>Add the testimonial and the person’s name to preview the card.</p>"}</div></section>` };
+        page = { title: "Testimonial preview", description: "", path: "/", nav: "", body: `<section class="section wrap"><p class="eyebrow">How this testimonial card appears on the website</p><div class="quotes">${s ? R.storyCard(s) : R.emptyState({ title: "Nothing to preview yet.", text: "Add the testimonial and the person’s name to preview the card." })}</div></section>` };
       } else throw new HttpError(400, "This content type has no page preview.", "no_preview");
       if (!page) throw new HttpError(422, "Add a title, slug and page content to preview this page.", "incomplete");
-      let html = L.layout({ ...page, site: d.site });
+      let html = R.dropEmptySections(L.layout({ ...page, site: d.site }));
       if (cfg.production) html = html.replace("<head>", `<head>\n  <base href="${cfg.publicSiteUrl}/">`);
       return { html, report, path: page.path, view: live ? "live" : "draft" };
     },

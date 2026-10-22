@@ -1,0 +1,272 @@
+{
+  "_readme": "Faith Works photo registry: the one place that says which photo appears where. IMAGES lists every photo once: src (the original in assets/images/, never edited), alt, optional crop [left, top, right, bottom] as fractions of the original, position (CSS object-position focal point), social (also make a 1200px JPG for link previews) and socialDefault names the site-wide link-preview photo. replaces (retired image paths that CMS records may still point at; the build serves this photo instead). PAGES lists, per page, the galleries and photo slots the page sources call with {{gallery:page.slot}}. layout is single (one photo), stack (a main photo with floating cards), mosaic (an asymmetric grid) or figures (captioned photos). Each item names an image id and may override its alt or position (focal point) for that slot; caption is optional. The Events gallery (homepage and Workshops masonry) is listed in src/data/events.json. After adding or changing an image run `python tools/images.py` (Pillow) to make its web versions in assets/images/web/, then `node tools/build.mjs`.",
+  "socialDefault": "speaking-faith-screen",
+  "images": {
+    "founder-studio": {
+      "src": "assets/images/founder-photo.JPG",
+      "crop": [0.3734, 0, 0.9067, 1],
+      "alt": "Faith Natividad in a white blouse, smiling at a studio microphone.",
+      "position": "50% 30%"
+    },
+    "speaking-faith-screen": {
+      "src": "assets/images/rac1.jpg",
+      "alt": "Faith Natividad speaking with a microphone beside a screen showing the Faith Works name.",
+      "position": "38% 35%",
+      "social": true
+    },
+    "speaking-five-steps": {
+      "src": "assets/images/rac2.jpg",
+      "alt": "Faith Natividad smiling as she presents a five-step AI framework on screen.",
+      "position": "55% 40%"
+    },
+    "speaking-whiteboard": {
+      "src": "assets/images/rac3.jpg",
+      "alt": "Faith Natividad speaking beside a whiteboard of workshop notes.",
+      "position": "38% 30%"
+    },
+    "talk-generations": {
+      "src": "assets/images/rac4.jpg",
+      "alt": "Participants watching a slide on how different generations bring different strengths to AI learning.",
+      "position": "50% 45%",
+      "social": true,
+      "replaces": ["assets/images/temp-leadership"]
+    },
+    "talk-big-screen": {
+      "src": "assets/images/rac5.jpg",
+      "alt": "Faith Natividad presenting a framework on a large screen to a seated audience.",
+      "position": "60% 45%"
+    },
+    "talk-laptops": {
+      "src": "assets/images/rac6.jpg",
+      "alt": "Faith Natividad demonstrating an AI tool on screen while participants follow on their laptops.",
+      "position": "40% 40%"
+    },
+    "group-orchestrator": {
+      "src": "assets/images/rac7.JPG",
+      "alt": "Participants of the Operator to Orchestrator session posing together in front of the event screen.",
+      "position": "50% 55%"
+    },
+    "community-house-of-creatives": {
+      "src": "assets/images/hoc.jpg",
+      "alt": "A Faith Works community gathering at House of Creatives, everyone smiling for a group photo.",
+      "position": "50% 50%"
+    },
+    "stage-notebook": {
+      "src": "assets/images/wow-con1.JPG",
+      "alt": "Faith Natividad on a conference stage, pointing to a live AI notebook demo on the big screen.",
+      "position": "35% 50%",
+      "social": true,
+      "replaces": ["assets/images/temp-faith-ai"]
+    },
+    "stage-prompting": {
+      "src": "assets/images/wow-con2.png",
+      "alt": "Faith Natividad on a conference stage beside a giant slide titled What Is Prompt Engineering?",
+      "position": "50% 50%"
+    },
+    "room-chart": {
+      "src": "assets/images/workshop.JPG",
+      "alt": "A corporate team on laptops during a Faith Works training, with a poll chart on screen.",
+      "position": "50% 50%"
+    },
+    "room-full": {
+      "src": "assets/images/workshop1.JPG",
+      "alt": "A full room of participants learning together at a Faith Works session.",
+      "position": "50% 60%"
+    },
+    "room-hotel": {
+      "src": "assets/images/workshop2.JPG",
+      "alt": "Participants at tables with laptops facing the screen during a Faith Works session.",
+      "position": "50% 55%",
+      "social": true,
+      "replaces": ["assets/images/temp-learning-to-doing"]
+    },
+    "group-selfie": {
+      "src": "assets/images/workshop3.png",
+      "alt": "A large group of Faith Works participants gathered for a celebratory photo after a session.",
+      "position": "50% 45%"
+    },
+    "group-office": {
+      "src": "assets/images/workshop4.jpg",
+      "alt": "A company team seated together in their office after a Faith Works AI training.",
+      "position": "50% 60%"
+    },
+    "roundtable": {
+      "src": "assets/images/workshop5.jpg",
+      "alt": "Leaders around a boardroom table smiling after a Faith Works roundtable.",
+      "position": "50% 50%"
+    },
+    "group-community": {
+      "src": "assets/images/workshop6.jpg",
+      "alt": "A large community of participants posing together at a Faith Works event.",
+      "position": "50% 55%"
+    },
+    "group-gala": {
+      "src": "assets/images/workshop7.jpg",
+      "alt": "Participants gathered in front of a glittering stage backdrop at a Faith Works event.",
+      "position": "50% 60%"
+    },
+    "certificates-stage": {
+      "src": "assets/images/workshop8.jpg",
+      "alt": "Participants on stage holding their certificates after completing a Faith Works program.",
+      "position": "50% 45%",
+      "social": true,
+      "replaces": ["assets/images/temp-growth"]
+    },
+    "bgc-room": {
+      "src": "assets/images/bgc-workshop.jpg",
+      "alt": "Participants working on laptops in a bright training room during a Faith Works workshop.",
+      "position": "50% 55%"
+    },
+    "bgc-laptops": {
+      "src": "assets/images/bgc-workshop-1.jpg",
+      "alt": "Workshop participants working on their laptops during a hands-on Faith Works session.",
+      "position": "50% 60%",
+      "social": true,
+      "replaces": ["assets/images/temp-ai-everyday-work", "assets/images/participants-laptop"]
+    },
+    "hotel-laptops": {
+      "src": "assets/images/bgc-workshop-2.jpg",
+      "alt": "Participants following along on laptops in a warmly lit hotel function room.",
+      "position": "50% 55%",
+      "social": true,
+      "replaces": ["assets/images/temp-full-day"]
+    },
+    "masterclass-certificates": {
+      "src": "assets/images/ai-claude.jpg",
+      "alt": "AI & Claude Masterclass graduates holding their certificates in the session room.",
+      "position": "50% 50%",
+      "social": true
+    },
+    "coaching-at-tables": {
+      "src": "assets/images/ai-claude.png",
+      "alt": "Faith Natividad with a microphone among participants working on their laptops.",
+      "position": "50% 40%"
+    },
+    "masterclass-cheer": {
+      "src": "assets/images/ai-claude-1.png",
+      "alt": "Masterclass participants cheering with their arms raised on stage.",
+      "position": "50% 50%"
+    },
+    "masterclass-stage-group": {
+      "src": "assets/images/ai-claude-3.jpg",
+      "alt": "Masterclass participants posing together on and around the stage.",
+      "position": "50% 55%"
+    },
+    "open-qa": {
+      "src": "assets/images/ai-claude7.png",
+      "alt": "Faith Natividad and a participant, both with microphones, discussing a slide during an open Q&A.",
+      "position": "45% 45%"
+    },
+    "slides-poll": {
+      "src": "assets/images/ai-claude8.png",
+      "alt": "A Faith Works facilitator presenting live poll results on screen to a seated group.",
+      "position": "50% 40%",
+      "social": true,
+      "replaces": ["assets/images/temp-research-workflow"]
+    },
+    "presenter-qr": {
+      "src": "assets/images/ai-claude-2.png",
+      "alt": "A facilitator presenting beside a QR code on screen while participants follow along on their laptops.",
+      "position": "50% 55%"
+    },
+    "room-wide": {
+      "src": "assets/images/ai-claude6.png",
+      "alt": "A wide view of a Faith Works session: rows of participants at tables facing the presentation screen.",
+      "position": "50% 55%"
+    },
+    "hotel-session": {
+      "src": "assets/images/ai-claude8.JPG",
+      "alt": "Participants with laptops at round tables in a hotel function room, facing the screen at the front.",
+      "position": "50% 60%"
+    }
+  },
+  "pages": {
+    "home": {
+      "business": { "layout": "single", "sizes": "(min-width: 901px) 42vw, 100vw", "items": [{ "image": "room-full" }] },
+      "founder": { "layout": "single", "sizes": "260px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
+    },
+    "about": {
+      "hero": { "layout": "single", "sizes": "(min-width: 901px) 40vw, 100vw", "priority": true, "items": [{ "image": "founder-studio" }] },
+      "stage": { "layout": "single", "sizes": "(min-width: 901px) 32vw, 100vw", "items": [{ "image": "speaking-whiteboard", "alt": "Faith Natividad speaking to an audience with a microphone." }] }
+    },
+    "business": {
+      "hero": {
+        "layout": "stack",
+        "sizes": "(min-width: 900px) 45vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "room-chart" },
+          { "image": "roundtable", "caption": "Leadership roundtables" },
+          { "image": "group-office" }
+        ]
+      }
+    },
+    "community": {
+      "hero": {
+        "layout": "mosaic",
+        "sizes": "(min-width: 900px) 45vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "community-house-of-creatives" },
+          { "image": "masterclass-cheer" },
+          { "image": "group-community" }
+        ]
+      }
+    },
+    "learn": {
+      "hero": {
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "bgc-laptops" },
+          { "image": "coaching-at-tables" },
+          { "image": "slides-poll" },
+          { "image": "talk-laptops" },
+          { "image": "hotel-session" }
+        ]
+      }
+    },
+    "workshops": {
+      "hero": {
+        "layout": "stack",
+        "sizes": "(min-width: 900px) 40vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "masterclass-certificates" },
+          { "image": "certificates-stage", "caption": "Every batch, certified" },
+          { "image": "hotel-laptops" }
+        ]
+      }
+    },
+    "speaking": {
+      "hero": {
+        "layout": "stack",
+        "variant": "tall",
+        "sizes": "(min-width: 900px) 30vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "speaking-faith-screen" },
+          { "image": "stage-prompting", "caption": "Conference keynotes" },
+          { "image": "talk-big-screen" }
+        ]
+      },
+      "qa": { "layout": "single", "sizes": "(min-width: 900px) 40vw, 100vw", "items": [{ "image": "open-qa" }] }
+    },
+    "professionals": {
+      "hero": { "layout": "single", "sizes": "(min-width: 900px) 40vw, 100vw", "priority": true, "items": [{ "image": "talk-laptops" }] },
+      "founder": { "layout": "single", "sizes": "120px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] }
+    },
+    "starter-kit": {
+      "founder": { "layout": "single", "sizes": "200px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] },
+      "rooms": {
+        "layout": "figures",
+        "sizes": "(min-width: 900px) 30vw, 100vw",
+        "items": [
+          { "image": "masterclass-certificates", "caption": "AI & Claude Masterclass graduates" },
+          { "image": "bgc-laptops", "caption": "Hands-on, on real tasks" }
+        ]
+      }
+    }
+  }
+}

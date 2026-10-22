@@ -34,6 +34,31 @@ function toList(v) {
 }
 function toBool(v) { return v === true || v === "true" || v === "TRUE" || v === "1" || v === 1 || v === "yes" || v === "on"; }
 
+// An image list (type "images"): rows without an address are dropped; when no row is marked as
+// the cover, the first one is. More than one cover is left for validate() to refuse.
+function toImages(v) {
+  const out = (Array.isArray(v) ? v : []).filter((x) => x && typeof x === "object")
+    .map((x) => ({ url: String(x.url ?? "").trim(), alt: String(x.alt ?? "").trim(), primary: toBool(x.primary), featured: toBool(x.featured) }))
+    .filter((x) => x.url);
+  if (out.length && !out.some((x) => x.primary)) out[0].primary = true;
+  return out;
+}
+
+// Events: the gallery's cover is mirrored into the single-image fields (event cards, link
+// previews, older readers). A save that sends no gallery at all (an older client) but does send
+// a featured image gets a one-image gallery from it, so nothing it set is lost.
+export function syncEventCover(rec, input) {
+  if (!Array.isArray(rec.gallery)) rec.gallery = [];
+  if (!rec.gallery.length && input?.gallery === undefined && rec.featured_image_url) {
+    rec.gallery = [{ url: String(rec.featured_image_url).trim(), alt: String(rec.featured_image_alt || "").trim(), primary: true, featured: false }];
+  }
+  const cover = rec.gallery.find((g) => g.primary);
+  rec.featured_image_url = cover ? cover.url : "";
+  rec.featured_image_alt = cover ? cover.alt : "";
+  return rec;
+}
+const IMAGE_SRC = /^(\/(?!\/)|https?:\/\/)/i;
+
 // Coerce raw input into the field's type. Unknown keys are dropped.
 export function normalize(collection, input) {
   const out = {};
@@ -56,11 +81,13 @@ export function normalize(collection, input) {
           .filter((row) => Object.values(row).some(Boolean));
         break;
       }
+      case "images": out[fd.key] = toImages(v); break;
       case "json": out[fd.key] = v && typeof v === "object" ? v : null; break;
       case "html": case "css": case "textarea": out[fd.key] = String(v).replace(/\r\n/g, "\n"); break;
       default: out[fd.key] = String(v).trim();
     }
   }
+  if (collection === "events") syncEventCover(out, input);
   return out;
 }
 
@@ -102,12 +129,27 @@ export function validate(collection, rec, { strict = false, tags = null, refs = 
         }
         if (strict && v.some((row) => fd.subfields.some((sf) => !row[sf.key]))) errors[fd.key] = `Complete every row of ${fd.label}, or remove empty rows.`;
         break;
+      case "images": {
+        const seen = new Set();
+        for (const [i, g] of v.entries()) {
+          const n = `Image ${i + 1}`;
+          const e = IMAGE_SRC.test(g.url) ? checkUrl(g.url) : "use an https:// address or a site path starting with /.";
+          if (e) { errors[fd.key] = `${n}: ${e}`; break; }
+          if (seen.has(g.url)) { errors[fd.key] = `${n} is already in the list. Remove the copy.`; break; }
+          seen.add(g.url);
+          if (g.alt.length > 200) { errors[fd.key] = `${n}: the description must be 200 characters or fewer.`; break; }
+          if (strict && !g.alt) { errors[fd.key] = `${n}: describe what the image shows (alt text) for screen readers.`; break; }
+        }
+        if (!errors[fd.key] && v.filter((g) => g.primary).length !== 1) errors[fd.key] = "Choose one cover image.";
+        if (!errors[fd.key] && fd.max && v.length > fd.max) errors[fd.key] = `An event can have up to ${fd.max} images.`;
+        break;
+      }
       case "html": case "css": if (v.length > 45000 * (fd.long || 1)) errors[fd.key] = `${fd.label} is too long to store (${v.length.toLocaleString()} characters).`; break;
     }
   }
   // Collection-specific rules
   const imgPairs = [["featured_image_url", "featured_image_alt"], ["cover_image_url", "cover_image_alt"]];
-  for (const [u, a] of imgPairs) if (strict && rec[u] && !rec[a] && rec[a] !== undefined) errors[a] = "Describe the image (alt text) for screen readers.";
+  for (const [u, a] of imgPairs) if (collection !== "events" && strict && rec[u] && !rec[a] && rec[a] !== undefined) errors[a] = "Describe the image (alt text) for screen readers.";
   if (collection === "events") {
     if (rec.end_date && !rec.event_date) errors.end_date = "Add the start date first.";
     else if (rec.end_date && rec.end_date < rec.event_date) errors.end_date = "The end date must be on or after the start date.";

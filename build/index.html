@@ -14,12 +14,12 @@
   <meta property="og:title" content="Build with AI · Use cases and Faith AI · Faith Works">
   <meta property="og:description" content="Practical AI use cases for small businesses and teams, the difference between training projects, demonstrations and supported products, and how to request a Faith AI demo.">
   <meta property="og:url" content="https://faithph.ai/build/">
-  <meta property="og:image" content="https://faithph.ai/assets/images/masterclass-batch3-1440.jpg">
+  <meta property="og:image" content="https://faithph.ai/assets/images/web/speaking-faith-screen-1200.jpg">
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="../css/style.css?v=15">
+  <link rel="stylesheet" href="../css/style.css?v=23">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -29,9 +29,13 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="../js/config.js?v=15" defer></script>
-  <script src="../js/main.js?v=15" defer></script>
-  <script src="../js/forms.js?v=15" defer></script>
+  <script src="../js/config.js?v=23" defer></script>
+  <script src="../js/vendor/gsap-3.15.0.min.js" defer></script>
+  <script src="../js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
+  <script src="../js/vendor/lenis-1.3.26.min.js" defer></script>
+  <script src="../js/main.js?v=23" defer></script>
+  <script src="../js/motion.js?v=23" defer></script>
+  <script src="../js/forms.js?v=23" defer></script>
 </head>
 <body data-page="/build/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,10 +46,11 @@
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       <a href="../learn/index.html">Learn AI</a>
       <a href="../build/index.html" aria-current="page">Build with AI</a>
+      <a href="../professionals/index.html">For Professionals</a>
       <a href="../business/index.html">For Business</a>
       <a href="../resources/index.html">Resources</a>
       <a href="../about/index.html">About</a>
-      <a class="btn btn--yellow" href="../free-ai-starter-kit/index.html" data-track="starter_kit_click">Get the Free AI Starter Kit</a>
+      <a class="btn btn--yellow" href="../free-ai-starter-kit/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
@@ -141,26 +146,11 @@
 
     <section class="section wrap faithai" id="faith-ai" aria-labelledby="fai-title">
       <div class="faithai__copy">
-        <h2 id="fai-title">Faith AI: start with your use case.</h2>
+        <p class="brandlock"><img class="brandmark brandmark--ai" src="../assets/icons/faith-ai.svg" alt="" width="2030" height="496" loading="lazy" decoding="async"></p>
+        <h2 id="fai-title"><span class="sr-only">Faith AI: </span>Start with your use case.</h2>
         <p class="split__lead">Faith AI explores how AI-supported business systems could handle work like inquiry tracking, follow-up and internal answers.</p>
         <p>A demo starts with one business process. We look at how it works today, what a supported system could take on, and which steps should stay with a person. You get a plain answer about what is possible and what it would take.</p>
         <p>Faith AI’s current features, plans and availability are being confirmed. Nothing is sold on this page, and a demo request is not a purchase.</p>
-        <figure class="agents" data-reveal>
-        <div class="agents__canvas" role="img" aria-label="Diagram: Your business process in the centre coordinates three AI agents (Inquiry tracking, Follow-up, Internal answers). Their work meets at a human review step before anything is sent.">
-          <svg class="agents__wires" viewBox="0 0 600 360" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path class="agents__wire" d="M300 180 C 230 180, 200 64, 128 64"/><path class="agents__wire" d="M300 180 H128"/><path class="agents__wire" d="M300 180 C 230 180, 200 296, 128 296"/>
-            <path class="agents__wire agents__wire--out" d="M300 180 H472"/>
-            <circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="0.0s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 C 230 180, 200 64, 128 64"/></circle><circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="1.2s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 H128"/></circle><circle class="agents__signal" r="4"><animateMotion dur="3.6s" begin="2.4s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" path="M300 180 C 230 180, 200 296, 128 296"/></circle>
-            <circle class="agents__signal agents__signal--out" r="4.5"><animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" path="M300 180 H472"/></circle>
-          </svg>
-          <div class="agents__node agents__node--a" style="--n:0"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Inquiry tracking</b><small>Logs each new lead</small></span></div>
-          <div class="agents__node agents__node--b" style="--n:1"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Follow-up</b><small>Drafts the next message</small></span></div>
-          <div class="agents__node agents__node--c" style="--n:2"><span class="agents__chip" aria-hidden="true">AI</span><span class="agents__txt"><b>Internal answers</b><small>Finds it in your notes</small></span></div>
-          <div class="agents__hub"><span class="agents__pulse" aria-hidden="true"></span><small>Coordinates</small><b>Your business process</b></div>
-          <div class="agents__human"><span class="agents__seal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5 10 17.5 19 7"/></svg></span><span class="agents__txt"><b>You approve</b><small>before anything is sent</small></span></div>
-        </div>
-        <figcaption class="agents__cap">Illustrative. Each agent takes one part of the work; a person stays in charge of the result.</figcaption>
-      </figure>
       </div>
       <ol class="faithai__steps">
         <li><b>Tell us the process</b><span>One workflow that takes too much time or gets dropped.</span></li>
@@ -215,7 +205,7 @@
         </div>
         <nav class="site-footer__links" aria-label="Footer">
           <div><h2>Learn</h2><a href="../learn/index.html">Learn AI</a><a href="../workshops/index.html">Workshops</a><a href="../resources/index.html">Resources</a><a href="../free-ai-starter-kit/index.html">Free AI Starter Kit</a></div>
-          <div><h2>Work with us</h2><a href="../business/index.html">For Business</a><a href="../build/index.html">Build with AI</a><a href="../speaking/index.html">Speaking &amp; partnerships</a><a href="../about/index.html">About Faith Works</a></div>
+          <div><h2>Work with us</h2><a href="../professionals/index.html">For Professionals</a><a href="../business/index.html">For Business</a><a href="../build/index.html">Build with AI</a><a href="../speaking/index.html">Speaking &amp; partnerships</a><a href="../about/index.html">About Faith Works</a></div>
           <div><h2>Follow</h2><a href="https://www.facebook.com/profile.php?id=61580485384062" target="_blank" rel="noopener" aria-label="Faith Works PH on Facebook (opens in a new tab)">Facebook <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.instagram.com/faithworksph_/" target="_blank" rel="noopener" aria-label="Faith Works on Instagram (opens in a new tab)">Instagram <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/faithnatividad/" target="_blank" rel="noopener" aria-label="Faith Natividad on LinkedIn (opens in a new tab)">LinkedIn <span class="icon-arrow" aria-hidden="true">↗</span></a><a href="https://www.facebook.com/share/g/1DGeoshBNh/" target="_blank" rel="noopener" data-track="community_click">Community group <span class="icon-arrow" aria-hidden="true">↗</span></a></div>
         </nav>
       </div>

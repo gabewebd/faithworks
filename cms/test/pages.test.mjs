@@ -293,3 +293,37 @@ test("scoped Page CSS keeps its design tokens even when it starts with a comment
   assert.match(scoped, /^\.cms-body--x\{\n  --pink: #EFACBA;/m, "tokens are defined on the page wrapper");
   assert.ok(!/\.cms-body--x \/\*/.test(scoped), "no comment glued into a selector");
 });
+
+test("listings: empty states, featured resources, Keep reading cards, article contents", async () => {
+  const R = await import("../../tools/render.mjs");
+  const { toRenderData } = await import("../../tools/content.mjs");
+  const { buildSnapshot } = await import("../shared/public.mjs");
+  R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings }, view: "preview" })));
+  for (const html of [R.programShowcase(), R.programRowsHome(), R.programLinks(), R.resourcesEmpty(), R.events("upcoming")]) {
+    assert.match(html, /^<div class="empty"><p><strong>[^<]+<\/strong>/, "one empty panel everywhere");
+  }
+  for (const html of [R.resourceFeatured(), R.resourceList(), R.guides(), R.featuredInsight(), R.insightList(), R.events("past"), R.voices()]) assert.equal(html, R.EMPTY_SECTION);
+  assert.equal(R.dropEmptySections(`<p>a</p><!-- label --><section><h2>X</h2>${R.EMPTY_SECTION}</section><p>b</p>`), "<p>a</p><p>b</p>");
+  assert.equal(R.dropEmptySections(`<section>x</section><div>${R.EMPTY_SECTION}</div>`), "<section>x</section><div></div>", "only the section that holds it");
+
+  R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings, resources: seed.resources }, view: "preview" })));
+  const feat = R.resourceFeatured();
+  const insight = R.featuredInsight();
+  assert.equal((insight.match(/<h2 id="insight-title">/g) || []).length, 1, "one featured insight");
+  assert.equal((feat.match(/class="rfeat__item/g) || []).length, seed.resources.filter((r) => r.featured).length - 1, "the lead insight is not repeated as a card");
+  assert.match(feat, /rfeat__item rfeat__item--lead/);
+  assert.ok(seed.resources.filter((r) => r.featured).every((r) => !R.resourceList().includes(`>${r.title}<`) && !R.insightList().includes(`>${r.title}<`)), "featured items are not repeated below");
+  assert.match(R.insightList(), /data-insight-filters hidden/, "topic filters appear only with JS");
+  assert.equal(R.resourcesEmpty(), R.EMPTY_SECTION);
+
+  const html = `<p>Intro</p><div class="article__body"><h2>Why it works</h2><p>a</p><h2 id="kept">Kept id</h2><h2>Why it works</h2></div><p>after</p>`;
+  const out = R.withToc(html);
+  assert.match(out, /href="#why-it-works">Why it works<\/a><\/li><li><a class="toc__link" href="#kept">Kept id<\/a><\/li><li><a class="toc__link" href="#why-it-works-2">/, "ids are made, kept and unique");
+  assert.ok(out.startsWith("<p>Intro</p><div class=\"article__layout wrap\">") && out.endsWith("</div><p>after</p>"));
+  assert.equal(R.withToc(`<div class="article__body"><h2>Only one</h2></div>`), `<div class="article__body"><h2>Only one</h2></div>`, "one heading: no sidebar");
+
+  const a = toRenderData(buildSnapshot({ records: { settings: seed.settings, resources: seed.resources }, view: "preview" })).articles[0];
+  const page = R.articlePage(a).body;
+  assert.match(page, /<a class="kr" href="\/resources\/[^"]+\/">\s*<picture class="kr__img">/, "Keep reading cards carry the featured image");
+  assert.equal((page.match(/class="kr"/g) || []).length, 3);
+});

@@ -49,6 +49,7 @@ export const LINKS = {
 export const COMPONENTS = {
   "status-badge": { label: "Status badge", help: "Shows the enrolment or event status from Details." },
   "featured-image": { label: "Featured image", help: "The featured image and its description from Details." },
+  "event-gallery": { label: "Event photos", help: "The event’s other images from Details → Event images, after the cover (none when it has only a cover)." },
   "article-meta": { label: "Byline, date and reading time", help: "Authors and publish date from Details; reading time is calculated." },
   "event-facts": { label: "Event facts", help: "Date, time, duration and location from Details." },
   "event-actions": { label: "Registration button", help: "The registration button from Details → Registration (none when this page is the registration page)." },
@@ -351,7 +352,11 @@ export function img(image, sizes, cls = "") {
   if (image.url) return `<picture${cls ? ` class="${cls}"` : ""}><img src="${esc(image.url)}"${image.width && image.height ? ` width="${image.width}" height="${image.height}"` : ""} alt="${esc(image.alt)}" loading="lazy" decoding="async"></picture>`;
   const base = "/" + image.base.replace(/^\//, "");
   const ws = image.widths;
-  const set = (ext) => ws.map((w) => `${base}-${w}.${ext} ${w}w`).join(", ");
+  // sizesOf: each file's real width when it differs from its name (a small original); formats:
+  // ["webp"] for photos from the site's photo registry, which have no JPEG copies
+  const real = image.sizesOf || ws;
+  const set = (ext) => ws.map((w, i) => `${base}-${w}.${ext} ${real[i]}w`).join(", ");
+  if (image.formats?.length === 1) return `<picture${cls ? ` class="${cls}"` : ""}><img src="${base}-${ws[ws.length - 1]}.${image.formats[0]}" srcset="${set(image.formats[0])}" sizes="${sizes}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="lazy" decoding="async" style="object-position:${esc(image.position || "50% 50%")}"></picture>`;
   const mid = ws.find((w) => w >= 960) || ws[ws.length - 1];
   return `<picture${cls ? ` class="${cls}"` : ""}><source type="image/webp" srcset="${set("webp")}" sizes="${sizes}"><img src="${base}-${mid}.jpg" srcset="${set("jpg")}" sizes="${sizes}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="lazy" decoding="async" style="object-position:${esc(image.position || "50% 50%")}"></picture>`;
 }
@@ -415,6 +420,11 @@ export function recordComponent(name, collection, rec, { today = new Date(), aut
       if (!im) return null;
       const cap = !isDoc(rec) && rec.featured_image_caption ? `<figcaption class="small">${esc(rec.featured_image_caption)}</figcaption>` : "";
       return img(im, "(min-width: 1200px) 1200px, 100vw") + cap;
+    }
+    case "event-gallery": {
+      const rest = collection === "events" && Array.isArray(rec.gallery) ? rec.gallery.filter((g) => g?.url && !g.primary) : [];
+      if (!rest.length) return null;
+      return `<ul class="event-gallery" role="list">${rest.map((g) => `<li><figure>${img({ url: g.url, alt: g.alt || "" }, "(min-width: 900px) 33vw, 50vw")}</figure></li>`).join("")}</ul>`;
     }
     case "article-meta": return articleMeta({ ...rec, byline: bylineOf(rec, authorNames) });
     case "event-facts": return eventFacts(rec, today);

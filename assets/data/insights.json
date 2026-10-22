@@ -15,18 +15,22 @@
       "featured": true,
       "excerpt": "AI is becoming part of everyday professional work. The opportunity is not to replace expertise, but to combine existing skills with better tools, workflows, and judgment.",
       "image": {
-        "base": "assets/images/temp-ai-everyday-work",
+        "alt": "Workshop participants working on their laptops during a hands-on Faith Works session.",
+        "base": "assets/images/web/bgc-laptops",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 1200,
-        "position": "50% 40%",
-        "alt": "A professional working on a laptop at a café table",
-        "source": "https://unsplash.com/photos/a-man-sitting-at-a-table-using-a-laptop-computer-YF7iYfmF488"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 960,
+        "position": "50% 60%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -180,18 +184,22 @@
       "readTime": "4 min read",
       "excerpt": "AI can cut hours of reading down to minutes. The risk is speed without accuracy. A five-step workflow keeps the sources attached and the final check human.",
       "image": {
-        "base": "assets/images/temp-research-workflow",
+        "alt": "A Faith Works facilitator presenting live poll results on screen to a seated group.",
+        "base": "assets/images/web/slides-poll",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 1201,
-        "position": "50% 50%",
-        "alt": "A person taking notes with a pencil beside an open laptop",
-        "source": "https://unsplash.com/photos/person-holding-pencil-near-laptop-computer-5fNmWej4tAA"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 720,
+        "position": "50% 40%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -326,18 +334,22 @@
       "readTime": "3 min read",
       "excerpt": "Most professionals aren’t short on interest in AI. They’re short on time to try it. The fix isn’t a free afternoon; it’s attaching AI to work you’re already doing.",
       "image": {
-        "base": "assets/images/temp-full-day",
+        "alt": "Participants following along on laptops in a warmly lit hotel function room.",
+        "base": "assets/images/web/hotel-laptops",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 2700,
-        "position": "50% 60%",
-        "alt": "Two professionals working side by side at laptops in an office",
-        "source": "https://unsplash.com/photos/a-couple-of-men-sitting-at-a-table-with-laptops-A9qQ8vE1Bmw"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 1707,
+        "position": "50% 55%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -471,18 +483,22 @@
       "readTime": "3 min read",
       "excerpt": "Watching a demo is not the same as using a tool on your own work. Skill shows up when you apply it, get stuck, and work it out.",
       "image": {
-        "base": "assets/images/temp-learning-to-doing",
+        "alt": "Participants at tables with laptops facing the screen during a Faith Works session.",
+        "base": "assets/images/web/room-hotel",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 1013,
-        "position": "50% 40%",
-        "alt": "Two colleagues working through a task together on a laptop",
-        "source": "https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 720,
+        "position": "50% 55%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -516,15 +532,22 @@
         {
           "type": "image",
           "image": {
-            "base": "assets/images/participants-laptop",
+            "alt": "Workshop participants working on their laptops during a hands-on Faith Works session.",
+            "base": "assets/images/web/bgc-laptops",
             "widths": [
-              480,
-              508
+              640,
+              1280
             ],
-            "width": 508,
-            "height": 499,
-            "position": "50% 40%",
-            "alt": "Workshop participants working on their laptops during a hands-on Faith Works session"
+            "formats": [
+              "webp"
+            ],
+            "width": 1280,
+            "height": 960,
+            "position": "50% 60%",
+            "sizesOf": [
+              640,
+              1280
+            ]
           },
           "caption": "Hands-on work at a Faith Works session: real tasks, on your own laptop."
         },
@@ -621,18 +644,22 @@
       "readTime": "3 min read",
       "excerpt": "AI can produce an answer quickly. Leaders still decide whether it’s the right one, and whether it’s right for their people.",
       "image": {
-        "base": "assets/images/temp-leadership",
+        "alt": "Participants watching a slide on how different generations bring different strengths to AI learning.",
+        "base": "assets/images/web/talk-generations",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 1208,
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 853,
         "position": "50% 45%",
-        "alt": "A woman leading a discussion with her team around a table",
-        "source": "https://unsplash.com/photos/a-group-of-people-sitting-around-a-table-with-laptops-cNGvcAvxHAo"
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -760,18 +787,22 @@
       "readTime": "3 min read",
       "excerpt": "Better tools make it easier to do more. Purpose is what helps you decide what’s worth doing.",
       "image": {
-        "base": "assets/images/temp-growth",
+        "alt": "Participants on stage holding their certificates after completing a Faith Works program.",
+        "base": "assets/images/web/certificates-stage",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 2400,
-        "position": "50% 35%",
-        "alt": "A professional pausing to think in a warehouse aisle",
-        "source": "https://unsplash.com/photos/woman-in-black-long-sleeve-shirt-standing-near-brown-wooden-shelf-3BdlPx8sBPw"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 960,
+        "position": "50% 45%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {
@@ -880,18 +911,22 @@
       "readTime": "3 min read",
       "excerpt": "You don’t need whole days. Short, regular sessions tied to real work add up.",
       "image": {
-        "base": "assets/images/temp-faith-ai",
+        "alt": "Faith Natividad on a conference stage, pointing to a live AI notebook demo on the big screen.",
+        "base": "assets/images/web/stage-notebook",
         "widths": [
-          480,
-          960,
-          1440,
-          1800
+          640,
+          1280
         ],
-        "width": 1800,
-        "height": 3200,
-        "position": "50% 70%",
-        "alt": "A young professional smiling while working on a laptop",
-        "source": "https://unsplash.com/photos/a-man-sitting-at-a-table-with-a-laptop-KkLGj4515RU"
+        "formats": [
+          "webp"
+        ],
+        "width": 1280,
+        "height": 853,
+        "position": "35% 50%",
+        "sizesOf": [
+          640,
+          1280
+        ]
       },
       "content": [
         {

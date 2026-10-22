@@ -3,8 +3,10 @@
 The faithph.ai website for Faith Works PH: practical AI learning for founders, professionals and teams.
 Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 2026).
 
-**Current phase:** staging. Every page in the brief's sitemap exists. Forms are designed and tested but
-**not connected** to a CRM yet (preview mode: nothing is sent). The pages are `noindex` until launch.
+**Current phase:** staging. Every page in the brief's sitemap exists. Forms are in **preview mode**
+(nothing is sent). Their destination is built: the CMS stores each submission in Supabase, alerts the
+team by email and shows it under *Form submissions* (`cms/README.md` §13). It is switched on with
+`js/config.js` (`mode: "endpoint"`) once the CMS settings are in place. The pages are `noindex` until launch.
 
 Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
 that the header, footer and repeated content (programs, events, articles) come from one place.
@@ -47,6 +49,10 @@ it never falls back to the fixtures. See `cms/README.md` §5.5.
 | `src/pages/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
 | `cms/` | The CMS (dashboard, API, Google Sheets store). Programs, events, resources/articles, testimonials, tags and site settings are edited there. |
 | `cms/fixtures/seed.json` | Development content fixture (all current content, with its approval state). Regenerate with `node cms/scripts/seed-from-site.mjs`. |
+| `src/data/gallery.json` | **Photo registry**: every site photo once (original, alt text, crop, focal point) and, per page, the galleries and photo slots that page sources fill with `{{gallery:page.slot}}` (hero stacks and mosaics, founder photos). Edit this to add, remove, reorder or replace photos. |
+| `src/data/events.json`, `tools/event-gallery.mjs` | **Events gallery** (separate from Resources): the archive of photos from past sessions, by registry id, with order, `featured` (also on the homepage) and optional caption, focal point and CMS `eventId`. The build adds the images editors mark *Show in the events gallery* on published CMS events (the CMS is authoritative for those), never repeats a photo, and lays them out as a masonry grid: `{{eventGallery:home}}` (10 featured, below Trusted by) and `{{eventGallery:all}}` (Workshops page). |
+| `src/data/trusted-by.json` | The homepage **Trusted by** logo strip. Placeholders until approved client logos are supplied; set `name` and `logo` per entry to use a real one (`show: false` keeps an entry without showing it). |
+| `tools/images.py`, `assets/images/web/` | Makes each registered photo's web versions from its original: WebP at 640 and 1280px (plus a 1200×630 JPEG link preview where `social` is set). Run `python tools/images.py` (needs Pillow) after changing the registry, then build; the web files are committed, so deploys need nothing extra. Originals in `assets/images/` are never edited and never deployed. |
 | `assets/data/programs.json`, `events.json`, `resources.json`, `insights.json`, `success-stories.json`, `site.json` | **Migration source only** (used to create the seed). The build no longer reads them; edit content in the CMS. |
 | `tools/content.mjs` | The website's content interface: fixtures, local CMS or live CMS → the shapes the templates render. |
 | `tools/build.mjs`, `layout.mjs`, `render.mjs` | The generator, shared page chrome, and content/form renderers (CMS page documents with their Details values, forms and lists filled in). |
@@ -56,7 +62,7 @@ it never falls back to the fixtures. See `cms/README.md` §5.5.
 | `docs/01–07_*.docx` | Project documents: scope, audit, gap list, architecture, copy, forms spec, acceptance checklist. |
 
 Generated output (do not edit by hand): `index.html`, `404.html`, `sitemap.xml`, `robots.txt` and the
-route folders `about/ build/ business/ community/ contact/ free-ai-starter-kit/ learn/ privacy/ programs/
+route folders `about/ build/ business/ community/ contact/ free-ai-starter-kit/ learn/ privacy/ professionals/ programs/
 resources/ speaking/ terms/ workshops/` (and `events/` when an event has its own page content). Pages for
 content that is no longer in the build's content view are removed automatically.
 

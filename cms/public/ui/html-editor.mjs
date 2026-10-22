@@ -42,6 +42,8 @@ cms-keep{display:inline-flex!important;align-items:center;gap:6px;font:500 12px/
 #cms-root:empty::before{content:"This page has no content yet. Use “Start from the template” in the panel, or paste HTML in HTML mode.";display:block;padding:64px 16px;text-align:center;color:#666;font:15px system-ui,sans-serif}
 body.cms-canvas{min-height:100vh}`;
 
+// Same as VERSION in tools/layout.mjs: a new value makes the canvas load the current site styles.
+const SITE_CSS_VERSION = "17";
 const isLocal = () => ["localhost", "127.0.0.1"].includes(location.hostname);
 const trimDoc = (s) => String(s || "").replace(/^\s*\n/, "").replace(/\s+$/, "");
 
@@ -328,16 +330,16 @@ ${state.html}
     return d.body.innerHTML;
   }
   const chrome = (where) => state.layout !== "site" || card ? "" : where === "top"
-    ? `<div class="cms-chrome" contenteditable="false"><b>Faith Works</b><span>Learn AI · Build with AI · For Business · Resources · About</span><span>Global navbar · from the website</span></div>`
+    ? `<div class="cms-chrome" contenteditable="false"><b>Faith Works</b><span>Learn AI · Build with AI · For Professionals · For Business · Resources · About</span><span>Global navbar · from the website</span></div>`
     : `<div class="cms-chrome cms-chrome--foot" contenteditable="false"><b>Faith Works</b><span>Footer links, social links, Privacy Notice and Terms</span><span>Global footer · from the website</span></div>`;
   function frameDoc() {
     const self = siteBase || "'self'";
     const policy = ["default-src 'none'", `style-src 'unsafe-inline' https: ${self}`, `img-src https: data: ${self}`, `font-src https: data: ${self}`, "media-src https:", "frame-src https:", "form-action 'none'", `base-uri ${siteBase || "'none'"}`].join("; ");
-    const fonts = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">';
+    const fonts = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap">';
     const body = card
       ? `<main class="section wrap"><div class="quotes fw-quotes"><div id="cms-root" class="cms-card">${protect(state.html)}</div></div></main>`
       : `${chrome("top")}<main id="cms-root" class="cms-page">${protect(state.html)}</main>${chrome("foot")}`;
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${policy}"><meta name="viewport" content="width=device-width, initial-scale=1">${siteBase ? `<base href="${siteBase}/">` : ""}${fonts}${state.siteStyles ? `<link rel="stylesheet" href="${siteBase}/css/style.css">` : ""}<style id="cms-page-css">${sanitizeCss(state.css).css}</style><style id="cms-editor-css">${EDITOR_CSS}</style></head><body class="cms-canvas${state.layout === "custom" ? " page--custom" : ""}">${body}</body></html>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${policy}"><meta name="viewport" content="width=device-width, initial-scale=1">${siteBase ? `<base href="${siteBase}/">` : ""}${fonts}${state.siteStyles ? `<link rel="stylesheet" href="${siteBase}/css/style.css?v=${SITE_CSS_VERSION}">` : ""}<style id="cms-page-css">${sanitizeCss(state.css).css}</style><style id="cms-editor-css">${EDITOR_CSS}</style></head><body class="cms-canvas${state.layout === "custom" ? " page--custom" : ""}">${body}</body></html>`;
   }
   function renderFrame() {
     renderNote();

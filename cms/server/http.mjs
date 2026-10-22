@@ -18,6 +18,8 @@ export function json(data, status = 200, headers = {}) {
 export async function readJson(request, limit = 3_000_000) {
   const type = request.headers.get("content-type") || "";
   if (!type.includes("application/json")) throw new HttpError(415, "Send JSON (content-type: application/json).", "bad_content_type");
+  // Refuse a declared oversize body before reading it; the length check below covers the rest.
+  if (Number(request.headers.get("content-length")) > limit) throw new HttpError(413, "The request is too large.", "too_large");
   const text = await request.text();
   if (text.length > limit) throw new HttpError(413, "The request is too large.", "too_large");
   try { return text ? JSON.parse(text) : {}; } catch { throw new HttpError(400, "The request body is not valid JSON.", "bad_json"); }

@@ -5,6 +5,9 @@
   "buildCommand": "node tools/build.mjs --deploy --content=cms --view=published --out=dist",
   "outputDirectory": "dist",
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/individuals/", "destination": "/professionals/", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -37,6 +37,8 @@ export function loadConfig(env = process.env) {
     cmsRoot: CMS_ROOT,
     jsonPath: env.CMS_JSON_PATH || join(CMS_ROOT, ".data", "store.json"),
     seedPath: join(CMS_ROOT, "fixtures", "seed.json"),
+    // Local development only (JSON store): uploaded event images go to the website's assets
+    uploadDir: env.CMS_UPLOAD_DIR || join(CMS_ROOT, "..", "assets", "images", "uploads"),
     supabaseUrl: (env.SUPABASE_URL || "").replace(/\/$/, ""),
     supabaseKeyVar,
     supabaseServiceKey: (env[supabaseKeyVar] || "").trim(),
@@ -54,6 +56,7 @@ export function loadConfig(env = process.env) {
     publicSiteUrl: (env.PUBLIC_SITE_URL || "https://faithph.ai").replace(/\/$/, ""),
     deployHookUrl: env.PUBLIC_SITE_DEPLOY_HOOK_URL || "",
     iframeHosts: env.CMS_IFRAME_HOSTS ? list(env.CMS_IFRAME_HOSTS) : DEFAULT_IFRAME_HOSTS,
+    forms: formsConfig(env),
   };
 
   if (!["supabase", "sheets", "json"].includes(store)) errors.push(`CMS_STORE must be "supabase", "sheets" or "json" (got "${store}").`);
@@ -72,14 +75,62 @@ export function loadConfig(env = process.env) {
     if (!cfg.oauthClientId || !cfg.oauthClientSecret) errors.push("GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are required for sign-in.");
     if (!cfg.baseUrl) errors.push("CMS_BASE_URL is required (the CMS address, e.g. https://cms.faithph.ai).");
     if (!cfg.superAdmins.length) errors.push("CMS_SUPER_ADMINS must list at least one Super Admin email address (the pinned admins).");
+    else if (cfg.superAdmins.some((e) => !EMAIL_ADDRESS.test(e))) errors.push("CMS_SUPER_ADMINS must contain only full email addresses, separated by commas.");
   }
   if (env.CMS_DEV_LOGIN === "true" && production) errors.push("CMS_DEV_LOGIN cannot be enabled in production. Remove it.");
   if (cfg.previewToken && cfg.previewToken.length < 32) errors.push("CMS_PREVIEW_TOKEN must be at least 32 random characters (or unset).");
   if (cfg.devLogin && !cfg.sessionSecret) cfg.sessionSecret = "local-development-only-session-secret-not-for-production";
+  if (cfg.forms.sheetsMirror && (!cfg.spreadsheetId || !cfg.clientEmail || !cfg.privateKey)) {
+    cfg.forms.problems.push("FORMS_SHEETS_MIRROR needs the Google Sheets settings (GOOGLE_SHEETS_SPREADSHEET_ID and the service account).");
+    cfg.forms.sheetsMirror = false;
+  }
 
   cfg.errors = errors;
   return Object.freeze(cfg);
 }
+
+// Website form submissions (server/forms/). Problems here never stop the CMS: they are listed in
+// cfg.forms.problems, shown on /api/health (as a count) and on the Submissions page, and the part
+// they concern stays off. The submission endpoint is off until FORMS_ALLOWED_ORIGINS is set.
+const EMAIL_ADDRESS = /^[^\s@<>,]+@[^\s@<>,]+\.[^\s@<>,]{2,}$/;
+export function formsConfig(env = process.env) {
+  const problems = [];
+  const emails = (name) => {
+    const all = list(env[name]);
+    const bad = all.filter((e) => !EMAIL_ADDRESS.test(e));
+    if (bad.length) problems.push(`${name} has ${bad.length} invalid address(es).`);
+    return all.filter((e) => EMAIL_ADDRESS.test(e));
+  };
+  const allowedOrigins = list(env.FORMS_ALLOWED_ORIGINS).map((o) => o.replace(/\/$/, ""));
+  const badOrigins = allowedOrigins.filter((o) => !/^https:\/\/[^/]+$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o));
+  if (badOrigins.length) problems.push("FORMS_ALLOWED_ORIGINS must list origins like https://faithph.ai (https, no path).");
+  const notifyToByForm = {};
+  for (const k of Object.keys(env)) {
+    const m = k.match(/^FORMS_NOTIFY_TO_([A-Z0-9_]+)$/);
+    if (m) notifyToByForm[m[1].toLowerCase()] = emails(k);
+  }
+  const f = {
+    allowedOrigins: allowedOrigins.filter((o) => !badOrigins.includes(o)),
+    resendKey: (env.RESEND_API_KEY || "").trim(),
+    emailFrom: (env.FORMS_EMAIL_FROM || "").trim(),
+    notifyTo: list(env.FORMS_NOTIFY_TO).length ? emails("FORMS_NOTIFY_TO") : [DEFAULT_NOTIFY_TO],
+    notifyToByForm,
+    sheetsMirror: env.FORMS_SHEETS_MIRROR === "true",
+    sheetsTab: (env.FORMS_SHEETS_TAB || "form_submissions").trim(),
+    netlifySecret: (env.NETLIFY_FORMS_WEBHOOK_SECRET || "").trim(),
+    rateLimit: Math.min(Math.max(Number(env.FORMS_RATE_LIMIT) || 5, 1), 100),
+    problems,
+  };
+  if (f.resendKey && !f.emailFrom) problems.push("FORMS_EMAIL_FROM is required for email alerts (a sender on a domain verified in Resend).");
+  if (f.emailFrom && !/<[^>]+@[^>]+>$|^[^\s@]+@[^\s@]+$/.test(f.emailFrom)) problems.push("FORMS_EMAIL_FROM must be an address or \"Name <address>\".");
+  if (f.resendKey && !f.notifyTo.length) problems.push("FORMS_NOTIFY_TO has no valid address (leave it empty to use the default).");
+  if (f.netlifySecret && f.netlifySecret.length < 32) problems.push("NETLIFY_FORMS_WEBHOOK_SECRET must be at least 32 random characters.");
+  f.email = !!(f.resendKey && f.emailFrom && !problems.some((p) => /FORMS_EMAIL_FROM|FORMS_NOTIFY_TO/.test(p)));
+  return f;
+}
+// Every form's team alert goes here unless FORMS_NOTIFY_TO (or a per-form variable) says otherwise.
+export const DEFAULT_NOTIFY_TO = "projects@digitalgrowthscale.com";
+export const recipientsFor = (forms, formId) => (forms.notifyToByForm[formId]?.length ? forms.notifyToByForm[formId] : forms.notifyTo);
 
 // The kind of Supabase key, never the key itself: "secret" (sb_secret_…), "service_role" (legacy
 // JWT), "publishable", another JWT role, or null when unset/unrecognised.

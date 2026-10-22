@@ -19,8 +19,24 @@ import { withMigrations } from "./store/migrate.mjs";
 import { createAdmin } from "./services/admin.mjs";
 import { createPublic } from "./services/public.mjs";
 import { createPreview } from "./services/preview.mjs";
+import { createMedia } from "./services/media.mjs";
 import { safeEqual } from "./session.mjs";
 import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
+import { createSubmissions } from "./forms/submissions.mjs";
+import { createNotifier } from "./forms/notify.mjs";
+import { createSheetsMirror } from "./forms/sheets-mirror.mjs";
+import { fromWebsite, fromNetlify, verifyNetlifySignature } from "./forms/adapters.mjs";
+
+// The visitor's address as reported by the host's edge (Netlify, then Vercel, then a proxy).
+const clientIp = (request) => request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-real-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+// Alerts run right after the submission is stored; the visitor waits at most this long for them.
+// Whatever is not finished is completed by the retry job (netlify/functions/forms-retry.mjs).
+const DELIVERY_WAIT_MS = 6000;
+async function within(promise, ms) {
+  let timer;
+  await Promise.race([promise.catch(() => {}), new Promise((r) => { timer = setTimeout(r, ms); })]);
+  clearTimeout(timer);
+}
 
 export function createApp({ env = process.env, store: injectedStore, fetchImpl = globalThis.fetch, log = console } = {}) {
   const cfg = loadConfig(env);
@@ -38,6 +54,15 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   const records = store && createRecords({ store, cfg, log: logSvc, onPublicChange: (why) => pub.triggerDeploy(why) });
   const admin = store && createAdmin({ store, cfg, log: logSvc, auth });
   const preview = store && createPreview({ store, cfg });
+  const media = store && createMedia({ cfg, store, log: logSvc, fetchImpl });
+  // Form submissions are stored in Supabase (JSON locally); not in the Sheets rollback store.
+  const forms = store && store.kind !== "sheets" && createSubmissions({
+    store, cfg, log, audit: logSvc.log,
+    notifier: createNotifier({ cfg, fetchImpl }),
+    mirror: cfg.forms.sheetsMirror
+      ? createSheetsMirror({ api: createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }), tab: cfg.forms.sheetsTab })
+      : { enabled: false },
+  });
   const headers = securityHeaders(cfg);
 
   const routes = [];
@@ -48,7 +73,56 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   };
 
   /* ---- Public (no session) ---- */
-  route("GET", "/api/health", async () => json({ ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}) }), { auth: false });
+  route("GET", "/api/health", async () => {
+    const f = forms ? forms.setup() : null;
+    return json({
+      ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}),
+      forms: f ? { endpoint: f.endpoint, email: f.email, sheets: f.sheets, netlify: f.netlify, problems: f.problems.length } : null,
+    });
+  }, { auth: false });
+
+  /* ---- Website forms (public, no session; see server/forms/) ---- */
+  const formsCors = (request) => {
+    const origin = request.headers.get("origin");
+    return origin && cfg.forms.allowedOrigins.includes(origin) ? {
+      "access-control-allow-origin": origin, vary: "Origin", "access-control-allow-methods": "POST, OPTIONS",
+      "access-control-allow-headers": "content-type, idempotency-key", "access-control-max-age": "600",
+    } : null;
+  };
+  const formsReady = () => {
+    if (!forms) throw new HttpError(503, "Form submissions need the Supabase store.", "forms_unavailable");
+    if (!forms.enabled()) throw new HttpError(503, "Form submissions are not switched on (FORMS_ALLOWED_ORIGINS).", "forms_off");
+  };
+  route("OPTIONS", "/api/forms/submit", async ({ request }) => {
+    const cors = formsCors(request);
+    if (!cors) throw new HttpError(403, "This website is not allowed to send forms here.", "origin");
+    return new Response(null, { status: 204, headers: cors });
+  }, { auth: false, csrf: false });
+  route("POST", "/api/forms/submit", async ({ request }) => {
+    const cors = formsCors(request);
+    try {
+      formsReady();
+      if (!cors) throw new HttpError(403, "This website is not allowed to send forms here.", "origin");
+      const r = await forms.capture(fromWebsite(await readJson(request, 64_000)), { ip: clientIp(request) });
+      if (!r.duplicate) await within(forms.deliver(r.id), DELIVERY_WAIT_MS);
+      return json({ ok: true, id: r.id }, r.duplicate ? 200 : 201, cors);
+    } catch (e) {
+      if (cors) e.headers = cors;
+      throw e;
+    }
+  }, { auth: false, csrf: false });
+  // Native Netlify Forms (future): Netlify's signed "form submission" webhook.
+  route("POST", "/api/forms/netlify", async ({ request }) => {
+    if (!forms || !cfg.forms.netlifySecret) throw new HttpError(404, "Not found.", "not_found");
+    const raw = await request.text();
+    if (raw.length > 256_000) throw new HttpError(413, "The request is too large.", "too_large");
+    if (!verifyNetlifySignature(raw, request.headers.get("x-webhook-signature"), cfg.forms.netlifySecret)) throw new HttpError(401, "Invalid webhook signature.", "unauthorized");
+    let payload;
+    try { payload = JSON.parse(raw); } catch { throw new HttpError(400, "The request body is not valid JSON.", "bad_json"); }
+    const r = await forms.capture(fromNetlify(payload));
+    if (!r.duplicate) await within(forms.deliver(r.id), DELIVERY_WAIT_MS);
+    return json({ ok: true, id: r.id });
+  }, { auth: false, csrf: false });
   route("GET", "/api/public/content", async () => {
     const { snap, stale } = await pub.published();
     // Not cached by the CDN: a publish starts a website build at once, and that build must read
@@ -91,6 +165,9 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("GET", "/api/records/:collection/:id/history", async ({ user, params }) => json(await records.history(user, params.collection, params.id)));
   route("POST", "/api/records/:collection/:id/history/:hid/restore", async ({ user, params, request, rid }) => json(await records.restoreVersion(user, params.collection, params.id, params.hid, await readJson(request), { requestId: rid })));
   route("GET", "/api/authors", async () => json(await records.authors()));
+  // Event images: one file per request (raw bytes, name in X-File-Name), and the site's photos
+  route("POST", "/api/media", async ({ user, request, rid }) => json(await media.upload(user, request, { requestId: rid }), 201));
+  route("GET", "/api/media/library", async () => json(media.library()));
   route("POST", "/api/preview", async ({ user, request }) => {
     const body = await readJson(request);
     return json(await preview.render(user, body.collection, body));
@@ -104,6 +181,16 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("POST", "/api/users", async ({ user, request, rid }) => json(await admin.saveUser(user, await readJson(request), { requestId: rid })));
   route("GET", "/api/audit", async ({ user, url }) => json(await admin.audit(user, { actor: url.searchParams.get("actor") || "", recordId: url.searchParams.get("record") || "" })));
   route("GET", "/api/recovery", async ({ user }) => json(await admin.recovery(user)));
+
+  /* ---- Form submissions (Super Admins) ---- */
+  const formsAdmin = () => { if (!forms) throw new HttpError(503, "Form submissions need the Supabase store.", "forms_unavailable"); return forms; };
+  route("GET", "/api/submissions", async ({ user, url }) => json(await formsAdmin().list(user, Object.fromEntries(["q", "form", "status", "kind", "from", "to"].map((k) => [k, url.searchParams.get(k) || ""])))));
+  route("GET", "/api/submissions/:id", async ({ user, params }) => json(await formsAdmin().get(user, params.id)));
+  route("PUT", "/api/submissions/:id", async ({ user, params, request, rid }) => {
+    const { status, kind } = await readJson(request);
+    return json(await formsAdmin().update(user, params.id, { status, kind }, { requestId: rid }));
+  });
+  route("POST", "/api/submissions/:id/retry", async ({ user, params, rid }) => json(await formsAdmin().retry(user, params.id, { requestId: rid })));
   route("GET", "/api/backup", async ({ user, rid }) => {
     const data = await admin.backup(user, { requestId: rid });
     return json(data, 200, { "content-disposition": `attachment; filename="faithworks-cms-backup-${data.exported_at.slice(0, 10)}.json"` });
@@ -141,7 +228,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     } catch (e) {
       const status = e instanceof HttpError ? e.status : 500;
       if (status >= 500) log.error(`[${rid}] ${request.method} ${request.url}: ${e.stack || e.message}`);
-      res = json({ error: { code: e.code || "error", message: status === 500 && !(e instanceof HttpError) ? "Something went wrong on the server. Nothing was saved by this request." : e.message, ...(e.details || {}), request_id: rid } }, status);
+      res = json({ error: { code: e.code || "error", message: status === 500 && !(e instanceof HttpError) ? "Something went wrong on the server. Nothing was saved by this request." : e.message, ...(e.details || {}), request_id: rid } }, status, e.headers || {});
     }
     const h = new Headers(res.headers);
     for (const [k, v] of Object.entries(headers)) if (!h.has(k)) h.set(k, v);
@@ -149,7 +236,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     return new Response(res.body, { status: res.status, headers: h });
   }
 
-  return { handle, cfg, store, services: { records, admin, pub, auth } };
+  return { handle, cfg, store, services: { records, admin, pub, auth, forms } };
 }
 
 let app;

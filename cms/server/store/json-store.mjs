@@ -17,7 +17,7 @@ export function createJsonStore({ path, seedPath }) {
   let queue = Promise.resolve();
   const load = () => {
     const data = JSON.parse(readFileSync(path, "utf8"));
-    for (const t of ALL_TABS) data[t] ||= [];
+    for (const t of [...ALL_TABS, "form_submissions"]) data[t] ||= [];
     return data;
   };
   const save = (data) => {
@@ -37,6 +37,16 @@ export function createJsonStore({ path, seedPath }) {
     async list(tab) { return clone(load()[tab]); },
     async listMany(tabs) { const d = load(); return Object.fromEntries(tabs.map((t) => [t, clone(d[t])])); },
     async get(tab, id) { return clone(load()[tab].find((r) => r.id === id) || null); },
+    // Same filters as the Supabase store's query(). Values compare as ISO strings or text.
+    async query(tab, { eq = {}, in: within = {}, gte = {}, lt = {}, order = "id.asc", limit = 1000 } = {}) {
+      const [col, dir] = order.split(".");
+      const rows = load()[tab].filter((r) => Object.entries(eq).every(([k, v]) => String(r[k] ?? "") === String(v))
+        && Object.entries(within).every(([k, v]) => v.includes(r[k]))
+        && Object.entries(gte).every(([k, v]) => String(r[k] ?? "") >= String(v))
+        && Object.entries(lt).every(([k, v]) => String(r[k] ?? "") < String(v)));
+      rows.sort((a, b) => String(a[col] ?? "").localeCompare(String(b[col] ?? "")) * (dir === "desc" ? -1 : 1));
+      return clone(rows.slice(0, limit));
+    },
     insert: (tab, record) => exclusive((d) => {
       if (d[tab].some((r) => r.id === record.id)) throw new HttpError(409, `An item with id ${record.id} already exists.`, "duplicate_id");
       d[tab].push(clone(record));

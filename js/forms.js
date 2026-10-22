@@ -110,6 +110,9 @@
         source_page: location.pathname,
         submitted_at: new Date().toISOString(),
         utm: utm,
+        // Spam signals the server records (it never trusts the browser's own checks alone)
+        hp: $("input[name=website]", form).value,
+        elapsed_ms: Date.now() - renderedAt,
         consent: consent ? {
           marketing: consent.checked ? "yes" : "no",
           wording: consent.checked ? $('label[for="' + consent.id + '"]', form).textContent.trim() : null,
@@ -180,7 +183,7 @@
         credentials: "same-origin"
       }).then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (json) {
-          if (!res.ok || !json.ok) throw new Error("not stored");
+          if (!res.ok || !json.ok) { var err = new Error("not stored"); err.status = res.status; err.body = json; throw err; }
           return json;
         });
       }).then(function (json) {
@@ -196,9 +199,21 @@
         message("success", "<h3>" + escapeHtml(form.getAttribute("data-success")) + "</h3>" +
           "<p>Your request: <strong>" + escapeHtml(body.offer_title) + "</strong>.</p>");
         requestId = uuid();
-      }).catch(function () {
+      }).catch(function (err) {
         clearTimeout(timer);
         setBusy(false);
+        // The server checks the same rules; show its field messages where they belong
+        var invalid = err && err.status === 422 && err.body && err.body.error && err.body.error.fields;
+        if (invalid && invalid.length) {
+          invalid.forEach(function (x) { var input = doc.getElementById(key + "-" + x.field); if (input) showError(input, x.message); });
+          message("error", "<p><strong>Please check the highlighted fields, then send again.</strong></p>");
+          return;
+        }
+        if (err && err.status === 429) {
+          message("error", "<p><strong>We received several requests from your connection.</strong> Please wait a few minutes, then try again.</p>" +
+            '<p>Or email <a href="mailto:' + cfg.contactEmail + '">' + cfg.contactEmail + "</a>.</p>");
+          return;
+        }
         message("error", "<p><strong>We could not complete your request. Please try again.</strong> Your details are still in the form.</p>" +
           '<p>If it keeps failing, email <a href="mailto:' + cfg.contactEmail + '">' + cfg.contactEmail + "</a>.</p>");
       });

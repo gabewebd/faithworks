@@ -505,3 +505,16 @@ test("draft page preview renders with the site templates", async () => {
   assert.ok(res.data.report.some((m) => m.includes("script")));
   cleanup();
 });
+
+test("resource preview shows the article contents sidebar and drops an empty Keep reading", async () => {
+  const { u, cleanup } = await setup();
+  const body = `<article class="article"><div class="article__body"><h2>First step</h2><p>One.</p><h2>Second step</h2><p>Two.</p></div></article>
+<section class="section wrap" aria-labelledby="related-title"><h2 id="related-title" class="h3">Keep reading</h2><ul class="more" data-cms-component="related-articles"></ul></section>`;
+  const res = await u.author.post("/api/preview", { collection: "resources", data: article({ doc_version: 2, body_html: body }) });
+  assert.equal(res.status, 200);
+  assert.match(res.data.html, /<div class="article__layout wrap"><aside class="article__aside"><details class="toc" open data-toc>/);
+  assert.match(res.data.html, /<a class="toc__link" href="#first-step">First step<\/a>/);
+  assert.match(res.data.html, /<h2 id="second-step">Second step<\/h2>/);
+  assert.ok(!res.data.html.includes("fw:empty-section"), "no marker left in the preview");
+  cleanup();
+});

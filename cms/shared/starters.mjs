@@ -213,6 +213,8 @@ function events() {
 
 <figure class="article__cover wrap" data-cms-component="featured-image"></figure>
 
+<section class="wrap event-photos" aria-label="Event photos" data-cms-component="event-gallery"></section>
+
 <section class="section wrap fw-section" aria-labelledby="cards-title">
   <div class="fw-section__head">
     <h2 id="cards-title">This Is a Card</h2>

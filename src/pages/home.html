@@ -4,9 +4,56 @@
   "description": "Practical workshops, guided programs and business support that help founders, professionals and teams turn AI learning into work they can use.",
   "nav": "home"
 }-->
-    <!-- HERO: the task (left) becomes the result (right), around the message (brief §3 hero copy) -->
+    <!-- HERO: the message at the centre of a network of AI agents and the everyday apps they work with.
+         Wide screens: two half-networks frame the copy from the viewport edges (.hnet--wide, behind it). Tablet and phone: a simpler
+         network sits below the CTAs (.hnet--compact), so nothing ever overlaps the headline or buttons. -->
     <section class="hero" id="home" aria-labelledby="hero-title" data-reveal>
-      <div class="hero__glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="hnet hnet--wide" role="img" aria-label="Illustration: AI agents such as Claude, ChatGPT, OpenAI Codex, Grok, Hermes Agent, OpenClaw, Obsidian and NotebookLM, connected to everyday work in Gmail, Google Drive, Google Docs, Google Calendar and Google Sheets.">
+        <div class="hnet__layer hnet__half hnet__half--l">
+          <svg class="hnet__lines" viewBox="0 0 440 760" focusable="false" aria-hidden="true">
+          <g class="hnet__side hnet__side--l">
+            <path class="hnet__link hnet__link--bus" style="--i:0" pathLength="1" d="M230 130H328Q340 130 340 142V503"/>
+            <path class="hnet__link hnet__link--agent" style="--i:1" pathLength="1" d="M110 257H400"/>
+            <path class="hnet__link hnet__link--agent" style="--i:2" pathLength="1" d="M220 380H400"/>
+            <path class="hnet__link hnet__link--agent" style="--i:3" pathLength="1" d="M120 503H400"/>
+            <path class="hnet__link hnet__link--app" style="--i:8" d="M260 620V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:9" d="M120 660V503"/>
+          </g>
+          <circle class="hnet__port hnet__port--l" style="--i:0" cx="400" cy="257" r="3.5"/>
+          <circle class="hnet__port hnet__port--l" style="--i:2" cx="400" cy="503" r="3.5"/>
+          </svg>
+          <span class="hnode hnode--agent hnode--lead hnode--float" style="--x:50%;--y:50%;--s:86px;--i:0;--d:0.6;--fd:7s"><img src="/assets/icons/tools/claude-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l hnode--float" style="--x:27.27%;--y:66.18%;--s:66px;--i:2;--d:0.4;--fd:9s"><img src="/assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l" style="--x:52.27%;--y:17.11%;--s:52px;--i:4;--d:0.3"><img src="/assets/icons/tools/hermes-agent.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--l hnode--float" style="--x:25%;--y:33.82%;--s:54px;--i:6;--d:0.3;--fd:10.5s"><img src="/assets/icons/tools/grok.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--you hnode--l" style="--x:90.91%;--y:50%;--s:44px;--i:4;--d:0.7"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg><span class="hnode__label">You</span></span>
+          <span class="hnode hnode--app" style="--x:59.09%;--y:81.58%;--s:46px;--i:8;--d:0.3"><img src="/assets/icons/tools/gmail.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app" style="--x:27.27%;--y:86.84%;--s:44px;--i:11;--d:0.2"><img src="/assets/icons/tools/google-calendar.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+        </div>
+        <div class="hnet__layer hnet__half hnet__half--r">
+          <svg class="hnet__lines" viewBox="1000 0 440 760" focusable="false" aria-hidden="true">
+          <g class="hnet__side hnet__side--r">
+            <path class="hnet__link hnet__link--bus" style="--i:4" pathLength="1" d="M1210 130H1112Q1100 130 1100 142V503"/>
+            <path class="hnet__link hnet__link--agent" style="--i:5" pathLength="1" d="M1320 257H1040"/>
+            <path class="hnet__link hnet__link--agent" style="--i:6" pathLength="1" d="M1220 380H1040"/>
+            <path class="hnet__link hnet__link--agent" style="--i:7" pathLength="1" d="M1330 503H1040"/>
+            <path class="hnet__link hnet__link--app" style="--i:10" d="M1160 620V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:11" d="M1330 640V503"/>
+            <path class="hnet__link hnet__link--app" style="--i:12" d="M1245 700H1172Q1160 700 1160 688V620"/>
+          </g>
+          <circle class="hnet__port hnet__port--r" style="--i:3" cx="1040" cy="257" r="3.5"/>
+          <circle class="hnet__port hnet__port--r" style="--i:5" cx="1040" cy="503" r="3.5"/>
+          </svg>
+          <span class="hnode hnode--agent hnode--r" style="--x:72.73%;--y:33.82%;--s:70px;--i:1;--d:0.5"><img src="/assets/icons/tools/codex-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r hnode--float" style="--x:50%;--y:50%;--s:64px;--i:3;--d:0.5;--fd:8s"><img src="/assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r" style="--x:75%;--y:66.18%;--s:56px;--i:5;--d:0.4"><img src="/assets/icons/tools/obsidian.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--agent hnode--r hnode--float" style="--x:47.73%;--y:17.11%;--s:54px;--i:7;--d:0.4;--fd:9.5s"><img src="/assets/icons/tools/openclaw.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--you hnode--r" style="--x:9.09%;--y:50%;--s:44px;--i:5;--d:0.7"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/></svg><span class="hnode__label">You</span></span>
+          <span class="hnode hnode--app" style="--x:36.36%;--y:81.58%;--s:46px;--i:9;--d:0.3"><img src="/assets/icons/tools/google-drive.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app hnode--float" style="--x:75%;--y:84.21%;--s:44px;--i:10;--d:0.2;--fd:11s"><img src="/assets/icons/tools/google-docs.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+          <span class="hnode hnode--app" style="--x:55.68%;--y:92.11%;--s:44px;--i:12;--d:0.3"><img src="/assets/icons/tools/google-sheets.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+        </div>
+      </div>
       <div class="hero__stage wrap">
         <div class="hero__copy">
           <p class="eyebrow hero__eyebrow"><span class="dot" aria-hidden="true"></span>Human first. AI empowered.</p>
@@ -20,41 +67,76 @@
           </h1>
           <p class="intro hero__intro">Practical workshops, guided programs, and business support that help founders, professionals, and teams turn AI learning into work they can use.</p>
           <div class="actions hero__actions">
-            <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
             <a class="btn btn--light" href="/business/">Train My Team</a>
           </div>
           <p class="small hero__small">Learn. Implement. Scale.</p>
         </div>
-
-        <div class="hero__input" data-ui data-tilt role="img" aria-label="Illustration: less overwhelm, more possibility. One task, turning a topic into a content plan, with its inputs.">
-          <div class="visual" data-depth="0.6">
-            <p class="visual__label">LESS OVERWHELM. MORE POSSIBILITY.</p>
-            <div class="visual__arrow" aria-hidden="true">↗</div>
-            <p class="visual__bottom">A LITTLE LEARNING.<br>A REAL NEXT STEP.</p>
-          </div>
-          <div class="h-prompt" data-depth="1.5">
-            <p class="h-prompt__label"><span class="dot" aria-hidden="true"></span>THE TASK</p>
-            <p class="h-prompt__text"><span class="h-prompt__typed">Turn a topic into a content plan.</span><span class="h-prompt__caret"></span></p>
-            <div class="h-prompt__chips"><span>Audience</span><span>Objective</span><span>Source notes</span></div>
-          </div>
-        </div>
-
-        <div class="hero__output" data-ui data-tilt role="img" aria-label="Illustration: from where do I start, to I built this. A clearer workflow, a useful first prototype and the confidence to keep going.">
-          <div class="work-card" data-depth="1">
-            <small>YOUR NEXT CHAPTER</small>
-            <p class="work-card__title">From “where do I start?”<br>to “I built this.”</p>
-            <ul class="work-card__tasks">
-              <li style="--n:0"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> A clearer workflow</li>
-              <li style="--n:1"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> A useful first prototype</li>
-              <li style="--n:2"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span> The confidence to keep going</li>
-            </ul>
-          </div>
-          <div class="pink-card" data-depth="1.7">
-            <small>THE FAITH WORKS APPROACH</small>
-            <strong>Upgrade the human.<br>Then the tools.</strong>
+        <div class="hnet hnet--compact" role="img" aria-label="Illustration: AI agents such as Claude, ChatGPT, OpenAI Codex, Grok, Hermes Agent, OpenClaw, Obsidian and NotebookLM, connected to everyday work in Gmail, Google Drive, Google Docs, Google Calendar and Google Sheets.">
+          <div class="hnet__layer">
+            <span class="hnet__hub" aria-hidden="true"></span>
+            <svg class="hnet__lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+            <path class="hnet__link hnet__link--agent" style="--i:0" pathLength="1" vector-effect="non-scaling-stroke" d="M50 3V44"/>
+            <path class="hnet__link hnet__link--agent" style="--i:1" pathLength="1" vector-effect="non-scaling-stroke" d="M50 16H27V34"/>
+            <path class="hnet__link hnet__link--agent" style="--i:2" pathLength="1" vector-effect="non-scaling-stroke" d="M50 16H73V34"/>
+            <path class="hnet__link hnet__link--agent is-t2" style="--i:3" pathLength="1" vector-effect="non-scaling-stroke" d="M27 16H7V30"/>
+            <path class="hnet__link hnet__link--agent is-t2" style="--i:4" pathLength="1" vector-effect="non-scaling-stroke" d="M73 16H93V30"/>
+            <path class="hnet__link hnet__link--peer" style="--i:5" pathLength="1" vector-effect="non-scaling-stroke" d="M27 34V50H14V64"/>
+            <path class="hnet__link hnet__link--peer" style="--i:6" pathLength="1" vector-effect="non-scaling-stroke" d="M73 34V50H86V64"/>
+            <path class="hnet__link hnet__link--peer is-t2" style="--i:7" pathLength="1" vector-effect="non-scaling-stroke" d="M50 58H36V72"/>
+            <path class="hnet__link hnet__link--app" style="--i:8" vector-effect="non-scaling-stroke" d="M27 50V90"/>
+            <path class="hnet__link hnet__link--app" style="--i:9" vector-effect="non-scaling-stroke" d="M50 44V88"/>
+            <path class="hnet__link hnet__link--app" style="--i:10" vector-effect="non-scaling-stroke" d="M73 50V90"/>
+            <path class="hnet__link hnet__link--app is-t2" style="--i:11" vector-effect="non-scaling-stroke" d="M14 64V90"/>
+            <path class="hnet__link hnet__link--app is-t2" style="--i:12" vector-effect="non-scaling-stroke" d="M86 64V90"/>
+            </svg>
+            <span class="hnode hnode--agent hnode--lead hnode--float is-t1" style="--x:50%;--y:44%;--s:66px;--i:0;--fd:7s"><img src="/assets/icons/tools/claude-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:27%;--y:30%;--s:54px;--i:1;--fd:9s"><img src="/assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:73%;--y:30%;--s:54px;--i:2;--fd:8.5s"><img src="/assets/icons/tools/codex-color.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t1" style="--x:14%;--y:64%;--s:46px;--i:3"><img src="/assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent hnode--float is-t1" style="--x:86%;--y:64%;--s:46px;--i:4;--fd:10s"><img src="/assets/icons/tools/obsidian.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:7%;--y:26%;--s:40px;--i:5"><img src="/assets/icons/tools/grok.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:93%;--y:26%;--s:40px;--i:6"><img src="/assets/icons/tools/openclaw.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--agent is-t2" style="--x:36%;--y:72%;--s:40px;--i:7"><img src="/assets/icons/tools/hermes-agent.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:27%;--y:90%;--s:38px;--i:8"><img src="/assets/icons/tools/gmail.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:52%;--y:88%;--s:36px;--i:9"><img src="/assets/icons/tools/google-sheets.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t1" style="--x:73%;--y:90%;--s:38px;--i:10"><img src="/assets/icons/tools/google-drive.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t2" style="--x:14%;--y:90%;--s:34px;--i:11"><img src="/assets/icons/tools/google-calendar.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
+            <span class="hnode hnode--app is-t2" style="--x:86%;--y:90%;--s:34px;--i:12"><img src="/assets/icons/tools/google-docs.svg" alt="" width="24" height="24" loading="eager" decoding="async"></span>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- TRUSTED BY: a quiet logo strip (src/data/trusted-by.json). Placeholders until approved
+         client logos are supplied. The loop is CSS only (css/style.css §10b); js/main.js §11
+         adds the pause button. -->
+    <section class="trusted" aria-labelledby="trusted-title">
+      <div class="wrap trusted__head">
+        <h2 id="trusted-title" class="trusted__title">Trusted by</h2>
+        <button type="button" class="trusted__toggle" data-logo-toggle aria-pressed="false" hidden><span class="trusted__toggle-pause">Pause</span><span class="trusted__toggle-play">Play</span><span class="sr-only"> the logo strip</span></button>
+      </div>
+      <div class="trusted__marquee" data-logo-marquee>
+        {{trustedBy}}
+      </div>
+    </section>
+
+    <!-- EVENTS GALLERY: real Faith Works sessions only (no stock), as an editorial masonry grid.
+         Photos: CMS event images marked for the gallery, then src/data/events.json (tools/event-gallery.mjs).
+         Full bleed: the section is not a .wrap, so the grid runs edge to edge; only the heading
+         sits on the page grid. -->
+    <section class="section egallery egallery--bleed" id="gallery" aria-labelledby="gallery-title">
+      <div class="wrap section-head" data-reveal>
+        <div>
+          <p class="eyebrow">Events</p>
+          <h2 id="gallery-title" data-split>Made for<br>real-world work.</h2>
+        </div>
+        <div class="egallery__intro">
+          <p>Masterclasses, hands-on workshops, keynotes and community gatherings, with real people working on real tasks.</p>
+          <a class="text-link" href="/workshops/#gallery">View all events</a>
+        </div>
+      </div>
+      {{eventGallery:home}}
     </section>
 
     <div class="strip">
@@ -78,15 +160,14 @@
       </div>
       <ol class="routes" data-reveal>
         <li class="route route--stone" style="--n:0">
-          <a class="route__link" href="/learn/">
-            <span class="route__top">
-              <span class="route__num">For professionals</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <path class="route__track" d="M14 28 H106"/>
-                <circle class="route__dot route__dot--done" cx="14" cy="28" r="7"/>
-                <circle class="route__dot route__dot--done" cx="50" cy="28" r="7"/>
-                <circle class="route__dot" cx="86" cy="28" r="7"/>
-                <path class="route__check" d="M10.5 28 L13 30.5 L17.5 25.5 M46.5 28 L49 30.5 L53.5 25.5"/>
+          <a class="route__link" href="/professionals/">
+            <span class="route__num">For professionals</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__ring" cx="24" cy="24" r="17"/>
+                <path class="route__line" d="M24 5.5v3.5M24 39v3.5M5.5 24h3.5M39 24h3.5"/>
+                <path class="route__needle route__needle--lead" d="M30.4 17.6 26.1 26.1 21.9 21.9Z"/>
+                <path class="route__needle" d="M17.6 30.4 21.9 21.9 26.1 26.1Z"/>
               </svg>
             </span>
             <h3 class="route__title">I want to learn AI.</h3>
@@ -96,13 +177,13 @@
         </li>
         <li class="route route--pink" style="--n:1">
           <a class="route__link" href="/build/">
-            <span class="route__top">
-              <span class="route__num">For founders</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <rect class="route__box" x="4" y="6" width="30" height="18" rx="5"/>
-                <rect class="route__box" x="4" y="32" width="30" height="18" rx="5"/>
-                <path class="route__track" d="M34 15 H48 Q56 15 56 23 V28 H70 M34 41 H48 Q56 41 56 33 V28"/>
-                <rect class="route__box route__box--accent" x="70" y="14" width="44" height="28" rx="7"/>
+            <span class="route__num">For founders</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <rect class="route__node" x="6" y="8" width="13" height="13" rx="3.5"/>
+                <rect class="route__node" x="6" y="27" width="13" height="13" rx="3.5"/>
+                <path class="route__line" d="M19 14.5h3.5a3.5 3.5 0 0 1 3.5 3.5v12a3.5 3.5 0 0 1-3.5 3.5H19M26 24h3"/>
+                <rect class="route__node route__node--lead" x="29" y="17.5" width="13" height="13" rx="3.5"/>
               </svg>
             </span>
             <h3 class="route__title">I want to build with AI.</h3>
@@ -112,14 +193,15 @@
         </li>
         <li class="route route--yellow" style="--n:2">
           <a class="route__link" href="/business/">
-            <span class="route__top">
-              <span class="route__num">For organizations</span>
-              <svg class="route__motif" viewBox="0 0 120 56" aria-hidden="true" focusable="false" data-draw>
-                <circle class="route__person" cx="30" cy="28" r="14"/>
-                <circle class="route__person" cx="54" cy="28" r="14"/>
-                <circle class="route__person" cx="78" cy="28" r="14"/>
-                <circle class="route__badge" cx="104" cy="16" r="10"/>
-                <path class="route__check route__check--badge" d="M99.5 16 L102.5 19 L108.5 12.5"/>
+            <span class="route__num">For organizations</span>
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__head route__head--lead" cx="24" cy="9.5" r="4.5"/>
+                <path class="route__line" d="M16.5 22a7.5 7.5 0 0 1 15 0M24 25v4M11 29h26M11 29v3.5M24 29v3.5M37 29v3.5"/>
+                <circle class="route__head" cx="11" cy="37" r="3"/>
+                <circle class="route__head" cx="24" cy="37" r="3"/>
+                <circle class="route__head" cx="37" cy="37" r="3"/>
+                <path class="route__line" d="M6 45.5a5 5 0 0 1 10 0M19 45.5a5 5 0 0 1 10 0M32 45.5a5 5 0 0 1 10 0"/>
               </svg>
             </span>
             <h3 class="route__title">I want my team ready.</h3>
@@ -130,7 +212,7 @@
       </ol>
     </section>
 
-    <!-- MAKE IT CONCRETE: task → AI assists → human check → output -->
+    <!-- MAKE IT CONCRETE: three cards, task → AI assists → you review -->
     <section class="section band band--stone" id="examples" aria-labelledby="examples-title">
       <div class="wrap">
         <div class="section-head" data-reveal>
@@ -142,38 +224,62 @@
         </div>
 
         <div class="flow" data-reveal>
-          <div class="flow__tabs" role="tablist" aria-label="Explore example projects">
+          <div class="flow__tabs" role="tablist" aria-label="Choose an example task">
             <button type="button" role="tab" id="ex-tab-0" aria-controls="ex-panel" aria-selected="true" data-example="0"><span class="flow__tab-num">01</span><span class="flow__tab-name">Content planning</span></button>
-            <button type="button" role="tab" id="ex-tab-1" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="1"><span class="flow__tab-num">02</span><span class="flow__tab-name">Lead follow-up</span></button>
+            <button type="button" role="tab" id="ex-tab-1" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="1"><span class="flow__tab-num">02</span><span class="flow__tab-name">Lead follow‑up</span></button>
             <button type="button" role="tab" id="ex-tab-2" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="2"><span class="flow__tab-num">03</span><span class="flow__tab-name">Team knowledge</span></button>
           </div>
 
-          <div class="flow__canvas is-playing" data-ui id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
-            <article class="flow__stage flow__stage--task">
-              <p class="flow__kicker">THE TASK</p>
-              <h3 id="example-task">Turn a topic into a content plan.</h3>
-              <p id="example-input">Start with your audience, one business objective and approved source notes.</p>
-              <ul class="flow__chips" id="example-chips" aria-label="Starting inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
+          <!-- Three cards, one per step: the task → AI assists → you review. js/main.js swaps the copy per task -->
+          <div class="flow__cards is-playing" id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
+            <article class="fcard fcard--task">
+              <div class="fcard__art" aria-hidden="true">
+                <ul class="fpills" id="ex-inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>01</span>The task</p>
+                <h3 id="ex-task-title">Start with the right context</h3>
+                <p id="ex-task-copy">Turn a topic into a content plan. Begin with your audience, one business objective and approved source notes.</p>
+              </div>
             </article>
-            <article class="flow__stage flow__stage--ai">
-              <p class="flow__kicker">AI ASSISTS</p>
-              <div class="flow__tools" aria-hidden="true"><span class="flow__tool"><img class="tool" src="/assets/icons/tools/claude.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="/assets/icons/tools/chatgpt.svg" alt="" width="18" height="18"></span><span class="flow__tool"><img class="tool" src="/assets/icons/tools/gemini.svg" alt="" width="18" height="18"></span></div>
-              <p class="flow__status"><span class="flow__status-dot" aria-hidden="true"></span>Drafts a first version</p>
-              <span class="flow__bar" aria-hidden="true"><span></span></span>
-              <p class="flow__note">Example tools only. Any capable assistant works.</p>
+            <article class="fcard fcard--ai">
+              <div class="fcard__art">
+                <div class="fdraft" aria-hidden="true">
+                  <p class="fdraft__top"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.5Q13 10.9 21.5 12 13 13.1 12 21.5 11 13.1 2.5 12 11 10.9 12 2.5Z"/></svg>Drafting</p>
+                  <p class="fdraft__label" id="ex-draft">Three content angles</p>
+                  <span class="fdraft__bar"><span></span></span>
+                  <span class="fdraft__line"></span>
+                  <span class="fdraft__line fdraft__line--short"></span>
+                </div>
+                <ul class="ftools" aria-label="Example AI tools">
+                  <li><img src="/assets/icons/tools/notebooklm.svg" alt="NotebookLM" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/chatgpt.svg" alt="ChatGPT" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/grok.svg" alt="Grok" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/claude-color.svg" alt="Claude" width="24" height="24"></li>
+                </ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>02</span>AI assists</p>
+                <h3 id="ex-ai-title">Turn notes into a first draft</h3>
+                <p id="ex-ai-copy">AI drafts three content angles from your approved source notes, ready for you to choose from.</p>
+              </div>
             </article>
-            <article class="flow__stage flow__stage--check">
-              <p class="flow__kicker">YOU STAY IN CONTROL</p>
-              <span class="flow__seal" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 19.5c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></span>
-              <p id="example-review">Check accuracy, voice and whether every claim is supported.</p>
-            </article>
-            <article class="flow__stage flow__stage--output">
-              <p class="flow__kicker">ILLUSTRATIVE OUTPUT</p>
-              <h3 id="example-title">A simple content planning workflow</h3>
-              <ol id="example-list" class="flow__list"><li>Choose one useful audience question</li><li>Draft three angles from your source notes</li><li>Review and turn one angle into a publishable draft</li></ol>
-              <a class="text-link" href="/learn/">Find a learning pathway <span class="link-arrow" aria-hidden="true">↗</span></a>
+            <article class="fcard fcard--review">
+              <div class="fcard__art" aria-hidden="true">
+                <div class="fout">
+                  <p class="fout__head" id="ex-out">Content plan</p>
+                  <ul class="fout__rows" id="ex-output"><li>Answer one audience question</li><li>Share a practical how-to</li><li>Tell a real example</li></ul>
+                  <span class="fout__seal"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 12.5 10 16.5 18 8"/></svg></span>
+                </div>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span>03</span>You review</p>
+                <h3 id="ex-review-title">Review before it goes live</h3>
+                <p id="ex-review-copy">Check accuracy, voice and whether every claim is supported, then publish one angle.</p>
+              </div>
             </article>
           </div>
+          <p class="flow__foot"><a class="text-link" href="/learn/">Find a learning pathway</a></p>
         </div>
       </div>
     </section>
@@ -337,7 +443,7 @@
       </div>
       {{programRowsHome}}
       <div class="programs__foot">
-        <a class="btn btn--light" href="/learn/">See all programs <span class="btn__arrow" aria-hidden="true">↗</span></a>
+        <a class="btn btn--light" href="/learn/">See all programs</a>
         <a class="text-link" href="/workshops/">Upcoming workshops <span class="link-arrow" aria-hidden="true">↗</span></a>
         <p class="small">New schedules, fees and enrollment details are announced on each program page once confirmed.</p>
       </div>
@@ -363,15 +469,12 @@
           </div>
         </div>
         <figure class="business__photo">
-          <picture>
-            <source type="image/webp" srcset="/assets/images/masterclass-room-480.webp 480w, /assets/images/masterclass-room-960.webp 960w" sizes="(min-width: 901px) 42vw, 100vw">
-            <img src="/assets/images/masterclass-room-960.jpg" width="960" height="555" alt="A full room of participants learning together at a Faith Works session." loading="lazy" decoding="async">
-          </picture>
+          {{gallery:home.business}}
         </figure>
       </div>
     </section>
 
-    <!-- PROOF: participants' own words (exactly as written), and recent sessions with their venues (CMS events) -->
+    <!-- PROOF: participants' own words (exactly as written) -->
     <section class="section proof" id="proof" aria-labelledby="proof-title">
       <div class="wrap proof__head" data-reveal>
         <p class="eyebrow">In their words</p>
@@ -379,9 +482,6 @@
         <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
       </div>
       {{voices}}
-      <div class="wrap proof__sessions">
-        {{sessionsRun:3}}
-      </div>
     </section>
 
     <!-- VIDEO: a real Faith Works video from Site settings; removed when none is set -->
@@ -390,32 +490,6 @@
         <h2 id="video-title" class="h3">See a session in action.</h2>
       </div>
       {{featuredVideo}}
-    </section>
-
-    <!-- GALLERY: real Faith Works sessions only (no stock), as a slow looping strip (js/main.js §11) -->
-    <section class="gallery" data-marquee aria-labelledby="gallery-title">
-      <div class="wrap gallery__head">
-        <h2 id="gallery-title" class="gallery__title">Made for real-world work.</h2>
-        <div class="marquee__controls" role="group" aria-label="Photo slideshow controls">
-          <button type="button" class="voices__btn" data-marquee-prev aria-controls="gallery-set" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <button type="button" class="voices__btn" data-marquee-next aria-controls="gallery-set" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
-          <button type="button" class="voices__btn voices__btn--toggle" data-marquee-toggle aria-pressed="false" aria-label="Pause the photo slideshow"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
-        </div>
-      </div>
-      <div class="marquee">
-        <div class="marquee__viewport" tabindex="0" role="region" aria-label="Photos from Faith Works sessions. Use the left and right arrow keys to move.">
-          <div class="marquee__track">
-            <ul class="marquee__set" id="gallery-set">
-              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/masterclass-batch3-1440.webp" srcset="/assets/images/masterclass-batch3-480.webp 480w, /assets/images/masterclass-batch3-960.webp 960w, /assets/images/masterclass-batch3-1440.webp 1440w" sizes="(min-width: 900px) 520px, 80vw" width="1440" height="810" alt="Participants of the Faith Works AI &amp; Claude Masterclass, Batch 3, posing together in the session room." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 3</figcaption></figure></li>
-              <li class="marquee__item marquee__item--tall"><figure><img src="/assets/images/speaker-pink-blazer-453.webp" srcset="/assets/images/speaker-pink-blazer-453.webp 453w" sizes="(min-width: 900px) 520px, 80vw" width="453" height="670" alt="Faith Natividad speaking to a workshop audience." loading="lazy" decoding="async" style="object-position:50% 22%"><figcaption>On stage</figcaption></figure></li>
-              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/workshop-slides-960.webp" srcset="/assets/images/workshop-slides-480.webp 480w, /assets/images/workshop-slides-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="430" alt="A Faith Works facilitator presenting slides to a seated group." loading="lazy" decoding="async"><figcaption>Learning on real examples</figcaption></figure></li>
-              <li class="marquee__item marquee__item--square"><figure><img src="/assets/images/participants-laptop-508.webp" srcset="/assets/images/participants-laptop-480.webp 480w, /assets/images/participants-laptop-508.webp 508w" sizes="(min-width: 900px) 520px, 80vw" width="508" height="499" alt="Two participants working through an exercise on a laptop." loading="lazy" decoding="async"><figcaption>Hands-on, on real tasks</figcaption></figure></li>
-              <li class="marquee__item marquee__item--wide"><figure><img src="/assets/images/masterclass-room-960.webp" srcset="/assets/images/masterclass-room-480.webp 480w, /assets/images/masterclass-room-960.webp 960w" sizes="(min-width: 900px) 520px, 80vw" width="960" height="555" alt="A full room of participants at the Faith Works AI &amp; Claude Masterclass, Batch 1." loading="lazy" decoding="async"><figcaption>AI &amp; Claude Masterclass · Batch 1</figcaption></figure></li>
-              <li class="marquee__item marquee__item--square"><figure><img src="/assets/images/workshop-qa-672.webp" srcset="/assets/images/workshop-qa-480.webp 480w, /assets/images/workshop-qa-672.webp 672w" sizes="(min-width: 900px) 520px, 80vw" width="672" height="549" alt="A participant asking a question during a workshop Q&amp;A." loading="lazy" decoding="async" style="object-position:80% 50%"><figcaption>Open Q&amp;A</figcaption></figure></li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ABOUT: founder and ecosystem (brief §3; only active destinations at launch) -->
@@ -438,20 +512,14 @@
             </div>
           </div>
           <figure class="founder__photo">
-            <picture>
-              <source type="image/webp" srcset="/assets/images/founder-portrait-480.webp 480w, /assets/images/founder-portrait-960.webp 960w" sizes="260px">
-              <img src="/assets/images/founder-portrait-480.jpg" alt="Portrait of Faith Natividad, founder of Faith Works PH." width="480" height="720" loading="lazy" decoding="async">
-            </picture>
+            {{gallery:home.founder}}
           </figure>
         </div>
       </div>
-      <div class="ecosystem">
-        {{agentNetwork}}
-        <div class="ecosystem__list" data-reveal>
-          <a href="/learn/"><span class="ecosystem__tag">Learn</span><h3>Faith Works</h3><p>Practical education, workshops, coaching and strategy.</p></a>
-          <a href="/build/#faith-ai"><span class="ecosystem__tag">Build</span><h3>Faith AI</h3><p>AI-supported business systems, starting with your use case.</p></a>
-          <a href="/community/"><span class="ecosystem__tag">Keep going</span><h3>Faith Works Community</h3><p>People who keep learning and applying together.</p></a>
-        </div>
+      <div class="ecosystem__list" data-reveal>
+        <a href="/learn/"><h3 class="ecosystem__brand"><img class="brandmark" src="/assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385" loading="lazy" decoding="async"></h3><p>Practical education, workshops, coaching and strategy.</p></a>
+        <a href="/build/#faith-ai"><h3 class="ecosystem__brand"><img class="brandmark brandmark--ai" src="/assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3><p>AI-supported business systems, starting with your use case.</p></a>
+        <a href="/community/"><h3 class="ecosystem__brand"><img class="brandmark brandmark--community" src="/assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3><p>People who keep learning and applying together.</p></a>
       </div>
     </section>
 
@@ -478,7 +546,7 @@
           <p class="eyebrow">A useful place to begin</p>
           <h2 id="kit-title" data-split>Start with one<br>useful workflow.</h2>
           <p>The free AI Workflow Starter Kit helps you choose one recurring task, organize your inputs, and plan a first version you can test, with a person reviewing the result.</p>
-          <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <p class="small">Free. No card required. Designed for non-technical learners.</p>
         </div>
         <div class="kitart" data-ui aria-label="What is inside the kit">
@@ -523,7 +591,7 @@
         <h2 id="cta-title" data-split>You don’t have to figure<br>out AI on your own.</h2>
         <p>Bring your curiosity. Let’s turn it into something useful.</p>
         <div class="actions actions--center">
-          <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <a class="btn btn--light" href="/contact/">Talk to us</a>
         </div>
       </div>

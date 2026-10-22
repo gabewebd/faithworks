@@ -6,8 +6,9 @@
 
 [functions]
   node_bundler = "esbuild"
-  # The page preview renders with the website's own templates (../tools).
-  included_files = ["../tools/**", "shared/**", "fixtures/seed.json"]
+  # The page preview renders with the website's own templates (../tools); the image picker lists
+  # the website's photos (../src/data).
+  included_files = ["../tools/**", "shared/**", "fixtures/seed.json", "../src/data/*.json"]
 
 [[headers]]
   for = "/*"

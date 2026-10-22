@@ -18,10 +18,10 @@ const TRANSIENT = new Set([408, 429, 500, 502, 503, 504]);
 const PAGE = 1000; // Supabase's default max rows per request
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const TS = ["created_at", "updated_at", "published_at", "deleted_at", "at"];
-const INT = ["version", "published_version"];
+const TS = ["created_at", "updated_at", "published_at", "deleted_at", "at", "submitted_at", "received_at", "notified_at", "sheets_at"];
+const INT = ["version", "published_version", "notify_attempts", "sheets_attempts"];
 const BOOL = ["active", "archived"];
-const JSON_COLS = ["payload", "data"];
+const JSON_COLS = ["payload", "data", "answers", "context"];
 
 // Typed columns of every table (cms/supabase/migrations). Content tables also have `fields`.
 const COLUMNS = {
@@ -32,7 +32,13 @@ const COLUMNS = {
   tags: ["id", "label", "description", "archived", "version", "write_id", "created_at", "created_by", "updated_at", "updated_by"],
 };
 for (const c of Object.keys(COLLECTIONS)) COLUMNS[c] = [...SYSTEM_FIELDS, ...(hasSlug(c) ? ["slug"] : [])];
+// CMS content and system tables (check, seed, import and backup work on these).
 export const SUPABASE_TABS = Object.keys(COLUMNS);
+// Website form submissions (supabase/migrations/20261021000000_form_submissions.sql). Not content:
+// kept out of SUPABASE_TABS, so seeding, imports and content backups never touch it.
+COLUMNS.form_submissions = ["id", "provider", "provider_id", "form_id", "name", "email", "answers", "context", "status", "kind", "spam_reason", "ip_hash",
+  "submitted_at", "received_at", "notify_state", "notify_attempts", "notify_error", "notified_at", "sheets_state", "sheets_attempts", "sheets_error", "sheets_at",
+  "version", "write_id", "updated_at", "updated_by"];
 export const tableOf = (tab) => {
   if (!COLUMNS[tab]) throw new HttpError(500, `Unknown CMS table: ${tab}`, "unknown_table");
   return `cms_${tab}`;
@@ -158,6 +164,18 @@ export function createSupabaseStore({ url, serviceKey, fetchImpl = globalThis.fe
       return Object.fromEntries(tabs.map((t, i) => [t, lists[i]]));
     },
     get,
+
+    // Filtered read: { eq: { col: v }, in: { col: [...] }, gte: { col: v }, lt: { col: v }, order: "col.desc", limit }.
+    async query(tab, { eq: equals = {}, in: within = {}, gte = {}, lt = {}, order = "id.asc", limit = PAGE } = {}) {
+      const filters = [
+        ...Object.entries(equals).map(([k, v]) => `${k}=${eq(v)}`),
+        ...Object.entries(within).map(([k, v]) => `${k}=in.(${v.map((x) => encodeURIComponent(`"${x}"`)).join(",")})`),
+        ...Object.entries(gte).map(([k, v]) => `${k}=gte.${encodeURIComponent(v)}`),
+        ...Object.entries(lt).map(([k, v]) => `${k}=lt.${encodeURIComponent(v)}`),
+      ];
+      const rows = await call("GET", `${tableOf(tab)}?select=*${filters.map((x) => `&${x}`).join("")}&order=${order}&limit=${Math.min(limit, PAGE)}`, { retry: true });
+      return rows.map((r) => decodeRow(tab, r));
+    },
 
     async insert(tab, record) {
       try {
