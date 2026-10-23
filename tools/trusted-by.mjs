@@ -13,10 +13,10 @@ const MARKS = new Set(["circle", "square", "diamond", "ring", "bars", "none"]);
 const STYLES = new Set(["caps", "wide", "bold", "light"]);
 
 function logo(l, hidden) {
-  if (l.logo) return `<li class="logo logo--image"><img src="${esc(l.logo)}" alt="${hidden ? "" : esc(l.name)}" loading="lazy" decoding="async"></li>`;
+  if (l.logo) return `<li class="trusted__logo trusted__logo--image"><img src="${esc(l.logo)}" alt="${hidden ? "" : esc(l.name)}" loading="lazy" decoding="async"></li>`;
   const mark = MARKS.has(l.mark) ? l.mark : "none";
   const style = STYLES.has(l.style) ? l.style : "caps";
-  return `<li class="logo logo--${style}">${mark === "none" ? "" : `<span class="logo__mark logo__mark--${mark}" aria-hidden="true"></span>`}<span class="logo__name">${esc(l.name)}</span></li>`;
+  return `<li class="trusted__logo trusted__logo--${style}">${mark === "none" ? "" : `<span class="trusted__mark trusted__mark--${mark}" aria-hidden="true"></span>`}<span class="trusted__name">${esc(l.name)}</span></li>`;
 }
 
 export function trustedBy() {

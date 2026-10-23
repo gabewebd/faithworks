@@ -212,34 +212,106 @@
     }, "aria-checked");
   }
 
-  /* ---- 5a. Program showcase (learn) --------------------------------------- */
-  // As a swipe row (narrow screens, touch, reduced motion), the bar and the current step follow
-  // the row's own scroll and a step scrolls its card into view. When js/motion.js pins the
-  // section (is-pinned) it drives both from the page scroll instead.
-  var pshow = $("[data-pshow]");
-  if (pshow && $("[data-pshow-viewport]", pshow)) {
-    var view = $("[data-pshow-viewport]", pshow), bar = $("[data-pshow-bar]", pshow);
-    var steps = $$("[data-pshow-step]", pshow), cards = $$(".pshow__item", pshow);
-    var current = function (p) {
-      var at = Math.min(cards.length - 1, Math.round(p * (cards.length - 1)));
-      steps.forEach(function (s, n) { if (n === at) s.setAttribute("aria-current", "true"); else s.removeAttribute("aria-current"); });
-      if (bar) bar.style.transform = "scaleX(" + Math.max(0.04, p) + ")";
-    };
-    window.fwShowcase = { current: current };
-    view.addEventListener("scroll", function () {
-      if (pshow.classList.contains("is-pinned")) return;
-      var max = view.scrollWidth - view.clientWidth;
-      current(max > 0 ? view.scrollLeft / max : 0);
-    }, { passive: true });
-    steps.forEach(function (s, n) {
-      s.addEventListener("click", function (e) {
-        if (pshow.classList.contains("is-pinned") && window.fwMotion && window.fwMotion.showcaseTo) { e.preventDefault(); window.fwMotion.showcaseTo(n); return; }
-        e.preventDefault();
-        view.scrollTo({ left: cards[n].offsetLeft - cards[0].offsetLeft, behavior: reduceMotion ? "auto" : "smooth" });
+  /* ---- 5a. Workshop photo gallery (all hero showcases: loop & zoom parallax) */
+  var pgalleries = $$("[data-pgallery]");
+  pgalleries.forEach(function (pgallery) {
+    var stage = $("figure.pgallery__stage", pgallery);
+    var stageImg = stage ? $("img", stage) : null;
+    var thumbs = $$(".pgallery__thumb", pgallery);
+    if (!stageImg || !thumbs.length) return;
+
+    var currentIndex = 0;
+    var timer = null;
+    var INTERVAL = 4400;
+    var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    thumbs.forEach(function (b, i) {
+      if (b.getAttribute("aria-pressed") === "true") currentIndex = i;
+    });
+
+    function goTo(idx, isUser) {
+      if (idx < 0) idx = thumbs.length - 1;
+      if (idx >= thumbs.length) idx = 0;
+      currentIndex = idx;
+      var btn = thumbs[idx];
+      thumbs.forEach(function (b, n) {
+        b.setAttribute("aria-pressed", n === idx ? "true" : "false");
+      });
+
+      var tImg = btn.querySelector("img");
+      var src = (tImg && tImg.getAttribute("src")) || btn.getAttribute("data-src");
+      var srcset = (tImg && tImg.getAttribute("srcset")) || btn.getAttribute("data-srcset");
+      var alt = btn.getAttribute("data-alt");
+      var pos = btn.getAttribute("data-pos");
+
+      // Cross-dissolve: outgoing image placed on top layer, dissolves smoothly to reveal incoming
+      var prevLayer = stage.querySelector(".pgallery__dissolve-layer");
+      if (prevLayer && prevLayer.parentNode) prevLayer.parentNode.removeChild(prevLayer);
+
+      var clone = stageImg.cloneNode(true);
+      clone.classList.add("pgallery__dissolve-layer");
+      clone.style.zIndex = "2";
+      clone.style.opacity = "1";
+      clone.style.transition = reduceMotion ? "none" : "opacity 500ms cubic-bezier(0.25, 1, 0.5, 1)";
+      stage.appendChild(clone);
+
+      if (srcset) stageImg.setAttribute("srcset", srcset);
+      if (src) stageImg.setAttribute("src", src);
+      if (alt) stageImg.setAttribute("alt", alt);
+      if (pos) stageImg.style.objectPosition = pos;
+
+      // Restart zoom animation on new image
+      stage.classList.remove("is-zooming");
+      void stage.offsetWidth;
+      stage.classList.add("is-zooming");
+
+      requestAnimationFrame(function () {
+        clone.style.opacity = "0";
+      });
+
+      setTimeout(function () {
+        if (clone.parentNode) clone.parentNode.removeChild(clone);
+      }, reduceMotion ? 0 : 520);
+
+      if (isUser) {
+        restart();
+      }
+    }
+
+    function start() {
+      if (prefersReduced) return;
+      stop();
+      timer = setInterval(function () {
+        goTo(currentIndex + 1, false);
+      }, INTERVAL);
+    }
+
+    function stop() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function restart() {
+      stop();
+      start();
+    }
+
+    thumbs.forEach(function (btn, i) {
+      btn.addEventListener("click", function () {
+        goTo(i, true);
       });
     });
-    current(0);
-  }
+
+    pgallery.addEventListener("mouseenter", stop);
+    pgallery.addEventListener("mouseleave", start);
+    pgallery.addEventListener("focusin", stop);
+    pgallery.addEventListener("focusout", start);
+
+    stage.classList.add("is-zooming");
+    start();
+  });
 
   /* ---- 6. Starter kit thank-you ------------------------------------------ */
   var dl = $("[data-kit-download]");
@@ -915,6 +987,21 @@
     track.addEventListener("scroll", queue, { passive: true });
     window.addEventListener("resize", queue);
     update();
+  });
+
+  /* ---- 18. Event Gallery Masonry Marquee ------------------------------------ */
+  // Continuous smooth marquee loop of the 1-row masonry grid (Phase 1 + Phase 2).
+  // Automatically glides continuously without buttons or clicking.
+  // Pauses on hover or focus so photos and captions can be inspected comfortably.
+  $$("[data-mmarquee]").forEach(function (box) {
+    var track = $(".mmarquee__track", box);
+    var set = $("[data-mmarquee-set]", box);
+    if (!track || !set) return;
+
+    // Clone the set for a seamless, continuous -50% CSS loop
+    var clone = set.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    track.appendChild(clone);
   });
 
   window.__fwReady = true;

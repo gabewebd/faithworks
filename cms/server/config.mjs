@@ -129,7 +129,7 @@ export function formsConfig(env = process.env) {
   return f;
 }
 // Every form's team alert goes here unless FORMS_NOTIFY_TO (or a per-form variable) says otherwise.
-export const DEFAULT_NOTIFY_TO = "projects@digitalgrowthscale.com";
+export const DEFAULT_NOTIFY_TO = ["projects", "digitalgrowthscale.com"].join("@");
 export const recipientsFor = (forms, formId) => (forms.notifyToByForm[formId]?.length ? forms.notifyToByForm[formId] : forms.notifyTo);
 
 // The kind of Supabase key, never the key itself: "secret" (sb_secret_…), "service_role" (legacy

@@ -112,6 +112,51 @@ export function masonry(items, { label } = {}) {
         </ul>`;
 }
 
+// Home marquee: a full-bleed horizontal strip that auto-scrolls on a CSS loop.
+// The first photo is shown as a wider "anchor" tile; all others are square-ish.
+// Two identical sets of tiles are placed side by side; CSS animates the track
+// left by exactly one set's width, then snaps back — creating a seamless loop.
+export function photoMarquee(items, { label } = {}) {
+  const tile = (it, i) => {
+    const isAnchor = i === 0;
+    const sizes = isAnchor ? '(min-width:1000px) 42vw, 90vw' : '(min-width:1000px) 22vw, 50vw';
+    const img = it.photo
+      ? imgTag(it.photo, { sizes, alt: it.alt, position: it.position })
+      : `<img src="${esc(it.url)}" alt="${esc(it.alt || '')}" loading="lazy" decoding="async">`;
+    return `<li class="pmarquee__tile${isAnchor ? ' pmarquee__tile--anchor' : ''}"><figure>${img}${it.caption ? `<figcaption>${esc(it.caption)}</figcaption>` : ''}</figure></li>`;
+  };
+  const tileSet = items.map(tile).join('\n            ');
+  return `<div class="pmarquee" aria-label="${esc(label || 'Photos from Faith Works events')}" role="region">
+        <div class="pmarquee__track" aria-hidden="true">
+          <ul class="pmarquee__set">${tileSet}</ul>
+          <ul class="pmarquee__set" aria-hidden="true">${tileSet}</ul>
+        </div>
+      </div>`;
+}
+
+export function masonryMarquee(items, { label } = {}) {
+  const set1 = items.slice(0, 5);
+  const set2 = items.slice(5, 10);
+
+  const renderTiles = (list, offset) => list.map((it, i) => {
+    const s = BAND[offset + i];
+    const style = `--c:${s.d[0]};--r:${s.d[1]};--ct:${s.t[0]};--rt:${s.t[1]};--cm:${s.m[0]};--rm:${s.m[1]}`;
+    return `<li class="mgrid__tile mgrid__tile--${s.kind}" style="${style}"><figure>${tileImg(it, s.kind)}${it.caption ? `<figcaption>${esc(it.caption)}</figcaption>` : ""}</figure></li>`;
+  }).join("\n          ");
+
+  const block1 = `<ul class="mgrid" role="list">\n          ${renderTiles(set1, 0)}\n        </ul>`;
+  const block2 = `<ul class="mgrid" role="list">\n          ${renderTiles(set2, 5)}\n        </ul>`;
+
+  return `<div class="mmarquee" data-mmarquee aria-label="${esc(label || 'Photos from Faith Works events')}" role="region">
+        <div class="mmarquee__track">
+          <div class="mmarquee__set" data-mmarquee-set>
+            <div class="mmarquee__block">${block1}</div>
+            <div class="mmarquee__block">${block2}</div>
+          </div>
+        </div>
+      </div>`;
+}
+
 // Event render data → the gallery entries content.mjs attaches to each event (resolved photos).
 export function eventGalleryEntries(gallery = []) {
   const list = gallery.filter((g) => g && g.url);
@@ -130,5 +175,6 @@ export function eventGallery(scope, events) {
   const all = galleryItems(events);
   const items = scope === "home" ? all.filter((x) => x.featured).slice(0, HOME_COUNT) : all;
   if (!items.length) return "";
-  return masonry(items, { label: scope === "home" ? "Photos from Faith Works events" : "All photos from Faith Works events" });
+  if (scope === "home") return masonryMarquee(items, { label: "Photos from Faith Works events" });
+  return masonry(items, { label: "All photos from Faith Works events" });
 }

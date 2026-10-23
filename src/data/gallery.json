@@ -191,25 +191,29 @@
     },
     "business": {
       "hero": {
-        "layout": "stack",
-        "sizes": "(min-width: 900px) 45vw, 100vw",
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
           { "image": "room-chart" },
-          { "image": "roundtable", "caption": "Leadership roundtables" },
-          { "image": "group-office" }
+          { "image": "roundtable" },
+          { "image": "group-office" },
+          { "image": "room-full" },
+          { "image": "talk-big-screen" }
         ]
       }
     },
     "community": {
       "hero": {
-        "layout": "mosaic",
-        "sizes": "(min-width: 900px) 45vw, 100vw",
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
           { "image": "community-house-of-creatives" },
           { "image": "masterclass-cheer" },
-          { "image": "group-community" }
+          { "image": "group-community" },
+          { "image": "group-gala" },
+          { "image": "group-orchestrator" }
         ]
       }
     },
@@ -229,32 +233,46 @@
     },
     "workshops": {
       "hero": {
-        "layout": "stack",
-        "sizes": "(min-width: 900px) 40vw, 100vw",
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
           { "image": "masterclass-certificates" },
-          { "image": "certificates-stage", "caption": "Every batch, certified" },
-          { "image": "hotel-laptops" }
+          { "image": "certificates-stage" },
+          { "image": "hotel-laptops" },
+          { "image": "hotel-session" },
+          { "image": "masterclass-stage-group" }
         ]
       }
     },
     "speaking": {
       "hero": {
-        "layout": "stack",
-        "variant": "tall",
-        "sizes": "(min-width: 900px) 30vw, 100vw",
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
           { "image": "speaking-faith-screen" },
-          { "image": "stage-prompting", "caption": "Conference keynotes" },
-          { "image": "talk-big-screen" }
+          { "image": "stage-prompting" },
+          { "image": "talk-big-screen" },
+          { "image": "speaking-five-steps" },
+          { "image": "stage-notebook" }
         ]
       },
       "qa": { "layout": "single", "sizes": "(min-width: 900px) 40vw, 100vw", "items": [{ "image": "open-qa" }] }
     },
     "professionals": {
-      "hero": { "layout": "single", "sizes": "(min-width: 900px) 40vw, 100vw", "priority": true, "items": [{ "image": "talk-laptops" }] },
+      "hero": {
+        "layout": "showcase",
+        "sizes": "(min-width: 900px) 46vw, 100vw",
+        "priority": true,
+        "items": [
+          { "image": "talk-laptops" },
+          { "image": "coaching-at-tables" },
+          { "image": "bgc-laptops" },
+          { "image": "masterclass-certificates" },
+          { "image": "slides-poll" }
+        ]
+      },
       "founder": { "layout": "single", "sizes": "120px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] }
     },
     "starter-kit": {

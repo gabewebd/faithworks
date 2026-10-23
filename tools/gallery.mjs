@@ -64,8 +64,11 @@ const LAYOUTS = {
   showcase: (g) => {
     const items = g.items.slice(0, 5);
     const thumb = (it, i) => {
-      const alt = it.alt ?? photo(it.image).alt;
-      return `<li><button type="button" class="pgallery__thumb" aria-pressed="${i ? "false" : "true"}" data-alt="${esc(alt)}">${imgTag(it.image, { sizes: "(min-width: 900px) 9vw, 20vw", alt: "", position: it.position })}<span class="sr-only">Show photo ${i + 1}: ${esc(alt)}</span></button></li>`;
+      const p = photo(it.image);
+      const alt = it.alt ?? p.alt;
+      const srcset = [...new Map(p.files.map((f) => [f.w, f])).values()].map((f) => `${f.url} ${f.w}w`).join(", ");
+      const pos = it.position || p.position || "";
+      return `<li><button type="button" class="pgallery__thumb" aria-pressed="${i ? "false" : "true"}" data-src="${p.files[1].url}" data-srcset="${srcset}" data-alt="${esc(alt)}" data-pos="${esc(pos)}">${imgTag(it.image, { sizes: "(min-width: 900px) 9vw, 20vw", alt: "", position: it.position })}<span class="sr-only">Show photo ${i + 1}: ${esc(alt)}</span></button></li>`;
     };
     return `<div class="pgallery" data-pgallery>
           <figure class="pgallery__stage">${imgTag(items[0].image, opts(g, items[0]))}</figure>

@@ -563,7 +563,7 @@ id in the tab before appending, so retries do not duplicate.
   labels; free text over 300 characters shortened), the offer and source page, and a link into the
   CMS. Never the email address, phone or consent record: those stay behind the sign-in. Spam is
   never emailed; tests are marked `[TEST]`.
-- **Recipient:** `projects@digitalgrowthscale.com` for every form, built in
+- **Recipient:** default recipient for every form, built in
   (`DEFAULT_NOTIFY_TO`, server/config.mjs). `FORMS_NOTIFY_TO` replaces it only if set; an invalid
   value switches alerts off rather than falling back.
 - **Netlify webhook:** `X-Webhook-Signature` (JWS, HS256) is verified with
@@ -593,7 +593,7 @@ sheets:setup`, after a backup).
 2. **Email:** a Resend account owned by Faith Works; verify the sending domain (Resend lists the
    SPF/DKIM DNS records to add; faithph.ai's DNS is on Cloudflare in front of GHL); create an API
    key with *sending access* only; set `RESEND_API_KEY` and `FORMS_EMAIL_FROM`. Leave
-   `FORMS_NOTIFY_TO` empty to use projects@digitalgrowthscale.com. Then send one labelled test
+   `FORMS_NOTIFY_TO` empty to use the default recipient. Then send one labelled test
    per form and confirm each alert arrives there before calling alerts live.
 3. **Sheets copy:** `FORMS_SHEETS_MIRROR=true`. The service account already has access.
 4. **Switch on the endpoint:** `FORMS_ALLOWED_ORIGINS=https://<website origin>` (staging first).
@@ -609,7 +609,7 @@ sheets:setup`, after a backup).
 | `FORMS_ALLOWED_ORIGINS` | Website origins allowed to submit; empty = endpoint off |
 | `FORMS_RATE_LIMIT` | Per connection per 10 minutes (default 5) |
 | `RESEND_API_KEY`, `FORMS_EMAIL_FROM` | Alert sending (sender on a verified domain) |
-| `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>` | Optional overrides of the built-in recipient (projects@digitalgrowthscale.com) |
+| `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>` | Optional overrides of the built-in recipient |
 | `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB` | Optional copy to the spreadsheet |
 | `NETLIFY_FORMS_WEBHOOK_SECRET` | Only with native Netlify Forms (§13.5) |
 

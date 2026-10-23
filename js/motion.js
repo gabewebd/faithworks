@@ -100,7 +100,7 @@
     $$(":scope > section, :scope > article > section, :scope > .cms-page > section", main).forEach(function (section) {
       var before = section.previousElementSibling;
       while (before && before.matches("style, script, template")) before = before.previousElementSibling;
-      if (!before || section.matches("[data-reveal], [data-pshow]") || section.querySelector("[data-reveal]")) return;
+      if (!before || section.matches("[data-reveal]") || section.querySelector("[data-reveal]")) return;
       blocks.push.apply(blocks, blocksOf(section));
     });
     blocks.push.apply(blocks, $$(".article__fig", main));
@@ -143,81 +143,6 @@
     window.addEventListener("beforeprint", function () { reveal(pending.slice(), true); });
   }
 
-  /* ---- 5b. Program showcase (learn) --------------------------------------- */
-  // On wide screens with a mouse or trackpad, the Programs section holds still under the header
-  // while vertical scrolling moves the card track from right to left; the section lets go once
-  // the last card is in view. The scroll is shared out as move, hold, move, hold: each card
-  // comes to rest on the stage and stays there for a stretch of scrolling before the next one
-  // moves in, so nothing ever scrolls the page on its own. The progress bar and the current step
-  // follow the track, and tabbing into a card (or pressing a step) scrolls the page to that
-  // card's resting point. Touch, narrow screens and reduced motion keep the native swipe row
-  // (js/main.js §5a); gsap.matchMedia undoes the pin when the screen stops qualifying.
-  var pshow = doc.querySelector("[data-pshow]");
-  var showcase = null;
-  if (pshow && pshow.querySelector("[data-pshow-track]")) {
-    var pinBox = pshow.querySelector(".pshow__pin");
-    var track = pshow.querySelector("[data-pshow-track]");
-    var view = pshow.querySelector("[data-pshow-viewport]");
-    var siteHeader = doc.querySelector(".site-header");
-    var headerH = function () { return siteHeader && getComputedStyle(siteHeader).position === "sticky" ? siteHeader.offsetHeight : 0; };
-    var cardsOf = function () { return $$(".pshow__item", pshow); };
-    var travel = function () { return Math.max(0, track.scrollWidth - view.clientWidth); };
-    // Card i is on stage when the track has moved i / (n - 1) of the way. The stage runs from the
-    // page grid's left edge to where the last card comes to rest against the right edge.
-    var stage = function () {
-      var cards = cardsOf(), max = travel(), pad = parseFloat(getComputedStyle(track).paddingLeft);
-      var p = max ? Math.min(1, -gsap.getProperty(track, "x") / max) : 0;
-      var rest = view.clientWidth - pad - cards[cards.length - 1].offsetWidth;
-      var left = view.getBoundingClientRect().left + pad + p * (rest - pad);
-      cards.forEach(function (c) {
-        var r = c.getBoundingClientRect();
-        c.style.setProperty("--d", Math.min(1, Math.abs(r.left - left) / r.width).toFixed(3));
-      });
-      if (window.fwShowcase) window.fwShowcase.current(p);
-    };
-    gsap.matchMedia().add("(min-width: 1024px) and (min-height: 620px) and (hover: hover) and (pointer: fine)", function () {
-      pshow.classList.add("is-pinned");
-      view.scrollLeft = 0;
-      var n = cardsOf().length, HOLD = 0.45;
-      var tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: pinBox, pin: true, anticipatePin: 1, invalidateOnRefresh: true, scrub: 0.5,
-          start: function () { return "top " + headerH() + "px"; },
-          // about one viewport of scrolling per card, moves and holds together
-          end: function () { return "+=" + Math.max(travel(), window.innerHeight * (n - 1)); }
-        },
-        onUpdate: stage
-      });
-      tl.addLabel("c0", 0).to({}, { duration: HOLD / 2 });
-      for (var i = 1; i < n; i++) {
-        tl.to(track, { x: (function (k) { return function () { return -travel() * k / (n - 1); }; })(i), duration: 1, ease: "power1.inOut" })
-          .addLabel("c" + i)
-          .to({}, { duration: i < n - 1 ? HOLD : HOLD / 2 });
-      }
-      stage();
-      showcase = tl;
-      var onFocus = function (e) {
-        var card = e.target.closest(".pshow__item");
-        if (card) showcaseTo(cardsOf().indexOf(card), true);
-      };
-      pshow.addEventListener("focusin", onFocus);
-      return function () {
-        pshow.removeEventListener("focusin", onFocus);
-        pshow.classList.remove("is-pinned");
-        cardsOf().forEach(function (c) { c.style.removeProperty("--d"); });
-        showcase = null;
-      };
-    });
-  }
-  // Scrolls the page to card n's resting point (a little into its hold)
-  var showcaseTo = function (n, instant) {
-    var st = showcase && showcase.scrollTrigger;
-    if (!st || !(("c" + n) in showcase.labels)) return;
-    var t = Math.min(showcase.duration(), showcase.labels["c" + n] + 0.1);
-    var y = st.start + (t / showcase.duration()) * (st.end - st.start);
-    if (instant) lenis.scrollTo(y, { immediate: true, force: true });
-    else lenis.scrollTo(y, { duration: 1.1, easing: expoOut });
-  };
 
   /* ---- 6. Keeping measurements fresh -------------------------------------- */
   // ScrollTrigger re-measures on resize and load by itself. Content that changes the page's

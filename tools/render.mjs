@@ -277,7 +277,8 @@ export function programGrid() {
   if (!D.programs.length) return noPrograms();
   return `<ol class="pstack pgrid">${D.programs.map((p, i) => {
     const cover = PROGRAM_COVER[p.slug];
-    const outcome = p.outputs[0];
+    const forAudience = (p.audience && p.audience.length) ? p.audience.slice(0, 2).join(" · ") : "";
+    const outcome = (p.outputs && p.outputs.length) ? p.outputs[0] : "";
     return `
       <li class="prog prog--${cover ? cover.tone : "white"}" id="${p.slug}" style="--i:${i}" data-reveal>
         <article class="prog__card" aria-labelledby="prog-${p.slug}">
@@ -288,7 +289,11 @@ export function programGrid() {
             <p class="prog__cat">${esc(p.category)}</p>
             <h3 class="prog__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
             <p class="prog__summary">${esc(cover?.line || p.summary)}</p>
-            ${outcome ? `<p class="prog__outcome"><b>You leave with</b> ${esc(outcome)}</p>` : ""}
+            <dl class="prog__facts">
+              ${forAudience ? `<div><dt>For</dt><dd>${esc(forAudience)}</dd></div>` : ""}
+              ${outcome ? `<div><dt>You leave with</dt><dd>${esc(outcome)}</dd></div>` : ""}
+              ${p.format ? `<div><dt>Format</dt><dd>${esc(p.format)}</dd></div>` : ""}
+            </dl>
             <div class="prog__actions">
               <a class="btn prog__btn" href="/programs/${p.slug}/" data-track="program_click">View program <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only">: ${esc(p.title)}</span></a>
               ${p.statusLabel ? badge(p.statusKey, p.statusLabel) : ""}

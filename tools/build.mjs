@@ -77,8 +77,8 @@ function relativize(html, route) {
     return prefix + path + m[2];
   };
   return html
-    .replace(/(\s(?:href|src|data-redirect))="([^"]*)"/g, (all, attr, url) => `${attr}="${fix(url)}"`)
-    .replace(/(\ssrcset)="([^"]*)"/g, (all, attr, set) => `${attr}="${set.split(",").map((s) => { const [u, ...rest] = s.trim().split(/\s+/); return [fix(u), ...rest].join(" "); }).join(", ")}"`);
+    .replace(/(\s(?:href|src|data-src|data-redirect))="([^"]*)"/g, (all, attr, url) => `${attr}="${fix(url)}"`)
+    .replace(/(\s(?:srcset|data-srcset))="([^"]*)"/g, (all, attr, set) => `${attr}="${set.split(",").map((s) => { const [u, ...rest] = s.trim().split(/\s+/); return [fix(u), ...rest].join(" "); }).join(", ")}"`);
 }
 
 const written = [];

@@ -8,12 +8,12 @@ import assert from "node:assert/strict";
 import { createHash, createHmac, generateKeyPairSync, randomUUID } from "node:crypto";
 import { testApp, signedIn } from "./helpers.mjs";
 import { FORMS, FORM_IDS, validateAnswers } from "../shared/forms.mjs";
-import { formsConfig, recipientsFor } from "../server/config.mjs";
+import { formsConfig, recipientsFor, DEFAULT_NOTIFY_TO } from "../server/config.mjs";
 import { alertEmail } from "../server/forms/notify.mjs";
 import { submissionId } from "../server/forms/submissions.mjs";
 import * as R from "../../tools/render.mjs";
 
-const ORIGIN = "https://faithworks.vercel.app";
+const ORIGIN = "https://example.test";
 const EMAIL_ENV = {
   RESEND_API_KEY: "re_test_not_a_real_key", FORMS_EMAIL_FROM: "Faith Works Forms <forms@example.test>",
   FORMS_NOTIFY_TO: "team@example.test", FORMS_NOTIFY_TO_CORPORATE_INQUIRY: "corporate@example.test, owner@example.test",
@@ -102,11 +102,11 @@ test("validation: required fields, formats, options, limits; unknown fields drop
 });
 
 test("configuration: forms problems never stop the CMS, and per-form recipients override the default", () => {
-  const f = formsConfig({ RESEND_API_KEY: "re_x", FORMS_NOTIFY_TO: "a@example.test, not-an-address", FORMS_ALLOWED_ORIGINS: "https://faithworks.vercel.app/, http://evil.example" });
+  const f = formsConfig({ RESEND_API_KEY: "re_x", FORMS_NOTIFY_TO: "a@example.test, not-an-address", FORMS_ALLOWED_ORIGINS: "https://example.test/, http://evil.example" });
   assert.equal(f.email, false, "no sender, and an invalid recipient");
   assert.ok(f.problems.some((p) => /FORMS_EMAIL_FROM/.test(p)));
   assert.ok(f.problems.some((p) => /invalid address/.test(p)));
-  assert.deepEqual(f.allowedOrigins, ["https://faithworks.vercel.app"], "trailing slash removed; plain http refused");
+  assert.deepEqual(f.allowedOrigins, ["https://example.test"], "trailing slash removed; plain http refused");
   const { app, cleanup } = testApp({ env: { RESEND_API_KEY: "re_x" } });
   assert.deepEqual(app.cfg.errors, [], "the CMS itself stays configured");
   cleanup();
@@ -566,9 +566,9 @@ test("alert email text (unit)", () => {
   assert.ok(!/Name: Ben\n[\s\S]*Name: Ben/.test(c.text), "the name is not repeated");
 });
 
-test("alerts go to projects@digitalgrowthscale.com unless FORMS_NOTIFY_TO is set", () => {
+test("alerts go to default recipient unless FORMS_NOTIFY_TO is set", () => {
   const f = formsConfig({ RESEND_API_KEY: "re_x", FORMS_EMAIL_FROM: "forms@example.test" });
   assert.equal(f.email, true);
-  assert.deepEqual(FORM_IDS.map((id) => recipientsFor(f, id)), FORM_IDS.map(() => ["projects@digitalgrowthscale.com"]), "every form");
+  assert.deepEqual(FORM_IDS.map((id) => recipientsFor(f, id)), FORM_IDS.map(() => [DEFAULT_NOTIFY_TO]), "every form");
   assert.equal(formsConfig({ RESEND_API_KEY: "re_x", FORMS_EMAIL_FROM: "forms@example.test", FORMS_NOTIFY_TO: "nope" }).email, false, "an invalid override is not silently replaced");
 });

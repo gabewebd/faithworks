@@ -167,8 +167,8 @@ test("form submissions on Supabase: filtered queries, a dropped insert reply, du
   const store = createSupabaseStore({ url: "https://abc.supabase.co", serviceKey: KEY, fetchImpl, baseDelayMs: 1, log: { error() {} } });
   const seed = JSON.parse(readFileSync(new URL("../fixtures/seed.json", import.meta.url), "utf8"));
   await store.importMissing("users", seed.users);
-  const { app, cleanup } = testApp({ store, fetchImpl, env: { FORMS_ALLOWED_ORIGINS: "https://faithworks.vercel.app", FORMS_RATE_LIMIT: "2", RESEND_API_KEY: "re_test", FORMS_EMAIL_FROM: "forms@example.test", FORMS_NOTIFY_TO: "team@example.test" } });
-  const submit = (b) => app.handle(new Request("http://localhost/api/forms/submit", { method: "POST", headers: { "content-type": "application/json", origin: "https://faithworks.vercel.app", "x-real-ip": "203.0.113.5" }, body: JSON.stringify(b) }));
+  const { app, cleanup } = testApp({ store, fetchImpl, env: { FORMS_ALLOWED_ORIGINS: "https://example.test", FORMS_RATE_LIMIT: "2", RESEND_API_KEY: "re_test", FORMS_EMAIL_FROM: "forms@example.test", FORMS_NOTIFY_TO: "team@example.test" } });
+  const submit = (b) => app.handle(new Request("http://localhost/api/forms/submit", { method: "POST", headers: { "content-type": "application/json", origin: "https://example.test", "x-real-ip": "203.0.113.5" }, body: JSON.stringify(b) }));
   const b = { form_id: "event_notify", request_id: "req-1", source_page: "/workshops/", elapsed_ms: 8000, fields: { first_name: "[TEST] Kai", email: "kai@example.test" } };
 
   fake.faults.push({ method: "POST", table: "cms_form_submissions", drop: true }); // stored, reply lost

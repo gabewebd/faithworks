@@ -24,14 +24,34 @@
         <h2 id="programs-title">Programs</h2>
         <p>Choose by what you want to leave with. Each program page has the full details; dates and fees appear once they are confirmed for sale.</p>
       </div>
-      <div class="journey-line">
-        <h3 id="journey-line-title" class="sr-only">How every program works</h3>
-        <ol class="journey-line__steps" aria-labelledby="journey-line-title">
-          <li><b>Learn</b> the foundations</li>
-          <li><b>Apply</b> AI to a real task</li>
-          <li><b>Build</b> a useful first version</li>
-          <li><b>Implement</b> it in your work</li>
-          <li><b>Improve</b> it through feedback</li>
+      <div class="journey-strip" aria-labelledby="journey-strip-title">
+        <h3 id="journey-strip-title" class="sr-only">How every program works</h3>
+        <ol class="journey-strip__steps">
+          <li class="journey-strip__step">
+            <span class="journey-strip__num">01</span>
+            <b class="journey-strip__title">Learn</b>
+            <span class="journey-strip__desc">the foundations</span>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__num">02</span>
+            <b class="journey-strip__title">Apply</b>
+            <span class="journey-strip__desc">AI to a real task</span>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__num">03</span>
+            <b class="journey-strip__title">Build</b>
+            <span class="journey-strip__desc">a useful first version</span>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__num">04</span>
+            <b class="journey-strip__title">Implement</b>
+            <span class="journey-strip__desc">it in your work</span>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__num">05</span>
+            <b class="journey-strip__title">Improve</b>
+            <span class="journey-strip__desc">it through feedback</span>
+          </li>
         </ol>
       </div>
       {{programGrid}}
@@ -76,30 +96,46 @@
         <p class="eyebrow">No surprises</p>
         <h2 id="promise-title">Before you register, every program page tells you</h2>
       </div>
-      <ol class="promise__list">
-        <li><span class="promise__n" aria-hidden="true">01</span><b>Who it is for</b> <span>And what you should already know.</span></li>
-        <li><span class="promise__n" aria-hidden="true">02</span><b>What you leave with</b> <span>A prototype, a workflow or a plan.</span></li>
-        <li><span class="promise__n" aria-hidden="true">03</span><b>The format</b> <span>Sessions, dates and time commitment.</span></li>
-        <li><span class="promise__n" aria-hidden="true">04</span><b>The fee in PHP</b> <span>What it includes and any extra tool costs.</span></li>
-        <li><span class="promise__n" aria-hidden="true">05</span><b>What is not included</b> <span>So there are no surprises.</span></li>
-        <li><span class="promise__n" aria-hidden="true">06</span><b>How to register</b> <span>And the cancellation and refund terms.</span></li>
+      <ol class="promise__grid">
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">01</span>
+          <h3 class="promise__title">Who it is for</h3>
+          <p class="promise__desc">And what you should already know.</p>
+        </li>
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">02</span>
+          <h3 class="promise__title">What you leave with</h3>
+          <p class="promise__desc">A prototype, a workflow or a plan.</p>
+        </li>
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">03</span>
+          <h3 class="promise__title">The format</h3>
+          <p class="promise__desc">Sessions, dates and time commitment.</p>
+        </li>
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">04</span>
+          <h3 class="promise__title">The fee in PHP</h3>
+          <p class="promise__desc">What it includes and any extra tool costs.</p>
+        </li>
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">05</span>
+          <h3 class="promise__title">What is not included</h3>
+          <p class="promise__desc">So there are no surprises.</p>
+        </li>
+        <li class="promise__item">
+          <span class="promise__num" aria-hidden="true">06</span>
+          <h3 class="promise__title">How to register</h3>
+          <p class="promise__desc">And the cancellation and refund terms.</p>
+        </li>
       </ol>
     </section>
 
-    <section class="section section--flush-top wrap" aria-labelledby="close-title">
-      <div class="lclose">
-        <div class="lclose__copy">
-          <p class="eyebrow">Free starter kit</p>
-          <h2 id="close-title">Not ready to choose a program?</h2>
+    <section class="section section--flush-top wrap">
+      <div class="band-cta">
+        <div>
+          <h2 class="h3">Not ready to choose a program?</h2>
           <p>Start with the free AI Workflow Starter Kit. Pick one task and map your first workflow.</p>
         </div>
-        <div class="lclose__side">
-          <ol class="lclose__flow" aria-label="How the starter kit works">
-            <li><span aria-hidden="true">01</span> Choose one recurring task</li>
-            <li><span aria-hidden="true">02</span> Map the AI-assisted steps</li>
-            <li><span aria-hidden="true">03</span> Keep a human check</li>
-          </ol>
-          <a class="btn lclose__btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
-        </div>
+        <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Get the Free AI Starter Kit <span class="btn__arrow" aria-hidden="true">↗</span></a>
       </div>
     </section>

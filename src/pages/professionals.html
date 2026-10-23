@@ -11,7 +11,7 @@
       <div class="wrap phero__grid">
         <div class="phero__copy" data-reveal>
           <p class="eyebrow">For professionals</p>
-          <h1 id="pro-title">Work smarter with AI. Stay ahead in your career.</h1>
+          <h1 id="pro-title" class="hero__title--xl">Work smarter with AI. Stay ahead in your career.</h1>
           <p class="phero__lead">Build practical AI skills for the job you have now and the one you want next. Hands-on, human-first learning that gives you hours back, sharpens the quality of your work and keeps you relevant as your workplace changes.</p>
           <div class="actions">
             <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
@@ -19,21 +19,18 @@
           </div>
           <p class="small">For employees, freelancers, consultants, creators, team leaders and career changers. No technical background needed.</p>
         </div>
-        <div class="pro-hero__media">
-          <figure class="phero__photo">
-            {{gallery:professionals.hero}}
-          </figure>
-          <div class="pro-hero__card">
-            <p class="pro-hero__label">How every session works</p>
-            <ol>
-              <li><b>Pick</b> a task you repeat every week</li>
-              <li><b>Practise</b> with AI on your own work</li>
-              <li><b>Check</b> the output with your judgment</li>
-              <li><b>Keep</b> a workflow you can reuse</li>
-            </ol>
-          </div>
-        </div>
+        {{gallery:professionals.hero}}
       </div>
+    </section>
+
+    <section class="pro-strip wrap" aria-labelledby="pro-strip-title">
+      <h2 id="pro-strip-title" class="sr-only">How every session works</h2>
+      <ol class="pro-strip__steps">
+        <li><b>Pick</b> a task you repeat every week</li>
+        <li><b>Practise</b> with AI on your own work</li>
+        <li><b>Check</b> the output with your judgment</li>
+        <li><b>Keep</b> a workflow you can reuse</li>
+      </ol>
     </section>
 
     <!-- TRUST: who teaches, with the record from the About page (verified, unchanged) -->
@@ -57,7 +54,7 @@
     </section>
 
     <!-- CHALLENGES: the workplace problems people bring, and what they learn instead -->
-    <section class="section band band--stone" aria-labelledby="pro-pain-title">
+    <section class="section band band--gradient-textured" aria-labelledby="pro-pain-title">
       <div class="wrap">
         <div class="section-head" data-reveal>
           <div>
