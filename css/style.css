@@ -138,6 +138,7 @@ code { font-size: 0.9em; }
 /* 3. Layout + shared ------------------------------------------------------- */
 .wrap { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: var(--section); }
+[id] { scroll-margin-top: calc(var(--header-h, 72px) + 24px); }
 .section--flush-top { padding-top: 0; }
 /* A coloured page hero is its own boundary: content after it still needs a lead-in */
 .phero + .section--flush-top { padding-top: clamp(40px, 4.4vw, 64px); }
@@ -1287,8 +1288,10 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .formblock__intro h2 { margin-top: 0; }
 .formblock__intro > p { margin-top: 14px; max-width: 46ch; }
 /* The intro stays in view while the taller form beside it scrolls past */
-.formblock__intro, .contact__side { position: sticky; top: calc(var(--header-h) + 32px); align-self: start; }
 .formblock .form { padding: clamp(22px, 3vw, 36px); border-radius: var(--r-lg); background: var(--white); }
+.form--ghl { position: relative; width: 100%; display: block; overflow: hidden; }
+.form--ghl iframe { display: block; width: 100%; border: none; background: transparent; }
+.kit-card .form--ghl { padding: 0; background: transparent; box-shadow: none; }
 .form__note { margin: 0 0 16px; font-size: var(--fs-small); color: var(--muted); }
 .form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
 .field { grid-column: 1 / -1; display: grid; gap: 6px; align-content: start; }

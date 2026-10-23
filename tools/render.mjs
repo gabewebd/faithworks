@@ -877,49 +877,66 @@ function form({ key, offer, offerTitle, purpose, button, fields, consent = true,
     </form>`;
 }
 
+function ghlFormEmbed({ id, title, height = 540 }) {
+  return `<div class="form form--ghl" style="width:100%;min-height:${height}px;">
+      <iframe
+        src="https://api.faithph.ai/widget/form/${id}"
+        style="width:100%;height:100%;min-height:${height}px;border:none;border-radius:4px"
+        id="inline-${id}" 
+        data-layout="{'id':'INLINE'}"
+        data-trigger-type="alwaysShow"
+        data-trigger-value=""
+        data-activation-type="alwaysActivated"
+        data-activation-value=""
+        data-deactivation-type="neverDeactivate"
+        data-deactivation-value=""
+        data-form-name="${esc(title)}"
+        data-height="${height}"
+        data-layout-iframe-id="inline-${id}"
+        data-form-id="${id}"
+        title="${esc(title)}">
+      </iframe>
+      <script src="https://api.faithph.ai/js/form_embed.js"></script>
+    </div>`;
+}
+
 export function starterKitForm() {
-  return form({
-    key: "starter_kit", offer: "ai-workflow-starter-kit", offerTitle: "AI Workflow Starter Kit",
-    purpose: "deliver the kit you requested", button: "Send Me the Free Starter Kit",
-    success: "Your starter kit is ready.", redirect: "/free-ai-starter-kit/thank-you/",
-    fields: FORMS.starter_kit.fields,
-    extra: `<input type="hidden" name="lead_magnet_version" value="v1.0-draft">`,
+  return ghlFormEmbed({
+    id: "mhloeEueDRLExO5Ct7Xw",
+    title: "Free AI Workflow Starter Kit",
+    height: 520,
   });
 }
 
 export function programForm(p) {
-  return form({
-    key: "program_interest", offer: p.slug, offerTitle: p.title,
-    purpose: `contact you about ${p.title}`, button: ctaFor(p),
-    success: `You’re on the list for ${p.title}. We will email you when dates, fees and inclusions are confirmed.`,
-    fields: FORMS.program_interest.fields,
+  return ghlFormEmbed({
+    id: "AIe91j9ZF3bfizhBoHxX",
+    title: `Program Inquiry / Waitlist${p?.title ? ` - ${p.title}` : ""}`,
+    height: 580,
   });
 }
 
 export function proposalForm() {
-  return form({
-    key: "corporate_inquiry", offer: "corporate-training", offerTitle: "Corporate AI training",
-    purpose: "respond to your inquiry", button: "Request a proposal", consent: true,
-    success: "Thank you. We have your request for corporate training and will be in touch about next steps.",
-    fields: FORMS.corporate_inquiry.fields,
+  return ghlFormEmbed({
+    id: "ftpaEhfFmT2XnE2NrViH",
+    title: "Corporate AI Training Proposal",
+    height: 720,
   });
 }
 
 export function speakingForm() {
-  return form({
-    key: "speaking_inquiry", offer: "speaking-partnerships", offerTitle: "Speaking or partnership",
-    purpose: "respond to your inquiry", button: "Send booking inquiry",
-    success: "Thank you. We have your event details and will come back with a tailored proposal.",
-    fields: FORMS.speaking_inquiry.fields,
+  return ghlFormEmbed({
+    id: "sXxldcFIY3RFN6iA71NL",
+    title: "Speaking or Partnership Inquiry",
+    height: 760,
   });
 }
 
 export function demoForm() {
-  return form({
-    key: "faith_ai_demo", offer: "faith-ai-discovery", offerTitle: "Faith AI demo",
-    purpose: "arrange your demo", button: "Request a Demo",
-    success: "Thank you. We have your demo request and will contact you to arrange a time.",
-    fields: FORMS.faith_ai_demo.fields,
+  return ghlFormEmbed({
+    id: "GTRLqxCYYA2fkVwxrhZU",
+    title: "Build with AI Demo Request",
+    height: 600,
   });
 }
 
@@ -933,10 +950,9 @@ export function contactForm() {
 }
 
 export function notifyForm() {
-  return form({
-    key: "event_notify", offer: "event-notify", offerTitle: "New workshop dates",
-    purpose: "tell you about new dates for the events you choose", button: "Notify me",
-    success: "Thank you. We will email you when new dates are confirmed.",
-    fields: FORMS.event_notify.fields,
+  return ghlFormEmbed({
+    id: "5UInnuA6YOOqEt09Vl7J",
+    title: "Workshops and Events Notification",
+    height: 500,
   });
 }
