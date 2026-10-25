@@ -172,8 +172,6 @@ test("uploads to Supabase Storage go to the event-images bucket with the secret 
   assert.equal(calls[0].init.headers["content-type"], "image/png");
   assert.equal(out.url, calls[0].url.replace("/object/event-images/", "/object/public/event-images/"));
   await assert.rejects(media.upload({ email: USERS.author }, req()), (e) => e.status === 502 && /bucket is missing/.test(e.message));
-  const sheets = createMedia({ cfg: { ...cfg, store: "sheets" }, store: { kind: "sheets" }, log: { log: async () => {} } });
-  await assert.rejects(sheets.upload({}, req()), (e) => e.status === 501);
 });
 
 test("file sniffing recognises JPEG, PNG and WebP, and nothing else", () => {
@@ -227,7 +225,7 @@ test("the masonry grid has no holes on desktop, tablet or phone, for any number 
   }
 });
 
-test("the Events gallery puts featured CMS event images first, never repeats a photo, and keeps the homepage to 10", () => {
+test("the Events gallery puts featured CMS event images first, never repeats a photo, and keeps the homepage to three rows of 18", () => {
   const events = [
     { rid: "evt_a", title: "Older", date: "2026-01-10", gallery: eventGalleryEntries([{ url: "/assets/images/web/room-full-1280.webp", alt: "", primary: true, featured: true }]) },
     { rid: "evt_b", title: "Newer", date: "2026-09-10", gallery: eventGalleryEntries([
@@ -242,7 +240,9 @@ test("the Events gallery puts featured CMS event images first, never repeats a p
   const keys = items.map((x) => x.key);
   assert.equal(new Set(keys).size, keys.length, "group-community is also in the archive, but shown once");
   const home = eventGallery("home", events);
-  assert.equal((home.match(/<li /g) || []).length, 10);
+  assert.equal((home.match(/<li /g) || []).length, 18);
+  assert.deepEqual((home.match(/data-srow="(\w+)"/g) || []).map((m) => m.slice(11, -1)), ["left", "right", "left"]);
+  assert.ok(!/<figcaption/.test(home), "the rows carry no captions");
   assert.ok(!eventGallery("home", []).includes("poster"));
   assert.equal((eventGallery("all", []).match(/<li /g) || []).length, 30);
 });

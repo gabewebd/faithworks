@@ -8,7 +8,7 @@
 // of its retired paths, counts as that photo). Drafts and hidden events never reach this list:
 // the content view already leaves them out (cms/shared/public.mjs).
 //
-// {{eventGallery:home}}  the first 10 featured photos (homepage)
+// {{eventGallery:home}}  18 photos, featured first, in three scroll-driven rows (homepage)
 // {{eventGallery:all}}   every photo (Workshops page)
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,7 +29,9 @@ const archive = JSON.parse(readFileSync(join(ROOT, "src/data/events.json"), "utf
   }
 }
 
-const HOME_COUNT = 10;
+// Homepage: three rows of six. Featured photos first; when fewer are featured, the rest of the
+// gallery (in its own order) fills the rows so each one is wider than the screen.
+const HOME_COUNT = 18;
 const byStartDesc = (a, b) => String(b.date || "").localeCompare(String(a.date || ""));
 
 // Every gallery photo, in display order. `events` is the render data from tools/content.mjs.
@@ -88,11 +90,13 @@ export function spansFor(n) {
   return [...out, ...tailSpans(n % 5)];
 }
 
+// Tiles crop landscape photos to square or portrait shapes (object-fit: cover), so the photo is
+// drawn wider than its tile: these name that drawn width, so high-density screens get a sharp file.
 const SIZES = {
-  large: "(min-width: 1000px) 50vw, 100vw",
-  tall: "(min-width: 1000px) 25vw, 50vw",
-  small: "(min-width: 1000px) 25vw, 50vw",
-  row: "(min-width: 1000px) 33vw, 50vw",
+  large: "(min-width: 1000px) 80vw, 100vw",
+  tall: "(min-width: 1000px) 60vw, 100vw",
+  small: "(min-width: 1000px) 40vw, 100vw",
+  row: "(min-width: 1000px) 50vw, 100vw",
 };
 
 function tileImg(it, kind) {
@@ -134,26 +138,38 @@ export function photoMarquee(items, { label } = {}) {
       </div>`;
 }
 
-export function masonryMarquee(items, { label } = {}) {
-  const set1 = items.slice(0, 5);
-  const set2 = items.slice(5, 10);
+/* ---- Homepage rows -------------------------------------------------------------------------
+   Three full-bleed rows of photos, one height per row and varied widths (each tile's --ar is its
+   width as a multiple of the row height). Photos are dealt across the rows in turn, so the
+   featured ones lead every row. js/motion.js §5c slides the rows left, right, left as the
+   section crosses the viewport; without it (reduced motion, phones, no script) each row is a
+   plain horizontal scroller. Every photo appears once: nothing is duplicated to fake a loop. */
+const ROWS = 3;
+const ROW_DIRS = ["left", "right", "left"];
+// Width patterns per row, offset so tile edges never line up between rows
+const ROW_RATIOS = [
+  [1.7, 0.9, 1.45, 1.15, 1.8, 1.3],
+  [1.15, 1.8, 0.9, 1.5, 1.25, 1.6],
+  [1.45, 1.1, 1.75, 0.9, 1.6, 1.3],
+];
 
-  const renderTiles = (list, offset) => list.map((it, i) => {
-    const s = BAND[offset + i];
-    const style = `--c:${s.d[0]};--r:${s.d[1]};--ct:${s.t[0]};--rt:${s.t[1]};--cm:${s.m[0]};--rm:${s.m[1]}`;
-    return `<li class="mgrid__tile mgrid__tile--${s.kind}" style="${style}"><figure>${tileImg(it, s.kind)}${it.caption ? `<figcaption>${esc(it.caption)}</figcaption>` : ""}</figure></li>`;
-  }).join("\n          ");
-
-  const block1 = `<ul class="mgrid" role="list">\n          ${renderTiles(set1, 0)}\n        </ul>`;
-  const block2 = `<ul class="mgrid" role="list">\n          ${renderTiles(set2, 5)}\n        </ul>`;
-
-  return `<div class="mmarquee" data-mmarquee aria-label="${esc(label || 'Photos from Faith Works events')}" role="region">
-        <div class="mmarquee__track">
-          <div class="mmarquee__set" data-mmarquee-set>
-            <div class="mmarquee__block">${block1}</div>
-            <div class="mmarquee__block">${block2}</div>
-          </div>
-        </div>
+export function scrollRows(items, { label } = {}) {
+  const rows = Array.from({ length: ROWS }, () => []);
+  items.forEach((it, i) => rows[i % ROWS].push(it));
+  const tile = (it, r, i) => {
+    const ar = ROW_RATIOS[r][i % ROW_RATIOS[r].length];
+    const sizes = `(max-width: 640px) ${Math.round(38 * ar)}vw, ${Math.round(16 * ar)}vw`;
+    const img = it.photo
+      ? imgTag(it.photo, { sizes, alt: it.alt, position: it.position })
+      : `<img src="${esc(it.url)}" alt="${esc(it.alt || "")}" loading="lazy" decoding="async">`;
+    return `<li class="srows__tile" style="--ar:${ar}"><figure>${img}</figure></li>`;
+  };
+  const lists = rows.filter((row) => row.length).map((row, r) =>
+    `<ul class="srows__row" data-srow="${ROW_DIRS[r]}" role="list">
+          ${row.map((it, i) => tile(it, r, i)).join("\n          ")}
+        </ul>`);
+  return `<div class="srows" data-srows role="region" aria-label="${esc(label || "Photos from Faith Works events")}">
+        ${lists.join("\n        ")}
       </div>`;
 }
 
@@ -173,8 +189,8 @@ export function eventGalleryEntries(gallery = []) {
 
 export function eventGallery(scope, events) {
   const all = galleryItems(events);
-  const items = scope === "home" ? all.filter((x) => x.featured).slice(0, HOME_COUNT) : all;
+  const items = scope === "home" ? [...all.filter((x) => x.featured), ...all.filter((x) => !x.featured)].slice(0, HOME_COUNT) : all;
   if (!items.length) return "";
-  if (scope === "home") return masonryMarquee(items, { label: "Photos from Faith Works events" });
+  if (scope === "home") return scrollRows(items, { label: "Photos from Faith Works events" });
   return masonry(items, { label: "All photos from Faith Works events" });
 }

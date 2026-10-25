@@ -1,7 +1,7 @@
 /* ==========================================================================
    Faith Works — smooth scrolling and scroll motion (every page)
    1. Setup  2. Lenis + ScrollTrigger  3. In-page links  4. Depth (parallax)
-   5. Section reveals  5b. Program showcase (pinned)  6. Keeping measurements fresh
+   5. Section reveals  5b. Program showcase (pinned)  5c. Gallery rows  6. Keeping measurements fresh
    Lenis smooths wheel scrolling of the window itself (touch, keyboard, scrollbars and nested
    scroll areas stay native) and GSAP's ticker drives it, so Lenis and ScrollTrigger share one
    frame loop. The CSS reveals (style.css §18, [data-reveal]) stay as they are: this file only
@@ -142,6 +142,36 @@
     });
     window.addEventListener("beforeprint", function () { reveal(pending.slice(), true); });
   }
+
+
+  /* ---- 5c. Gallery rows (homepage events) --------------------------------- */
+  // The three photo rows (tools/event-gallery.mjs scrollRows) slide left, right, left while the
+  // gallery crosses the viewport, scrubbed to the scroll so going back up reverses them. Each
+  // row travels at most its own overflow (content width minus the gallery's width), so no row
+  // ever pulls away from an edge; the rates differ a little for depth, and a cap keeps very wide
+  // rows restrained. Phones keep the rows as native sideways scrollers (style.css). matchMedia
+  // reverts the tweens and their triggers when the layout crosses the breakpoint.
+  var RATES = [1, 0.8, 0.9];
+  $$("[data-srows]").forEach(function (box) {
+    var rows = $$("[data-srow]", box);
+    if (!rows.length) return;
+    gsap.matchMedia().add("(min-width: 641px)", function () {
+      box.classList.add("is-scrubbed");
+      rows.forEach(function (row, i) {
+        row.scrollLeft = 0;
+        var right = row.getAttribute("data-srow") === "right";
+        var travel = function () {
+          var over = row.scrollWidth - box.clientWidth;
+          return Math.max(0, Math.min(over * RATES[i % RATES.length], window.innerWidth * 0.35));
+        };
+        gsap.fromTo(row, { x: function () { return right ? -travel() : 0; } }, {
+          x: function () { return right ? 0 : -travel(); }, ease: "none",
+          scrollTrigger: { trigger: box, start: "top bottom", end: "bottom top", scrub: true, invalidateOnRefresh: true }
+        });
+      });
+      return function () { box.classList.remove("is-scrubbed"); };
+    });
+  });
 
 
   /* ---- 6. Keeping measurements fresh -------------------------------------- */

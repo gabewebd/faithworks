@@ -22,7 +22,7 @@ test("configuration fails closed on hosted deployments", () => {
   assert.ok(cfg.errors.some((e) => e.includes("CMS_DEV_LOGIN cannot be enabled")));
   assert.equal(cfg.devLogin, false);
   assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "json" }).errors.some((e) => e.includes("must use the Supabase store")));
-  assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "sheets" }).errors.some((e) => e.includes("GOOGLE_SHEETS_SPREADSHEET_ID")), "the Sheets store (rollback) still needs its settings");
+  assert.ok(loadConfig({ NETLIFY: "true", CMS_STORE: "sheets" }).errors.some((e) => e.includes("The Google Sheets store was removed")), "the Sheets store no longer exists");
 });
 
 test("misconfigured deployment refuses every API call except health", async () => {
@@ -86,29 +86,41 @@ test("authors edit and publish their own content; nobody skips the version check
   cleanup();
 });
 
-test("authors cannot change another author's content, even with direct requests", async () => {
+test("any author edits and publishes content someone else created; each change records who made it", async () => {
   const { u, cleanup } = await setup();
   let r = rec(await u.author.post("/api/records/resources", { data: article() }));
   const other = u.author2;
   const view = (await other.get(`/api/records/resources/${r.id}`)).data;
-  assert.equal(view.can_edit, false, "others may read it, not edit it");
-  assert.deepEqual(view.actions, [], "and get no workflow actions");
-  assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Taken over" }) })).status, 403);
-  assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author, USERS.author2] }) })).status, 403, "cannot add themselves as an author");
+  assert.equal(view.can_edit, true, "another author may edit it");
+  assert.deepEqual(view.actions, ["publish"], "and publish it, but not archive or delete it");
+  r = rec(await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author], summary: "Edited by a colleague" }) }));
+  assert.equal(r.summary, "Edited by a colleague");
+  assert.equal(r.updated_by, USERS.author2, "the editor is recorded");
+  assert.equal(r.created_by, USERS.author, "the creator stays recorded for attribution");
+  const pub = await other.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
+  assert.equal(pub.status, 200, "another author publishes it");
+  r = rec(pub);
+  assert.equal(r.published_by, USERS.author2);
+  assert.equal(pub.data.live.published_by, USERS.author2);
+  // History and the audit log name the user, the action and the time of every change
+  const hist = (await u.super.get(`/api/records/resources/${r.id}/history`)).data;
+  assert.deepEqual(hist.map((h) => [h.kind, h.by]), [["publish", USERS.author2], ["save", USERS.author2], ["create", USERS.author]]);
+  assert.ok(hist.every((h) => !Number.isNaN(Date.parse(h.at))));
+  const audit = (await u.super.get(`/api/audit?record=${r.id}`)).data;
+  for (const [action, actor] of [["create", USERS.author], ["save", USERS.author2], ["publish", USERS.author2]]) {
+    assert.ok(audit.some((a) => a.action === action && a.actor === actor && a.record_id === r.id && a.collection === "resources" && a.at), `${action} by ${actor} is in the audit log`);
+  }
+  // Destructive and lifecycle actions stay with the item's owners and Super Admins
+  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: r.version })).status, 403, "cannot unpublish it");
   for (const a of ["archive", "delete"]) {
     assert.equal((await other.post(`/api/records/resources/${r.id}/actions/${a}`, { version: r.version })).status, 403, a);
   }
-  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version })).status, 403, "cannot publish it");
-  r = rec(await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
-  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: r.version })).status, 403, "cannot unpublish it");
-  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/reconcile`, {})).status, 403, "cannot finish publishing it");
-  const hist = (await other.get(`/api/records/resources/${r.id}/history`)).data;
-  assert.equal((await other.post(`/api/records/resources/${r.id}/history/${hist[0].id}/restore`, { version: r.version })).status, 403, "cannot restore a version");
-  // Imported content (created by the importer, no authors) belongs to Super Admins
+  assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author2] }) })).status, 422, "cannot remove the creator from the authors");
+  // Imported content (created by the importer, no authors) is editable by every author too
   const prog = (await u.author.get("/api/records/programs")).data[0];
-  assert.equal(prog.can_edit, false);
-  const pv = (await u.super.get(`/api/records/programs/${prog.id}`)).data;
-  assert.equal(pv.can_edit, true, "Super Admins edit any content");
+  assert.equal(prog.can_edit, true);
+  // Site settings stay Super Admin only
+  assert.equal((await u.author.get("/api/records/settings")).status, 403);
   // A Super Admin can edit and delete an Author's item
   const sv = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ summary: "Edited by the Super Admin" }) });
   assert.equal(sv.status, 200);
@@ -126,7 +138,8 @@ test("co-authors share an item; only its creator or a Super Admin removes someon
   assert.match(drop.data.error.errors.authors, /Super Admin/);
   r = rec(await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author] }) }));
   assert.deepEqual(r.authors, [USERS.author], "they can take themselves off");
-  assert.equal((await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article() })).status, 403, "and then lose access");
+  r = rec(await u.author2.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author], summary: "Still editable" }) }));
+  assert.equal(r.summary, "Still editable", "and can still edit it (editing is not limited to authors)");
   const sa = await u.super.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author2] }) });
   assert.equal(sa.status, 200, "Super Admins reassign authors");
   const own = await u.author.put(`/api/records/resources/${r.id}`, { version: rec(sa).version, data: article({ authors: [USERS.author] }) });
@@ -275,8 +288,10 @@ test("testimonials: quote, name, optional role and photo, and a visibility switc
   pub = content.testimonials.find((x) => x.id === t.id);
   assert.equal(pub.role, "", "the role is optional");
   assert.equal(pub.featured_image_url, "/assets/images/ana.jpg");
-  // Another author cannot hide it
-  assert.equal((await u.author2.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, visible: false } })).status, 403);
+  // Another author can edit it too (the change is a draft until someone publishes it)
+  const hidden = await u.author2.put(`/api/records/testimonials/${t.id}`, { version: t.version, data: { ...data, authors: t.authors, visible: false } });
+  assert.equal(hidden.status, 200);
+  assert.equal(rec(hidden).status, "draft");
   cleanup();
 });
 

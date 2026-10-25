@@ -61,6 +61,7 @@ export const COMPONENTS = {
 
 /* ---- Formatting ------------------------------------------------------------ */
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 // Calendar dates are formatted in UTC from noon UTC: the date never shifts with a time zone.
 export function fmtDate(iso, opts = { day: "numeric", month: "long", year: "numeric" }) {
   if (!DATE_RE.test(String(iso || ""))) return "";
@@ -115,12 +116,28 @@ export function eventTimeText(rec) {
   const tz = rec.time_zone || "Asia/Manila";
   return `${t} ${tzAbbrev(tz)}`.trim();
 }
-// Past once its last day (the end date, or the start date) is over in the event's own time
-// zone. Events without a date are never past.
+// The one rule for "this event is over" (cards, event pages, calendar, forms, the dashboard
+// preview, and the browser check in js/main.js). It ends at its end time on its last day (the end
+// date, or the start date) in its own time zone; an end time earlier than the start time on a
+// one-day event runs past midnight. Without an end time it lasts until the end of its last day.
+// Returns that instant as ISO 8601 with the zone's offset, or null for an event without a date.
+export function eventEndsAt(rec) {
+  const multiDay = DATE_RE.test(rec.end_date || "") && rec.end_date !== rec.event_date;
+  const last = multiDay ? rec.end_date : rec.event_date;
+  if (!DATE_RE.test(last || "")) return null;
+  const tz = rec.time_zone || "Asia/Manila";
+  const nextDay = (d) => new Date(Date.parse(`${d}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+  if (TIME_RE.test(rec.end_time || "")) {
+    const overnight = !multiDay && TIME_RE.test(rec.start_time || "") && rec.end_time <= rec.start_time;
+    return eventInstant(overnight ? nextDay(last) : last, rec.end_time, tz);
+  }
+  return eventInstant(nextDay(last), "00:00", tz);
+}
+// Past once it has ended. An event that has started but not ended is not past, and events
+// without a date are never past.
 export function isPastEvent(rec, today = new Date()) {
-  const last = DATE_RE.test(rec.end_date || "") ? rec.end_date : rec.event_date;
-  if (!DATE_RE.test(last || "")) return false;
-  return last < localDate(today, rec.time_zone || "Asia/Manila");
+  const end = eventEndsAt(rec);
+  return !!end && Date.parse(end) <= today.getTime();
 }
 // The calendar date (YYYY-MM-DD) of an instant in a time zone.
 export function localDate(when, tz = "Asia/Manila") {
@@ -396,14 +413,18 @@ export function eventFacts(rec, today = new Date()) {
 }
 // The registration button. Past events and "No registration link" have none. On the event's
 // own page (onPage), a CMS event page needs no button: the page is the registration page.
+// data-event-end lets js/main.js remove the button once the event ends, even when the page was
+// built before that (the website is rebuilt daily and on every publish).
 export function eventCta(rec, past, { onPage = false } = {}) {
   if (past) return "";
   const type = rec.registration_type || "none", label = rec.cta_label || "Register";
   const about = `<span class="sr-only"> for ${esc(rec.title)}</span>`;
+  const ends = eventEndsAt(rec);
+  const endAttr = ends ? ` data-event-end="${esc(ends)}"` : "";
   if (type === "external" && rec.registration_url) {
-    return `<a class="btn" href="${esc(rec.registration_url)}" target="_blank" rel="noopener" data-track="registration_start">${esc(label)}${about} <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`;
+    return `<a class="btn" href="${esc(rec.registration_url)}" target="_blank" rel="noopener" data-track="registration_start"${endAttr}>${esc(label)}${about} <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>`;
   }
-  if (type === "page" && rec.slug && !onPage) return `<a class="btn" href="/events/${esc(rec.slug)}/" data-track="registration_start">${esc(label)}${about}</a>`;
+  if (type === "page" && rec.slug && !onPage) return `<a class="btn" href="/events/${esc(rec.slug)}/" data-track="registration_start"${endAttr}>${esc(label)}${about}</a>`;
   return "";
 }
 export function articleMeta(rec) {

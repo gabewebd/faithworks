@@ -9,8 +9,6 @@ import { loadConfig, publicConfig, supabaseKeyKind } from "./config.mjs";
 import { securityHeaders } from "./security.mjs";
 import { HttpError, json, readJson, randomId } from "./http.mjs";
 import { createJsonStore } from "./store/json-store.mjs";
-import { createSheetsStore } from "./store/sheets-store.mjs";
-import { createSheetsApi } from "./store/sheets-api.mjs";
 import { createSupabaseStore } from "./store/supabase-store.mjs";
 import { createAuth } from "./auth.mjs";
 import { createLog } from "./services/log.mjs";
@@ -23,28 +21,17 @@ import { createMedia } from "./services/media.mjs";
 import { safeEqual } from "./session.mjs";
 import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
 import { createSubmissions } from "./forms/submissions.mjs";
-import { createNotifier } from "./forms/notify.mjs";
-import { createSheetsMirror } from "./forms/sheets-mirror.mjs";
 import { fromWebsite, fromNetlify, verifyNetlifySignature } from "./forms/adapters.mjs";
 
 // The visitor's address as reported by the host's edge (Netlify, then Vercel, then a proxy).
 const clientIp = (request) => request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-real-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0].trim();
-// Alerts run right after the submission is stored; the visitor waits at most this long for them.
-// Whatever is not finished is completed by the retry job (netlify/functions/forms-retry.mjs).
-const DELIVERY_WAIT_MS = 6000;
-async function within(promise, ms) {
-  let timer;
-  await Promise.race([promise.catch(() => {}), new Promise((r) => { timer = setTimeout(r, ms); })]);
-  clearTimeout(timer);
-}
 
 export function createApp({ env = process.env, store: injectedStore, fetchImpl = globalThis.fetch, log = console } = {}) {
   const cfg = loadConfig(env);
   let store = injectedStore;
   if (!store && !cfg.errors.length) {
-    // Supabase is the content store; Sheets only when explicitly chosen (rollback), JSON only locally.
+    // Supabase is the content store; JSON only locally.
     store = cfg.store === "supabase" ? createSupabaseStore({ url: cfg.supabaseUrl, serviceKey: cfg.supabaseServiceKey, fetchImpl, log })
-      : cfg.store === "sheets" ? createSheetsStore(createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }))
       : createJsonStore({ path: cfg.jsonPath, seedPath: cfg.seedPath });
   }
   if (store) store = withMigrations(store); // records from earlier versions, converted on read
@@ -55,14 +42,8 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   const admin = store && createAdmin({ store, cfg, log: logSvc, auth });
   const preview = store && createPreview({ store, cfg });
   const media = store && createMedia({ cfg, store, log: logSvc, fetchImpl });
-  // Form submissions are stored in Supabase (JSON locally); not in the Sheets rollback store.
-  const forms = store && store.kind !== "sheets" && createSubmissions({
-    store, cfg, log, audit: logSvc.log,
-    notifier: createNotifier({ cfg, fetchImpl }),
-    mirror: cfg.forms.sheetsMirror
-      ? createSheetsMirror({ api: createSheetsApi({ spreadsheetId: cfg.spreadsheetId, clientEmail: cfg.clientEmail, privateKey: cfg.privateKey, fetchImpl, log }), tab: cfg.forms.sheetsTab })
-      : { enabled: false },
-  });
+  // Form submissions are stored in Supabase (JSON locally). Alerts and follow-up are GoHighLevel's.
+  const forms = store && createSubmissions({ store, cfg, log, audit: logSvc.log });
   const headers = securityHeaders(cfg);
 
   const routes = [];
@@ -77,7 +58,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     const f = forms ? forms.setup() : null;
     return json({
       ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}),
-      forms: f ? { endpoint: f.endpoint, email: f.email, sheets: f.sheets, netlify: f.netlify, problems: f.problems.length } : null,
+      forms: f ? { endpoint: f.endpoint, netlify: f.netlify, problems: f.problems.length } : null,
     });
   }, { auth: false });
 
@@ -104,7 +85,6 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
       formsReady();
       if (!cors) throw new HttpError(403, "This website is not allowed to send forms here.", "origin");
       const r = await forms.capture(fromWebsite(await readJson(request, 64_000)), { ip: clientIp(request) });
-      if (!r.duplicate) await within(forms.deliver(r.id), DELIVERY_WAIT_MS);
       return json({ ok: true, id: r.id }, r.duplicate ? 200 : 201, cors);
     } catch (e) {
       if (cors) e.headers = cors;
@@ -120,7 +100,6 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     let payload;
     try { payload = JSON.parse(raw); } catch { throw new HttpError(400, "The request body is not valid JSON.", "bad_json"); }
     const r = await forms.capture(fromNetlify(payload));
-    if (!r.duplicate) await within(forms.deliver(r.id), DELIVERY_WAIT_MS);
     return json({ ok: true, id: r.id });
   }, { auth: false, csrf: false });
   route("GET", "/api/public/content", async () => {
@@ -165,7 +144,8 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   route("GET", "/api/records/:collection/:id/history", async ({ user, params }) => json(await records.history(user, params.collection, params.id)));
   route("POST", "/api/records/:collection/:id/history/:hid/restore", async ({ user, params, request, rid }) => json(await records.restoreVersion(user, params.collection, params.id, params.hid, await readJson(request), { requestId: rid })));
   route("GET", "/api/authors", async () => json(await records.authors()));
-  // Event images: one file per request (raw bytes, name in X-File-Name), and the site's photos
+  // Event images: one file per request (raw bytes, name in X-File-Name), and the site's photos.
+  // (The dashboard adds event images by address only; these stay for API clients.)
   route("POST", "/api/media", async ({ user, request, rid }) => json(await media.upload(user, request, { requestId: rid }), 201));
   route("GET", "/api/media/library", async () => json(media.library()));
   route("POST", "/api/preview", async ({ user, request }) => {
@@ -190,7 +170,6 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     const { status, kind } = await readJson(request);
     return json(await formsAdmin().update(user, params.id, { status, kind }, { requestId: rid }));
   });
-  route("POST", "/api/submissions/:id/retry", async ({ user, params, rid }) => json(await formsAdmin().retry(user, params.id, { requestId: rid })));
   route("GET", "/api/backup", async ({ user, rid }) => {
     const data = await admin.backup(user, { requestId: rid });
     return json(data, 200, { "content-disposition": `attachment; filename="faithworks-cms-backup-${data.exported_at.slice(0, 10)}.json"` });

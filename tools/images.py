@@ -3,11 +3,13 @@
     python tools/images.py            make anything missing or older than its original
     python tools/images.py --force    remake everything
 
-Each photo gets two WebP files in assets/images/web/: <id>-640.webp (phones, small slots) and
-<id>-1280.webp (everything larger), never wider than the (cropped) original. Photos marked
+Each photo gets three WebP files in assets/images/web/: <id>-640.webp (phones, small slots),
+<id>-1280.webp and <id>-1920.webp (large slots on high-density screens), never wider than the
+(cropped) original. They are encoded at a high quality setting so photos stay sharp; the browser
+picks the smallest file that fills its slot (srcset), so phones never download the large one. Photos marked
 "social" also get <id>-1200.jpg, a 1200x630 link-preview image. The originals stay untouched in
 assets/images/; the site only ever loads the web versions. src/data/gallery.lock.json records each
-photo's final size and the real width of each file (listed in the order 640, 1280), so the build can reserve its space (width/height) without opening the file.
+photo's final size and the real width of each file (listed in the order 640, 1280, 1920), so the build can reserve its space (width/height) without opening the file.
 Needs Pillow (pip install pillow). The web versions are committed, so builds (Vercel) need nothing.
 """
 import json
@@ -20,8 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 REGISTRY = ROOT / "src" / "data" / "gallery.json"
 LOCK = ROOT / "src" / "data" / "gallery.lock.json"
 OUT = ROOT / "assets" / "images" / "web"
-WIDTHS = (640, 1280)
-WEBP_QUALITY = 78
+WIDTHS = (640, 1280, 1920)
+WEBP_QUALITY = 92
+SOCIAL_QUALITY = 92
 SOCIAL = (1200, 630)
 
 
@@ -94,7 +97,7 @@ def main():
             out.save(OUT / f"{key}-{w}.webp", "WEBP", quality=WEBP_QUALITY, method=6)
             widths.append(size)
         if spec.get("social"):
-            social_crop(im, spec.get("position")).save(OUT / f"{key}-1200.jpg", "JPEG", quality=82, optimize=True, progressive=True)
+            social_crop(im, spec.get("position")).save(OUT / f"{key}-1200.jpg", "JPEG", quality=SOCIAL_QUALITY, optimize=True, progressive=True, subsampling=0)
         big = min(WIDTHS[-1], im.width)
         lock[key] = {"width": big, "height": round(im.height * big / im.width), "widths": widths, "crop": spec.get("crop")}
         made += 1

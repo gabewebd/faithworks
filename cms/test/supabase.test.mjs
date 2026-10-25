@@ -73,9 +73,10 @@ test("config: Supabase needs a URL and the service-role key, never a public key"
   assert.ok(loadConfig({ ...base, SUPABASE_SECRET_KEY: "sb_publishable_abc" }).errors.some((e) => e.startsWith("SUPABASE_SECRET_KEY is a publishable key")));
   assert.equal(supabaseKeyKind("sb_secret_abc"), "secret");
   assert.equal(supabaseKeyKind(KEY), "service_role");
-  // The Google settings are still read with the Supabase store (Sheets integration kept)
-  const cfg = loadConfig({ ...base, SUPABASE_SERVICE_ROLE_KEY: KEY, GOOGLE_SHEETS_SPREADSHEET_ID: "sheet", GOOGLE_SERVICE_ACCOUNT_EMAIL: "sa@x.iam", GOOGLE_PRIVATE_KEY: "k\\nk", GOOGLE_OAUTH_CLIENT_ID: "cid" });
-  assert.deepEqual([cfg.spreadsheetId, cfg.clientEmail, cfg.privateKey, cfg.oauthClientId], ["sheet", "sa@x.iam", "k\nk", "cid"]);
+  // Google sign-in settings are read with the Supabase store; the Google Sheets settings are gone
+  const cfg = loadConfig({ ...base, SUPABASE_SERVICE_ROLE_KEY: KEY, GOOGLE_SHEETS_SPREADSHEET_ID: "sheet", GOOGLE_OAUTH_CLIENT_ID: "cid" });
+  assert.equal(cfg.oauthClientId, "cid");
+  assert.ok(!("spreadsheetId" in cfg) && !("privateKey" in cfg) && !("clientEmail" in cfg));
 });
 
 test("records map to typed columns plus a fields bag, and back unchanged", () => {
@@ -176,10 +177,10 @@ test("form submissions on Supabase: filtered queries, a dropped insert reply, du
   assert.equal((await submit(b)).status, 200, "the browser's retry finds it");
   const rows = fake.tables.cms_form_submissions;
   assert.equal(rows.length, 1);
-  assert.equal(sent.length, 1);
-  assert.equal(rows[0].notify_state, "sent");
+  assert.equal(sent.length, 0, "no email is sent (GoHighLevel handles alerts)");
+  assert.equal(rows[0].notify_state, "off");
   assert.equal(typeof rows[0].answers, "object", "answers stored as jsonb");
-  assert.equal(rows[0].notify_attempts, 1, "integer column");
+  assert.equal(rows[0].notify_attempts, 0, "integer column");
 
   const q = fake.calls.find((c) => c.method === "GET" && c.url.searchParams.has("ip_hash"));
   assert.match(q.url.searchParams.get("received_at"), /^gte\.\d{4}-/, "rate limit asks the database for the last 10 minutes only");

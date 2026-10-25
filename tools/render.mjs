@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import { esc } from "./layout.mjs";
 import {
-  badge, tbc, extLink as ext, img, preview, eventCta, eventStatus, isPastEvent, programCtaLabel,
+  badge, tbc, extLink as ext, img, preview, eventCta, eventStatus, isPastEvent, eventEndsAt, programCtaLabel,
   applyBindings, bindingValues, fillComponents, recordComponent, tzAbbrev, findMarked, textOf,
 } from "../cms/shared/page-doc.mjs";
 import { FORMS, optionValue } from "../cms/shared/forms.mjs";
@@ -13,6 +13,7 @@ export { img, preview };
 export { gallery } from "./gallery.mjs";
 export { trustedBy } from "./trusted-by.mjs";
 import { eventGallery as eventGalleryOf } from "./event-gallery.mjs";
+import { imgTag } from "./gallery.mjs";
 
 let D;
 export function init(data) { D = data; }
@@ -341,6 +342,25 @@ export function programPage(p) {
 
 /* ---- Events ------------------------------------------------------------ */
 const eventImg = (im) => `<img src="${esc(im.src)}"${im.width && im.height ? ` width="${im.width}" height="${im.height}"` : ""} alt="${esc(im.alt)}" loading="lazy" decoding="async">`;
+const EVENT_IMG_SIZES = "(min-width: 1241px) 30vw, (min-width: 641px) 70vw, 100vw";
+// One event photo: a registered photo in every web size (srcset), otherwise the address as given.
+const eventPhoto = (g, attrs = "") => g.photo
+  ? imgTag(g.photo, { sizes: EVENT_IMG_SIZES, alt: g.alt }).replace(/^<img/, `<img${attrs}`)
+  : `<img${attrs} src="${esc(g.url)}" alt="${esc(g.alt)}" loading="lazy" decoding="async">`;
+const ARROW = { prev: "M15 5l-7 7 7 7", next: "M9 5l7 7-7 7" };
+const slideBtn = (dir, label) => `<button type="button" class="voices__btn event__slides-btn" data-slide-${dir} aria-label="${label}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW[dir]}"/></svg></button>`;
+// The card's picture. Two or more event images become a slideshow: Previous/Next buttons, the
+// arrow keys and a "2 / 5" count (js/main.js §20). Without script only the cover shows. Past
+// events keep their photos.
+function eventFigure(e) {
+  const photos = e.gallery || [];
+  if (photos.length < 2) return e.image ? `<figure class="event__img">${photos.length ? eventPhoto(photos[0]) : eventImg(e.image)}</figure>` : "";
+  const n = photos.length;
+  return `<figure class="event__img event__slides" data-slides role="group" aria-roledescription="slideshow" aria-label="Photos from ${esc(e.title)}">
+          <div class="event__slides-frame">${photos.map((g, i) => eventPhoto(g, `${i ? " hidden" : ""} data-slide="${i}"`)).join("")}</div>
+          <div class="event__slides-nav" data-slides-nav hidden>${slideBtn("prev", "Previous photo")}<span class="event__slides-count" aria-live="polite" data-slide-count>1 / ${n}</span>${slideBtn("next", "Next photo")}</div>
+        </figure>`;
+}
 
 // An event card: what, when and where, the registration button (when there is one) and an
 // "Event details" link when the event has its own page and the button goes elsewhere.
@@ -366,7 +386,7 @@ function eventCard(e) {
         <dl class="event__facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
         ${actions ? `<div class="event__cta">${actions}</div>` : ""}
       </div>
-      ${e.image ? `<figure class="event__img">${eventImg(e.image)}</figure>` : ""}
+      ${eventFigure(e)}
     </article>`;
 }
 export function eventPage(e) {
@@ -408,7 +428,9 @@ export function calendarData() {
     const r = e.registration;
     const url = e.hasPage ? `/events/${e.slug}/` : !past && r.type === "external" && r.url ? r.url : `/workshops/#event-${e.slug}`;
     const cta = past ? null : r.type === "external" && r.url ? (e.registration.label || "Register") : r.type === "page" ? (e.registration.label || "Register") : null;
-    return { id: e.slug, title: e.title, summary: e.summary, start: e.start, end: e.end, timeZone: e.timeZone, allDay: !e.rec.start_time, time: e.time ? `${e.time} ${tzAbbrev(e.timeZone)}` : null, location: e.venue, url, external: /^https?:/i.test(url), past, cta };
+    // endsAt/pastUrl: the calendar treats the event as past once it ends, even on an older build
+    const pastUrl = e.hasPage ? `/events/${e.slug}/` : `/workshops/#event-${e.slug}`;
+    return { id: e.slug, title: e.title, summary: e.summary, start: e.start, end: e.end, endsAt: eventEndsAt(e.rec), pastUrl, timeZone: e.timeZone, allDay: !e.rec.start_time, time: e.time ? `${e.time} ${tzAbbrev(e.timeZone)}` : null, location: e.venue, url, external: /^https?:/i.test(url), past, cta };
   });
 }
 // The Event Calendar (Workshops). js/main.js §8 draws the month from the embedded data: days are
@@ -650,6 +672,7 @@ export function articlePage(a) {
   const body = withBackLink(withToc(withShare(docBody(a, "resources", { "related-articles": () => relatedArticles(a.slug) }), `/resources/${a.slug}/`, a.title)));
   return {
     title: a.seoTitle || `${a.title} · Faith Works`, description: a.metaDescription || a.excerpt, path: `/resources/${a.slug}/`, nav: "resources", body,
+    socialTitle: a.seoTitle || a.title, ogType: "article",
     image: a.socialImage || a.image?.social || (a.image?.base && !a.image.formats ? `/${a.image.base}-1440.jpg` : a.image?.url), ...pageFrame(a),
   };
 }
@@ -659,6 +682,7 @@ export function resourcePage(r) {
   const body = withBackLink(withToc(withShare(docBody(r, "resources", { "related-articles": () => relatedArticles(r.slug) }), `/resources/${r.slug}/`, r.title)));
   return {
     title: r.seoTitle || `${r.title} · Faith Works`, description: r.metaDescription || r.summary, path: `/resources/${r.slug}/`, nav: "resources", body,
+    socialTitle: r.seoTitle || r.title, ogType: "article",
     image: r.socialImage || r.image?.url, ...pageFrame(r),
   };
 }

@@ -3,16 +3,17 @@
 The faithph.ai website for Faith Works PH: practical AI learning for founders, professionals and teams.
 Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 2026).
 
-**Current phase:** staging. Every page in the brief's sitemap exists. Forms are in **preview mode**
-(nothing is sent). Their destination is built: the CMS stores each submission in Supabase, alerts the
-team by email and shows it under *Form submissions* (`cms/README.md` §13). It is switched on with
-`js/config.js` (`mode: "endpoint"`) once the CMS settings are in place. The pages are `noindex` until launch.
+**Current phase:** staging. Every page in the brief's sitemap exists. Most forms are GoHighLevel
+embeds (GoHighLevel stores them and alerts the team). The contact form is the site's own form, in
+**preview mode** (nothing is sent); its destination is the CMS, which stores each submission in
+Supabase under *Form submissions* (`cms/README.md` §13), switched on with `js/config.js`
+(`mode: "endpoint"`). The pages are `noindex` until launch.
 
 Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
 that the header, footer and repeated content (programs, events, articles) come from one place.
 
-**Content is managed in the Faith Works CMS** (`cms/`, a separate app backed by Supabase, with the
-Google Sheets integration kept; see [`cms/README.md`](cms/README.md)). The website stays static: it
+**Content is managed in the Faith Works CMS** (`cms/`, a separate app backed by Supabase; see
+[`cms/README.md`](cms/README.md)). The website stays static: it
 reads CMS content only while it is built.
 
 ## Run it locally
@@ -36,6 +37,20 @@ For production on a host that serves this folder at the domain root, build with 
 node tools/build.mjs --deploy                # root-relative links: /learn/, /css/style.css
 ```
 
+**Public address (`PUBLIC_SITE_URL`).** Canonical URLs, link-preview tags (`og:url`, `og:image`,
+`twitter:*`), share links, `sitemap.xml` and `robots.txt` use one origin, chosen when the site is
+built: `PUBLIC_SITE_URL` if set (e.g. `https://faithworks.vercel.app`; an origin, no path), else on
+Vercel the project's production domain (`VERCEL_PROJECT_PRODUCTION_URL`), else the CMS Site setting
+*Website address*. Set it per Vercel environment (Production / Preview) and change it when the domain
+moves; nothing else hardcodes a domain. Staging builds stay `noindex`, but `robots.txt` lets
+link-preview crawlers (LinkedInBot, facebookexternalhit, Twitterbot, Slackbot) read pages.
+
+**Link previews after a deploy.** LinkedIn and Facebook cache what they read. To refresh a URL:
+LinkedIn *Post Inspector* (https://www.linkedin.com/post-inspector/) → paste the article URL →
+*Inspect* (this re-scrapes it); Facebook *Sharing Debugger* (https://developers.facebook.com/tools/debug/)
+→ *Debug* → *Scrape Again*. Instagram does not show link previews for website links in posts, so
+there is no equivalent check there.
+
 **Vercel (production):** `vercel.json` runs `node tools/build.mjs --deploy --content=cms --view=published
 --out=dist` and serves `dist/`, which holds only the generated pages, `css/`, `js/` and `assets/`
 (never `cms/`, `src/`, `tools/` or `docs/`). Set `CMS_CONTENT_URL=https://faithworks-cms.netlify.app` in
@@ -47,10 +62,10 @@ it never falls back to the fixtures. See `cms/README.md` §5.5.
 | Path | What |
 | --- | --- |
 | `src/pages/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
-| `cms/` | The CMS (dashboard, API, Google Sheets store). Programs, events, resources/articles, testimonials, tags and site settings are edited there. |
+| `cms/` | The CMS (dashboard, API, Supabase store). Programs, events, resources/articles, testimonials, tags and site settings are edited there. |
 | `cms/fixtures/seed.json` | Development content fixture (all current content, with its approval state). Regenerate with `node cms/scripts/seed-from-site.mjs`. |
 | `src/data/gallery.json` | **Photo registry**: every site photo once (original, alt text, crop, focal point) and, per page, the galleries and photo slots that page sources fill with `{{gallery:page.slot}}` (hero stacks and mosaics, founder photos). Edit this to add, remove, reorder or replace photos. |
-| `src/data/events.json`, `tools/event-gallery.mjs` | **Events gallery** (separate from Resources): the archive of photos from past sessions, by registry id, with order, `featured` (also on the homepage) and optional caption, focal point and CMS `eventId`. The build adds the images editors mark *Show in the events gallery* on published CMS events (the CMS is authoritative for those), never repeats a photo, and lays them out as a masonry grid: `{{eventGallery:home}}` (10 featured, below Trusted by) and `{{eventGallery:all}}` (Workshops page). |
+| `src/data/events.json`, `tools/event-gallery.mjs` | **Events gallery** (separate from Resources): the archive of photos from past sessions, by registry id, with order, `featured` (also on the homepage) and optional caption, focal point and CMS `eventId`. The build adds the images editors mark *Show in the events gallery* on published CMS events (the CMS is authoritative for those), never repeats a photo, and lays them out as a masonry grid: `{{eventGallery:home}}` (18 photos, featured first, as three rows that the page scroll slides left, right, left (`js/motion.js` §5c), below Trusted by) and `{{eventGallery:all}}` (Workshops page). |
 | `src/data/trusted-by.json` | The homepage **Trusted by** logo strip. Placeholders until approved client logos are supplied; set `name` and `logo` per entry to use a real one (`show: false` keeps an entry without showing it). |
 | `tools/images.py`, `assets/images/web/` | Makes each registered photo's web versions from its original: WebP at 640 and 1280px (plus a 1200×630 JPEG link preview where `social` is set). Run `python tools/images.py` (needs Pillow) after changing the registry, then build; the web files are committed, so deploys need nothing extra. Originals in `assets/images/` are never edited and never deployed. |
 | `assets/data/programs.json`, `events.json`, `resources.json`, `insights.json`, `success-stories.json`, `site.json` | **Migration source only** (used to create the seed). The build no longer reads them; edit content in the CMS. |

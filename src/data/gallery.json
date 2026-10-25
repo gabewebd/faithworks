@@ -182,12 +182,12 @@
   },
   "pages": {
     "home": {
-      "business": { "layout": "single", "sizes": "(min-width: 901px) 42vw, 100vw", "items": [{ "image": "room-full" }] },
+      "business": { "layout": "single", "sizes": "(min-width: 901px) 80vw, 100vw", "items": [{ "image": "room-full" }] },
       "founder": { "layout": "single", "sizes": "260px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
     },
     "about": {
       "hero": { "layout": "single", "sizes": "(min-width: 901px) 40vw, 100vw", "priority": true, "items": [{ "image": "founder-studio" }] },
-      "stage": { "layout": "single", "sizes": "(min-width: 901px) 32vw, 100vw", "items": [{ "image": "speaking-whiteboard", "alt": "Faith Natividad speaking to an audience with a microphone." }] }
+      "stage": { "layout": "single", "sizes": "(min-width: 901px) 60vw, 150vw", "items": [{ "image": "speaking-whiteboard", "alt": "Faith Natividad speaking to an audience with a microphone." }] }
     },
     "business": {
       "hero": {
@@ -234,7 +234,7 @@
     "workshops": {
       "hero": {
         "layout": "showcase",
-        "sizes": "(min-width: 900px) 46vw, 100vw",
+        "sizes": "100vw",
         "priority": true,
         "items": [
           { "image": "masterclass-certificates" },
@@ -258,7 +258,7 @@
           { "image": "stage-notebook" }
         ]
       },
-      "qa": { "layout": "single", "sizes": "(min-width: 900px) 40vw, 100vw", "items": [{ "image": "open-qa" }] }
+      "qa": { "layout": "single", "sizes": "(min-width: 900px) 60vw, 100vw", "items": [{ "image": "open-qa" }] }
     },
     "professionals": {
       "hero": {

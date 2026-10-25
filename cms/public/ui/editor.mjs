@@ -220,7 +220,7 @@ export async function editorView(app, { collection, id }) {
     const buttons = [];
     if (C.route !== null || collection === "testimonials") buttons.push(h("button", { class: "btn btn--light", type: "button", "data-preview": "", onclick: (e) => openPreview(e.currentTarget) }, icon("eye"), "Preview"));
     if (!readOnly) buttons.push(save);
-    // Super Admins, and Authors on their own items, publish in one step (save, then publish).
+    // Every CMS user publishes content in one step (save, then publish), whoever created the item.
     // Also on published items: editing one and pressing Publish saves and publishes the change.
     const canPublish = !isNew && (view.actions.includes("publish") || (view.can_edit && rec.status === "published"));
     if (canPublish) buttons.push(h("button", { class: "btn btn--yellow", type: "button", onclick: (e) => busy(e.currentTarget, () => publishNow()) }, "Publish"));
@@ -248,7 +248,7 @@ export async function editorView(app, { collection, id }) {
     if (rec.upgraded && !isNew) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Converted to the page editor. "), "Same content; nothing changes until you save and publish."))));
     if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "This item is live. "), `The website shows version ${view.live.version}. Changes here are a new draft; publish them to replace the live version.`))));
     if (view.live?.hidden) out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Hidden. "), "The published version has “Show on the website” turned off, so it is not on the website. Turn it on and press Publish to show it again."))));
-    if (!view.can_edit && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? (view.actions.includes("restore") ? "Archived items cannot be edited. Use More… → Restore to draft to edit it again." : "Archived items cannot be edited. Its authors or a Super Admin can restore it to draft.") : "You can view this item but not edit it. Only its authors and Super Admins can change it."))));
+    if (!view.can_edit && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? (view.actions.includes("restore") ? "Archived items cannot be edited. Use More… → Restore to draft to edit it again." : "Archived items cannot be edited. Its authors or a Super Admin can restore it to draft.") : "You can view this item but not edit it. Only Super Admins can change Site settings."))));
     return out;
   }
 

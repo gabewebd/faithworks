@@ -24,6 +24,23 @@ import { eventGalleryEntries } from "./event-gallery.mjs";
 
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 
+// The public address of this deployment: canonical URLs, link-preview tags (og:url, og:image),
+// share links, sitemap and robots.txt. Chosen from the build's environment, never from a request:
+//   1. PUBLIC_SITE_URL, set per deployment (e.g. https://faithworks.vercel.app while testing);
+//   2. on Vercel, the project's production domain (VERCEL_PROJECT_PRODUCTION_URL, set by Vercel);
+//   3. the CMS Site setting "Website address" (origin).
+// So a test deployment never advertises a domain that does not serve this site.
+export function siteOrigin(settingsOrigin, env = process.env) {
+  const given = String(env.PUBLIC_SITE_URL || "").trim().replace(/\/+$/, "");
+  if (given) {
+    if (!/^https?:\/\/[^/\s?#]+$/i.test(given)) throw new Error(`PUBLIC_SITE_URL must be an origin such as https://example.com, without a path (got "${given}").`);
+    return given;
+  }
+  const vercel = String(env.VERCEL_PROJECT_PRODUCTION_URL || "").trim();
+  if (env.VERCEL && /^[a-z0-9.-]+$/i.test(vercel)) return `https://${vercel}`;
+  return settingsOrigin;
+}
+
 async function fetchSnapshot(view) {
   const base = (process.env.CMS_CONTENT_URL || "").replace(/\/$/, "");
   if (!base) throw new Error("CMS_CONTENT_URL is not set (the CMS address, e.g. https://cms.example.com)");
@@ -70,6 +87,11 @@ export async function loadSnapshot({ root, source = "fixtures", view = "auto", a
       console.warn(`WARNING: CMS unavailable (${e.message}). Building from the cached snapshot of ${snap.generated_at}.`);
     }
   } else throw new Error(`Unknown content source "${source}" (use fixtures, local or cms).`);
+
+  // TEMPORARY: the public site shows the static programs (cms/fixtures/seed.json), whatever the
+  // content source, while the CMS programs feed is sorted out. The CMS Programs dashboard and
+  // its page preview are unaffected. Remove this block to render programs from the CMS again.
+  if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: readJson(join(root, "cms/fixtures/seed.json")).programs }, view: "preview" }).programs };
 
   const problems = checkSnapshot(snap);
   if (problems.length) throw new Error(`Content snapshot is not usable: ${problems.join(" ")}`);
@@ -185,7 +207,7 @@ export function toRenderData(snap) {
 
   const s = snap.settings;
   const site = {
-    origin: s.origin, staging: s.staging === true, brand: s.brand, contactEmail: s.contact_email, contactPhone: nz(s.contact_phone),
+    origin: siteOrigin(s.origin), staging: s.staging === true, brand: s.brand, contactEmail: s.contact_email, contactPhone: nz(s.contact_phone),
     responseTime: nz(s.response_time), social: list(s.social), community: { name: s.community_name, url: s.community_url },
     starterKitReady: s.starter_kit_ready === true, logo: nz(s.logo_url), logoReversed: nz(s.logo_reversed_url),
     primaryCta: { label: nz(s.primary_cta_label), url: nz(s.primary_cta_url) }, footerTagline: nz(s.footer_tagline), footerMotto: nz(s.footer_motto),

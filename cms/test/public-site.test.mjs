@@ -13,7 +13,7 @@ test("anonymous requests reach only the public endpoints", async () => {
     "/api/records/events/x/history", "/api/authors", "/api/tags", "/api/users", "/api/audit", "/api/recovery", "/api/backup", "/api/submissions", "/api/submissions/sub_x"]) {
     assert.equal((await anon.get(p)).status, 401, `GET ${p} needs a session`);
   }
-  for (const p of ["/api/records/resources", "/api/records/resources/x/actions/publish", "/api/preview", "/api/tags", "/api/users", "/api/deploy", "/api/submissions/sub_x/retry"]) {
+  for (const p of ["/api/records/resources", "/api/records/resources/x/actions/publish", "/api/preview", "/api/tags", "/api/users", "/api/deploy"]) {
     assert.equal((await anon.post(p, {})).status, 401, `POST ${p} needs a session`);
   }
   assert.equal((await anon.get("/api/public/preview")).status, 401, "drafts need the preview token");
@@ -21,7 +21,7 @@ test("anonymous requests reach only the public endpoints", async () => {
   const health = await anon.get("/api/health");
   assert.equal(health.status, 200);
   assert.deepEqual(Object.keys(health.data).sort(), ["configured", "forms", "ok", "store"]);
-  assert.deepEqual(Object.keys(health.data.forms).sort(), ["email", "endpoint", "netlify", "problems", "sheets"], "forms setup as booleans and a count only");
+  assert.deepEqual(Object.keys(health.data.forms).sort(), ["endpoint", "netlify", "problems"], "forms setup as booleans and a count only");
   assert.equal((await anon.put("/api/submissions/sub_x", { status: "completed" })).status, 401, "PUT /api/submissions/:id needs a session");
 
   const pub = await anon.get("/api/public/content");

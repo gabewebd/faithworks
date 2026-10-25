@@ -771,9 +771,8 @@ code { font-size: 0.9em; }
    Events gallery: a 12/6/2-column grid whose tiles carry their own spans (--c/--r desktop,
    --ct/--rt tablet, --cm/--rm phone; tools/event-gallery.mjs), so each band of five fills its
    rectangle exactly and the reading order is the order of the list. On the homepage
-   (.egallery--bleed) the section is not a .wrap: the grid spans the whole viewport with no outer
-   gutter, and its row height follows the grid's own width (container units), so tiles keep their
-   proportions on any screen instead of stretching sideways. */
+   (.egallery--bleed) the section is not a .wrap: the photos run as three full-bleed rows that the
+   page scroll slides sideways (.srows, below). */
 .trusted { padding-block: clamp(28px, 3.6vw, 52px) clamp(8px, 1.2vw, 16px); }
 .trusted__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
 .trusted__title { margin: 0; font-family: var(--font); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.4; }
@@ -822,17 +821,23 @@ code { font-size: 0.9em; }
 }
 @media (max-width: 900px) { .section-head > .egallery__intro { grid-column: 1 / -1; } }
 
-/* Masonry Marquee: full-bleed continuous loop of editorial masonry grid ------ */
-.mmarquee { position: relative; overflow: hidden; width: 100%; }
-.mmarquee__track { display: flex; width: max-content; will-change: transform; animation: mmarquee-scroll 55s linear infinite; }
-@keyframes mmarquee-scroll {
-  0%   { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-50%, 0, 0); }
-}
-.mmarquee__set { display: flex; flex-shrink: 0; gap: clamp(6px, 0.7vw, 12px); padding-right: clamp(6px, 0.7vw, 12px); }
-.mmarquee__block { flex: 0 0 100cqi; width: 100cqi; }
-@media (prefers-reduced-motion: reduce) {
-  .mmarquee__track { animation: none; }
+/* Homepage gallery rows (tools/event-gallery.mjs scrollRows) -----------------
+   Three full-bleed rows, one height per row (--h) and widths from each tile's --ar. Without
+   motion each row scrolls sideways on its own; js/motion.js §5c adds .is-scrubbed on tablets and
+   desktops (motion allowed), clips the rows and moves them with the page scroll instead. */
+.srows { --h: max(140px, 14vw); --g: clamp(6px, 0.7vw, 12px); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--g); overflow: hidden; }
+.srows__row { display: flex; gap: var(--g); margin: 0; padding: 0; list-style: none; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.srows__tile { flex: none; height: var(--h); aspect-ratio: var(--ar); }
+.srows__tile figure { height: 100%; margin: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--stone); }
+.srows__tile img { display: block; width: 100%; height: 100%; object-fit: cover; transition: scale 900ms var(--ease-expo); }
+@media (hover: hover) { .srows__tile:hover img { scale: 1.03; } }
+.srows.is-scrubbed .srows__row { width: max-content; overflow: visible; will-change: transform; }
+@media (max-width: 1000px) { .srows { --h: max(130px, 18vw); } }
+@media (max-width: 640px) {
+  .srows { --h: 38vw; --g: 6px; }
+  .srows__row { scrollbar-width: none; padding-inline: 0 6px; }
+  .srows__row::-webkit-scrollbar { display: none; }
+  .srows__tile figure { border-radius: var(--r); }
 }
 
 /* Photo marquee: a full-bleed looping strip of event photos ------------------- */
@@ -1931,6 +1936,12 @@ html.lenis, html.lenis body { height: auto; }
 .event__img img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .event__img figcaption { padding: 6px 10px; font-size: 12px; color: var(--muted); }
 .event--past .event__img img { filter: grayscale(0.4); }
+/* Several event photos: one at a time, Previous/Next below (js/main.js §20) */
+.event__slides-frame img[hidden] { display: none; }
+.event__slides-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px; }
+.event__slides-nav[hidden] { display: none; }
+.event__slides-btn { width: 36px; height: 36px; }
+.event__slides-count { font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* 11. Resource and article pages -------------------------------------------- */
 /* Resource cards, article cards, article typography */
@@ -2149,7 +2160,8 @@ html.lenis, html.lenis body { height: auto; }
 /* 13. Responsive ------------------------------------------------------------ */
 @media (max-width: 1240px) {
   .event { grid-template-columns: 96px minmax(0, 1fr); }
-  .event__img { display: none; }
+  .event__img { grid-column: 2 / -1; max-width: 560px; }
+  .event__img img { aspect-ratio: 16 / 9; }
   .fw-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
@@ -2164,6 +2176,7 @@ html.lenis, html.lenis body { height: auto; }
   .facts div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .needs__col { padding: 20px; }
   .event { grid-template-columns: minmax(0, 1fr); }
+  .event__img { grid-column: 1 / -1; max-width: none; }
   .event__date { aspect-ratio: auto; justify-content: start; grid-auto-flow: column; gap: 10px; padding: 10px 14px; }
   .event__date b { font-size: 28px; }
   .fw-grid--4 { grid-template-columns: minmax(0, 1fr); }

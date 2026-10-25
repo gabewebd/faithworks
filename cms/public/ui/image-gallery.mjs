@@ -1,17 +1,16 @@
 // The event image manager (field type "images"): an ordered list of photos, one of them the
-// cover. Photos are added by uploading files (POST /api/media, one file per request, so one
-// failure never loses the others), by picking photos already on the website (GET
-// /api/media/library) or by pasting an address. Each photo has its description (alt text), a
-// Cover choice (radio buttons, so there is always exactly one), "Show in the events gallery",
-// and can be moved with drag and drop or the arrow buttons, or removed. Nothing is stored on the
-// event until the editor saves; uploaded files are kept in storage either way.
+// cover. Photos are added by address only (until dedicated media storage exists): the address
+// is checked, and the image must actually load, with a preview shown, before it can be added.
+// Each photo has its description (alt text), a Cover choice (radio buttons, so there is always
+// exactly one), "Show in the events gallery", and can be moved with drag and drop or the arrow
+// buttons, or removed. Nothing is stored on the event until the editor saves.
 // Returns the widget shape fields.mjs expects: { el, control, get, set, invalid }.
-import { h, clear, toast, dialog } from "./dom.mjs";
+import { h, clear, toast } from "./dom.mjs";
 import { checkUrl } from "/shared/validate.mjs";
 
-const TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_MB = 5;
-const IMAGE_SRC = /^(\/(?!\/)|https?:\/\/)/i;
+// New images: an https:// address or a path on the website (/assets/images/…)
+const IMAGE_SRC = /^(\/(?!\/)|https:\/\/)/i;
+const LOAD_TIMEOUT_MS = 15000;
 
 let uid = 0;
 
@@ -21,11 +20,8 @@ export function imageGallery({ id, value, disabled = false, onChange, describedB
   const list = h("ol", { class: "imgs", id, "aria-describedby": describedBy || null });
   const status = h("p", { class: "imgs__status", role: "status", "aria-live": "polite" });
   const count = h("span", { class: "imgs__count" });
-  const file = h("input", { type: "file", accept: TYPES.join(","), multiple: true, hidden: true });
-  const uploadBtn = h("button", { type: "button", class: "btn btn--light btn--sm", disabled, onclick: () => file.click() }, "Upload photos");
-  const libraryBtn = h("button", { type: "button", class: "btn btn--light btn--sm", disabled, onclick: pickFromLibrary }, "Choose from website photos");
-  const urlBtn = h("button", { type: "button", class: "btn btn--ghost btn--sm", disabled, onclick: addByAddress }, "Add by address");
-  const el = h("div", { class: "imgs-field" }, h("div", { class: "row imgs__tools" }, uploadBtn, libraryBtn, urlBtn, h("span", { class: "spacer" }), count), file, status, list);
+  const urlBtn = h("button", { type: "button", class: "btn btn--light btn--sm", disabled, onclick: addByAddress }, "Add by address");
+  const el = h("div", { class: "imgs-field" }, h("div", { class: "row imgs__tools" }, urlBtn, h("span", { class: "spacer" }), count), status, list);
 
   const changed = () => onChange?.();
   const has = (url) => items.some((x) => x.url === url);
@@ -97,74 +93,78 @@ export function imageGallery({ id, value, disabled = false, onChange, describedB
     render();
     changed();
     status.textContent = gone.primary && items.length ? "Image removed. The first image is now the cover." : "Image removed.";
-    (list.children[Math.min(i, items.length - 1)]?.querySelector(".imgs__alt") || uploadBtn).focus();
+    (list.children[Math.min(i, items.length - 1)]?.querySelector(".imgs__alt") || urlBtn).focus();
   }
 
-  async function uploadOne(f) {
-    const res = await fetch("/api/media", {
-      method: "POST", credentials: "same-origin", body: f,
-      headers: { accept: "application/json", "content-type": f.type, "x-file-name": encodeURIComponent(f.name), "x-cms-csrf": "1" },
-    });
-    const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(data?.error?.message || `Upload failed (${res.status}).`);
-    return data;
-  }
+  // What is wrong with an address before trying to load it, or null.
+  const addressProblem = (url) => {
+    if (!url) return "Enter the image address.";
+    if (!IMAGE_SRC.test(url)) return "Use an https:// address or a path on the website starting with /.";
+    const e = checkUrl(url);
+    if (e) return e;
+    if (has(url)) return "This image is already in the list.";
+    if (room() <= 0) return `An event can have up to ${max} images.`;
+    return null;
+  };
 
-  file.addEventListener("change", async () => {
-    const files = [...file.files];
-    file.value = "";
-    if (!files.length) return;
-    if (files.length > room()) toast(`Only ${Math.max(0, room())} more image(s) fit (up to ${max}).`, "error");
-    const todo = files.slice(0, Math.max(0, room()));
-    uploadBtn.disabled = true;
-    let done = 0;
-    const failed = [];
-    for (const f of todo) {
-      status.textContent = `Uploading ${done + failed.length + 1} of ${todo.length}: ${f.name}…`;
-      try {
-        if (!TYPES.includes(f.type)) throw new Error("Use a JPEG, PNG or WebP photo.");
-        if (f.size > MAX_MB * 1024 * 1024) throw new Error(`The file is larger than ${MAX_MB} MB.`);
-        const up = await uploadOne(f);
-        add([{ url: up.url }]);
-        done++;
-      } catch (e) { failed.push(`${f.name}: ${e.message}`); }
+  // The address dialog: Add stays off until the address passes the checks and the image has
+  // loaded (shown as a preview with its size). Nothing is added if the dialog is cancelled.
+  function addByAddress() {
+    const fid = `${gid}-addr`;
+    const input = h("input", { class: "input", id: fid, type: "url", inputmode: "url", autocomplete: "off", spellcheck: "false", placeholder: "https://… or /assets/images/…", "aria-describedby": `${fid}-help ${fid}-msg` });
+    const msg = h("p", { class: "imgs-addr__msg small", id: `${fid}-msg`, role: "status", "aria-live": "polite" });
+    const preview = h("img", { class: "imgs-addr__preview", alt: "", hidden: true });
+    const ok = h("button", { class: "btn", type: "submit", value: "ok", disabled: true }, "Add image");
+    let checked = "", seq = 0, timer;
+    const say = (text, bad = false) => { msg.textContent = text; msg.classList.toggle("error", bad); input.toggleAttribute("aria-invalid", bad); };
+    function check() {
+      const url = input.value.trim(), mine = ++seq;
+      checked = ""; ok.disabled = true; preview.hidden = true;
+      const problem = addressProblem(url);
+      if (problem) { say(url ? problem : "", !!url); return; }
+      say("Checking the image…");
+      const probe = new Image();
+      const done = (fn) => { clearTimeout(timer); if (mine === seq) fn(); };
+      timer = setTimeout(() => done(() => say("The image took too long to load. Check the address, or try again.", true)), LOAD_TIMEOUT_MS);
+      probe.onload = () => done(() => {
+        if (!probe.naturalWidth) { say("This address did not return an image.", true); return; }
+        checked = url; ok.disabled = false;
+        preview.src = probe.src; preview.hidden = false;
+        say(`Image found: ${probe.naturalWidth} × ${probe.naturalHeight} pixels.${probe.naturalWidth < 800 ? " It is small, so it may look soft on large screens." : ""}`);
+      });
+      probe.onerror = () => done(() => say("This address did not load an image. Use a public link straight to a JPEG, PNG or WebP file (not a web page or a private link).", true));
+      probe.src = src(url);
     }
-    uploadBtn.disabled = disabled;
-    status.textContent = `${done} of ${todo.length} uploaded.${done ? " Add a description to each photo, then save." : ""}`;
-    if (failed.length) toast(`Not uploaded: ${failed.join(" · ")}`, "error", 9000);
-  });
-
-  async function pickFromLibrary() {
-    let photos;
-    try {
-      const res = await fetch("/api/media/library", { credentials: "same-origin", headers: { accept: "application/json" } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      ({ photos } = await res.json());
-    } catch (e) { toast(`The website photos could not be loaded. ${e.message}`, "error"); return; }
-    if (!photos.length) { toast("No website photos are available here.", "info"); return; }
-    const boxes = photos.map((p, i) => {
-      const inList = has(p.url);
-      const cb = h("input", { type: "checkbox", id: `${gid}-lib${i}`, value: String(i), checked: inList, disabled: inList });
-      return h("label", { class: `imgs-lib__item${inList ? " is-added" : ""}`, for: cb.id, title: p.alt }, cb, h("img", { src: src(p.thumb), alt: "", loading: "lazy" }), h("span", { class: "sr-only" }, p.alt));
+    let debounce;
+    input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(check, 400); });
+    const d = h("dialog", {},
+      h("form", { method: "dialog", class: "dlg", novalidate: true }, // site paths are not "valid" type=url values
+        h("h2", {}, "Add an image by address"),
+        h("div", { class: "field" }, h("label", { for: fid }, "Image address", h("span", { class: "req" }, " *")),
+          h("p", { class: "help", id: `${fid}-help` }, "A public https:// link straight to the image file, or a website path such as /assets/images/workshop.jpg."),
+          input, msg),
+        preview,
+        h("div", { class: "row" }, h("button", { class: "btn btn--light", type: "button", onclick: () => d.close("cancel") }, "Cancel"), ok)));
+    d.querySelector("form").addEventListener("submit", (ev) => {
+      // Enter before the check finished, or after the address changed: check it, do not add
+      if (!checked || checked !== input.value.trim()) { ev.preventDefault(); clearTimeout(debounce); check(); return; }
+      d.returnValue = "ok";
     });
-    const r = await dialog({ title: "Choose from website photos", body: "Photos already on the Faith Works website. Selected photos are added with their descriptions.", content: h("div", { class: "imgs-lib" }, boxes), confirm: "Add selected", wide: true });
-    if (!r.ok) return;
-    add(boxes.map((b) => b.querySelector("input")).filter((c) => c.checked && !c.disabled).map((c) => photos[Number(c.value)]).map((p) => ({ url: p.url, alt: p.alt })));
-  }
-
-  async function addByAddress() {
-    const r = await dialog({ title: "Add an image by address", note: { label: "Image address (https://… or /assets/images/…)", required: true }, confirm: "Add image" });
-    if (!r.ok) return;
-    const url = r.value.trim();
-    const problem = IMAGE_SRC.test(url) ? checkUrl(url) : "Use an https:// address or a site path starting with /.";
-    if (problem) { toast(problem, "error"); return; }
-    add([{ url, featured: false }]);
+    d.addEventListener("close", () => {
+      clearTimeout(debounce); clearTimeout(timer); seq++;
+      if (d.returnValue === "ok" && checked) add([{ url: checked, featured: false }]);
+      d.remove();
+      urlBtn.focus();
+    });
+    document.body.append(d);
+    d.showModal();
+    input.focus();
   }
 
   function set(v) { items = (Array.isArray(v) ? v : []).filter((x) => x?.url).map((x) => ({ url: x.url, alt: x.alt || "", primary: !!x.primary, featured: !!x.featured })); if (items.length && !items.some((x) => x.primary)) items[0].primary = true; render(); }
   set(value);
   return {
-    el, control: uploadBtn,
+    el, control: urlBtn,
     get: () => items.map((x) => ({ url: x.url, alt: x.alt.trim(), primary: x.primary, featured: x.featured })),
     set,
     invalid: (on) => el.toggleAttribute("data-invalid", on),

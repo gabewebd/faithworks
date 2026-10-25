@@ -2,7 +2,7 @@
   "name": "faithworks-cms",
   "private": true,
   "version": "1.0.0",
-  "description": "Faith Works headless CMS: dashboard + API, Supabase content store (Google Sheets integration kept). No runtime dependencies.",
+  "description": "Faith Works headless CMS: dashboard + API, Supabase content store. No runtime dependencies.",
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
@@ -13,11 +13,6 @@
     "supabase:check": "node scripts/supabase.mjs check",
     "supabase:seed": "node scripts/supabase.mjs seed",
     "supabase:import": "node scripts/supabase.mjs import",
-    "supabase:backup": "node scripts/supabase.mjs backup",
-    "sheets:setup": "node scripts/sheets.mjs setup",
-    "sheets:seed": "node scripts/sheets.mjs seed",
-    "sheets:check": "node scripts/sheets.mjs check",
-    "backup": "node scripts/sheets.mjs backup",
-    "restore": "node scripts/sheets.mjs restore"
+    "supabase:backup": "node scripts/supabase.mjs backup"
   }
 }

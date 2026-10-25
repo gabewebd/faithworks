@@ -2,7 +2,7 @@
 // (sizes written by tools/images.py). A page source calls {{gallery:page.slot}}; the layout of
 // that slot decides the markup: single (one <img>), figures (captioned figures), stack (a main
 // photo with floating cards), showcase (a large photo over thumbnails) or mosaic (an asymmetric grid). The Events gallery (masonry) is
-// tools/event-gallery.mjs. Every photo is served as WebP in two widths with its size reserved.
+// tools/event-gallery.mjs. Every photo is served as WebP in three widths with its size reserved.
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,29 +10,37 @@ import { esc } from "./layout.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const WEB = "assets/images/web";
-const WIDTHS = [640, 1280];
+const WIDTHS = [640, 1280, 1920];
+// The web files are checked wherever they are present as a folder (every website build). The CMS
+// page preview runs without them (they are not bundled into its function); its pages load the
+// photos from the public website instead.
+const CHECK_FILES = existsSync(join(ROOT, WEB));
 const registry = JSON.parse(readFileSync(join(ROOT, "src/data/gallery.json"), "utf8"));
 const lockFile = join(ROOT, "src/data/gallery.lock.json");
 const lock = existsSync(lockFile) ? JSON.parse(readFileSync(lockFile, "utf8")) : {};
 
 // A registered photo, with its web files checked: a missing one stops the build rather than
-// shipping a broken image.
+// shipping a broken image. `files` lists each real width once (a small original has the same
+// width under several names), smallest first; `name` is the width in the file name.
 export function photo(id) {
   const spec = registry.images[id], size = lock[id];
   if (!spec) throw new Error(`gallery.json: unknown image "${id}"`);
-  if (!size) throw new Error(`gallery.json: "${id}" has no web versions yet. Run: python tools/images.py`);
-  const files = WIDTHS.map((w, i) => ({ url: `/${WEB}/${id}-${w}.webp`, w: size.widths[i] }));
-  for (const f of files) if (!existsSync(join(ROOT, f.url))) throw new Error(`gallery.json: missing ${f.url}. Run: python tools/images.py`);
+  if (!size || size.widths?.length !== WIDTHS.length) throw new Error(`gallery.json: "${id}" has no web versions yet. Run: python tools/images.py`);
+  const all = WIDTHS.map((w, i) => ({ url: `/${WEB}/${id}-${w}.webp`, w: size.widths[i], name: w }));
+  if (CHECK_FILES) for (const f of all) if (!existsSync(join(ROOT, f.url))) throw new Error(`gallery.json: missing ${f.url}. Run: python tools/images.py`);
+  const files = [...new Map(all.map((f) => [f.w, f])).values()];
   return { id, ...spec, width: size.width, height: size.height, files, social: spec.social ? `/${WEB}/${id}-1200.jpg` : null };
 }
+// src for browsers without srcset: the middle size (or the largest a small original has)
+const fallbackUrl = (p) => p.files[Math.min(1, p.files.length - 1)].url;
+const srcsetOf = (p) => p.files.map((f) => `${f.url} ${f.w}w`).join(", ");
 
-// One <img>: both widths in srcset (the browser picks by slot size), the size reserved,
+// One <img>: every width in srcset (the browser picks by slot size), the size reserved,
 // lazy unless it is the page's first view.
 export function imgTag(id, { sizes = "100vw", alt, cls = "", eager = false, priority = false, position } = {}) {
   const p = photo(id);
   const focus = position || p.position;
-  const srcset = [...new Map(p.files.map((f) => [f.w, f])).values()].map((f) => `${f.url} ${f.w}w`).join(", ");
-  return `<img${cls ? ` class="${cls}"` : ""} src="${p.files[1].url}" srcset="${srcset}" sizes="${esc(sizes)}" width="${p.width}" height="${p.height}" alt="${esc(alt ?? p.alt)}"${priority ? ` fetchpriority="high"` : eager ? "" : ` loading="lazy"`} decoding="async"${focus ? ` style="object-position:${esc(focus)}"` : ""}>`;
+  return `<img${cls ? ` class="${cls}"` : ""} src="${fallbackUrl(p)}" srcset="${srcsetOf(p)}" sizes="${esc(sizes)}" width="${p.width}" height="${p.height}" alt="${esc(alt ?? p.alt)}"${priority ? ` fetchpriority="high"` : eager ? "" : ` loading="lazy"`} decoding="async"${focus ? ` style="object-position:${esc(focus)}"` : ""}>`;
 }
 
 const slot = (name) => {
@@ -66,9 +74,8 @@ const LAYOUTS = {
     const thumb = (it, i) => {
       const p = photo(it.image);
       const alt = it.alt ?? p.alt;
-      const srcset = [...new Map(p.files.map((f) => [f.w, f])).values()].map((f) => `${f.url} ${f.w}w`).join(", ");
       const pos = it.position || p.position || "";
-      return `<li><button type="button" class="pgallery__thumb" aria-pressed="${i ? "false" : "true"}" data-src="${p.files[1].url}" data-srcset="${srcset}" data-alt="${esc(alt)}" data-pos="${esc(pos)}">${imgTag(it.image, { sizes: "(min-width: 900px) 9vw, 20vw", alt: "", position: it.position })}<span class="sr-only">Show photo ${i + 1}: ${esc(alt)}</span></button></li>`;
+      return `<li><button type="button" class="pgallery__thumb" aria-pressed="${i ? "false" : "true"}" data-src="${fallbackUrl(p)}" data-srcset="${srcsetOf(p)}" data-alt="${esc(alt)}" data-pos="${esc(pos)}">${imgTag(it.image, { sizes: "(min-width: 900px) 9vw, 20vw", alt: "", position: it.position })}<span class="sr-only">Show photo ${i + 1}: ${esc(alt)}</span></button></li>`;
     };
     return `<div class="pgallery" data-pgallery>
           <figure class="pgallery__stage">${imgTag(items[0].image, opts(g, items[0]))}</figure>
@@ -108,7 +115,7 @@ export function resolveImage(image) {
   if (!hit) return image;
   const p = photo(hit.id);
   return {
-    base: `${WEB}/${p.id}`, widths: WIDTHS, sizesOf: p.files.map((f) => f.w), formats: ["webp"],
+    base: `${WEB}/${p.id}`, widths: p.files.map((f) => f.name), sizesOf: p.files.map((f) => f.w), formats: ["webp"],
     width: p.width, height: p.height, position: p.position,
     // A retired picture's alt text described that picture, so the new photo brings its own
     alt: hit.legacy || !image.alt ? p.alt : image.alt,

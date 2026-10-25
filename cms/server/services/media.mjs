@@ -8,7 +8,6 @@
 //                            supabase/migrations/20261022000000_event_galleries.sql)
 //            json store (local development): the website's assets/images/uploads/ folder, so the
 //                            local site build and the dashboard preview show it at once
-//            sheets store:   not available (the rollback store has no file storage)
 // library  The photos already on the website (src/data/gallery.json and its web versions), so an
 //          editor can pick one without uploading it again.
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -70,7 +69,6 @@ export function createMedia({ cfg, store, log, fetchImpl = globalThis.fetch }) {
 
   return {
     async upload(user, request, { requestId } = {}) {
-      if (store.kind === "sheets") throw new HttpError(501, "Uploading is not available while the CMS uses the Google Sheets store. Paste an image address instead.", "upload_unavailable");
       const buf = await readBody(request);
       const kind = sniffImage(buf);
       if (!kind) throw new HttpError(415, "Upload a JPEG, PNG or WebP photo.", "unsupported_type");

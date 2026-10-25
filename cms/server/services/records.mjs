@@ -1,6 +1,7 @@
 // Content records: create, edit, publishing. Every permission (role and item ownership) is
 // checked here on the server; the dashboard only mirrors these rules to decide which buttons
-// to show. There is no approval step: an item's owners and Super Admins publish it.
+// to show. There is no approval step: any CMS user may edit and publish content, whoever created
+// it (shared/workflow.mjs); every save and publish records who did it (audit log + history).
 //
 // Draft vs live: a record row is the WORKING COPY. What the website shows is the sanitized
 // payload in the `published` tab. Editing a live item changes only the working copy (its
@@ -15,7 +16,7 @@
 // Draft; the dashboard flags it and "Finish publishing" (reconcile) completes it.
 import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin, hasSlug, publicPath, migrateRecord, eventHasPage } from "../../shared/schema.mjs";
 import { normalize, validate, slugify, syncEventCover } from "../../shared/validate.mjs";
-import { ACTIONS, canEdit, canView, canManage, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
+import { ACTIONS, canEdit, canEditContent, canView, canManage, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
 import { toPublic } from "../../shared/public.mjs";
 import { readingTime, bylineOf } from "../../shared/page-doc.mjs";
 import { HttpError, randomId, now } from "../http.mjs";
@@ -41,7 +42,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       needs_repair: needsRepair,
       draft_differs: !!(live && rec.status !== "published"),
       can_edit: canEdit(user, collection, rec),
-      actions: allowedActions(user, collection, rec, { live: !!live }).concat(needsRepair && canManage(user, collection, rec) ? ["reconcile"] : []),
+      actions: allowedActions(user, collection, rec, { live: !!live }).concat(needsRepair && canEditContent(user, collection) ? ["reconcile"] : []),
       public_url: hasSlug(collection) && rec.slug && (collection !== "events" || eventHasPage(rec)) ? publicPath(collection, rec.slug) : null,
     };
   }
@@ -205,7 +206,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async save(user, collection, id, { version, data = {}, confirmSlugChange = false } = {}, { requestId } = {}) {
       const { rec, live } = await load(collection, id);
       if (!canEdit(user, collection, rec)) {
-        throw new HttpError(403, rec.status === "archived" ? "Archived items cannot be edited. Restore it to draft first." : "Only this item's authors or a Super Admin can edit it.", "forbidden");
+        throw new HttpError(403, rec.status === "archived" ? "Archived items cannot be edited. Restore it to draft first." : "You do not have permission to edit this item.", "forbidden");
       }
       checkVersion(rec, version);
       const incoming = guardFields(user, collection, normalize(collection, data), rec);
@@ -258,7 +259,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async publish(user, collection, id, { version } = {}, { requestId } = {}) {
       if (collection === "settings" && !isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can publish Site settings.", "forbidden");
       const { rec, liveRow } = await load(collection, id);
-      if (!canManage(user, collection, rec)) throw new HttpError(403, "Only this item's authors or a Super Admin can publish it.", "forbidden");
+      if (!canEditContent(user, collection)) throw new HttpError(403, "You do not have permission to publish this item.", "forbidden");
       checkVersion(rec, version);
       if (rec.deleted_at) throw new HttpError(409, "Deleted items cannot be published.", "deleted");
       if (rec.status === "archived") throw new HttpError(409, "Archived items cannot be published. Restore it to draft first.", "archived");
@@ -307,7 +308,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     // Completes a publish whose second step failed (live copy newer than the record says).
     async reconcile(user, collection, id, { requestId } = {}) {
       const { rec, live } = await load(collection, id);
-      if (!canManage(user, collection, rec)) throw new HttpError(403, "Only this item's authors or a Super Admin can finish publishing it.", "forbidden");
+      if (!canEditContent(user, collection)) throw new HttpError(403, "You do not have permission to finish publishing this item.", "forbidden");
       if (!live || Number(rec.published_version || 0) >= Number(live.version)) return { ...view(user, collection, rec, live), unchanged: true };
       const contentUnchanged = Number(rec.version) === Number(live.version) - 1 && rec.status === "draft";
       const patch = { published_version: live.version, published_at: live.published_at, published_by: live.published_by, published_slug: live.slug, previous_slugs: (live.payload?.previous_slugs || []).join(", ") };
@@ -358,7 +359,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
           if (canEdit(user, c, r) && r.status === "draft" && (mineItem || isSuperAdmin(user.role))) mine.push(item);
           if (manage && r.review_date && r.review_date < today && r.status !== "archived") overdue.push({ ...item, review_date: r.review_date });
           const l = liveIds.get(`${c}:${r.id}`);
-          if (manage && l && Number(r.published_version || 0) < Number(l.version)) repair.push(item);
+          if (canEditContent(user, c) && l && Number(r.published_version || 0) < Number(l.version)) repair.push(item);
           if (l && l.payload?.visible === false) counts[c].hidden = (counts[c].hidden || 0) + 1;
         }
         counts[c].live = [...liveIds.keys()].filter((k) => k.startsWith(`${c}:`)).length - (counts[c].hidden || 0);

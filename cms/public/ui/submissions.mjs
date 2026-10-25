@@ -3,10 +3,9 @@
 // anyone who is not a Super Admin, whatever this screen shows.
 import { h, clear, api, toast, busy, errorText, when, who, icon, skeleton } from "./dom.mjs";
 import { selectBox, datePicker } from "./controls.mjs";
-import { FORMS, FORM_IDS, formLabel, answerLabel, SUBMISSION_STATUSES, SUBMISSION_KINDS, DELIVERY_STATES } from "/shared/forms.mjs";
+import { FORMS, FORM_IDS, formLabel, answerLabel, SUBMISSION_STATUSES, SUBMISSION_KINDS } from "/shared/forms.mjs";
 
 const STATUS_TONE = { new: "pink", in_progress: "yellow", completed: "green" };
-const DELIVERY_TONE = { pending: "yellow", sending: "yellow", sent: "green", failed: "red", off: "stone" };
 const PROVIDERS = { cms_endpoint: "Website form (CMS endpoint)", netlify_forms: "Netlify Forms" };
 
 const statusBadge = (s) => h("span", { class: `badge badge--${STATUS_TONE[s] || "stone"}` }, SUBMISSION_STATUSES[s] || s);
@@ -19,7 +18,6 @@ function setupNotes(s) {
   if (!s) return null;
   const notes = [];
   if (!s.endpoint) notes.push("The website cannot send submissions yet: FORMS_ALLOWED_ORIGINS is not set on the CMS, and the website forms are still in preview mode.");
-  if (!s.email) notes.push("Email alerts are off: RESEND_API_KEY, FORMS_EMAIL_FROM and FORMS_NOTIFY_TO are not all set. Submissions are still saved here.");
   for (const p of s.problems || []) notes.push(p);
   return notes.length ? h("div", { class: "alert alert--warn", style: "margin-bottom:16px" }, h("div", {}, h("p", {}, h("strong", {}, "Setup")), h("ul", { class: "small" }, notes.map((n) => h("li", {}, n))))) : null;
 }
@@ -56,8 +54,7 @@ export async function submissionsView() {
           h("td", { class: "title" }, h("a", { href: `#/submissions/${encodeURIComponent(r.id)}` }, r.name || "(no name)"), h("div", { class: "small muted" }, r.email || "")),
           h("td", { class: "small" }, formLabel(r.form_id)),
           h("td", {}, statusBadge(r.status)),
-          h("td", {}, h("div", { class: "row", style: "gap:6px" }, kindBadge(r.kind),
-            r.has_error ? h("span", { class: "badge badge--red", title: "The email alert or the Google Sheets copy failed. Open the submission to retry." }, "Delivery failed") : null))))))),
+          h("td", {}, h("div", { class: "row", style: "gap:6px" }, kindBadge(r.kind)))))))),
         d.truncated ? h("p", { class: "small muted", style: "margin-top:10px" }, "Showing the latest 1,000 matches. Narrow the dates to see older ones.") : null]
         : h("div", { class: "card empty" }, h("h3", {}, filtered ? "Nothing matches these filters" : "No submissions yet"), h("p", {}, filtered ? "Try clearing the search or filters." : "Submissions from the website's forms will appear here.")));
     } catch (e) { clear(body, h("div", { class: "alert alert--error" }, h("div", {}, errorText(e)))); }
@@ -95,26 +92,11 @@ export async function submissionView(app, { id }) {
       try { render(await api("PUT", `/api/submissions/${encodeURIComponent(s.id)}`, { kind: v })); toast(`Marked as ${SUBMISSION_KINDS[v]}.`, "ok"); } catch (err) { toast(errorText(err), "error"); }
     } });
 
-    const delivery = (label, state, attempts, error, at) => [h("dt", {}, label), h("dd", {},
-      h("span", { class: `badge badge--${DELIVERY_TONE[state] || "stone"}` }, DELIVERY_STATES[state] || state),
-      attempts ? h("span", { class: "small muted" }, ` ${attempts} attempt(s)`) : null,
-      at ? h("span", { class: "small muted" }, ` · ${fullDate(at)}`) : null,
-      error ? h("div", { class: "small", style: "color:var(--red)" }, error) : null)];
-    const retryable = ["failed", "pending", "sending"].includes(s.notify_state) || ["failed", "pending", "sending"].includes(s.sheets_state);
-    const retry = retryable ? h("button", { class: "btn btn--light btn--sm", type: "button", onclick: (e) => busy(e.currentTarget, async () => {
-      try {
-        const r = await api("POST", `/api/submissions/${encodeURIComponent(s.id)}/retry`, {});
-        render(r.submission);
-        const failed = r.result.notify === false || r.result.sheets === false;
-        toast(failed ? "Retried, but it failed again. See the error below." : "Retried.", failed ? "error" : "ok");
-      } catch (err) { toast(errorText(err), "error"); }
-    }) }, "Retry now") : null;
-
     clear(wrap,
       h("p", {}, h("a", { class: "icon-link", href: "#/submissions" }, icon("left"), "All submissions")),
       pageHead(s.name || "(no name)", `${formLabel(s.form_id)} · received ${fullDate(s.received_at)}`),
       setupNotes(s.setup),
-      s.kind === "spam" ? h("div", { class: "alert alert--error", style: "margin-bottom:16px" }, h("div", {}, h("p", {}, h("strong", {}, "Marked as spam. "), s.spam_reason || "Marked by a Super Admin.", " No email alert was sent."))) : null,
+      s.kind === "spam" ? h("div", { class: "alert alert--error", style: "margin-bottom:16px" }, h("div", {}, h("p", {}, h("strong", {}, "Marked as spam. "), s.spam_reason || "Marked by a Super Admin."))) : null,
       s.kind === "test" ? h("div", { class: "alert alert--info", style: "margin-bottom:16px" }, h("div", {}, h("p", {}, h("strong", {}, "Test submission. "), "Not a real inquiry."))) : null,
       h("div", { class: "card" }, h("h2", {}, "Status"),
         h("div", { class: "row", role: "group", "aria-label": "Status" }, Object.entries(SUBMISSION_STATUSES).map(([value, label]) =>
@@ -125,10 +107,6 @@ export async function submissionView(app, { id }) {
         h("dl", { class: "kv" }, fieldRows.length ? fieldRows : [h("dt", {}, "Answers"), h("dd", { class: "muted" }, "None")]),
         c.validation_errors?.length ? h("div", { class: "alert alert--warn", style: "margin-top:12px" }, h("div", {}, h("p", {}, h("strong", {}, "Some answers did not pass the website's checks and were not kept: ")), h("ul", { class: "small" }, c.validation_errors.map((x) => h("li", {}, x.message))))) : null),
       contextRows.length ? h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, "Context"), h("dl", { class: "kv" }, contextRows)) : null,
-      h("div", { class: "card", style: "margin-top:16px" }, h("div", { class: "row" }, h("h2", { style: "margin:0" }, "Delivery"), h("span", { class: "spacer" }), retry),
-        h("dl", { class: "kv" },
-          delivery("Email alert", s.notify_state, s.notify_attempts, s.notify_error, s.notified_at),
-          delivery("Google Sheets copy", s.sheets_state, s.sheets_attempts, s.sheets_error, s.sheets_at))),
       h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, "Record"),
         h("dl", { class: "kv small" },
           h("dt", {}, "Received through"), h("dd", {}, PROVIDERS[s.provider] || s.provider),

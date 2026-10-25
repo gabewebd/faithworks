@@ -104,8 +104,6 @@ export const formLabel = (id) => FORMS[id]?.label || id;
 // Team workflow on a submission, and what kind of record it is.
 export const SUBMISSION_STATUSES = { new: "New", in_progress: "In Progress", completed: "Completed" };
 export const SUBMISSION_KINDS = { genuine: "Genuine", spam: "Spam", test: "Test" };
-// Delivery of the team email and of the Google Sheets copy.
-export const DELIVERY_STATES = { pending: "Pending", sending: "Sending", sent: "Sent", failed: "Failed", off: "Not configured" };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -150,7 +148,7 @@ export function validateAnswers(formId, input) {
   return { answers, errors };
 }
 
-// Plain-text view of a value for lists, emails and spreadsheets.
+// Plain-text view of a value for lists.
 export function answerLabel(formId, name, value) {
   const f = FORMS[formId]?.fields.find((x) => x.name === name);
   if (!f || f.type !== "select" || !Array.isArray(f.options)) return value;

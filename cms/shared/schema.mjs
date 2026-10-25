@@ -9,7 +9,7 @@ import { TIME_ZONES, DOC_VERSION } from "./page-doc.mjs";
 
 export const ROLES = {
   super_admin: { label: "Super Admin", rank: 2, help: "Full CMS and administrative access." },
-  author: { label: "Author", rank: 1, help: "Can create, edit and publish their own content, but cannot manage users or administrative settings." },
+  author: { label: "Author", rank: 1, help: "Can create, edit and publish any content, whoever created it. Can unpublish or archive only their own items, and cannot manage users or administrative settings." },
 };
 // Any other stored role is refused at sign-in and flagged on Users and roles until a Super
 // Admin assigns a current role.
@@ -140,7 +140,7 @@ export const COLLECTIONS = {
       f("registration_url", "Registration link", "url", { group: "reg", showIf: (r) => r.registration_type === "external", help: "The existing registration page, e.g. the GHL funnel. It opens in a new tab." }),
       f("cta_label", "Button text", "text", { group: "reg", max: 60, showIf: (r) => r.registration_type !== "none", help: "Optional. Leave empty for “Register”." }),
       f("event_page", "Also give this event its own page on the website", "boolean", { group: "reg", showIf: (r) => r.registration_type !== "page", help: "Optional. The card then links to “Event details”, while the button still goes to the registration link." }),
-      f("gallery", "Event images", "images", { group: "media", long: 2, max: MAX_EVENT_IMAGES, help: "Optional. Upload or add one or more photos. The cover shows on the event card (and the event page); “Show in the events gallery” also puts a photo in the gallery on the homepage and the Workshops page. Drag or use the arrows to change the order." }),
+      f("gallery", "Event images", "images", { group: "media", long: 2, max: MAX_EVENT_IMAGES, help: "Optional. Add one or more photos by their image address (https://… or /assets/images/…). The cover shows on the event card (and the event page); “Show in the events gallery” also puts a photo in the gallery on the homepage and the Workshops page. Drag or use the arrows to change the order." }),
       // The cover image, kept in step with the gallery on every save, for the event card, link
       // previews and anything that still reads the single-image fields
       f("featured_image_url", "Cover image URL", "url", { hidden: true, computed: true }),
@@ -277,26 +277,7 @@ export const retiredOf = (collection) => COLLECTIONS[collection]?.retired || [];
 export function field(collection, key) { return fieldsOf(collection).find((x) => x.key === key); }
 export const hasSlug = (collection) => !!field(collection, "slug");
 
-// Spreadsheet columns for a tab, in order, with overflow cells for long values.
-export function columnsFor(tab) {
-  const defs = COLLECTIONS[tab]
-    ? [...SYSTEM_FIELDS, ...COLLECTIONS[tab].fields.map((x) => (x.long ? { key: x.key, long: x.long } : x.key))]
-    : SYSTEM_TABS[tab].columns;
-  const out = [];
-  for (const d of defs) {
-    if (typeof d === "string") { if (!out.includes(d)) out.push(d); continue; }
-    out.push(d.key);
-    for (let i = 2; i <= d.long; i++) out.push(`${d.key}__${i}`);
-  }
-  return out;
-}
 export const ALL_TABS = [...ALL_COLLECTIONS, ...Object.keys(SYSTEM_TABS)];
-
-export function longCells(tab, key) {
-  if (COLLECTIONS[tab]) return COLLECTIONS[tab].fields.find((x) => x.key === key)?.long || 1;
-  const d = SYSTEM_TABS[tab]?.columns.find((c) => typeof c === "object" && c.key === key);
-  return d ? d.long : 1;
-}
 
 // Public URL of a record (null when the collection has no pages).
 export function publicPath(collection, slug) {

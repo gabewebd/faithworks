@@ -192,7 +192,7 @@ test("preview: the page follows Details, custom layouts drop the global chrome, 
   assert.ok(!res.data.html.includes("Stale heading"));
   assert.ok(!res.data.html.includes('class="site-header"') && !res.data.html.includes('class="site-footer"'), "no global navbar/footer");
   assert.match(res.data.html, /Own nav/);
-  assert.match(res.data.html, /data-fw-form="program_interest"/, "generated form component");
+  assert.match(res.data.html, /class="form form--ghl"/, "generated form component (the GoHighLevel program form)");
   const site = await u.author.post("/api/preview", { collection: "programs", data: program() });
   assert.match(site.data.html, /class="site-header"/);
   assert.match(site.data.html, /href="\/css\/style\.css/);
@@ -286,6 +286,32 @@ test("event times keep their own time zone; past is decided in that zone", async
   assert.equal(isPastEvent({ event_date: "", time_zone: "Asia/Manila" }, now), false, "no date: never past");
 });
 
+test("an event is past once its end time has passed: future, ongoing, multi-day and overnight events", async () => {
+  const { eventEndsAt, isPastEvent, eventCta } = await import("../shared/page-doc.mjs");
+  const at = (iso) => new Date(iso);
+  const timed = { event_date: "2026-10-22", start_time: "13:00", end_time: "16:00", time_zone: "Asia/Manila", registration_type: "external", registration_url: "https://example.test/r", title: "T" };
+  assert.equal(eventEndsAt(timed), "2026-10-22T16:00:00+08:00");
+  assert.equal(isPastEvent(timed, at("2026-10-22T04:00:00Z")), false, "future (12:00 Manila)");
+  assert.equal(isPastEvent(timed, at("2026-10-22T06:30:00Z")), false, "ongoing (14:30 Manila)");
+  assert.equal(isPastEvent(timed, at("2026-10-22T08:00:00Z")), true, "ended at 16:00 Manila");
+  assert.equal(isPastEvent(timed, at("2026-10-22T07:59:00Z")), false, "a minute before the end");
+  // Multi-day: the end date and end time decide
+  const multi = { ...timed, end_date: "2026-10-24" };
+  assert.equal(isPastEvent(multi, at("2026-10-23T10:00:00Z")), false, "day two of three");
+  assert.equal(isPastEvent(multi, at("2026-10-24T08:00:00Z")), true);
+  // Date only: lasts the whole day in its own zone
+  const allDay = { event_date: "2026-10-22", time_zone: "Asia/Manila" };
+  assert.equal(eventEndsAt(allDay), "2026-10-23T00:00:00+08:00");
+  assert.equal(isPastEvent(allDay, at("2026-10-22T15:59:00Z")), false, "23:59 Manila");
+  assert.equal(isPastEvent(allDay, at("2026-10-22T16:00:00Z")), true, "midnight Manila");
+  // Overnight one-day event (22:00–01:00) ends the next morning
+  const late = { event_date: "2026-10-22", start_time: "22:00", end_time: "01:00", time_zone: "Asia/Manila" };
+  assert.equal(eventEndsAt(late), "2026-10-23T01:00:00+08:00");
+  // The button carries the end so the browser can drop it after the event; past events get none
+  assert.match(eventCta(timed, false), /data-event-end="2026-10-22T16:00:00\+08:00"/);
+  assert.equal(eventCta(timed, true), "");
+});
+
 test("scoped Page CSS keeps its design tokens even when it starts with a comment", async () => {
   const { scopeCss } = await import("../shared/sanitize-css.mjs");
   assert.equal(scopeCss("/* note */\n:root{--a:1}\n/* x */ .b{c:d}", ".s"), ".s{--a:1}\n.s .b{c:d}");
@@ -299,7 +325,7 @@ test("listings: empty states, featured resources, Keep reading cards, article co
   const { toRenderData } = await import("../../tools/content.mjs");
   const { buildSnapshot } = await import("../shared/public.mjs");
   R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings }, view: "preview" })));
-  for (const html of [R.programShowcase(), R.programRowsHome(), R.programLinks(), R.resourcesEmpty(), R.events("upcoming")]) {
+  for (const html of [R.programRowsHome(), R.programLinks(), R.resourcesEmpty(), R.events("upcoming")]) {
     assert.match(html, /^<div class="empty"><p><strong>[^<]+<\/strong>/, "one empty panel everywhere");
   }
   for (const html of [R.resourceFeatured(), R.resourceList(), R.guides(), R.featuredInsight(), R.insightList(), R.events("past"), R.voices()]) assert.equal(html, R.EMPTY_SECTION);

@@ -4,8 +4,7 @@
 //
 //   npm run supabase:check                       access, tables and row counts
 //   npm run supabase:seed [-- --dry-run]         add missing cms/fixtures/seed.json rows (development users and logs skipped)
-//   npm run supabase:import -- --from-sheets     copy the CMS tabs of the Google Sheet into Supabase (the sheet is only read)
-//   npm run supabase:import -- <backup.json>     load a CMS backup (dashboard "Download backup" or `npm run backup`)
+//   npm run supabase:import -- <backup.json>     load a CMS backup (dashboard "Download backup" or `npm run supabase:backup`)
 //   npm run supabase:backup                      write every table to cms/backups/<timestamp>.json
 //
 // Imports only ADD rows whose id is missing, keeping ids, versions, timestamps, publishing state
@@ -17,16 +16,13 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "./env.mjs";
 import { loadConfig, supabaseKeyKind } from "../server/config.mjs";
 import { createSupabaseStore, SUPABASE_TABS } from "../server/store/supabase-store.mjs";
-import { createSheetsApi } from "../server/store/sheets-api.mjs";
-import { decodeRow as decodeSheetRow } from "../server/store/codec.mjs";
-import { ALL_TABS, CONTENT_COLLECTIONS } from "../shared/schema.mjs";
+import { CONTENT_COLLECTIONS } from "../shared/schema.mjs";
 
 const CMS = join(dirname(fileURLToPath(import.meta.url)), "..");
 loadEnv(join(CMS, ".env"));
 const args = process.argv.slice(2);
 const cmd = args[0];
 const dryRun = args.includes("--dry-run");
-const fromSheets = args.includes("--from-sheets");
 const file = args.slice(1).find((a) => !a.startsWith("--"));
 
 const cfg = loadConfig({ ...process.env, CMS_STORE: "supabase" });
@@ -44,21 +40,6 @@ async function check() {
   for (const tab of SUPABASE_TABS) console.log(`  cms_${tab}: ${data[tab].length} row(s)`);
   if (!data.settings.length) console.warn("  WARNING: no Site settings row. Run `npm run supabase:seed` or import the content.");
   console.log("Access and tables OK.");
-}
-
-// The CMS tabs of the spreadsheet, read only. Columns are matched by header name; a column the
-// sheet does not have yet (a newer field) is simply empty, so an outdated sheet still imports.
-async function readSheets() {
-  const sc = loadConfig({ ...process.env, CMS_STORE: "sheets" });
-  const problems = sc.errors.filter((e) => /GOOGLE_SHEETS|service-account|GOOGLE_SERVICE/.test(e));
-  if (problems.length) throw new Error("Cannot read Google Sheets:\n  - " + problems.join("\n  - "));
-  const api = createSheetsApi({ spreadsheetId: sc.spreadsheetId, clientEmail: sc.clientEmail, privateKey: sc.privateKey, maxAttempts: 6, baseDelayMs: 2000 });
-  const values = await api.batchGet(ALL_TABS.map((t) => api.sheetRange(t)));
-  return Object.fromEntries(ALL_TABS.map((tab, i) => {
-    const [header = [], ...rows] = values[i];
-    const h = header.map((x) => String(x).trim());
-    return [tab, rows.filter((r) => (r || []).some((c) => String(c ?? "").trim())).map((r) => decodeSheetRow(tab, h, r)).filter((r) => r.id)];
-  }));
 }
 
 async function importTabs(source, { skipTabs = [] } = {}) {
@@ -87,7 +68,7 @@ async function importTabs(source, { skipTabs = [] } = {}) {
 }
 
 function readBackup(path) {
-  if (!path || !existsSync(path)) throw new Error("Usage: npm run supabase:import -- <backup.json>   (or -- --from-sheets)");
+  if (!path || !existsSync(path)) throw new Error("Usage: npm run supabase:import -- <backup.json>");
   const b = JSON.parse(readFileSync(path, "utf8"));
   if (b.format === "faithworks-cms-backup") return b.tabs;
   if (b.settings && b.programs) return b; // a fixture file (cms/fixtures/seed.json format)
@@ -109,12 +90,12 @@ try {
     console.log(`${dryRun ? "Dry run (nothing is written): comparing with" : "Seeding from"} cms/fixtures/seed.json (development users and logs are skipped)…`);
     await importTabs(readBackup(join(CMS, "fixtures", "seed.json")), { skipTabs: ["users", "audit_log", "history"] });
   } else if (cmd === "import") {
-    const source = fromSheets ? await readSheets() : readBackup(file);
-    console.log(`${dryRun ? "Dry run (nothing is written): comparing with" : "Importing from"} ${fromSheets ? "the Google Sheet (read only)" : file}…`);
+    const source = readBackup(file);
+    console.log(`${dryRun ? "Dry run (nothing is written): comparing with" : "Importing from"} ${file}…`);
     await importTabs(source);
   } else if (cmd === "backup") await backup();
   else {
-    console.log("Commands: check | seed | import (--from-sheets | <file>) [--dry-run] | backup");
+    console.log("Commands: check | seed | import <file> [--dry-run] | backup");
     process.exit(cmd ? 1 : 0);
   }
 } catch (e) {

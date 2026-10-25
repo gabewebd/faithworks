@@ -1,10 +1,11 @@
 {
   "founder-studio": {
-    "width": 1280,
-    "height": 1600,
+    "width": 1920,
+    "height": 2400,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": [
       0.3734,
@@ -14,209 +15,232 @@
     ]
   },
   "speaking-faith-screen": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "speaking-five-steps": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "speaking-whiteboard": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "talk-generations": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "talk-big-screen": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "talk-laptops": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "group-orchestrator": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "community-house-of-creatives": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "stage-notebook": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "stage-prompting": {
-    "width": 1280,
-    "height": 853,
+    "width": 1920,
+    "height": 1280,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "room-chart": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "room-full": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "room-hotel": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "group-selfie": {
-    "width": 1280,
-    "height": 612,
+    "width": 1920,
+    "height": 918,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "group-office": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "roundtable": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "group-community": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "group-gala": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "certificates-stage": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "bgc-room": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "bgc-laptops": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "hotel-laptops": {
-    "width": 1280,
-    "height": 1707,
+    "width": 1536,
+    "height": 2048,
     "widths": [
       640,
-      1280
+      1280,
+      1536
     ],
     "crop": null
   },
   "masterclass-certificates": {
-    "width": 1280,
-    "height": 800,
+    "width": 1920,
+    "height": 1200,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
@@ -225,6 +249,7 @@
     "height": 1152,
     "widths": [
       640,
+      847,
       847
     ],
     "crop": null
@@ -234,34 +259,38 @@
     "height": 569,
     "widths": [
       640,
+      706,
       706
     ],
     "crop": null
   },
   "masterclass-stage-group": {
-    "width": 1280,
-    "height": 960,
+    "width": 1920,
+    "height": 1440,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "open-qa": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
   "slides-poll": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   },
@@ -270,6 +299,7 @@
     "height": 1260,
     "widths": [
       640,
+      706,
       706
     ],
     "crop": null
@@ -279,16 +309,18 @@
     "height": 946,
     "widths": [
       640,
+      1276,
       1276
     ],
     "crop": null
   },
   "hotel-session": {
-    "width": 1280,
-    "height": 720,
+    "width": 1920,
+    "height": 1080,
     "widths": [
       640,
-      1280
+      1280,
+      1920
     ],
     "crop": null
   }

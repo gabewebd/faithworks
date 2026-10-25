@@ -191,8 +191,10 @@ const indexable = written.filter((p) => p.endsWith("/") && !p.includes("thank-yo
 writeFileSync(join(OUT, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   indexable.map((p) => `  <url><loc>${origin}${p}</loc></url>`).join("\n") + `\n</urlset>\n`);
+// Link-preview crawlers may still read staging pages (LinkedIn honours robots.txt, so without this a
+// shared link shows no preview); the pages themselves stay noindex.
 writeFileSync(join(OUT, "robots.txt"), data.site.staging
-  ? "# Staging build: keep out of search engines (brief §6). Replace at launch.\nUser-agent: *\nDisallow: /\n"
+  ? "# Staging build: keep out of search engines (brief §6). Replace at launch.\n# Link-preview crawlers may fetch pages so shared links show their title and image.\nUser-agent: LinkedInBot\nUser-agent: facebookexternalhit\nUser-agent: Facebot\nUser-agent: Twitterbot\nUser-agent: Slackbot\nAllow: /\n\nUser-agent: *\nDisallow: /\n"
   : `User-agent: *\nAllow: /\nSitemap: ${origin}/sitemap.xml\n`);
 
 console.log(`Content: ${opts.source}, ${snapshot.view} view (snapshot ${snapshot.generated_at}).`);

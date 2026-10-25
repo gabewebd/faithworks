@@ -5,9 +5,10 @@ resources/articles, testimonials, tags and site settings** in a dashboard. Conte
 **Supabase (Postgres)**, the single source of truth for CMS content, through a server-side
 integration. The public website is rebuilt from the **published** content only.
 
-Sign-in stays **Google OAuth**. The earlier **Google Sheets** integration (code, scripts, spreadsheet
-and credentials) is kept, unchanged, for future data workflows (form submissions, inquiries,
-registrations) and as an explicit rollback store. It is not used for CMS content.
+Sign-in stays **Google OAuth**. The earlier **Google Sheets** integration (rollback content store,
+form-submission copy, `sheets:*` scripts and service-account settings) and the **Resend email
+alerts** were removed on 25 Oct 2026: GoHighLevel handles form submissions, alerts and follow-up.
+The spreadsheet itself was not touched.
 
 - No runtime dependencies (Node 20+ built-ins only): nothing to `npm install`, no supply-chain surface.
 - Runs on Vercel or Netlify (serverless functions + static dashboard), or locally with `npm run dev`.
@@ -28,8 +29,6 @@ registrations) and as an explicit rollback store. It is not used for CMS content
                                         cms_testimonials, cms_settings, cms_tags, cms_users,
                                         cms_published, cms_history, cms_audit_log (RLS on)
                         │
-                   (Google Sheets: separate, kept for future workflows; not CMS content)
-                        │
      GET /api/public/content (published copies only, cached)
                         ▼
  Website build (tools/build.mjs + tools/content.mjs) ──► static HTML ──► host (Netlify/Vercel/GHL)
@@ -37,11 +36,11 @@ registrations) and as an explicit rollback store. It is not used for CMS content
 
 | Piece | Where | Notes |
 | --- | --- | --- |
-| Content model | `cms/shared/schema.mjs` | One definition drives the sheet columns, the forms, validation, field permissions and which fields are public. |
+| Content model | `cms/shared/schema.mjs` | One definition drives the table columns, the forms, validation, field permissions and which fields are public. |
 | Workflow | `cms/shared/workflow.mjs`, `cms/server/services/records.mjs` | Statuses, transitions, role rules. Enforced on the server. |
 | Public projection | `cms/shared/public.mjs` | The only code that decides what leaves the CMS. |
 | Sanitizer | `cms/shared/sanitize-html.mjs`, `sanitize-css.mjs` | Allowlist tokenizer that re-serializes the markup, plus CSS neutralization and scoping. |
-| Storage adapters | `cms/server/store/` | `supabase-store.mjs` (production), `json-store.mjs` (local development and tests), `sheets-store.mjs` (kept; rollback only). Same interface. Chosen by `CMS_STORE`; never a silent fallback. |
+| Storage adapters | `cms/server/store/` | `supabase-store.mjs` (production), `json-store.mjs` (local development and tests). Same interface. Chosen by `CMS_STORE`; never a silent fallback. |
 | Database schema | `cms/supabase/migrations/` | SQL migrations for the Supabase tables, privileges and Row Level Security. |
 | Website content interface | `tools/content.mjs` | `fixtures`, `local` or `cms` source; `published` or `preview` view; same output shape. |
 
@@ -58,21 +57,25 @@ and `cms/server/services/`). Hiding a button is never the protection.
 | --- | :-: | :-: |
 | Read content items (to link and reference them) | ✓ | ✓ |
 | Create content | ✓ | ✓ |
-| Edit, preview, publish (one step), unpublish, archive, restore to draft | any item | own items |
-| Show or hide an event or testimonial on the website | any item | own items |
-| Change a live page’s slug (with confirmation), restore earlier versions | any item | own items |
+| Edit, preview and publish (one step), whoever created the item | any item | any item |
+| Show or hide an event or testimonial (an edit, live once published) | any item | any item |
+| Change a live page’s slug (with confirmation), restore earlier versions | any item | any item |
+| Unpublish, archive, restore to draft | any item | own items |
 | Tags, site settings (including launch and tracking), activity log, website rebuild | ✓ | – |
 | Delete / undelete, recovery, backups, users and roles | ✓ | – |
 
 - **Own items:** an Author owns an item they created or are listed on as an author. `created_by`
-  is set by the server only. The creator (or a Super Admin) manages the authors list; a co-author
-  may add people and take themselves off but cannot remove anyone else. Imported content has no
-  Author owner, so only Super Admins change it until they add authors to it.
+  is set by the server only. Ownership is kept for attribution and decides who may take an item
+  off the website; it does not limit editing or publishing. The creator (or a Super Admin) manages
+  the authors list; anyone else may add people and take themselves off but cannot remove anyone else.
+- **Who changed what:** every save and publish records the user (`updated_by`, `published_by`), and
+  the version history and activity log (`cms_history`, `cms_audit_log`: item, user, action, time)
+  keep every step. The editor shows *Last saved … by* and *Published … by*; the History tab lists each version.
 - Super Admins listed in `CMS_SUPER_ADMINS` are pinned. They cannot be changed or locked out from the UI.
 - **Unknown roles.** The only roles are `super_admin` and `author`. A `users` row with any other
   role cannot sign in and shows “Review: was …” on **Users and roles** until a Super Admin saves a
   current role for it. Nothing is rewritten in the database automatically.
-- Other people are rows in the `cms_users` table (the `users` tab with the Sheets store), managed only from **Users and roles**. Nobody can change their own role.
+- Other people are rows in the `cms_users` table, managed only from **Users and roles**. Nobody can change their own role.
 - Sign-in is **Google OAuth** (OpenID Connect with PKCE). The CMS never stores or sees a password.
   Scopes are `openid email` only. The ID token's RS256 signature is verified with Google's published
   keys (`https://www.googleapis.com/oauth2/v3/certs`, cached), then its issuer, audience, `azp`,
@@ -85,8 +88,7 @@ and `cms/server/services/`). Hiding a button is never the protection.
 ## 3. Publishing, drafts and the live version
 
 Statuses: **Draft → Published**, plus **Archived**. There is no review or approval step and no
-publisher role: an item's owners (its creator and listed authors) and Super Admins publish it with
-one click. Tags are separate.
+publisher role: any CMS user (Author or Super Admin) publishes it with one click. Tags are separate.
 
 - **Draft:** saved, not on the website. **Published:** on the website. **Archived:** kept for the record, off the website (*More → Restore to draft* brings it back).
 - **Show on the website** (events and testimonials): a published item with this switch off is not on the website but stays in the CMS, marked *Hidden*, so it can be shown again later. Change the switch and press **Publish**.
@@ -219,13 +221,8 @@ snapshot and the website build). Nothing is rewritten until someone saves the it
 - **Testimonials:** Faith Pink card, shown, unless consent was recorded as declined or withdrawn, or the website was holding the live copy back for missing consent (those stay hidden until someone turns them on and publishes). Role, kind, source, consent fields, display approval and card templates are retired.
 
 **Retired fields** (`retired` in `shared/schema.mjs`) are read from older rows so they can be
-converted, and their stored values are written back unchanged, but new sheets do not get those
-columns and they are never published. `approved_*`, `submitted_*`, `reviewed_*` and `review_note`
+converted, and their stored values are written back unchanged, but they are never published. `approved_*`, `submitted_*`, `reviewed_*` and `review_note`
 are no longer CMS columns; an older sheet keeps them (hand-added columns are always preserved).
-
-Google Sheets: run `npm run sheets:setup` once after deploying this version. It adds the new columns
-(`registration_type`, `event_page`, `visible`, `tone`…) at the end of each tab without moving or
-deleting anything. Take a backup first (`npm run backup`).
 
 ## 4. Database design (Supabase)
 
@@ -260,48 +257,11 @@ One table per CMS collection and system tab, named `cms_<tab>`, all in the `publ
 - Roles are not constrained in the database on purpose: a row with a retired role is kept,
   refused at sign-in and flagged for review (section 2).
 
-## 4a. Spreadsheet design (Google Sheets: kept, not the content store)
+## 4a. Google Sheets (removed)
 
-The spreadsheet below is the earlier CMS content store. Its tabs, rows and credentials are left
-exactly as they were. The CMS does not read or write it while `CMS_STORE=supabase`. It can be
-read by `npm run supabase:import -- --from-sheets`, maintained with the `sheets:*` scripts, and
-used again only by setting `CMS_STORE=sheets` deliberately (rollback). Future form, inquiry or
-registration workflows can reuse `cms/server/store/sheets-api.mjs` (service-account client) with
-their own tabs; do not route CMS content through it as well.
-
-
-One spreadsheet, one tab per collection, plus system tabs. Row 1 holds the column headers.
-**Columns are found by header name, not position.** Rows are found by the immutable `id`,
-never by row number.
-
-| Tab | Holds | Key columns |
-| --- | --- | --- |
-| `programs`, `events`, `resources`, `testimonials` | Working copies | `id` (e.g. `prg_3fa9…`), `status`, `version`, `write_id`, `slug`, `tags`, ownership and workflow timestamps, then the type's fields |
-| `settings` | One row, `id = site` | Brand, contacts, social, CTA, footer, legal links, tracking IDs |
-| `published` | Live copies | `id = collection:record_id`, `slug`, `version`, `state` (`live` or `unpublished`), `payload` (sanitized JSON) |
-| `history` | Version snapshots | `record_id`, `version`, `kind` (save, publish, delete…), `data` (full JSON) |
-| `audit_log` | Who did what | `at`, `actor`, `role`, `action`, `record_id`, `version`, `detail` (no content, no secrets) |
-| `users` | Role assignments (no passwords) | `id = email`, `role`, `active` |
-| `tags` | Reusable tags | `id` (slug), `label`, `archived` |
-
-Current columns, after the system columns (`id, status, version, write_id, created_at, created_by,
-updated_at, updated_by, published_at, published_by, published_version, published_slug,
-previous_slugs, deleted_at, deleted_by`):
-
-- `events`: `title, summary, event_date, start_time, end_date, end_time, time_zone, venue, registration_type, registration_url, cta_label, event_page, featured_image_url, featured_image_alt, slug, seo_title, meta_description, social_image_url, body_html…body_html__6, body_css, body_css__2, page_layout, doc_version, visible, authors, byline, sort_order`
-- `testimonials`: `quote, display_name, role, featured_image_url, visible, authors, sort_order` (an older sheet's `tone` column is kept but no longer used)
-- `programs`, `resources`, `settings`: unchanged by this version.
-
-Encoding: lists are one item per line; tags are comma-separated ids; agenda, FAQ and social links are JSON; booleans are `TRUE` or `FALSE`. Dates use ISO 8601 (`2026-10-20`, `2026-10-16T08:00:00Z`).
-Every value is written with `valueInputOption=RAW`, so text that starts with `=` is never evaluated as a formula.
-A cell holds at most 50,000 characters, so long values continue in overflow columns:
-`body_html` to `body_html__6` (~270k characters), and `payload`/`data` up to `__10`.
-Columns added by hand are preserved but ignored.
-
-**Rules for people with access to the sheet** (only the owner and maybe one technical admin should have it):
-- Edit content in the CMS, not in the sheet. The sheet is not the authentication system. Anyone who can edit it can edit roles and live content directly.
-- Do **not** sort rows, insert rows in the middle, rename headers or delete rows. Use *Data → Filter views* to look at data. If rows move during a save, the CMS refuses to confirm and the item's history keeps the previous version.
-- Protect the tabs (*Data → Protect sheets and ranges*: only the owner and the service account).
+The CMS no longer reads or writes Google Sheets (removed 25 Oct 2026). The earlier spreadsheet and
+its service account were left untouched; delete or archive them in Google Cloud only if nobody
+else uses them. Content that was in the sheet was imported into Supabase on 20 Oct 2026.
 
 ## 5. Setup
 
@@ -311,7 +271,7 @@ Columns added by hand are preserved but ignored.
 cd cms
 cp .env.example .env          # CMS_STORE=json and CMS_DEV_LOGIN=true are fine locally
 npm run dev                   # http://localhost:5174
-npm test                      # roles, workflow, publishing, sanitizer, Supabase and Sheets adapters
+npm test                      # roles, workflow, publishing, sanitizer, Supabase adapter, forms
 ```
 
 The JSON store lives at `cms/.data/store.json` (git-ignored) and is seeded from `cms/fixtures/seed.json`.
@@ -329,37 +289,16 @@ To see your local edits on the website: `node tools/build.mjs --content=local` f
 5. **Load the content** (every command only adds missing rows, never changes or deletes, and is safe to rerun):
    ```bash
    cd cms
-   npm run supabase:import -- --from-sheets --dry-run   # what would be copied from the Google Sheet
-   npm run supabase:import -- --from-sheets             # copy the CMS tabs of the Sheet (the Sheet is only read)
-   npm run supabase:seed                                # or: start from cms/fixtures/seed.json instead
+   npm run supabase:seed                                # start from cms/fixtures/seed.json
    npm run supabase:check                               # access, tables and row counts
    ```
    `supabase:import -- <backup.json>` loads a backup file instead. Imports keep ids, versions,
    timestamps, publishing state and history, and verify every row afterwards.
 
-**Status of the existing spreadsheet (checked 20 Oct 2026, read only):** it held 4 programs, 4
-events, 9 resources, 8 testimonials, the Site settings row and its live copy, and no users, tags,
-history or audit rows. Every row was identical (same `write_id`) to `cms/fixtures/seed.json`,
-so there was no editorial content beyond the seed. Its `settings` tab is also missing the four
-newest columns (`booking_url`, `featured_video_*`), so `sheets:check` currently stops there; the
-import reads the sheet without that check, and the missing values are empty.
+### 5.3 Google Cloud: sign-in
 
-### 5.3 Google Cloud: sign-in and the spreadsheet
-
-1. **Spreadsheet:** create a blank Google Sheet owned by a Faith Works Google account (not a personal developer account). Keep sharing *Restricted*; never "Anyone with the link". Copy its ID from the URL (`/d/<ID>/edit`).
-2. **Google Cloud project** (owned by the same organization): enable the **Google Sheets API**.
-3. **Service account:** *IAM & Admin → Service accounts → Create*. Give it no project roles. Create a JSON key.
-4. **Share the spreadsheet** with the service account's email as **Editor**, and with nobody else who does not need it.
-5. **OAuth client for sign-in:** *APIs & Services → OAuth consent screen* (Internal if you use Google Workspace, otherwise External with test users), then *Credentials → Create OAuth client ID → Web application*.
+1. **OAuth client for sign-in** (a Google Cloud project owned by Faith Works): *APIs & Services → OAuth consent screen* (Internal if you use Google Workspace, otherwise External with test users), then *Credentials → Create OAuth client ID → Web application*.
    Authorized redirect URI: `https://<cms-domain>/api/auth/google/callback` (and `http://localhost:5174/api/auth/google/callback` for local tests).
-6. **Sheets integration (optional, kept):** set the `GOOGLE_SHEETS_*` / service-account variables only if a workflow uses the spreadsheet (or for `supabase:import -- --from-sheets`). These scripts maintain the CMS tabs of the sheet, which are no longer the content store:
-   ```bash
-   cd cms
-   npm run sheets:setup    # creates tabs and header columns (never reorders or deletes)
-   npm run sheets:seed     # adds missing cms/fixtures/seed.json rows by id; safe to rerun (dev users are skipped)
-   npm run sheets:seed -- --dry-run   # read-only: which seed rows are present / missing
-   npm run sheets:check    # access, headers and row counts
-   ```
 
 ### 5.4 Deploying the CMS
 
@@ -368,7 +307,7 @@ import reads the sheet without that check, and the missing values are empty.
 
 Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Development, Preview and Production environment variables. Point Production at the production Supabase project. Do not reuse the production database for preview deployments.
 
-**Netlify, when switching an existing CMS site to Supabase:** add `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (scope: Functions), set `CMS_STORE=supabase` or remove `CMS_STORE` (the hosted default is `supabase`; a leftover `CMS_STORE=sheets` keeps using Sheets), keep every Google variable, and redeploy. `/api/health` then shows `"store":"supabase"` and `"supabaseKey":"secret"`.
+**Netlify, when switching an existing CMS site to Supabase:** add `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (scope: Functions), set `CMS_STORE=supabase` or remove `CMS_STORE` (the hosted default is `supabase`; `CMS_STORE=sheets` is now refused), keep the Google OAuth variables, and redeploy. `/api/health` then shows `"store":"supabase"` and `"supabaseKey":"secret"`.
 
 ### 5.5 Connecting the website
 
@@ -412,13 +351,16 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 | Sign-in (Google OAuth) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | Session and access | `CMS_SESSION_SECRET` (32+ random characters), `CMS_SUPER_ADMINS`; optional `CMS_SESSION_HOURS`, `CMS_ALLOWED_EMAIL_DOMAINS` |
 
-Kept for the Google Sheets integration (required only with `CMS_STORE=sheets`, otherwise optional):
-`GOOGLE_SHEETS_SPREADSHEET_ID` and the service-account credentials (`GOOGLE_SERVICE_ACCOUNT_EMAIL` +
-`GOOGLE_PRIVATE_KEY`, or `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`). Optional website settings:
-`PUBLIC_SITE_URL`, `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild), `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
-Website form submissions (all optional; the endpoint stays off without `FORMS_ALLOWED_ORIGINS`):
-`FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT`, `RESEND_API_KEY`, `FORMS_EMAIL_FROM`, `FORMS_NOTIFY_TO`,
-`FORMS_NOTIFY_TO_<FORM_ID>`, `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB`, `NETLIFY_FORMS_WEBHOOK_SECRET` (§13).
+Optional website settings: `PUBLIC_SITE_URL` (the public site's address, no path: dashboard
+previews load images from it), `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild),
+`CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`. Website form submissions (all optional; the endpoint stays
+off without `FORMS_ALLOWED_ORIGINS`): `FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT`,
+`NETLIFY_FORMS_WEBHOOK_SECRET` (§13).
+
+**No longer used** (removed 25 Oct 2026; delete them from the host): `GOOGLE_SHEETS_SPREADSHEET_ID`,
+`GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`,
+`RESEND_API_KEY`, `FORMS_EMAIL_FROM`, `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>`,
+`FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB`.
 
 The public website (Vercel) needs none of these; it only reads `/api/public/content` from the CMS
 (its one setting is `CMS_CONTENT_URL`, see §5.5).
@@ -436,13 +378,10 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 
 ## 8. Reliability, quotas and caching
 
-- **Supabase store:** every call has an 8-second timeout; reads and updates retry 429, 5xx and network errors with backoff (an update recognises its own earlier attempt by its `write_id`). Inserts and log entries are retried only after checking that the first attempt did not land, so there are no duplicates. A database failure is reported to the user ("The CMS database (Supabase) could not be reached…"); the CMS never falls back to Google Sheets or local data. Publishing still writes the live copy first and the record second (see below).
-- *The rest of this section describes the Google Sheets store (rollback only).* Google calls have an 8-second timeout. Reads and full-row writes retry 429, 5xx and network errors with exponential backoff and jitter, honouring `Retry-After`. Appends are never blindly retried: after a failure the tab is re-read, and the row is appended again only if it is missing (no duplicates).
-- A save is reported as successful only after the row is read back with its new `write_id`.
-- **Quotas:** Google Sheets allows about 300 read and 300 write requests per minute per project, and 60 per minute per user. All CMS traffic counts as one user, the service account. A save costs about 2 reads and 3 writes; a dashboard load costs 1 batched read. That is comfortable for a team of a few editors. On a rate limit, users see "Google Sheets is busy, wait a minute", and nothing is half-saved.
+- **Supabase store:** every call has an 8-second timeout; reads and updates retry 429, 5xx and network errors with backoff (an update recognises its own earlier attempt by its `write_id`). Inserts and log entries are retried only after checking that the first attempt did not land, so there are no duplicates. A database failure is reported to the user ("The CMS database (Supabase) could not be reached…"); the CMS never falls back to local data. Publishing still writes the live copy first and the record second (see below).
 - **No cross-tab transactions:** publishing writes the live copy first, then the record. If the second write fails, the item is live but flagged; *Finish publishing* (or *Recovery*) completes it. If the first write fails, nothing changed.
 - **Public cache:** 10 seconds in memory per server instance and `cache-control: no-store` (no CDN copy), so a build started by *Publish* always reads the new content. If the database is down, an instance that has a snapshot serves it with `x-content-stale: 1` (the website build logs a warning). A failed edit is never shown as saved. The cache is not a backup.
-- **Growth:** about 10 million cells per spreadsheet. `history` grows with every save, so archive old rows yearly (copy them to an archive spreadsheet, then delete them from `history`) once it passes about 20,000 rows.
+- **Growth:** `cms_history` grows with every save; review its size yearly.
 
 ## 9. Backup, recovery and rollback
 
@@ -452,19 +391,23 @@ None of these is ever sent to the browser. `/api/session` exposes only non-secre
 | Accidental delete | Super Admin → **Recovery and backup** → *Restore*. Deletes are soft; the row stays in the database. |
 | Publish did not finish | Item banner or **Recovery** → *Finish publishing*. |
 | Bad content went live | *Unpublish* the item (it is removed at the next rebuild), or restore an earlier version and publish it. |
-| Sheet damaged by hand | Google Sheets *File → Version history* → restore a version from before the change. Then `npm run sheets:check`. |
 | Full restore (Supabase) | Supabase *Database → Backups* (daily on paid plans; point-in-time recovery if enabled), or `npm run supabase:import -- backups/<file>.json` into an empty project after running the migration. |
-| Full restore (Sheets store) | `npm run restore -- backups/<file>.json` into a **new, empty** spreadsheet (the script refuses to overwrite data). Share it with the service account, update `GOOGLE_SHEETS_SPREADSHEET_ID`, redeploy. |
 | Website deploy broke | Roll back to the previous deploy in Netlify/Vercel (*Deploys → Publish deploy* / *Promote to production*). The CMS is not affected. |
 | CMS deploy broke | Roll back the CMS project's deploy the same way. Content in the database is unaffected. |
-| Roll back to the Sheets store | Only deliberately: `npm run supabase:backup`, set `CMS_STORE=sheets`, redeploy. Edits made in Supabase since the switch are **not** in the sheet; copy them by hand, or load the backup with `npm run restore` into a new, empty spreadsheet. |
 
 **Backups:** weekly, and before any bulk change: `npm run supabase:backup` (writes to `cms/backups/`,
-git-ignored; `npm run backup` is the Sheets equivalent) or *Recovery → Download a full backup*. Store backups privately. They contain
-internal fields (owners, editors' emails and any retired consent notes). Google's own version history is a second line,
+git-ignored) or *Recovery → Download a full backup*. Store backups privately. They contain
+internal fields (owners, editors' emails and any retired consent notes). Supabase's own backups are a second line,
 not a replacement.
 
 ## 10. What is tested, and what is not
+
+**25 Oct 2026 (current: `npm test`, 108 tests, all passing).** Cross-owner editing and publishing
+with the user, action and time recorded in history and the audit log, while unpublish, archive,
+delete and Site settings stay restricted; the Google Sheets store and its tests, and the email/Sheets
+delivery of form submissions, were removed (see §4a, §13); past/ongoing/future events by end time.
+The notes below are the earlier record and mention features that no longer exist.
+
 
 **Automated (`npm test`, 65 tests, all passing).** Added for this version: one-step publishing with no approval actions (the old ones answer 404) and no approval columns; testimonials with and without a photo, colour changes, hide and show again (public output, Hidden filter and dashboard count) and Author boundaries; the three event registration destinations (external link required, informational events never keep a URL, CMS event page needs content), automatic free slugs; hidden and draft events kept out of public and staging output; event cards (button routing, separate *Event details* link, no empty buttons, past events without buttons, date order) and the calendar data; time zones (offsets with summer time, past decided in the event's zone); migration of records and live copies from the earlier workflow without rewriting them; and, on the Sheets adapter mock, new tabs without retired columns while an older sheet's retired and hand-added columns are read and preserved. Earlier coverage: scoped Page CSS keeps its tokens; page documents (marker-based bindings that never match by text, nested and commented markup, empty-value placeholders, links removed when empty, generated components, card lists from the page); the read-time upgrade of older records without losing content; starter templates for all four types that publish with nothing removed and use only labelled placeholder images; reading time (reproduces every existing article’s value) and event duration; time-zone changes never moving an event; authors from the user list with a names-only byline; server-calculated reading time; hidden legacy values kept on save; event date ranges; preview following Details, custom layouts without the global navbar and footer, live-version preview; testimonial cards always showing the exact quote; and, as before: configuration fails closed; CSRF and authentication; the dev login is localhost-only; every role boundary; Author workflow; draft vs live separation; concurrent-edit conflicts; slug format, duplicates and live renames with redirects; field-level permissions (Super-Admin-only); content ownership (Authors change only their own items, including direct API requests); retired-role accounts mapped to Author and flagged for review; user management; archive, delete, undelete, history restore and audit; unsafe HTML kept in drafts but never published; both partial-publish failure paths; draft preview with the site templates; 45 XSS vectors; sanitizer stability and fidelity (all seven article bodies round-trip byte-for-byte); CSS sanitizing and scoping; and the Sheets adapter against an in-memory **mock** of the Sheets REST API (RS256 token exchange, header-name mapping, overflow cells, re-sorted rows, conflicts, retries, rate limits, duplicate-safe appends, actionable 403/key errors, a full create→publish flow).
 
@@ -472,7 +415,7 @@ not a replacement.
 
 **Supabase (20 Oct 2026).** `npm test` includes `test/supabase.test.mjs`: configuration (service-role key required, anon/publishable keys refused, Google settings still loaded), record ↔ row mapping, database-side conflict detection, duplicate-safe inserts after a dropped connection, retries and error reporting, insert-only imports, and a create → publish → unpublish → history → audit flow. Against a **real Postgres 16 + PostgREST** (a local Supabase-equivalent with the `anon`/`authenticated`/`service_role` roles and Supabase's default grants, in Docker): the migration applies and re-applies cleanly; anon and key-less requests are refused on every table; the service role cannot delete rows or change history/audit (triggers also stop the table owner); `test/api.test.mjs` and `test/pages.test.mjs` pass on the Supabase store (44 of 45; the other test reads the JSON file directly, and the same check was confirmed in SQL); `supabase:import -- --from-sheets` copied the real spreadsheet, a rerun added nothing, and all 27 records compared field by field were identical. To repeat: set `CMS_TEST_SUPABASE_URL`, `CMS_TEST_SUPABASE_KEY` and `CMS_TEST_SUPABASE_RESET` (see `test/helpers.mjs`; use a throwaway database) and run `node --test --test-concurrency=1 test/api.test.mjs test/pages.test.mjs`.
 
-**Not yet tested (needs real credentials or access):** a hosted **Supabase project** (no project or keys were available: the migration and adapter were verified on Postgres + PostgREST, not on supabase.co); writes to **real Google Sheets** (including `sheets:setup` and `sheets:seed`; reading it was verified); real Google sign-in; a deployed Vercel/Netlify function (including the preview importing `../tools`); the deploy hook; GHL hosting. Run `npm run sheets:check` and the checklist in section 12 when credentials exist.
+**Not yet tested (needs real credentials or access):** a hosted **Supabase project** (no project or keys were available: the migration and adapter were verified on Postgres + PostgREST, not on supabase.co); real Google sign-in; a deployed Vercel/Netlify function (including the preview importing `../tools`); the deploy hook; GHL hosting. Run the checklist in section 12 when credentials exist.
 
 ## 11. GoHighLevel (GHL)
 
@@ -487,7 +430,7 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 ## 12. Go-live checklist (CMS)
 
 1. Supabase project owned by Faith Works; migration run; `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (`sb_secret_…`) set only in the CMS host's environment; no `SUPABASE_SERVICE_ROLE_KEY` left behind.
-2. `npm run supabase:import -- --from-sheets` (or `supabase:seed`) and `npm run supabase:check` pass against the production project; the spreadsheet stays shared only with the service account and the owner.
+2. `npm run supabase:seed` (or an import of a backup) and `npm run supabase:check` pass against the production project.
 3. Hosted env vars set; `/api/health` shows `"store": "supabase"`, `"configured": true` and `"supabaseKey": "secret"`; dev login unavailable.
 4. First Super Admin signs in with Google; team added under *Users and roles*; a test Author can publish their own item but cannot edit another Author’s item or open Users and roles.
 5. Website project builds with `CONTENT_SOURCE=cms`; a test publish triggers the rebuild and appears within minutes; unpublish removes it.
@@ -497,160 +440,58 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 
 ## 13. Website form submissions
 
-Every website form (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
-general contact, event notify) can send its submissions to the CMS. Super Admins see them under
-**Inbox → Form submissions**. This replaces the earlier plan of native GHL forms (docs/04, docs/06)
-for capture. GHL itself is untouched; a GHL forwarder could later be added as another delivery
-channel.
+Most website forms (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
+event notify) are **GoHighLevel embeds** (`ghlFormEmbed` in `tools/render.mjs`): GoHighLevel stores
+those submissions and handles alerts and follow-up. The general contact form still uses the site's
+own form (`js/forms.js`), which can post to the CMS; Super Admins see those under
+**Inbox → Form submissions**. The CMS sends **no email** and writes **no Google Sheet** (the Resend
+alerts, the Sheets copy, their retry job and *Retry now* were removed on 25 Oct 2026; existing rows
+keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
 
 ### 13.1 Architecture
 
 ```
- Website form (js/forms.js, any host) ── POST JSON + request id ──► CMS /api/forms/submit
-                                                                     │  validate (shared/forms.mjs),
- Netlify Forms (future, optional) ── signed webhook ──► /api/forms/netlify   classify, rate-limit
-                                                                     ▼
-                                        Supabase cms_form_submissions   ◄── canonical record
-                                                                     │  then, each with its own state:
-                                       ┌─────────────────────────────┴───────────────┐
-                                       ▼                                             ▼
-                          Team email alert (Resend)                 Copy in the Sheet's own
-                                                                    "form_submissions" tab (optional)
-          retried by netlify/functions/forms-retry.mjs (every 10 min) and by "Retry now" in the CMS
+ Website form (js/forms.js) ── POST JSON + request id ──► CMS /api/forms/submit
+ Netlify Forms (future, optional) ── signed webhook ──► /api/forms/netlify
+                                     │ validate (shared/forms.mjs), classify, rate-limit
+                                     ▼
+                     Supabase cms_form_submissions  (the record; never deleted)
 ```
 
 | Piece | Where |
 | --- | --- |
-| Form definitions (fields, options, limits), one source for the website markup and the server | `shared/forms.mjs` (used by `tools/render.mjs`) |
-| Provider adapters (the hosting boundary) | `server/forms/adapters.mjs`: `cms_endpoint` (website forms, any host), `netlify_forms` (Netlify webhook) |
-| Capture, delivery, retries, CMS operations | `server/forms/submissions.mjs` |
-| Email alert | `server/forms/notify.mjs` (Resend over HTTPS, no SDK) |
-| Sheets copy | `server/forms/sheets-mirror.mjs` (reuses `server/store/sheets-api.mjs`) |
+| Form definitions, one source for the website markup and the server | `shared/forms.mjs` (used by `tools/render.mjs`) |
+| Provider adapters | `server/forms/adapters.mjs`: `cms_endpoint` (website forms), `netlify_forms` (Netlify webhook) |
+| Capture and CMS operations | `server/forms/submissions.mjs` |
 | Dashboard screens | `public/ui/submissions.mjs` |
 | Database | `supabase/migrations/20261021000000_form_submissions.sql` |
 
-**One source of truth.** The row in `cms_form_submissions` is the submission. The email and the
-Sheets row are notifications/copies; the CMS never reads them back, so the Submissions page works
-while Resend or Google is down. Each row is keyed by provider + provider id (the browser's request
-id, reused on retries, or Netlify's submission id), so a retry, double click or webhook redelivery
-never creates a second row or a second alert.
-
-**Order of work.** Validate → store → only then email and copy. The visitor sees success as soon
-as the row is stored, never before. If email or Sheets fails, the row keeps the error
-(`notify_state` / `sheets_state` = failed, with the message), the list shows *Delivery failed*,
-and the retry job tries again (up to 6 automatic attempts; a Super Admin can always press *Retry
-now*). Resend receives the submission id as its Idempotency-Key, and the Sheets copy looks for the
-id in the tab before appending, so retries do not duplicate.
+Each row is keyed by provider + provider id (the browser's request id, reused on retries, or
+Netlify's submission id), so a retry, double click or webhook redelivery never creates a second row.
 
 ### 13.2 Security
 
 - **Public endpoint** `POST /api/forms/submit`: off until `FORMS_ALLOWED_ORIGINS` is set; accepts
-  only requests whose `Origin` is listed (CORS answers only that origin); JSON up to 64 KB; every
-  field is validated and normalised on the server against `shared/forms.mjs` (unknown fields
-  dropped, control characters removed, select values checked, lengths limited).
-- **Spam:** the honeypot field and the 2.5-second time trap are re-checked on the server. Spam is
-  stored as *Spam* (reviewable and reclassifiable), answered like a success so bots learn
-  nothing, and never emailed or copied. **Test records** (addresses at `example.com/.org/.net` or
-  `*.test`, or a name starting with "Test"/"[TEST]") are labelled *Test*, and their alert subject
-  starts with `[TEST]`.
-- **Rate limit:** `FORMS_RATE_LIMIT` (default 5) per connection per 10 minutes, counted in the
-  database with a keyed hash of the visitor's address (HMAC with `CMS_SESSION_SECRET`). The
-  address itself is never stored.
-- **Access:** Super Admins only (API-enforced: 403 for Authors, 401 without a session). The table
-  has RLS on, no policies, no privileges for `anon`/`authenticated`, and no DELETE for anyone.
-  Status and type changes go to the audit log (no personal data in the entry).
-- **Email content:** form type, the person's name, the time (Manila), the form's answers (option
-  labels; free text over 300 characters shortened), the offer and source page, and a link into the
-  CMS. Never the email address, phone or consent record: those stay behind the sign-in. Spam is
-  never emailed; tests are marked `[TEST]`.
-- **Recipient:** default recipient for every form, built in
-  (`DEFAULT_NOTIFY_TO`, server/config.mjs). `FORMS_NOTIFY_TO` replaces it only if set; an invalid
-  value switches alerts off rather than falling back.
-- **Netlify webhook:** `X-Webhook-Signature` (JWS, HS256) is verified with
-  `NETLIFY_FORMS_WEBHOOK_SECRET`, including the issuer and the SHA-256 of the exact body, before
-  anything is read. Without the secret the route answers 404.
-- **Secrets** (`RESEND_API_KEY`, `NETLIFY_FORMS_WEBHOOK_SECRET`, Supabase and Google keys) exist
-  only in the CMS host's environment. The website has none: `js/config.js` holds only the endpoint
-  URL. Logs contain submission ids and error codes, never answers or addresses.
+  only requests whose `Origin` is listed; JSON up to 64 KB; every field is validated on the server.
+- **Spam:** honeypot and 2.5-second time trap re-checked on the server; spam is stored as *Spam* and
+  answered like a success. **Test records** (`example.*`/`*.test` addresses, "[TEST]" names) are labelled *Test*.
+- **Rate limit:** `FORMS_RATE_LIMIT` (default 5) per connection per 10 minutes, counted with a keyed
+  hash of the visitor's address; the address itself is never stored.
+- **Access:** Super Admins only (API-enforced). RLS on, no policies, no DELETE for anyone. Status and
+  type changes go to the audit log (no personal data in the entry).
+- **Netlify webhook:** the JWS signature is verified with `NETLIFY_FORMS_WEBHOOK_SECRET` before
+  anything is read; without the secret the route answers 404.
 
-### 13.3 Google Sheets coexistence
+### 13.3 Setup
 
-The spreadsheet holds only the earlier CMS-content tabs (rollback store, §4a). No form, report or
-trigger tabs were found (read-only check, 20 Oct 2026). With `FORMS_SHEETS_MIRROR=true` the CMS
-writes **only** the tab named by `FORMS_SHEETS_TAB` (`form_submissions`). It creates the tab with a
-header row if it is missing. If the tab exists, its own header row is used as-is: columns are
-matched by name, extra columns are left empty, nothing is reordered or overwritten, and rows are
-only appended (values RAW). The CMS-content tabs, credentials, sharing and `sheets:*` scripts are
-unchanged. Note: `npm run sheets:check` already reported a missing `role` column on the
-`testimonials` tab before this change; that is a separate, pre-existing item (`npm run
-sheets:setup`, after a backup).
+1. Run `supabase/migrations/20261021000000_form_submissions.sql` (additive).
+2. `FORMS_ALLOWED_ORIGINS=https://<website origin>` on the CMS host (Functions scope), redeploy.
+3. In `js/config.js` set `forms.mode = "endpoint"` and `forms.endpoint = "https://<cms-domain>/api/forms/submit"`.
 
-### 13.4 Setup (needs credentials and approval)
+### 13.4 Tested
 
-1. **Database** (additive: one new table): run `supabase/migrations/20261021000000_form_submissions.sql`
-   in the Supabase SQL editor, or `supabase db push`. Check: `/api/health` shows `"forms": {…}` and
-   the Submissions page loads.
-2. **Email:** a Resend account owned by Faith Works; verify the sending domain (Resend lists the
-   SPF/DKIM DNS records to add; faithph.ai's DNS is on Cloudflare in front of GHL); create an API
-   key with *sending access* only; set `RESEND_API_KEY` and `FORMS_EMAIL_FROM`. Leave
-   `FORMS_NOTIFY_TO` empty to use the default recipient. Then send one labelled test
-   per form and confirm each alert arrives there before calling alerts live.
-3. **Sheets copy:** `FORMS_SHEETS_MIRROR=true`. The service account already has access.
-4. **Switch on the endpoint:** `FORMS_ALLOWED_ORIGINS=https://<website origin>` (staging first).
-   Set every variable in the Netlify UI with the **Functions** scope and redeploy. The retry
-   function (`netlify/functions/forms-retry.mjs`) runs on published production deploys only.
-5. **Website:** in `js/config.js` set `forms.mode = "endpoint"` and
-   `forms.endpoint = "https://<cms-domain>/api/forms/submit"`; rebuild and deploy. Send one
-   labelled test per form (`[TEST]` name, an `@example.test` address) and check the CMS, the alert
-   and the Sheets tab.
-
-| Variable (CMS host, Functions scope) | Purpose |
-| --- | --- |
-| `FORMS_ALLOWED_ORIGINS` | Website origins allowed to submit; empty = endpoint off |
-| `FORMS_RATE_LIMIT` | Per connection per 10 minutes (default 5) |
-| `RESEND_API_KEY`, `FORMS_EMAIL_FROM` | Alert sending (sender on a verified domain) |
-| `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>` | Optional overrides of the built-in recipient |
-| `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB` | Optional copy to the spreadsheet |
-| `NETLIFY_FORMS_WEBHOOK_SECRET` | Only with native Netlify Forms (§13.5) |
-
-Problems with these settings never stop the CMS. They are listed on the Submissions page (and
-counted on `/api/health`), and only the affected part stays off.
-
-### 13.5 Moving the website from Vercel to Netlify
-
-The CMS and its submission history do not move or change.
-
-- **A. Keep the website's own forms (recommended; nothing to rebuild).** Deploy the website to
-  Netlify (build `node tools/build.mjs --deploy --content=cms --view=published --out=dist`,
-  publish `dist`, `CMS_CONTENT_URL` as today; `_redirects` is already generated). Add the new
-  origin to `FORMS_ALLOWED_ORIGINS`, keeping the Vercel origin until the switch is complete. The
-  forms keep posting to the same CMS endpoint. In the new Netlify site turn *Forms → Form
-  detection* off, so Netlify does not collect them a second time.
-- **B. Native Netlify Forms.** Each form needs `data-netlify="true"`, a `name` equal to its form id
-  (`general_contact`…), a hidden `form-name` input and static markup in the built HTML (it already
-  is), and js/forms.js must post url-encoded to the page instead of JSON to the CMS. In Netlify add
-  an outgoing webhook *Form submission → https://<cms-domain>/api/forms/netlify* with a JWS
-  secret, and set the same secret as `NETLIFY_FORMS_WEBHOOK_SECRET` on the CMS. Submissions then
-  appear in the same CMS list (marked *Netlify Forms*), stored once under Netlify's id.
-  **Not built:** the markup and js/forms.js changes for B. The webhook receiver is built and tested
-  with signatures made to Netlify's documented format, not against a live Netlify site.
-
-After a move, test: one labelled submission per form, a duplicate, an alert, the Sheets row, and a
-signed-out request to `/api/submissions` (must answer 401). DNS and the production host change
-only with approval.
-
-### 13.6 Tested
-
-`npm test` (102 tests) includes `test/forms.test.mjs` and a Supabase-adapter test: the website
-renders exactly the fields the server accepts; server validation; endpoint off by default; CORS;
-storage before alerting; duplicates (one row, one email); honeypot and time-trap spam; test-record
-labelling; rate limits; Resend HTTP and network failures, the 6-attempt cap, manual retry with the
-same idempotency key; an interrupted send; a status change during a send; the database unavailable
-(no false success; the browser's retry succeeds); the Sheets copy (own tab only, existing header
-order kept, Google failure and a lost reply without duplicate rows); Netlify signatures (wrong
-secret, body, issuer) and redelivery; Super-Admin-only access; search, filters (type, Manila dates,
-status, spam/test) and audited status changes. In Chrome (local JSON store, no email key): a test
-contact submission from the built website reached the CMS list and detail screens and its status
-was changed. **Not yet tested** (needs credentials or access): the migration on the hosted
-Supabase project, a real Resend send and domain verification, writes to the real spreadsheet, the
-deployed Netlify functions including the scheduled retry, and a live Netlify Forms webhook.
+`npm test` covers the rendered fields matching the server, the GoHighLevel embeds, validation,
+endpoint off by default, CORS, storage, duplicates, spam and test labelling, rate limits, the
+database unavailable (no false success), Netlify signatures and redelivery, Super-Admin-only access,
+filters and audited status changes, and that no request goes to an email service or Google even when
+the old settings are still present.

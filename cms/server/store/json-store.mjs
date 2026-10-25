@@ -1,4 +1,4 @@
-// JSON file store: a development and test adapter with the same interface as the Sheets
+// JSON file store: a development and test adapter with the same interface as the Supabase
 // store. It is NOT the production content store. Writes are serialized in-process and the
 // file is replaced atomically (write to a temp file, then rename).
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync, copyFileSync } from "node:fs";

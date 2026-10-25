@@ -1,3 +1,11 @@
 # Staging build: keep out of search engines (brief §6). Replace at launch.
+# Link-preview crawlers may fetch pages so shared links show their title and image.
+User-agent: LinkedInBot
+User-agent: facebookexternalhit
+User-agent: Facebot
+User-agent: Twitterbot
+User-agent: Slackbot
+Allow: /
+
 User-agent: *
 Disallow: /

@@ -6,7 +6,8 @@
    8. Event Calendar (workshops)  9. Testimonial photos  10. Hero network parallax
    11. Logo strip pause  12. Testimonial carousel  13. Video (click to load) and booking
    14. Article contents (sticky sidebar)  15. Insight topic filters  16. Share this (articles)
-   17. Card pager (professionals: challenges)
+   17. Card pager (professionals: challenges)  18. Event gallery marquee
+   19. Event buttons after the event  20. Event photo slideshows
    Each module checks that its elements exist, so one file serves every page.
    Motion lives in CSS; this file adds/removes state classes, except the pointer-driven hero
    and the testimonial deck, which need per-frame values.
@@ -347,6 +348,11 @@
   if (cal) {
     var calEvents = [];
     try { calEvents = JSON.parse($("[data-cal-data]", cal).textContent) || []; } catch (err) { calEvents = []; }
+    // An event that has ended since this page was built is shown as past, without its button
+    calEvents.forEach(function (ev) {
+      if (ev.past || !ev.endsAt || !(Date.parse(ev.endsAt) <= Date.now())) return;
+      ev.past = true; ev.cta = null; ev.url = ev.pastUrl || ev.url; ev.external = /^https?:/i.test(ev.url);
+    });
     var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var pad = function (n) { return (n < 10 ? "0" : "") + n; };
@@ -989,19 +995,39 @@
     update();
   });
 
-  /* ---- 18. Event Gallery Masonry Marquee ------------------------------------ */
-  // Continuous smooth marquee loop of the 1-row masonry grid (Phase 1 + Phase 2).
-  // Automatically glides continuously without buttons or clicking.
-  // Pauses on hover or focus so photos and captions can be inspected comfortably.
-  $$("[data-mmarquee]").forEach(function (box) {
-    var track = $(".mmarquee__track", box);
-    var set = $("[data-mmarquee-set]", box);
-    if (!track || !set) return;
+  /* ---- 19. Event buttons after the event ---------------------------------- */
+  // Registration buttons carry the event's end (data-event-end, from the build). A page built
+  // before the event ended drops them once it is over; the next daily rebuild does the same on
+  // the server.
+  $$("[data-event-end]").forEach(function (btn) {
+    if (!(Date.parse(btn.getAttribute("data-event-end")) <= Date.now())) return;
+    var box = btn.parentNode;
+    btn.remove();
+    if (box && box.classList.contains("event__cta") && !box.children.length) box.remove();
+  });
 
-    // Clone the set for a seamless, continuous -50% CSS loop
-    var clone = set.cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    track.appendChild(clone);
+  /* ---- 20. Event photo slideshows ------------------------------------------- */
+  // Event cards with several photos: Previous/Next buttons (and the arrow keys while focus is in
+  // the slideshow) show one photo at a time, wrapping round; the count is announced politely.
+  $$("[data-slides]").forEach(function (box) {
+    var slides = $$("[data-slide]", box), nav = $("[data-slides-nav]", box), count = $("[data-slide-count]", box);
+    if (slides.length < 2 || !nav) return;
+    var at = 0;
+    var show = function (i) {
+      at = (i + slides.length) % slides.length;
+      slides.forEach(function (img, k) {
+        if (k === at) { img.removeAttribute("hidden"); img.removeAttribute("loading"); } else img.setAttribute("hidden", "");
+      });
+      if (count) count.textContent = (at + 1) + " / " + slides.length;
+    };
+    nav.hidden = false;
+    $("[data-slide-prev]", box).addEventListener("click", function () { show(at - 1); });
+    $("[data-slide-next]", box).addEventListener("click", function () { show(at + 1); });
+    box.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      show(at + (e.key === "ArrowLeft" ? -1 : 1));
+    });
   });
 
   window.__fwReady = true;

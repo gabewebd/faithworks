@@ -1,4 +1,4 @@
-// Reads through any store (Sheets or JSON) with records from earlier CMS versions converted to
+// Reads through any store (Supabase or JSON) with records from earlier CMS versions converted to
 // the current model (shared/schema.mjs: migrateRecord): retired statuses read as Draft, old
 // event registration options and testimonial consent fields become the new fields. Only
 // reads are converted. Nothing is rewritten in the store until someone saves the item, and
