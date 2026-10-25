@@ -33,7 +33,7 @@ const ICONS = {
   shield: "M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z", plus: "M12 5v14M5 12h14", undo: "M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3", redo: "M15 14l5-5-5-5M20 9H9a5 5 0 0 0 0 10h3",
   desktop: "M3 5h18v11H3zM8 20h8M12 16v4", mobile: "M8 3h8v18H8zM11 18h2", eye: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
   code: "M8 8l-4 4 4 4M16 8l4 4-4 4", pointer: "M5 3l14 7-6 2-2 6z", trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3", copy: "M8 8h12v12H8zM4 16V4h12",
-  up: "M12 19V5M5 12l7-7 7 7", left: "M19 12H5M12 19l-7-7 7-7", right: "M5 12h14M12 5l7 7-7 7", external: "M7 17 17 7M8 7h9v9", down: "M12 5v14M5 12l7 7 7-7", parent: "M12 19V7M6 11l6-6 6 6", menu: "M4 7h16M4 12h16M4 17h16", inbox: "M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z", rocket: "M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M14 4c4 0 6 2 6 6l-7 7-6-6zM15 9h.01",
+  up: "M12 19V5M5 12l7-7 7 7", left: "M19 12H5M12 19l-7-7 7-7", right: "M5 12h14M12 5l7 7-7 7", external: "M7 17 17 7M8 7h9v9", down: "M12 5v14M5 12l7 7 7-7", parent: "M12 19V7M6 11l6-6 6 6", menu: "M4 7h16M4 12h16M4 17h16", dots: "M5 12h.01M12 12h.01M19 12h.01", inbox: "M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z", rocket: "M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M14 4c4 0 6 2 6 6l-7 7-6-6zM15 9h.01",
 };
 export function icon(name) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -150,9 +150,9 @@ export function statusBadge(status) {
   const s = STATUSES[statusOf(status)];
   return h("span", { class: `badge badge--${s.tone}`, title: s.help || "" }, s.label);
 }
-export const liveBadge = (live) => (!live ? null : live.hidden
-  ? h("span", { class: "badge badge--yellow", title: `Version ${live.version} is published but “Show on the website” is off` }, "Hidden")
-  : h("span", { class: "badge badge--live", title: `Version ${live.version} is on the website` }, `Live · v${live.version}`));
+// Status (Draft, Published, Archived) says whether an item is on the website; this flags only
+// a published item whose “Show on the website” is off.
+export const hiddenBadge = (live) => (live?.hidden ? h("span", { class: "badge badge--yellow", title: `Version ${live.version} is published but “Show on the website” is off` }, "Hidden") : null);
 export const roleLabel = (r) => ROLES[r]?.label || r;
 export function when(iso) {
   if (!iso) return "—";

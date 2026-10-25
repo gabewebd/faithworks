@@ -21,7 +21,7 @@ test("anonymous requests reach only the public endpoints", async () => {
   const health = await anon.get("/api/health");
   assert.equal(health.status, 200);
   assert.deepEqual(Object.keys(health.data).sort(), ["configured", "forms", "ok", "store"]);
-  assert.deepEqual(Object.keys(health.data.forms).sort(), ["endpoint", "netlify", "problems"], "forms setup as booleans and a count only");
+  assert.deepEqual(Object.keys(health.data.forms).sort(), ["endpoint", "problems"], "forms setup as booleans and a count only");
   assert.equal((await anon.put("/api/submissions/sub_x", { status: "completed" })).status, 401, "PUT /api/submissions/:id needs a session");
 
   const pub = await anon.get("/api/public/content");

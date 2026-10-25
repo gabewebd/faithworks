@@ -166,6 +166,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
             ...Object.fromEntries(SUMMARY_FIELDS.map((k) => [k, r[k]])), label: labelOf(collection, r),
             live: l ? { version: l.version, slug: l.slug, hidden: l.payload?.visible === false } : null, needs_repair: !!(l && Number(r.published_version || 0) < Number(l.version)),
             can_edit: canEdit(user, collection, r),
+            actions: allowedActions(user, collection, r, { live: !!l }), // the list's per-item menu
           };
         })
         .sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at)));

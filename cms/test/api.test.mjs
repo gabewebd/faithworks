@@ -79,9 +79,9 @@ test("authors edit and publish their own content; nobody skips the version check
   assert.equal(un.status, 200, "and unpublish it");
   assert.equal(un.data.live, null);
   assert.equal(rec(un).status, "draft", "an unpublished item is a draft again");
-  // Super Admin only: deleting and managing the CMS
-  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/delete`, { version: rec(un).version })).status, 403);
+  // Super Admin only: managing the CMS (users, site settings, the activity log)
   assert.equal((await u.author.get("/api/users")).status, 403);
+  assert.equal((await u.author.get("/api/audit")).status, 403);
   assert.equal((await u.author.get("/api/records/settings/site")).status, 403);
   cleanup();
 });
@@ -92,7 +92,7 @@ test("any author edits and publishes content someone else created; each change r
   const other = u.author2;
   const view = (await other.get(`/api/records/resources/${r.id}`)).data;
   assert.equal(view.can_edit, true, "another author may edit it");
-  assert.deepEqual(view.actions, ["publish"], "and publish it, but not archive or delete it");
+  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish"], "and publish, archive or delete it");
   r = rec(await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author], summary: "Edited by a colleague" }) }));
   assert.equal(r.summary, "Edited by a colleague");
   assert.equal(r.updated_by, USERS.author2, "the editor is recorded");
@@ -110,11 +110,14 @@ test("any author edits and publishes content someone else created; each change r
   for (const [action, actor] of [["create", USERS.author], ["save", USERS.author2], ["publish", USERS.author2]]) {
     assert.ok(audit.some((a) => a.action === action && a.actor === actor && a.record_id === r.id && a.collection === "resources" && a.at), `${action} by ${actor} is in the audit log`);
   }
-  // Destructive and lifecycle actions stay with the item's owners and Super Admins
-  assert.equal((await other.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: r.version })).status, 403, "cannot unpublish it");
-  for (const a of ["archive", "delete"]) {
-    assert.equal((await other.post(`/api/records/resources/${r.id}/actions/${a}`, { version: r.version })).status, 403, a);
-  }
+  // Lifecycle actions are open to every author too
+  const un = await other.post(`/api/records/resources/${r.id}/actions/unpublish`, { version: r.version });
+  assert.equal(un.status, 200, "another author unpublishes it");
+  const ar = await other.post(`/api/records/resources/${r.id}/actions/archive`, { version: rec(un).version });
+  assert.equal(ar.status, 200, "and archives it");
+  const rs = await other.post(`/api/records/resources/${r.id}/actions/restore`, { version: rec(ar).version });
+  assert.equal(rs.status, 200, "and restores it to draft");
+  r = rec(rs);
   assert.equal((await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author2] }) })).status, 422, "cannot remove the creator from the authors");
   // Imported content (created by the importer, no authors) is editable by every author too
   const prog = (await u.author.get("/api/records/programs")).data[0];
@@ -176,7 +179,7 @@ test("publishing is one step with no approval; the live copy is separate from dr
     assert.equal((await u.super.post(`/api/records/resources/${r.id}/actions/${old}`, { version: r.version })).status, 404, `no ${old} action`);
   }
   const view = (await u.author.get(`/api/records/resources/${r.id}`)).data;
-  assert.deepEqual(view.actions.sort(), ["archive", "publish"], "a draft can be published or archived by its author");
+  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish"], "a draft can be published, archived or deleted by its author");
   const pub = await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   assert.equal(pub.status, 200);
   assert.equal(rec(pub).status, "published");
@@ -353,14 +356,14 @@ test("archive, delete and recovery", async () => {
   const { u, cleanup } = await setup();
   let r = rec(await u.super.post("/api/records/resources", { data: article() }));
   r = rec(await u.super.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version }));
-  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version })).status, 403, "authors cannot delete");
-  const del = await u.super.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version });
-  assert.equal(del.status, 200);
+  const del = await u.author.post(`/api/records/resources/${r.id}/actions/delete`, { version: r.version });
+  assert.equal(del.status, 200, "authors delete any item, even one a Super Admin created");
   const content = (await u.author.get("/api/public/content")).data;
   assert.ok(!content.resources.some((x) => x.id === r.id), "deleted items are taken offline");
   assert.ok(!(await u.super.get("/api/records/resources")).data.some((x) => x.id === r.id));
   const recovery = (await u.super.get("/api/recovery")).data;
   assert.ok(recovery.deleted.some((x) => x.id === r.id));
+  assert.equal((await u.author.post(`/api/records/resources/${r.id}/actions/undelete`, { version: rec(del).version })).status, 403, "recovering deleted items stays Super Admin only");
   const un = await u.super.post(`/api/records/resources/${r.id}/actions/undelete`, { version: rec(del).version });
   assert.equal(un.status, 200);
   // Version history and restore
@@ -454,7 +457,7 @@ test("records from the earlier workflow are read in the new model, without rewri
   assert.deepEqual([t2.status, t2.visible], ["draft", true]);
   assert.ok(!(await u.author.get("/api/public/content")).data.testimonials.length, "a live copy held back for consent stays off the website");
   const views = (await get("events", "evt_old1"));
-  assert.deepEqual(views.actions.sort(), ["archive", "publish"]);
+  assert.deepEqual(views.actions.sort(), ["archive", "delete", "publish"]);
 
   // Saving writes the new fields; the retired values stay stored
   const saved = rec(await u.author.put("/api/records/events/evt_old1", { version: 3, data: { ...e1, summary: "Now saved" } }));

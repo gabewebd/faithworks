@@ -60,13 +60,13 @@ and `cms/server/services/`). Hiding a button is never the protection.
 | Edit, preview and publish (one step), whoever created the item | any item | any item |
 | Show or hide an event or testimonial (an edit, live once published) | any item | any item |
 | Change a live page’s slug (with confirmation), restore earlier versions | any item | any item |
-| Unpublish, archive, restore to draft | any item | own items |
+| Unpublish, archive, restore to draft, delete | any item | any item |
 | Tags, site settings (including launch and tracking), activity log, website rebuild | ✓ | – |
-| Delete / undelete, recovery, backups, users and roles | ✓ | – |
+| Undelete (recovery), backups, users and roles | ✓ | – |
 
 - **Own items:** an Author owns an item they created or are listed on as an author. `created_by`
-  is set by the server only. Ownership is kept for attribution and decides who may take an item
-  off the website; it does not limit editing or publishing. The creator (or a Super Admin) manages
+  is set by the server only. Ownership is kept for attribution and the dashboard's to-do lists;
+  it does not limit any content action. The creator (or a Super Admin) manages
   the authors list; anyone else may add people and take themselves off but cannot remove anyone else.
 - **Who changed what:** every save and publish records the user (`updated_by`, `published_by`), and
   the version history and activity log (`cms_history`, `cms_audit_log`: item, user, action, time)
@@ -93,7 +93,7 @@ publisher role: any CMS user (Author or Super Admin) publishes it with one click
 - **Draft:** saved, not on the website. **Published:** on the website. **Archived:** kept for the record, off the website (*More → Restore to draft* brings it back).
 - **Show on the website** (events and testimonials): a published item with this switch off is not on the website but stays in the CMS, marked *Hidden*, so it can be shown again later. Change the switch and press **Publish**.
 - A record row is the **working copy**. What the website shows is the sanitized payload in the `published` tab.
-- Editing a live item makes it a Draft again; the website keeps showing the live version until **Publish** (which saves first). The dashboard shows "Live · v5" (or "Hidden") next to the draft's status.
+- Editing a live item makes it a Draft again; the website keeps showing the live version until **Publish** (which saves first). Lists and the editor show only the status (Draft, Published, Archived), plus "Hidden" when a published event or testimonial has "Show on the website" off; the editor notes when a draft has unpublished changes. Each row in the Programs, Events, Resources and Testimonials lists has a ⋯ menu (Edit, Preview, and the Publish / Unpublish / Archive / Restore / Delete actions the user may take now); Publish, Unpublish, Archive and Delete ask for confirmation, as in the editor.
 - **Concurrent edits:** every save sends the version it was based on. If someone saved in between, the save is refused with who and when, and nothing is overwritten. The storage layer double-checks with a per-row `write_id`.
 - **Slugs:** format-checked, unique per route type (including old slugs that now redirect). A slug made from the title gets `-2`, `-3`… when it is taken (e.g. a monthly event with the same title). Changing a live page's slug needs a confirmation. The old URL then gets a redirect page (plus a Netlify `_redirects` 301 in deploy mode).
 - Every save and publishing step is copied to `history`, and every action is recorded in `audit_log`.
@@ -354,10 +354,9 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 Optional website settings: `PUBLIC_SITE_URL` (the public site's address, no path: dashboard
 previews load images from it), `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild),
 `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`. Website form submissions (all optional; the endpoint stays
-off without `FORMS_ALLOWED_ORIGINS`): `FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT`,
-`NETLIFY_FORMS_WEBHOOK_SECRET` (§13).
+off without `FORMS_ALLOWED_ORIGINS`): `FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT` (§13).
 
-**No longer used** (removed 25 Oct 2026; delete them from the host): `GOOGLE_SHEETS_SPREADSHEET_ID`,
+**No longer used** (removed 25 Oct 2026; delete them from the host): `NETLIFY_FORMS_WEBHOOK_SECRET`, `GOOGLE_SHEETS_SPREADSHEET_ID`,
 `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`,
 `RESEND_API_KEY`, `FORMS_EMAIL_FROM`, `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>`,
 `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB`.
@@ -452,7 +451,6 @@ keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
 
 ```
  Website form (js/forms.js) ── POST JSON + request id ──► CMS /api/forms/submit
- Netlify Forms (future, optional) ── signed webhook ──► /api/forms/netlify
                                      │ validate (shared/forms.mjs), classify, rate-limit
                                      ▼
                      Supabase cms_form_submissions  (the record; never deleted)
@@ -461,13 +459,13 @@ keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
 | Piece | Where |
 | --- | --- |
 | Form definitions, one source for the website markup and the server | `shared/forms.mjs` (used by `tools/render.mjs`) |
-| Provider adapters | `server/forms/adapters.mjs`: `cms_endpoint` (website forms), `netlify_forms` (Netlify webhook) |
+| Provider adapters | `server/forms/adapters.mjs`: `cms_endpoint` (website forms). The Netlify Forms webhook was removed on 25 Oct 2026 (GoHighLevel handles those forms); older `netlify_forms` rows are kept and shown |
 | Capture and CMS operations | `server/forms/submissions.mjs` |
 | Dashboard screens | `public/ui/submissions.mjs` |
 | Database | `supabase/migrations/20261021000000_form_submissions.sql` |
 
-Each row is keyed by provider + provider id (the browser's request id, reused on retries, or
-Netlify's submission id), so a retry, double click or webhook redelivery never creates a second row.
+Each row is keyed by provider + provider id (the browser's request id, reused on retries), so a
+retry or double click never creates a second row.
 
 ### 13.2 Security
 
@@ -479,8 +477,6 @@ Netlify's submission id), so a retry, double click or webhook redelivery never c
   hash of the visitor's address; the address itself is never stored.
 - **Access:** Super Admins only (API-enforced). RLS on, no policies, no DELETE for anyone. Status and
   type changes go to the audit log (no personal data in the entry).
-- **Netlify webhook:** the JWS signature is verified with `NETLIFY_FORMS_WEBHOOK_SECRET` before
-  anything is read; without the secret the route answers 404.
 
 ### 13.3 Setup
 
@@ -492,6 +488,6 @@ Netlify's submission id), so a retry, double click or webhook redelivery never c
 
 `npm test` covers the rendered fields matching the server, the GoHighLevel embeds, validation,
 endpoint off by default, CORS, storage, duplicates, spam and test labelling, rate limits, the
-database unavailable (no false success), Netlify signatures and redelivery, Super-Admin-only access,
+database unavailable (no false success), the retired Netlify route answering 404, Super-Admin-only access,
 filters and audited status changes, and that no request goes to an email service or Google even when
 the old settings are still present.

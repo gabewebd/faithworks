@@ -183,6 +183,8 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .menu-pop { position: absolute; right: 0; top: calc(100% + 6px); background: #fff; border: 1px solid var(--line); border-radius: 10px; border-color: var(--line-2); padding: 6px; min-width: 200px; z-index: 30; }
 .menu-pop button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
 .menu-pop button:hover { background: var(--hover); } .menu-pop .danger { color: var(--red); }
+.menu-pop--fixed { position: fixed; right: auto; top: 0; min-width: 180px; box-shadow: var(--shadow); }
+.table td.row-actions { width: 1%; padding: 6px 10px; text-align: right; } .row-menu .ic { stroke-width: 3.2; }
 .history li { font-size: .86rem; }
 
 /* ---- HTML / Visual editor ---- */

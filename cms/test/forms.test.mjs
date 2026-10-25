@@ -1,11 +1,11 @@
 // Website form submissions that post to the CMS: the shared form definitions, the public endpoint
-// (validation, CORS, spam, test records, rate limits, duplicates), Netlify Forms webhooks, and the
+// (validation, CORS, spam, test records, rate limits, duplicates), the retired Netlify webhook, and the
 // Super Admin screens' API. The CMS sends no email and writes no Google Sheet: every test runs with
 // a fetch that records outbound requests and checks there are none. Every submission here is a
 // labelled test record.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { testApp, signedIn } from "./helpers.mjs";
 import { FORMS, validateAnswers } from "../shared/forms.mjs";
 import { formsConfig } from "../server/config.mjs";
@@ -230,53 +230,13 @@ test("database unavailable: the visitor gets an error (never a false success) an
   cleanup();
 });
 
-/* ---- Netlify Forms adapter ---------------------------------------------------- */
+/* ---- Retired Netlify Forms webhook ------------------------------------------- */
 
-const SECRET = "n".repeat(40);
-const jws = (raw, secret = SECRET, claims = {}) => {
-  const enc = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
-  const head = enc({ alg: "HS256", typ: "JWT" });
-  const payload = enc({ iss: "netlify", sha256: createHash("sha256").update(raw).digest("hex"), ...claims });
-  return `${head}.${payload}.${createHmac("sha256", secret).update(`${head}.${payload}`).digest("base64url")}`;
-};
-const netlifyPayload = (over = {}) => JSON.stringify({
-  id: "6720aa1b2c3d4e5f60718293", form_name: "general_contact", created_at: "2026-10-21T02:00:00.000Z",
-  data: { name: "[TEST] Netlify Person", email: "netlify@example.test", inquiry_type: "programs", message: "TEST via Netlify", ip: "198.51.100.20", referrer: "https://faithworks.netlify.app/contact/", utm_source: "ad" },
-  ...over,
-});
-const hook = (app, raw, sig) => app.handle(new Request("http://localhost/api/forms/netlify", { method: "POST", headers: { "content-type": "application/json", "x-webhook-signature": sig }, body: raw }));
-
-test("Netlify webhook: verified signatures only; stored once under Netlify's submission id", async () => {
-  const net = noOutbound();
-  const { app, cleanup } = testApp({ env: { ...ENV, NETLIFY_FORMS_WEBHOOK_SECRET: SECRET }, fetchImpl: net.fetchImpl });
-  const raw = netlifyPayload();
-  assert.equal((await hook(app, raw, jws(raw, "w".repeat(40)))).status, 401, "wrong secret");
-  assert.equal((await hook(app, raw, jws(netlifyPayload({ id: "other" })))).status, 401, "signature for a different body");
-  assert.equal((await hook(app, raw, jws(raw, SECRET, { iss: "someone" }))).status, 401, "wrong issuer");
-  assert.equal((await hook(app, raw, "")).status, 401);
+test("the Netlify Forms webhook is gone (GHL handles those forms)", async () => {
+  const { app, cleanup } = testApp({ env: { ...ENV, NETLIFY_FORMS_WEBHOOK_SECRET: "n".repeat(40) } });
+  const r = await app.handle(new Request("http://localhost/api/forms/netlify", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }));
+  assert.equal(r.status, 404);
   assert.equal((await rows(app)).length, 0);
-
-  const ok = await hook(app, raw, jws(raw));
-  assert.equal(ok.status, 200);
-  assert.equal((await hook(app, raw, jws(raw))).status, 200, "Netlify redelivery");
-  const all = await rows(app);
-  assert.equal(all.length, 1);
-  assert.equal(all[0].provider, "netlify_forms");
-  assert.equal(all[0].id, submissionId("netlify_forms", "6720aa1b2c3d4e5f60718293"));
-  assert.equal(all[0].context.source_page, "/contact/");
-  assert.equal(all[0].answers.inquiry_type, "programs");
-  assert.ok(!("ip" in all[0].answers), "Netlify's metadata is not stored as an answer");
-  assert.deepEqual(net.calls, []);
-
-  const bad = netlifyPayload({ id: "x2", form_name: "not_ours" });
-  assert.equal((await hook(app, bad, jws(bad))).status, 422);
-  cleanup();
-});
-
-test("Netlify webhook route is closed without NETLIFY_FORMS_WEBHOOK_SECRET", async () => {
-  const { app, cleanup } = testApp({ env: ENV });
-  const raw = netlifyPayload();
-  assert.equal((await hook(app, raw, jws(raw))).status, 404);
   cleanup();
 });
 

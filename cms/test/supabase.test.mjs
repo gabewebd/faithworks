@@ -140,8 +140,7 @@ test("the CMS runs on the Supabase store: create, edit, publish, unpublish, hist
   const pub = await u.author.post(`/api/records/resources/${id}/actions/publish`, { version: created.data.record.version });
   assert.equal(pub.status, 200, JSON.stringify(pub.data));
   assert.ok((await u.author.get("/api/public/content")).data.resources.some((x) => x.id === id));
-  assert.equal((await u.author2.post(`/api/records/resources/${id}/actions/unpublish`, { version: pub.data.record.version })).status, 403, "another author cannot unpublish it");
-  const un = await u.super.post(`/api/records/resources/${id}/actions/unpublish`, { version: pub.data.record.version });
+  const un = await u.author2.post(`/api/records/resources/${id}/actions/unpublish`, { version: pub.data.record.version });
   assert.equal(un.status, 200);
   assert.equal(fake.tables.cms_published.find((p) => p.record_id === id).state, "unpublished");
   assert.deepEqual((await u.author.get(`/api/records/resources/${id}/history`)).data.map((h) => h.kind).sort(), ["create", "publish", "unpublish"]);

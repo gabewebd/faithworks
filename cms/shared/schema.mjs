@@ -9,7 +9,7 @@ import { TIME_ZONES, DOC_VERSION } from "./page-doc.mjs";
 
 export const ROLES = {
   super_admin: { label: "Super Admin", rank: 2, help: "Full CMS and administrative access." },
-  author: { label: "Author", rank: 1, help: "Can create, edit and publish any content, whoever created it. Can unpublish or archive only their own items, and cannot manage users or administrative settings." },
+  author: { label: "Author", rank: 1, help: "Can create, edit, publish, unpublish, archive and delete any content, whoever created it. Cannot manage users, site settings or the activity log." },
 };
 // Any other stored role is refused at sign-in and flagged on Users and roles until a Super
 // Admin assigns a current role.

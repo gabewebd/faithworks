@@ -21,7 +21,7 @@ import { createMedia } from "./services/media.mjs";
 import { safeEqual } from "./session.mjs";
 import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
 import { createSubmissions } from "./forms/submissions.mjs";
-import { fromWebsite, fromNetlify, verifyNetlifySignature } from "./forms/adapters.mjs";
+import { fromWebsite } from "./forms/adapters.mjs";
 
 // The visitor's address as reported by the host's edge (Netlify, then Vercel, then a proxy).
 const clientIp = (request) => request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-real-ip") || (request.headers.get("x-forwarded-for") || "").split(",")[0].trim();
@@ -58,7 +58,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     const f = forms ? forms.setup() : null;
     return json({
       ok: true, store: cfg.store, configured: !cfg.errors.length, ...(cfg.store === "supabase" ? { supabaseKey: supabaseKeyKind(cfg.supabaseServiceKey) } : {}),
-      forms: f ? { endpoint: f.endpoint, netlify: f.netlify, problems: f.problems.length } : null,
+      forms: f ? { endpoint: f.endpoint, problems: f.problems.length } : null,
     });
   }, { auth: false });
 
@@ -90,17 +90,6 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
       if (cors) e.headers = cors;
       throw e;
     }
-  }, { auth: false, csrf: false });
-  // Native Netlify Forms (future): Netlify's signed "form submission" webhook.
-  route("POST", "/api/forms/netlify", async ({ request }) => {
-    if (!forms || !cfg.forms.netlifySecret) throw new HttpError(404, "Not found.", "not_found");
-    const raw = await request.text();
-    if (raw.length > 256_000) throw new HttpError(413, "The request is too large.", "too_large");
-    if (!verifyNetlifySignature(raw, request.headers.get("x-webhook-signature"), cfg.forms.netlifySecret)) throw new HttpError(401, "Invalid webhook signature.", "unauthorized");
-    let payload;
-    try { payload = JSON.parse(raw); } catch { throw new HttpError(400, "The request body is not valid JSON.", "bad_json"); }
-    const r = await forms.capture(fromNetlify(payload));
-    return json({ ok: true, id: r.id });
   }, { auth: false, csrf: false });
   route("GET", "/api/public/content", async () => {
     const { snap, stale } = await pub.published();

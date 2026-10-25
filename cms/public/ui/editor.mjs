@@ -4,10 +4,10 @@
 // Details and the page are kept consistent through explicit markers (shared/page-doc.mjs):
 // Details values are written into marked elements of the page, and the marked title and
 // summary write back to Details when they are edited in the page.
-import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, icon, skeleton, ApiError } from "./dom.mjs";
+import { h, clear, api, toast, dialog, busy, errorText, statusBadge, hiddenBadge, when, who, icon, skeleton, ApiError } from "./dom.mjs";
 import { renderField, computedField } from "./fields.mjs";
 import { createHtmlEditor } from "./html-editor.mjs";
-import { COLLECTIONS, STATUSES, blankRecord, isSuperAdmin, eventHasPage, statusOf } from "/shared/schema.mjs";
+import { COLLECTIONS, STATUSES, blankRecord, eventHasPage, statusOf } from "/shared/schema.mjs";
 import { ACTIONS } from "/shared/workflow.mjs";
 import { BINDINGS, bindingValues, upgradeRecord, readingTime, eventDuration, bylineOf, DOC_VERSION } from "/shared/page-doc.mjs";
 import { starterTemplate } from "/shared/starters.mjs";
@@ -16,6 +16,17 @@ import { starterTemplate } from "/shared/starters.mjs";
 // versions) are shown generically.
 const KINDS = { create: "Created", save: "Saved", publish: "Published", unpublish: "Unpublished", archive: "Archived", restore: "Restored to draft", delete: "Deleted", undelete: "Restored", reconcile: "Finished publishing", restore_version: "Earlier version restored" };
 export const historyKind = (k) => KINDS[k] || "Earlier workflow step";
+
+// The confirmation for a publishing action, shared by the editor and the content lists' item
+// menu. live: the item's published copy ({ version }) or null; version: the working copy's.
+export function actionConfirm(action, { live = null, version } = {}) {
+  return {
+    publish: { title: "Publish to the website?", body: live ? `Version ${version} will replace the published version ${live.version}. The website rebuilds within a few minutes.` : "This item will appear on the website after the next rebuild (usually a few minutes).", confirm: "Publish" },
+    unpublish: { title: "Take this off the website?", body: "It is removed at the next website rebuild. The content stays here as a Draft.", confirm: "Unpublish", danger: true },
+    archive: { title: "Archive this item?", body: "Archived items are kept for the record and removed from the website.", confirm: "Archive", danger: true },
+    delete: { title: "Delete this item?", body: "It disappears from the dashboard and the website. A Super Admin can restore it from Recovery.", confirm: "Delete", danger: true },
+  }[action] || null;
+}
 
 export async function editorView(app, { collection, id }) {
   const C = COLLECTIONS[collection];
@@ -236,7 +247,7 @@ export async function editorView(app, { collection, id }) {
       h("div", { class: "titlebox" },
         h("a", { class: "back", href: collection === "settings" ? "#/" : `#/c/${collection}` }, icon("left"), collection === "settings" ? "Dashboard" : C.label),
         h("h1", {}, label),
-        h("div", { class: "meta" }, isNew ? h("span", {}, "Not saved yet") : [statusBadge(rec.status), liveBadge(view.live), h("span", {}, `Version ${rec.version}`), h("span", {}, `· saved ${when(rec.updated_at)} by ${who(rec.updated_by)}`)],
+        h("div", { class: "meta" }, isNew ? h("span", {}, "Not saved yet") : [statusBadge(rec.status), hiddenBadge(view.live), h("span", {}, `Version ${rec.version}`), h("span", {}, `· saved ${when(rec.updated_at)} by ${who(rec.updated_by)}`)],
           h("span", { "data-dirty": "", hidden: true, class: "row", style: "gap:6px" }, h("span", { class: "dirty-dot" }), "Unsaved changes"))),
       h("div", { class: "row" }, buttons));
   }
@@ -246,7 +257,7 @@ export async function editorView(app, { collection, id }) {
     if (view.needs_repair) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing did not finish. "), "The website already shows the new version, but this item's status was not updated. Use “Finish publishing”."))));
     if (rec.deleted_at) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Deleted "), `${when(rec.deleted_at)} by ${who(rec.deleted_by)}. It is not on the website.`))));
     if (rec.upgraded && !isNew) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Converted to the page editor. "), "Same content; nothing changes until you save and publish."))));
-    if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "This item is live. "), `The website shows version ${view.live.version}. Changes here are a new draft; publish them to replace the live version.`))));
+    if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Unpublished changes. "), `The website shows published version ${view.live.version}. Changes here are a new draft; publish them to replace it.`))));
     if (view.live?.hidden) out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Hidden. "), "The published version has “Show on the website” turned off, so it is not on the website. Turn it on and press Publish to show it again."))));
     if (!view.can_edit && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? (view.actions.includes("restore") ? "Archived items cannot be edited. Use More… → Restore to draft to edit it again." : "Archived items cannot be edited. Its authors or a Super Admin can restore it to draft.") : "You can view this item but not edit it. Only Super Admins can change Site settings."))));
     return out;
@@ -261,8 +272,7 @@ export async function editorView(app, { collection, id }) {
         h("h3", {}, "Status"),
         h("p", {}, statusBadge(rec.status)),
         h("p", { class: "small muted" }, live?.hidden && rec.status === "published" ? "Published, with “Show on the website” turned off." : s?.help || ""),
-        live && !live.hidden ? h("p", { class: "small" }, "Live on the website: version ", h("b", {}, String(live.version)), live.url ? [" · ", h("a", { class: "icon-link", href: siteUrl(live.url), target: "_blank", rel: "noopener" }, "View", icon("external"))] : null)
-          : h("p", { class: "small muted" }, isNew ? "" : live ? `Published (version ${live.version}), but hidden from the website.` : "Not on the website."),
+        live && !live.hidden && live.url ? h("p", { class: "small" }, h("a", { class: "icon-link", href: siteUrl(live.url), target: "_blank", rel: "noopener" }, "View on the website", icon("external"))) : null,
         isNew ? null : h("dl", { class: "kv" },
           h("dt", {}, "Created"), h("dd", {}, `${when(rec.created_at)} · ${who(rec.created_by)}`),
           h("dt", {}, "Last saved"), h("dd", {}, `${when(rec.updated_at)} · ${who(rec.updated_by)}`),
@@ -272,8 +282,7 @@ export async function editorView(app, { collection, id }) {
         h("ol", { class: "small muted", style: "padding-left:18px;margin:0" },
           h("li", {}, "Save your draft as often as you like. Every save is kept in History."),
           h("li", {}, "Press Publish to put it on the website. The website rebuilds within a few minutes."),
-          ["events", "testimonials"].includes(collection) ? h("li", {}, "To take it off the website but keep it here, turn off “Show on the website” and press Publish.") : null,
-          isSuperAdmin(app.user.role) ? null : h("li", {}, "You can publish, unpublish and archive the items you created or are listed on as an author. Other items are view only."))));
+          ["events", "testimonials"].includes(collection) ? h("li", {}, "To take it off the website but keep it here, turn off “Show on the website” and press Publish.") : null)));
   }
 
   /* ---- Saving ---- */
@@ -340,7 +349,7 @@ export async function editorView(app, { collection, id }) {
   // activity log.
   async function publishNow() {
     const r = await dialog({ title: "Publish to the website?", confirm: "Publish",
-      body: view.live ? `This replaces the live version ${view.live.version}. The website rebuilds within a few minutes.` : "It appears on the website after the next rebuild (usually a few minutes)." });
+      body: view.live ? `This replaces the published version ${view.live.version}. The website rebuilds within a few minutes.` : "It appears on the website after the next rebuild (usually a few minutes)." });
     if (!r.ok) return;
     if (dirty || htmlEd?.hasVisualChanges()) { const saved = await save_({ quiet: true }); if (!saved) return; }
     if (view.record.status === "published") { toast("This version is already on the website. Change something first, then publish.", "info"); return; }
@@ -366,14 +375,9 @@ export async function editorView(app, { collection, id }) {
       if (!r.ok) return;
     }
     const label = action === "reconcile" ? "Finish publishing" : ACTIONS[action]?.label || action;
-    const confirms = {
-      publish: { title: "Publish to the website?", body: view.live ? `Version ${view.record.version} will replace the live version ${view.live.version}. The website rebuilds within a few minutes.` : "This item will appear on the website after the next rebuild (usually a few minutes).", confirm: "Publish" },
-      unpublish: { title: "Take this off the website?", body: "It is removed at the next website rebuild. The content stays here as a Draft.", confirm: "Unpublish", danger: true },
-      archive: { title: "Archive this item?", body: "Archived items are kept for the record and removed from the website.", confirm: "Archive", danger: true },
-      delete: { title: "Delete this item?", body: "It disappears from the dashboard and the website. A Super Admin can restore it from Recovery.", confirm: "Delete", danger: true },
-    };
-    if (confirms[action]) {
-      const r = await dialog(confirms[action]);
+    const confirm = actionConfirm(action, { live: view.live, version: view.record.version });
+    if (confirm) {
+      const r = await dialog(confirm);
       if (!r.ok) return;
     }
     try {
@@ -477,5 +481,11 @@ export async function editorView(app, { collection, id }) {
   root.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s" && view.can_edit) { e.preventDefault(); if (dirty || isNew || htmlEd?.hasVisualChanges()) save_(); } });
 
   render();
+  // Opened with ?preview (the content list's item menu): show the full-page preview at once,
+  // after the router has placed the page, and drop the flag so a reload opens the editor.
+  if (!isNew && new URLSearchParams(location.hash.split("?")[1] || "").has("preview")) {
+    history.replaceState(null, "", location.hash.split("?")[0]);
+    setTimeout(() => openPreview(root.querySelector("[data-preview]")), 0);
+  }
   return { el: root, isDirty: () => dirty || !!htmlEd?.hasVisualChanges() };
 }

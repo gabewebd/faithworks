@@ -59,8 +59,7 @@ export function createSubmissions({ store, cfg, audit, clock = () => Date.now() 
 
     const { answers, errors } = validateAnswers(n.form_id, n.input);
     const cls = classify(n, answers);
-    // Website submissions must be valid (the browser checks the same rules first). Netlify has
-    // already accepted its submission, so it is kept with what is valid and the problems noted.
+    // Website submissions must be valid (the browser checks the same rules first).
     if (errors.length && n.provider === "cms_endpoint" && cls.kind !== "spam") throw new HttpError(422, "Please check the highlighted fields.", "invalid", { fields: errors });
 
     const hash = ipHash(ip || n.ip);
@@ -138,7 +137,7 @@ export function createSubmissions({ store, cfg, audit, clock = () => Date.now() 
   }
 
   function setup() {
-    return { endpoint: f.allowedOrigins.length > 0, netlify: !!f.netlifySecret, problems: f.problems };
+    return { endpoint: f.allowedOrigins.length > 0, problems: f.problems };
   }
 
   return { capture, list, get, update, setup, enabled: () => f.allowedOrigins.length > 0 };

@@ -3,26 +3,25 @@
 import { isSuperAdmin, normalizeRole } from "./schema.mjs";
 
 // who: "editor" = every CMS user (Authors and Super Admins), whoever created the item;
-// "owner" = the item's owners and Super Admins; "admin" = Super Admins only.
-// Publishing is one step: there is no review or approval role.
+// "admin" = Super Admins only. Publishing is one step: there is no review or approval role.
 export const ACTIONS = {
   publish: { label: "Publish", from: ["draft"], to: "published", who: "editor", confirm: true },
-  unpublish: { label: "Unpublish", from: null, to: "draft", who: "owner", live: true, confirm: true },
-  archive: { label: "Archive", from: ["draft", "published"], to: "archived", who: "owner", confirm: true },
-  restore: { label: "Restore to draft", from: ["archived"], to: "draft", who: "owner" },
-  delete: { label: "Delete", from: null, to: null, who: "admin", confirm: true },
+  unpublish: { label: "Unpublish", from: null, to: "draft", who: "editor", live: true, confirm: true },
+  archive: { label: "Archive", from: ["draft", "published"], to: "archived", who: "editor", confirm: true },
+  restore: { label: "Restore to draft", from: ["archived"], to: "draft", who: "editor" },
+  delete: { label: "Delete", from: null, to: null, who: "editor", confirm: true },
 };
 
-// Two roles. Super Admins create, edit and publish any content and manage the CMS itself:
-// users and roles, site settings, tags, deleting and restoring items, recovery and backup.
-// Authors create content and edit and publish any content item, whoever created it; unpublishing,
-// archiving and restoring stay with the item's owners (and Super Admins). Every change records
-// who made it (updated_by, published_by, the audit log and version history).
+// Two roles. Authors and Super Admins have the same content actions on every content item,
+// whoever created it: create, edit, publish, unpublish, archive, restore to draft and delete.
+// Super Admins also manage the CMS itself: users and roles, site settings, tags, the activity
+// log, recovering deleted items, and backup. Every change records who made it (updated_by,
+// published_by, the audit log and version history).
 
 // An item's owners: whoever created it and the people listed as its authors. created_by is
 // set by the server only, and Authors cannot remove other people from `authors`
-// (server/services/records.mjs). Ownership is kept for attribution and for taking an item off
-// the website; it does not limit who may edit or publish.
+// (server/services/records.mjs). Ownership is kept for attribution and the dashboard's to-do
+// lists; it does not limit who may change an item.
 export function isOwner(user, rec) {
   return rec.created_by === user.email || (Array.isArray(rec.authors) && rec.authors.includes(user.email));
 }
@@ -34,7 +33,8 @@ export function canEditContent(user, collection) {
   return !!normalizeRole(user.role);
 }
 
-// May this user take this item off the website or change its lifecycle (unpublish, archive, restore)?
+// Is this item on this user's to-do lists (the dashboard's overdue reviews)? Its owners and
+// Super Admins.
 export function canManage(user, collection, rec) {
   if (collection === "settings") return isSuperAdmin(user.role);
   return isSuperAdmin(user.role) || isOwner(user, rec);
@@ -56,11 +56,9 @@ export function allowedActions(user, collection, rec, { live = false } = {}) {
   const out = [];
   if (rec.deleted_at) return isSuperAdmin(user.role) ? ["undelete"] : [];
   const admin = isSuperAdmin(user.role);
-  const manage = canManage(user, collection, rec);
   const edit = canEditContent(user, collection);
   for (const [name, a] of Object.entries(ACTIONS)) {
     if (a.who === "admin" && !admin) continue;
-    if (a.who === "owner" && !manage) continue;
     if (a.who === "editor" && !edit) continue;
     if (a.live && !live) continue;
     if (a.from && !a.from.includes(rec.status)) continue;

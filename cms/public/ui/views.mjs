@@ -1,8 +1,9 @@
 // Dashboard, content lists and admin screens (tags, users, activity, recovery).
-import { h, clear, api, toast, dialog, busy, errorText, statusBadge, liveBadge, when, who, roleLabel, icon, skeleton } from "./dom.mjs";
+import { h, clear, api, toast, dialog, busy, errorText, statusBadge, hiddenBadge, when, who, roleLabel, icon, skeleton } from "./dom.mjs";
 import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin } from "/shared/schema.mjs";
 import { assetUrl } from "./fields.mjs";
-import { historyKind } from "./editor.mjs";
+import { historyKind, actionConfirm } from "./editor.mjs";
+import { ACTIONS } from "/shared/workflow.mjs";
 
 // Activity rows: content steps in plain words (steps of the retired workflow shown generically);
 // account and settings actions (sign_in, user_save…) as recorded.
@@ -24,7 +25,7 @@ export async function dashboardView(app) {
     const n = d.counts[c] || {};
     const total = Object.entries(n).filter(([k]) => k !== "live").reduce((a, [, v]) => a + v, 0);
     return h("a", { class: "card stat", href: `#/c/${c}` }, h("h3", { class: "row" }, icon(icons[c]), COLLECTIONS[c].label), h("p", { class: "num" }, String(total)),
-      h("div", { class: "row" }, n.live ? h("span", { class: "badge badge--live" }, `${n.live} live`) : null, n.hidden ? h("span", { class: "badge badge--yellow" }, `${n.hidden} hidden`) : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
+      h("div", { class: "row" }, n.published ? h("span", { class: "badge badge--green" }, `${n.published} published`) : null, n.hidden ? h("span", { class: "badge badge--yellow" }, `${n.hidden} hidden`) : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
   });
   const itemList = (items, empty) => items.length
     ? h("ul", { class: "list" }, items.map((r) => h("li", {}, statusBadge(r.status), h("div", {}, link(r.collection, r.id, r.label), h("div", { class: "small muted" }, `${COLLECTIONS[r.collection].singular} · ${when(r.updated_at)} by ${who(r.updated_by)}`)))))
@@ -48,7 +49,7 @@ export async function listView(app, { collection }) {
   const tags = await api("GET", "/api/tags").catch(() => []);
   const q = h("input", { class: "input", type: "search", placeholder: `Search ${C.label.toLowerCase()}…`, "aria-label": "Search" });
   const params = new URLSearchParams(location.hash.split("?")[1] || "");
-  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, { value: "live", label: "Live on the website" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
+  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
   const tagged = C.fields.some((fd) => fd.type === "tags");
   const tag = selectBox({ label: "Filter by tag", value: params.get("tag") || "", searchable: true, onChange: () => load(), options: [{ value: "", label: "All tags" }, ...tags.filter((t) => !t.archived).map((t) => ({ value: t.id, label: t.label }))] });
   const body = h("div", { class: "list-body" }, skeleton("table"));
@@ -61,19 +62,69 @@ export async function listView(app, { collection }) {
     try {
       const rows = await api("GET", `/api/records/${collection}?${qs}`);
       clear(body, rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
-        h("thead", {}, h("tr", {}, h("th", {}, "Title"), h("th", {}, "Status"), h("th", {}, "Website"), h("th", {}, "Authors"), h("th", {}, "Last saved"))),
+        h("thead", {}, h("tr", {}, h("th", {}, "Title"), h("th", {}, "Status"), h("th", {}, "Authors"), h("th", {}, "Last saved"), h("th", {}, h("span", { class: "sr-only" }, "Actions")))),
         h("tbody", {}, rows.map((r) => {
-          const tr = h("tr", { onclick: (e) => { if (!e.target.closest("a")) location.hash = `#/c/${collection}/${encodeURIComponent(r.id)}`; } },
+          const tr = h("tr", { onclick: (e) => { if (!e.target.closest("a, .menu-wrap")) location.hash = `#/c/${collection}/${encodeURIComponent(r.id)}`; } },
             h("td", { class: "title" }, h("div", { class: "row", style: "gap:10px;flex-wrap:nowrap" }, thumb(r), h("div", {}, link(collection, r.id, r.label || "(untitled)"), r.can_edit || r.status === "archived" ? null : h("span", { class: "badge badge--stone", title: "Only its authors and Super Admins can change this item" }, "View only"), subline(r), tagged && (r.tags || []).length ? h("div", {}, r.tags.map((t) => h("span", { class: "tag" }, tags.find((x) => x.id === t)?.label || t))) : null))),
-            h("td", {}, statusBadge(r.status)),
-            h("td", {}, r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : liveBadge(r.live) || h("span", { class: "muted small" }, "Not live")),
+            h("td", {}, h("div", { class: "row", style: "gap:6px" }, statusBadge(r.status), r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : hiddenBadge(r.live))),
             h("td", { class: "small" }, r.byline || r.content_owner || h("span", { class: "muted" }, "—")),
-            h("td", { class: "small muted" }, `${when(r.updated_at)} · ${who(r.updated_by)}`));
+            h("td", { class: "small muted" }, `${when(r.updated_at)} · ${who(r.updated_by)}`),
+            h("td", { class: "row-actions" }, itemMenu(r)));
           return tr;
         }))))
         : h("div", { class: "card empty" }, h("h3", {}, q.value || status.get() || tag.get() ? "Nothing matches these filters" : `No ${C.label.toLowerCase()} yet`), h("p", {}, q.value || status.get() || tag.get() ? "Try clearing the search or filters." : `Create the first ${C.singular.toLowerCase()} with the New button.`)));
     } catch (e) { clear(body, h("div", { class: "alert alert--error" }, h("div", {}, errorText(e)))); }
     body.removeAttribute("aria-busy");
+  }
+  // The three-dot menu on each row: the actions the server allows for this item now (r.actions),
+  // plus Edit and Preview. Publish, Unpublish, Archive and Delete ask first, as in the editor.
+  const previewable = C.route !== null || collection === "testimonials";
+  const ROW_ACTIONS = ["publish", "unpublish", "archive", "restore", "delete"];
+  function itemMenu(r) {
+    const href = `#/c/${collection}/${encodeURIComponent(r.id)}`;
+    const items = [
+      [r.can_edit ? "Edit" : "Open", () => { location.hash = href; }],
+      previewable ? ["Preview", () => { location.hash = `${href}?preview`; }] : null,
+      ...ROW_ACTIONS.filter((a) => (r.actions || []).includes(a)).map((a) => [ACTIONS[a].label, () => rowAction(r, a), ["unpublish", "archive", "delete"].includes(a)]),
+    ].filter(Boolean);
+    const toggle = h("button", { class: "btn btn--ghost btn--sm row-menu", type: "button", "aria-haspopup": "menu", "aria-expanded": "false", "aria-label": `Actions for ${r.label || "this item"}`, title: "Actions" }, icon("dots"));
+    const pop = h("div", { class: "menu-pop menu-pop--fixed", hidden: true, role: "menu" }, items.map(([label, run, danger]) =>
+      h("button", { type: "button", role: "menuitem", class: danger ? "danger" : "", onclick: () => { close(); run(); } }, label)));
+    const outside = (e) => { if (!toggle.contains(e.target) && !pop.contains(e.target)) close(); };
+    const key = (e) => { if (e.key === "Escape") { close(); toggle.focus(); } };
+    function close() {
+      if (pop.hidden) return;
+      pop.hidden = true; toggle.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", outside, true); document.removeEventListener("keydown", key); window.removeEventListener("scroll", close, true); window.removeEventListener("resize", close); document.removeEventListener("cms:menu", close);
+    }
+    function open() {
+      document.dispatchEvent(new CustomEvent("cms:menu")); // one item menu open at a time
+      pop.hidden = false; toggle.setAttribute("aria-expanded", "true");
+      // Fixed to the viewport, so the table's scroll box never clips it; opens upwards near the bottom.
+      const b = toggle.getBoundingClientRect(), m = pop.getBoundingClientRect();
+      pop.style.left = `${Math.max(8, b.right - m.width)}px`;
+      pop.style.top = `${b.bottom + 6 + m.height > innerHeight ? Math.max(8, b.top - 6 - m.height) : b.bottom + 6}px`;
+      document.addEventListener("click", outside, true); document.addEventListener("keydown", key); window.addEventListener("scroll", close, true); window.addEventListener("resize", close);
+      document.addEventListener("cms:menu", close, { once: true });
+      pop.querySelector("button")?.focus();
+    }
+    toggle.addEventListener("click", () => (pop.hidden ? open() : close()));
+    return h("div", { class: "menu-wrap" }, toggle, pop);
+  }
+  async function rowAction(r, action) {
+    const confirm = actionConfirm(action, { live: r.live, version: r.version });
+    if (confirm && !(await dialog(confirm)).ok) return;
+    try {
+      const res = await api("POST", `/api/records/${collection}/${encodeURIComponent(r.id)}/actions/${action}`, { version: r.version });
+      if (res.warning) toast(res.warning, "warn", 0);
+      else toast(`${ACTIONS[action].label}: done.`, "ok");
+      if (res.deploy) toast(res.deploy.triggered ? "Website rebuild started. Changes appear in a few minutes." : res.deploy.error || res.deploy.reason, res.deploy.error ? "error" : "info", 8000);
+      app.refreshCounts();
+    } catch (e) {
+      // Publishing checks every required field: the editor shows which ones need fixing.
+      toast(e.status === 422 ? `${errorText(e)} Open the item to see which fields.` : errorText(e), "error");
+    }
+    load();
   }
   // Testimonials: the photo (or a plain Faith Pink disc) beside the name, and the role under it.
   // Events: the date. Card colours are not stored: the website picks them by position.

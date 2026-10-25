@@ -78,11 +78,9 @@ export function formsConfig(env = process.env) {
   if (badOrigins.length) problems.push("FORMS_ALLOWED_ORIGINS must list origins like https://faithph.ai (https, no path).");
   const f = {
     allowedOrigins: allowedOrigins.filter((o) => !badOrigins.includes(o)),
-    netlifySecret: (env.NETLIFY_FORMS_WEBHOOK_SECRET || "").trim(),
     rateLimit: Math.min(Math.max(Number(env.FORMS_RATE_LIMIT) || 5, 1), 100),
     problems,
   };
-  if (f.netlifySecret && f.netlifySecret.length < 32) problems.push("NETLIFY_FORMS_WEBHOOK_SECRET must be at least 32 random characters.");
   return f;
 }
 
