@@ -88,10 +88,11 @@ export async function loadSnapshot({ root, source = "fixtures", view = "auto", a
     }
   } else throw new Error(`Unknown content source "${source}" (use fixtures, local or cms).`);
 
-  // TEMPORARY: the public site shows the static programs (cms/fixtures/seed.json), whatever the
+  // TEMPORARY: the public site shows the static programs (cms/shared/static-programs.json, copied
+  // from cms/fixtures/seed.json, which .vercelignore keeps off Vercel), whatever the
   // content source, while the CMS programs feed is sorted out. The CMS Programs dashboard and
   // its page preview are unaffected. Remove this block to render programs from the CMS again.
-  if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: readJson(join(root, "cms/fixtures/seed.json")).programs }, view: "preview" }).programs };
+  if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: readJson(join(root, "cms/shared/static-programs.json")) }, view: "preview" }).programs };
 
   const problems = checkSnapshot(snap);
   if (problems.length) throw new Error(`Content snapshot is not usable: ${problems.join(" ")}`);
