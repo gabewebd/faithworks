@@ -1,4 +1,7 @@
-[
+// TEMPORARY: the programs the public site shows (copied from cms/fixtures/seed.json) while the CMS
+// programs feed is sorted out. Hardcoded as a module, not read from a JSON file at runtime, so the
+// Vercel config bundle (vercel.mjs) carries it too. See loadSnapshot in tools/content.mjs.
+export const STATIC_PROGRAMS = [
   {
     "id": "prg_aa723f5b38",
     "status": "draft",
@@ -366,4 +369,4 @@
     "sort_order": 40,
     "tags": []
   }
-]
+];

@@ -21,6 +21,7 @@ import { upgradeRecord, extractList, extractText, readingTime, featuredImage, by
 import { eventHasPage } from "../cms/shared/schema.mjs";
 import { resolveImage } from "./gallery.mjs";
 import { eventGalleryEntries } from "./event-gallery.mjs";
+import { STATIC_PROGRAMS } from "../cms/shared/static-programs.mjs";
 
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 
@@ -88,11 +89,12 @@ export async function loadSnapshot({ root, source = "fixtures", view = "auto", a
     }
   } else throw new Error(`Unknown content source "${source}" (use fixtures, local or cms).`);
 
-  // TEMPORARY: the public site shows the static programs (cms/shared/static-programs.json, copied
-  // from cms/fixtures/seed.json, which .vercelignore keeps off Vercel), whatever the
-  // content source, while the CMS programs feed is sorted out. The CMS Programs dashboard and
-  // its page preview are unaffected. Remove this block to render programs from the CMS again.
-  if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: readJson(join(root, "cms/shared/static-programs.json")) }, view: "preview" }).programs };
+  // TEMPORARY: the public site shows the hardcoded programs (cms/shared/static-programs.mjs),
+  // whatever the content source, while the CMS programs feed is sorted out. Imported, not read
+  // from disk, because Vercel bundles vercel.mjs into .vercel/ where relative file paths break.
+  // The CMS Programs dashboard and its page preview are unaffected. Remove this block to render
+  // programs from the CMS again.
+  if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: STATIC_PROGRAMS }, view: "preview" }).programs };
 
   const problems = checkSnapshot(snap);
   if (problems.length) throw new Error(`Content snapshot is not usable: ${problems.join(" ")}`);
