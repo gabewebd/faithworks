@@ -112,7 +112,7 @@ const settings = record("settings", {
   brand: site.brand, logo_url: "/assets/icons/wordmark.svg", logo_reversed_url: "/assets/icons/wordmark-reversed.svg",
   contact_email: site.contactEmail, response_time: site.responseTime, social: site.social,
   community_name: site.community?.name, community_url: site.community?.url,
-  primary_cta_label: "Start Your AI Journey", primary_cta_url: "/free-ai-starter-kit/",
+  primary_cta_label: "Start Your AI Journey", primary_cta_url: "/start-your-ai-journey/",
   footer_tagline: "Work better with AI, without becoming a tech expert.", footer_motto: "Learn. Implement. Scale.",
   privacy_url: "/privacy/", terms_url: "/terms/", origin: site.origin, staging: site.staging, starter_kit_ready: site.starterKitReady,
 }, { id: "site", status: "published" }); // URLs need verification before launch (docs/02)

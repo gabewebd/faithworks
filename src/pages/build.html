@@ -18,81 +18,271 @@
       </div>
     </section>
 
-    <section class="section wrap" id="use-cases" aria-labelledby="uc-title">
-      <div class="section-head">
-        <h2 id="uc-title">Practical use cases</h2>
-        <p>Illustrative examples of the kind of work people learn to support with AI. They describe a way of working, not results from a specific customer.</p>
+    <!-- Use cases, kinds of build and Faith AI share one visual system (css/build.css, every class bw-):
+         flat brand colours on solid grounds, cards on one grid, and three markers that always mean
+         the same thing: the AI chip (what AI helps to do), the person seal (what a person checks), the filled square (the output). Accents: Faith Pink leads the use cases, AI Yellow leads Faith AI. -->
+    <link rel="stylesheet" href="/css/build.css?v=12">
+
+    <!-- USE CASES: a scroll story on solid Soft Charcoal; the output frame is the
+         homepage example card (.fcard, its glow and grid in .fcard__art, style.css).
+         Left, the four cases (title, task, the facts in its <dl>); right, the output of each, an
+         illustrative interface (role="img"). js/motion.js (§5d) adds .is-live on wide, tall screens:
+         the output stage stays put while the cases scroll past, and the one at the centre of the
+         screen is the one shown. Without it (small screens, reduced motion, no script) each case is
+         followed by its own output, so every illustration is always reachable. -->
+    <section class="bw-uses" id="use-cases" aria-labelledby="uc-title">
+      <div class="bw-head" data-reveal>
+        <h2 id="uc-title" class="bw-head__title">Practical use cases</h2>
+        <p class="bw-head__intro">Illustrative examples of the kind of work people learn to support with AI. They describe a way of working, not results from a specific customer.</p>
+        <p class="bw-key" aria-hidden="true">
+          <span class="bw-key__item"><span class="bw-mark bw-mark--ai">AI</span>AI helps to</span>
+          <span class="bw-key__item"><span class="bw-mark bw-mark--person"></span>A person checks</span>
+          <span class="bw-key__item"><span class="bw-mark bw-mark--out"></span>The output</span>
+        </p>
       </div>
-      <div class="usecases" role="table" aria-label="Use cases: the task, what AI does, what a person checks and the output">
-        <div class="usecases__row usecases__row--head" role="row">
-          <span role="columnheader">The task</span><span role="columnheader">AI helps to</span><span role="columnheader">A person checks</span><span role="columnheader">The output</span>
+
+      <div class="bw-story" data-story>
+        <div class="bw-story__steps">
+          <span class="bw-story__rail" aria-hidden="true"><i data-story-rail></i></span>
+
+          <!-- 1 · Content planning -->
+          <article class="bw-story__step" aria-labelledby="uc-plan" data-story-step>
+            <span class="bw-story__num" aria-hidden="true">01</span>
+            <h3 id="uc-plan" class="bw-case__title">Content planning</h3>
+            <p class="bw-case__task">Turn a topic into a month of useful posts.</p>
+            <dl class="bw-flow">
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--ai" aria-hidden="true">AI</span>AI helps to</dt><dd>Draft angles from your approved notes.</dd></div>
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--person" aria-hidden="true"></span>A person checks</dt><dd>Accuracy, voice and every claim.</dd></div>
+              <div class="bw-flow__step bw-flow__step--out"><dt><span class="bw-mark bw-mark--out" aria-hidden="true"></span>The output</dt><dd>A reviewed content plan.</dd></div>
+            </dl>
+          </article>
+
+          <!-- 2 · Lead follow-up -->
+          <article class="bw-story__step" aria-labelledby="uc-lead" data-story-step>
+            <span class="bw-story__num" aria-hidden="true">02</span>
+            <h3 id="uc-lead" class="bw-case__title">Lead follow-up</h3>
+            <p class="bw-case__task">Reply to every inquiry consistently.</p>
+            <dl class="bw-flow">
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--ai" aria-hidden="true">AI</span>AI helps to</dt><dd>Summarize the inquiry and draft a next step.</dd></div>
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--person" aria-hidden="true"></span>A person checks</dt><dd>Permission, pricing and context before sending.</dd></div>
+              <div class="bw-flow__step bw-flow__step--out"><dt><span class="bw-mark bw-mark--out" aria-hidden="true"></span>The output</dt><dd>A follow-up you approve.</dd></div>
+            </dl>
+          </article>
+
+          <!-- 3 · Team knowledge -->
+          <article class="bw-story__step" aria-labelledby="uc-know" data-story-step>
+            <span class="bw-story__num" aria-hidden="true">03</span>
+            <h3 id="uc-know" class="bw-case__title">Team knowledge</h3>
+            <p class="bw-case__task">Help people find the right answer.</p>
+            <dl class="bw-flow">
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--ai" aria-hidden="true">AI</span>AI helps to</dt><dd>Draft an answer with its source reference.</dd></div>
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--person" aria-hidden="true"></span>A person checks</dt><dd>Source permissions and when to escalate.</dd></div>
+              <div class="bw-flow__step bw-flow__step--out"><dt><span class="bw-mark bw-mark--out" aria-hidden="true"></span>The output</dt><dd>An internal answer guide.</dd></div>
+            </dl>
+          </article>
+
+          <!-- 4 · A simple web presence -->
+          <article class="bw-story__step" aria-labelledby="uc-web" data-story-step>
+            <span class="bw-story__num" aria-hidden="true">04</span>
+            <h3 id="uc-web" class="bw-case__title">A simple web presence</h3>
+            <p class="bw-case__task">Explain one offer clearly.</p>
+            <dl class="bw-flow">
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--ai" aria-hidden="true">AI</span>AI helps to</dt><dd>Draft the page structure and first copy.</dd></div>
+              <div class="bw-flow__step"><dt><span class="bw-mark bw-mark--person" aria-hidden="true"></span>A person checks</dt><dd>Facts, accessibility and privacy.</dd></div>
+              <div class="bw-flow__step bw-flow__step--out"><dt><span class="bw-mark bw-mark--out" aria-hidden="true"></span>The output</dt><dd>A first landing page to test.</dd></div>
+            </dl>
+          </article>
         </div>
-        <div class="usecases__row" role="row">
-          <span role="cell"><b>Content planning</b>Turn a topic into a month of useful posts.</span>
-          <span role="cell">Draft angles from your approved notes.</span>
-          <span role="cell">Accuracy, voice and every claim.</span>
-          <span role="cell">A reviewed content plan.</span>
-        </div>
-        <div class="usecases__row" role="row">
-          <span role="cell"><b>Lead follow-up</b>Reply to every inquiry consistently.</span>
-          <span role="cell">Summarize the inquiry and draft a next step.</span>
-          <span role="cell">Permission, pricing and context before sending.</span>
-          <span role="cell">A follow-up you approve.</span>
-        </div>
-        <div class="usecases__row" role="row">
-          <span role="cell"><b>Team knowledge</b>Help people find the right answer.</span>
-          <span role="cell">Draft an answer with its source reference.</span>
-          <span role="cell">Source permissions and when to escalate.</span>
-          <span role="cell">An internal answer guide.</span>
-        </div>
-        <div class="usecases__row" role="row">
-          <span role="cell"><b>A simple web presence</b>Explain one offer clearly.</span>
-          <span role="cell">Draft the page structure and first copy.</span>
-          <span role="cell">Facts, accessibility and privacy.</span>
-          <span role="cell">A first landing page to test.</span>
+
+        <!-- The output stage: one frame, the four outputs stacked in it, the shown one in step with the case -->
+        <div class="bw-story__stage">
+          <div class="bw-story__frame fcard" data-story-frame>
+            <div class="bw-story__bar" aria-hidden="true">
+              <span class="bw-story__label"><span class="bw-mark bw-mark--out"></span>The output</span>
+              <span class="bw-story__count"><b data-story-count>01</b> / 04</span>
+            </div>
+            <div class="bw-story__arts fcard__art">
+              <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: a month content calendar drafted from approved notes, with each post marked for review." data-story-art>
+                <div class="bw-cal">
+                  <div class="bw-cal__source"><span class="bw-mark bw-mark--ai">AI</span><span><b>Approved notes</b><small>Your topic, your sources</small></span></div>
+                  <div class="bw-cal__sheet">
+                    <div class="bw-cal__bar"><b>Content plan</b><span class="bw-tag">Draft</span><span class="bw-tag bw-tag--done">Reviewed</span></div>
+                    <div class="bw-cal__days"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span></div>
+                    <div class="bw-cal__grid">
+                      <span class="is-post">Audience question</span><span></span><span class="is-post is-checked">Practical how-to</span><span></span><span class="is-post">Real example</span>
+                      <span></span><span class="is-post is-checked">Real example</span><span></span><span class="is-post">Audience question</span><span></span>
+                      <span class="is-post is-checked">Practical how-to</span><span></span><span class="is-post">Audience question</span><span></span><span class="is-post is-checked">Real example</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: an inquiry inbox, an AI summary of one inquiry, and a drafted reply waiting for a person to check permission, pricing and context before it is sent." data-story-art>
+                <div class="bw-inbox">
+                  <div class="bw-inbox__list">
+                    <p class="bw-inbox__label">Inquiries</p>
+                    <span class="bw-inbox__row"><i></i><b>New inquiry</b><span class="bw-tag">New</span></span>
+                    <span class="bw-inbox__row is-open"><i></i><b>Workshop question</b><span class="bw-tag bw-tag--pink">Follow up</span></span>
+                    <span class="bw-inbox__row"><i></i><b>Team proposal</b><span class="bw-tag bw-tag--done">Done</span></span>
+                  </div>
+                  <div class="bw-inbox__work">
+                    <div class="bw-inbox__summary"><span class="bw-mark bw-mark--ai">AI</span><span><b>Summary</b><span class="bw-lines"><i></i><i></i></span></span></div>
+                    <div class="bw-inbox__draft">
+                      <p class="bw-inbox__label">Draft next step</p>
+                      <span class="bw-checks"><span><i></i>Permission</span><span><i></i>Pricing</span><span><i></i>Context</span></span>
+                      <span class="bw-inbox__send"><span class="bw-mark bw-mark--person"></span>Waiting for your approval</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: a team member searches internal notes; a drafted answer shows its source reference and a point to escalate to a person." data-story-art>
+                <div class="bw-ask">
+                  <div class="bw-ask__search"><span class="bw-ask__glass"></span><span class="bw-ask__q">How do we onboard a new client?</span></div>
+                  <div class="bw-ask__answer">
+                    <span class="bw-mark bw-mark--ai">AI</span>
+                    <span class="bw-ask__body">
+                      <b>Draft answer</b>
+                      <span class="bw-lines bw-lines--long"><i></i><i></i><i></i></span>
+                      <span class="bw-ask__refs"><span class="bw-ask__src">Source: onboarding guide</span><span class="bw-ask__esc"><span class="bw-mark bw-mark--person"></span>Unsure? Ask a person</span></span>
+                    </span>
+                  </div>
+                  <div class="bw-ask__docs"><span>Team handbook</span><span class="is-hit">Onboarding guide</span><span>Service notes</span></div>
+                </div>
+              </div>
+
+              <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: a first landing page in a browser window, with its facts, accessibility and privacy checked before it is tested." data-story-art>
+                <div class="bw-site">
+                  <div class="bw-site__bar"><i></i><i></i><i></i><span>your-first-version</span></div>
+                  <div class="bw-site__page">
+                    <span class="bw-site__nav"><i></i><i></i><i></i></span>
+                    <span class="bw-site__hero"><b></b><b class="is-short"></b><span class="bw-lines"><i></i><i></i></span><em></em></span>
+                    <span class="bw-site__shape"></span>
+                  </div>
+                  <div class="bw-site__checks"><span><i></i>Facts</span><span><i></i>Accessibility</span><span><i></i>Privacy</span></div>
+                </div>
+              </div>
+            </div>
+            <span class="bw-story__progress" aria-hidden="true"><i data-story-seg></i><i data-story-seg></i><i data-story-seg></i><i data-story-seg></i></span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section band band--stone" aria-labelledby="kinds-title">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="kinds-title">Know what you are looking at</h2>
-          <p>We label every build clearly, so you know what it is, who supports it, and what it is not.</p>
-        </div>
-        <div class="kinds">
-          <article class="kinds__item">
-            <h3>Training projects</h3>
-            <p>Built by you during a program, with guidance. Yours to keep and improve. Not maintained or supported by Faith Works after the program.</p>
-            <a class="text-link" href="/learn/">Explore programs <span class="link-arrow" aria-hidden="true">↗</span></a>
-          </article>
-          <article class="kinds__item">
-            <h3>Demonstrations</h3>
-            <p>Shown in sessions and on this site to explain what is possible. Examples to learn from, not products for sale as shown.</p>
-            <a class="text-link" href="#use-cases">See the use cases <span class="link-arrow" aria-hidden="true">↗</span></a>
-          </article>
-          <article class="kinds__item kinds__item--ink">
-            <h3>Supported products</h3>
-            <p>Systems that are set up and supported for a business. Under Faith AI, this scope is still being confirmed, so we start with a conversation about your use case.</p>
-            <a class="text-link" href="#faith-ai">About Faith AI <span class="link-arrow" aria-hidden="true">↗</span></a>
-          </article>
-        </div>
+    <!-- KINDS OF BUILD: three equal cards that gain weight as support grows: an outline on
+         Works White (yours), white (shown to learn from), Charcoal (supported). The meter repeats
+         that order; the cues are phrases from each description. -->
+    <section class="bw-kinds band--gradient-textured" aria-labelledby="kinds-title">
+      <div class="bw-head" data-reveal>
+        <h2 id="kinds-title" class="bw-head__title">Know what you are looking at</h2>
+        <p class="bw-head__intro">We label every build clearly, so you know what it is, who supports it, and what it is not.</p>
       </div>
+      <ul class="bw-kinds__list" data-reveal>
+        <li class="bw-kind bw-kind--train">
+          <span class="bw-kind__meter" aria-hidden="true"><i></i><i></i><i></i></span>
+          <h3 class="bw-kind__name">Training projects</h3>
+          <ul class="bw-kind__cues" aria-label="In short">
+            <li>Built by you</li>
+            <li>Yours to keep</li>
+            <li>Not supported after the program</li>
+          </ul>
+          <p>Built by you during a program, with guidance. Yours to keep and improve. Not maintained or supported by Faith Works after the program.</p>
+          <a class="text-link" href="/learn/">Explore programs <span class="link-arrow" aria-hidden="true">↗</span></a>
+        </li>
+        <li class="bw-kind bw-kind--demo">
+          <span class="bw-kind__meter" aria-hidden="true"><i></i><i></i><i></i></span>
+          <h3 class="bw-kind__name">Demonstrations</h3>
+          <ul class="bw-kind__cues" aria-label="In short">
+            <li>Shown in sessions</li>
+            <li>Examples to learn from</li>
+            <li>Not for sale as shown</li>
+          </ul>
+          <p>Shown in sessions and on this site to explain what is possible. Examples to learn from, not products for sale as shown.</p>
+          <a class="text-link" href="#use-cases">See the use cases <span class="link-arrow" aria-hidden="true">↗</span></a>
+        </li>
+        <li class="bw-kind bw-kind--product">
+          <span class="bw-kind__meter" aria-hidden="true"><i></i><i></i><i></i></span>
+          <h3 class="bw-kind__name">Supported products</h3>
+          <ul class="bw-kind__cues" aria-label="In short">
+            <li>Set up and supported</li>
+            <li>Scope still being confirmed</li>
+          </ul>
+          <p>Systems that are set up and supported for a business. Under Faith AI, this scope is still being confirmed, so we start with a conversation about your use case.</p>
+          <a class="text-link" href="#faith-ai">About Faith AI <span class="link-arrow" aria-hidden="true">↗</span></a>
+        </li>
+      </ul>
     </section>
 
-    <section class="section wrap faithai" id="faith-ai" aria-labelledby="fai-title">
-      <div class="faithai__copy">
-        <p class="brandlock"><img class="brandmark brandmark--ai" src="/assets/icons/faith-ai.svg" alt="" width="2030" height="496" loading="lazy" decoding="async"></p>
-        <h2 id="fai-title"><span class="sr-only">Faith AI: </span>Start with your use case.</h2>
-        <p class="split__lead">Faith AI explores how AI-supported business systems could handle work like inquiry tracking, follow-up and internal answers.</p>
-        <p>A demo starts with one business process. We look at how it works today, what a supported system could take on, and which steps should stay with a person. You get a plain answer about what is possible and what it would take.</p>
-        <p>Faith AI’s current features, plans and availability are being confirmed. Nothing is sold on this page, and a demo request is not a purchase.</p>
+    <!-- FAITH AI: one feature on a solid AI Yellow pastel ground. Copy left; right, one illustrative
+         system card: your process, the three kinds of work (each with the assistant it is pictured
+         with), and the person who approves. Below, the three steps and the demo request. -->
+    <section class="bw-fai" id="faith-ai" aria-labelledby="fai-title">
+      <div class="bw-fai__top">
+        <div class="bw-fai__copy" data-reveal>
+          <p class="brandlock bw-fai__brand"><img class="brandmark brandmark--ai" src="/assets/icons/faith-ai.svg" alt="" width="2030" height="496" loading="lazy" decoding="async"></p>
+          <h2 id="fai-title" class="bw-head__title"><span class="sr-only">Faith AI: </span>Start with your use case.</h2>
+          <p class="bw-fai__lead">Faith AI explores how AI-supported business systems could handle work like inquiry tracking, follow-up and internal answers.</p>
+          <p class="bw-fai__body">A demo starts with one business process. We look at how it works today, what a supported system could take on, and which steps should stay with a person. You get a plain answer about what is possible and what it would take.</p>
+        </div>
+
+        <figure class="bw-stage" data-reveal>
+          <div class="bw-sys fcard__art" role="img" aria-label="Illustration: your business process, connected to inquiry tracking, follow-up and internal answers, pictured with ChatGPT, Claude and NotebookLM. A person approves before anything is sent.">
+            <span class="bw-sys__hub"><small>Coordinates</small><b>Your business process</b></span>
+
+            <span class="bw-panel">
+              <span class="bw-panel__head"><img class="bw-logo" src="/assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" loading="lazy" decoding="async"><b>Inquiry tracking</b></span>
+              <span class="bw-panel__body">
+                <span class="bw-panel__row"><span>New inquiry</span><em class="is-new">New</em></span>
+                <span class="bw-panel__row"><span>Workshop question</span><em class="is-follow">Follow up</em></span>
+                <span class="bw-panel__row"><span>Team proposal</span><em class="is-done">Done</em></span>
+              </span>
+            </span>
+
+            <span class="bw-panel">
+              <span class="bw-panel__head"><img class="bw-logo" src="/assets/icons/tools/claude.svg" alt="" width="24" height="24" loading="lazy" decoding="async"><b>Follow-up</b></span>
+              <span class="bw-panel__body">
+                <span class="bw-panel__msg"><small>Draft next message</small><span class="bw-lines bw-lines--long"><i></i><i></i></span></span>
+                <span class="bw-panel__foot">Review point</span>
+              </span>
+            </span>
+
+            <span class="bw-panel">
+              <span class="bw-panel__head"><img class="bw-logo" src="/assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" loading="lazy" decoding="async"><b>Internal answers</b></span>
+              <span class="bw-panel__body">
+                <span class="bw-panel__search">Search your notes</span>
+                <span class="bw-panel__hit"><small>Source reference</small></span>
+              </span>
+            </span>
+
+            <span class="bw-sys__human"><span class="bw-mark bw-mark--person"></span><span><b>You approve</b><small>before anything is sent</small></span></span>
+          </div>
+          <figcaption class="bw-stage__cap">Illustrative. A person stays in charge of the result.</figcaption>
+        </figure>
       </div>
-      <ol class="faithai__steps">
-        <li><b>Tell us the process</b><span>One workflow that takes too much time or gets dropped.</span></li>
-        <li><b>See a demonstration</b><span>How a supported system could handle it, with human review points.</span></li>
-        <li><b>Get a plain recommendation</b><span>A training path, a demonstration to learn from, or a next conversation.</span></li>
-      </ol>
+
+      <div class="bw-fai__path" data-reveal>
+        <ol class="promise__grid" aria-label="How a demo works">
+          <li class="promise__item">
+            <span class="promise__num" aria-hidden="true">01</span>
+            <h3 class="promise__title">Tell us the process</h3>
+            <p class="promise__desc">One workflow that takes too much time or gets dropped.</p>
+          </li>
+          <li class="promise__item">
+            <span class="promise__num" aria-hidden="true">02</span>
+            <h3 class="promise__title">See a demonstration</h3>
+            <p class="promise__desc">How a supported system could handle it, with human review points.</p>
+          </li>
+          <li class="promise__item">
+            <span class="promise__num" aria-hidden="true">03</span>
+            <h3 class="promise__title">Get a plain recommendation</h3>
+            <p class="promise__desc">A training path, a demonstration to learn from, or a next conversation.</p>
+          </li>
+        </ol>
+        <div class="bw-fai__end">
+          <a class="btn" href="#demo" data-track="demo_request_start">Request a Demo <span class="btn__arrow btn__arrow--down" aria-hidden="true">↓</span></a>
+          <p class="bw-fai__note">Faith AI’s current features, plans and availability are being confirmed. Nothing is sold on this page, and a demo request is not a purchase.</p>
+        </div>
+      </div>
     </section>
 
     <section class="section band band--pink" id="demo" aria-labelledby="demo-title">

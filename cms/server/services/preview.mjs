@@ -63,10 +63,9 @@ export function createPreview({ store, cfg }) {
           page = { title: rec.title, description: rec.summary || "", path: "/workshops/", nav: "learn", body: `<section class="section wrap"><p class="eyebrow">This event has no page of its own. How its card appears on /workshops/</p>${R.events(isPastEvent(e.rec) ? "past" : "upcoming")}</section>` };
         }
       } else if (collection === "resources") {
-        const a = d.articles.find((x) => x.rid === rid), r = d.resources.find((x) => x.rid === rid);
-        if (a) page = R.articlePage(a);
-        else if (r?.hasPage) page = R.resourcePage(r);
-        else if (r) { d.resources = [r]; page = { title: rec.title, description: rec.summary, path: "/resources/", nav: "resources", body: `<section class="section wrap"><p class="eyebrow">This resource has no page of its own (no page content). How its card appears on /resources/</p>${R.resourceList()}</section>` }; }
+        const a = d.articles.find((x) => x.rid === rid);
+        if (a?.hasPage) page = R.articlePage(a);
+        else if (a?.href) { d.articles = [a]; page = { title: rec.title, description: rec.summary, path: "/resources/", nav: "resources", body: `<section class="section wrap"><p class="eyebrow">This resource has no page content yet. How its card appears on /resources/</p>${R.resourceCards()}</section>` }; }
       } else if (collection === "testimonials") {
         const s = d.stories.find((x) => x.id === rid);
         page = { title: "Testimonial preview", description: "", path: "/", nav: "", body: `<section class="section wrap"><p class="eyebrow">How this testimonial card appears on the website</p><div class="quotes">${s ? R.storyCard(s) : R.emptyState({ title: "Nothing to preview yet.", text: "Add the testimonial and the person’s name to preview the card." })}</div></section>` };

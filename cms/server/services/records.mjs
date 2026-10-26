@@ -85,7 +85,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       data.byline = Array.isArray(data.authors) && data.authors.length ? bylineOf({ authors: data.authors }, Object.fromEntries(dir)) : data.author || ""; // older articles: their stored author name
       data._authorSet = new Set([...dir.keys(), ...(current?.authors || [])]);
     }
-    if (collection === "resources") data.read_time = data.resource_type === "article" ? readingTime(data.body_html) : "";
+    if (collection === "resources") data.read_time = readingTime(data.body_html);
     // Events: a registration link only for "External link"; the address follows the title.
     if (collection === "events" && data.registration_type !== "external") data.registration_url = "";
     return data;

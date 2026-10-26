@@ -101,7 +101,7 @@ export async function editorView(app, { collection, id }) {
     clearTimeout(bindTimer);
     bindTimer = setTimeout(() => htmlEd?.refreshBindings(), 120); // Details → page
   }
-  // Fields that apply only in some cases (e.g. a destination URL for downloads, not articles)
+  // Fields that apply only in some cases (e.g. a resource’s card link, only while it has no page)
   function updateVisibility() {
     const rec = { ...view.record, ...details() };
     for (const fd of C.fields) {

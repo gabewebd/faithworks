@@ -2,7 +2,7 @@
  * Faith Works — Connected Universe Background Engine
  * Continuous, full-viewport generative network of delicate threads,
  * illuminated nodes, and stardust particles framing the homepage content.
- * Integrates with native scrolling & GSAP / Lenis loops, respecting reduced-motion.
+ * Integrates with native scrolling & GSAP loops, respecting reduced-motion.
  */
 (function () {
   "use strict";

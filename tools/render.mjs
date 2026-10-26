@@ -40,7 +40,7 @@ export function emptyState({ title, text, href, label, track }) {
 }
 const noPrograms = () => emptyState({
   title: "No programs are open right now.", text: "New programs are announced here first. Until then, start with the free AI Workflow Starter Kit.",
-  href: "/free-ai-starter-kit/", label: "Start Your AI Journey", track: "starter_kit_click",
+  href: "/start-your-ai-journey/", label: "Start Your AI Journey", track: "starter_kit_click",
 });
 
 // A page document with its Details values and generated parts filled in. `site` adds the
@@ -240,6 +240,110 @@ const PROGRAM_COVER = {
       </g>`,
   },
 };
+// Learn: each program drawn as a circuit board on its card's flat tone ground. Straight traces
+// with 90° corners only, vias and pads at every junction, and the AI step as real tool marks
+// (ChatGPT, Claude, NotebookLM) sitting on the pathway: input → branch → AI → merge → output.
+const K = { ink: "#1A1A1A", paper: "#FAF8F4", white: "#FFFFFF", pink: "#EFACBA", yellow: "#FBC522" };
+// pathLength="1" lets js/motion.js (5f) draw every trace in as its card arrives
+const TRACE = (d, c = K.ink, o = 1) => `<path class="ckt-trace" pathLength="1" d="${d}" fill="none" stroke="${c}"${o < 1 ? ` stroke-opacity="${o}"` : ""} stroke-width="2" stroke-linejoin="miter" stroke-linecap="square"/>`;
+const VIA = (x, y, c = K.ink, fill = K.paper) => `<circle cx="${x}" cy="${y}" r="4.5" fill="${fill}" stroke="${c}" stroke-width="2"/>`;
+const PAD = (x, y, c = K.ink) => `<circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`;
+// A tool mark on a white tile, 44 units square, in the tool's real colour
+const TILE = (name, x, y, size = 44) => {
+  const m = Math.round(size * 0.55);
+  return `<rect x="${x + 0.5}" y="${y + 0.5}" width="${size - 1}" height="${size - 1}" rx="9" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>${MARK(name, x + (size - m) / 2, y + (size - m) / 2, m, name === "claude" ? "#D97757" : "#000000")}`;
+};
+const PANEL = (x, y, w, h) => `<rect x="${x + 0.5}" y="${y + 0.5}" width="${w - 1}" height="${h - 1}" rx="8" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>`;
+const LINE = (d, c = K.ink, o = 0.24) => `<path d="${d}" stroke="${c}" stroke-opacity="${o}" stroke-width="3" stroke-linecap="round"/>`;
+const PROGRAM_CIRCUIT = {
+  // One task branched across three assistants, merged back into a workflow that runs Map → Design → Prototype
+  "ai-workforce-accelerator": {
+    tone: "pink",
+    svg: `<text x="28" y="84" class="art__mono" fill="${K.ink}">TASK</text>
+      ${PANEL(28, 96, 116, 88)}${LINE("M42 118 H124")}${LINE("M42 134 H110")}${LINE("M42 150 H118")}
+      <rect x="42" y="162" width="34" height="10" rx="2" fill="${K.pink}"/>
+      ${TRACE("M144 140 H214 M178 140 V62 H214 M178 140 V218 H214")}
+      ${TRACE("M258 62 H300 V218 H258 M258 140 H344")}
+      ${VIA(144, 140)}${PAD(178, 140)}${PAD(300, 140)}
+      <text x="214" y="28" class="art__mono" fill="${K.ink}">AI STEP</text>
+      ${TILE("chatgpt", 214, 40)}${TILE("claude", 214, 118)}${TILE("notebooklm", 214, 196)}
+      ${PANEL(344, 72, 188, 136)}
+      <text x="360" y="98" class="art__mono" fill="${K.ink}">WORKFLOW</text>
+      <path d="M344 110.5 H532" stroke="${K.ink}" stroke-opacity="0.12"/>
+      ${TRACE("M344 140 H368 M368 130 V186")}
+      <circle cx="368" cy="130" r="6" fill="${K.ink}"/><circle cx="368" cy="158" r="6" fill="${K.ink}"/>
+      <circle cx="368" cy="186" r="7" fill="${K.pink}" stroke="${K.ink}" stroke-width="2"/>
+      <g class="art__label"><text x="386" y="134.5">Map</text><text x="386" y="162.5">Design</text><text x="386" y="190.5">Prototype</text></g>`,
+  },
+  // One post drafted with two assistants, routed through LinkedIn to the client it was written for
+  "ai-linkedin-b2b-growth": {
+    tone: "white",
+    svg: `<text x="28" y="46" class="art__mono" fill="${K.ink}">POST</text>
+      ${PANEL(28, 58, 150, 164)}
+      <rect x="42" y="72" width="122" height="58" rx="5" fill="${K.pink}"/>
+      <rect x="42" y="146" width="96" height="9" rx="2" fill="${K.ink}"/><rect x="42" y="162" width="66" height="9" rx="2" fill="${K.ink}"/>
+      ${LINE("M42 194 H150", K.ink, 0.18)}
+      ${TRACE("M178 140 H210 M210 140 V86 H240 M210 140 V194 H240")}
+      ${TRACE("M284 86 H322 V194 H284 M322 140 H360")}
+      ${VIA(178, 140)}${PAD(210, 140)}${PAD(322, 140)}
+      <text x="240" y="52" class="art__mono" fill="${K.ink}">AI DRAFT</text>
+      ${TILE("chatgpt", 240, 64)}${TILE("claude", 240, 172)}
+      <rect x="360.5" y="118.5" width="43" height="43" rx="9" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>${LINKEDIN(369, 127, 26)}
+      ${TRACE("M404 140 H440")}
+      <clipPath id="ckt-avatar"><circle cx="480" cy="140" r="28"/></clipPath>
+      <circle cx="480" cy="140" r="39.5" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>
+      <g clip-path="url(#ckt-avatar)"><circle cx="480" cy="140" r="28" fill="${K.pink}"/><circle cx="480" cy="132" r="10" fill="${K.ink}"/><path d="M458 172 C460 154, 500 154, 502 172 Z" fill="${K.ink}"/></g>
+      <circle cx="509" cy="169" r="11" fill="${K.ink}"/><path d="M503.5 169.5 l4 4 l7 -7.5" fill="none" stroke="${K.pink}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="480" y="210" text-anchor="middle" class="art__mono" fill="${K.ink}">CLIENT</text>`,
+  },
+  // A landing page whose form routes through an assistant into a lead tracker, with a review switch on top
+  "ai-websites-workflow-building": {
+    tone: "yellow",
+    svg: `<text x="28" y="38" class="art__mono" fill="${K.ink}">PAGE</text>
+      ${PANEL(28, 50, 196, 180)}
+      <path d="M28 70.5 H224" stroke="${K.ink}" stroke-opacity="0.12"/>
+      <circle cx="42" cy="60" r="3" fill="${K.ink}" fill-opacity="0.3"/><circle cx="52" cy="60" r="3" fill="${K.ink}" fill-opacity="0.18"/><circle cx="62" cy="60" r="3" fill="${K.ink}" fill-opacity="0.18"/>
+      <rect x="44" y="86" width="110" height="12" rx="2" fill="${K.ink}"/>${LINE("M44 114 H170")}${LINE("M44 126 H140")}
+      <rect x="44.5" y="142.5" width="120" height="20" rx="4" fill="none" stroke="${K.ink}" stroke-opacity="0.28"/>
+      <rect x="44" y="174" width="70" height="24" rx="5" fill="${K.ink}"/>${LINE("M56 186 H100", K.paper, 1)}
+      ${TRACE("M114 186 H246 V140 H334")}
+      ${VIA(114, 186, K.ink, K.yellow)}${PAD(246, 186)}
+      ${TILE("claude", 262, 118)}
+      ${TRACE("M464 100 V68")}${PAD(464, 100)}
+      <rect x="334" y="100" width="198" height="148" rx="8" fill="${K.ink}"/>
+      <text x="350" y="125" class="art__mono" fill="${K.paper}">LEADS</text>
+      <path d="M334 136.5 H532 M350 172.5 H516 M350 200.5 H516" stroke="${K.white}" stroke-opacity="0.12"/>
+      <g stroke="${K.paper}" stroke-width="3" stroke-linecap="round"><path d="M350 158 H420"/><path d="M350 186 H402" stroke-opacity="0.5"/><path d="M350 214 H428" stroke-opacity="0.5"/></g>
+      <rect x="468" y="151" width="46" height="14" rx="7" fill="${K.yellow}"/><rect x="468.5" y="179.5" width="45" height="13" rx="6.5" fill="none" stroke="${K.paper}" stroke-opacity="0.5"/><rect x="468" y="207" width="46" height="14" rx="7" fill="${K.yellow}"/>
+      ${PANEL(396, 24, 136, 44)}
+      <text x="410" y="50" class="art__mono" fill="${K.ink}">REVIEW</text>
+      <rect x="488" y="37" width="34" height="18" rx="9" fill="${K.ink}"/><circle cx="513" cy="46" r="6" fill="${K.yellow}"/>`,
+  },
+  // A use-case brief into an assistant chip fed by three knowledge tools, stopping at a review checkpoint
+  "ai-agent-builder-bootcamp": {
+    tone: "ink",
+    svg: `<text x="28" y="58" class="art__mono" fill="${K.ink}">USE CASE</text>
+      ${PANEL(28, 70, 150, 140)}
+      <rect x="42" y="88" width="84" height="10" rx="2" fill="${K.ink}"/>${LINE("M42 114 H160", K.ink, 0.22)}${LINE("M42 128 H146", K.ink, 0.22)}${LINE("M42 142 H154", K.ink, 0.22)}
+      <rect x="42" y="164" width="64" height="20" rx="10" fill="${K.yellow}"/>${LINE("M54 174 H94", K.ink, 1)}
+      ${TRACE("M178 140 H226")}${VIA(178, 140, K.ink, K.yellow)}
+      ${TILE("notebooklm", 240, 20, 40)}${TILE("claude", 296, 20, 40)}${TILE("chatgpt", 352, 20, 40)}
+      ${TRACE("M260 60 V100 M316 60 V100 M372 60 V100")}
+      <text x="410" y="45" class="art__mono" fill="${K.ink}">SOURCES</text>
+      <rect x="226" y="100" width="180" height="114" rx="8" fill="${K.ink}"/>
+      ${PAD(260, 100, K.yellow)}${PAD(316, 100, K.yellow)}${PAD(372, 100, K.yellow)}
+      <circle cx="250" cy="124" r="9" fill="${K.yellow}"/><path d="M245 124 h10 M250 119 v10" stroke="${K.ink}" stroke-width="2" stroke-linecap="round"/>
+      <text x="266" y="128" class="art__mono" fill="${K.paper}">ASSISTANT</text>
+      <path d="M226 142.5 H406" stroke="${K.white}" stroke-opacity="0.12"/>
+      <rect x="242" y="154" width="96" height="20" rx="6" fill="${K.white}" fill-opacity="0.12"/>${LINE("M252 164 H324", K.paper, 0.6)}
+      <rect x="282" y="182" width="110" height="22" rx="6" fill="${K.paper}"/>${LINE("M292 193 H372", K.ink, 0.35)}
+      ${TRACE("M406 157 H470 V200")}${VIA(470, 157, K.ink, K.yellow)}
+      ${PANEL(414, 200, 118, 44)}
+      <text x="428" y="226" class="art__mono" fill="${K.ink}">REVIEW</text>
+      <rect x="488" y="213" width="34" height="18" rx="9" fill="${K.ink}"/><circle cx="513" cy="222" r="6" fill="${K.yellow}"/>`,
+  },
+};
+
 export function programRowsHome() {
   const picks = D.programs.filter((p) => PROGRAM_COVER[p.slug] && PROGRAM_COVER[p.slug].home !== false)
     .sort((a, b) => !!PROGRAM_COVER[b.slug].feature - !!PROGRAM_COVER[a.slug].feature);
@@ -270,40 +374,48 @@ export function programRowsHome() {
     </ol>`;
 }
 
-// Learn: every program as a homepage card (.prog, the PROGRAM_COVER art) in the same two-column
-// grid. A card carries only what helps someone choose: category, title, one line, the first thing
-// you leave with, the way in and the status. Audience, format, requirements and fees stay on each
-// program page.
+// Learn: every program as a card (.prog, with the PROGRAM_CIRCUIT art). A card carries only what
+// helps someone choose: category, title, one line, the first thing you leave with, who it is for,
+// the format, the way in and the status; requirements and fees stay on each program page.
+// The cards follow one another down the page. On wide, tall screens each one holds below the
+// header while the next scrolls up over it (style.css, "Programs"); js/motion.js (5f) adds the
+// depth as one card settles behind the next, and the circuit drawing in.
 export function programGrid() {
   if (!D.programs.length) return noPrograms();
-  return `<ol class="pstack pgrid">${D.programs.map((p, i) => {
+  const num = (i) => String(i + 1).padStart(2, "0");
+  return `<div class="pscroll" data-pscroll style="--n: ${D.programs.length}">
+      <ol class="pstack pgrid">${D.programs.map((p, i) => {
     const cover = PROGRAM_COVER[p.slug];
-    const forAudience = (p.audience && p.audience.length) ? p.audience.slice(0, 2).join(" · ") : "";
+    const art = PROGRAM_CIRCUIT[p.slug];
+    const audience = (p.audience && p.audience.length) ? p.audience.slice(0, 2) : [];
     const outcome = (p.outputs && p.outputs.length) ? p.outputs[0] : "";
     return `
-      <li class="prog prog--${cover ? cover.tone : "white"}" id="${p.slug}" style="--i:${i}" data-reveal>
-        <article class="prog__card" aria-labelledby="prog-${p.slug}">
-          <div class="prog__art">${cover ? `
-            <svg viewBox="${cover.view}" aria-hidden="true" focusable="false">${cover.svg}</svg>` : ""}
-          </div>
-          <div class="prog__body">
-            <p class="prog__cat">${esc(p.category)}</p>
-            <h3 class="prog__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
-            <p class="prog__summary">${esc(cover?.line || p.summary)}</p>
-            <dl class="prog__facts">
-              ${forAudience ? `<div><dt>For</dt><dd>${esc(forAudience)}</dd></div>` : ""}
-              ${outcome ? `<div><dt>You leave with</dt><dd>${esc(outcome)}</dd></div>` : ""}
-              ${p.format ? `<div><dt>Format</dt><dd>${esc(p.format)}</dd></div>` : ""}
-            </dl>
-            <div class="prog__actions">
-              <a class="btn prog__btn" href="/programs/${p.slug}/" data-track="program_click">View program <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only">: ${esc(p.title)}</span></a>
-              ${p.statusLabel ? badge(p.statusKey, p.statusLabel) : ""}
+        <li class="prog prog--${art ? art.tone : "white"}" id="${p.slug}" style="--i:${i}" data-reveal data-pscroll-item>
+          <article class="prog__card" aria-labelledby="prog-${p.slug}">
+            <div class="prog__art">${art ? `
+              <svg viewBox="0 0 560 280" aria-hidden="true" focusable="false">${art.svg}</svg>` : ""}
             </div>
-          </div>
-        </article>
-      </li>`;
+            <div class="prog__body">
+              <div class="prog__intro">
+                <p class="prog__cat"><span class="prog__num" aria-hidden="true">${num(i)}</span>${esc(p.category)}</p>
+                <h3 class="prog__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
+                <p class="prog__summary">${esc(cover?.line || p.summary)}</p>
+              </div>
+              ${outcome ? `<dl class="prog__outcome"><dt>You leave with</dt><dd>${esc(outcome)}</dd></dl>` : ""}
+              ${audience.length || p.format ? `<dl class="prog__facts">
+                ${audience.length ? `<div class="prog__fact prog__fact--for"><dt>For</dt><dd><ul class="prog__for">${audience.map((a) => `<li>${esc(a)}</li>`).join("")}</ul></dd></div>` : ""}
+                ${p.format ? `<div class="prog__fact"><dt>Format</dt><dd>${esc(p.format)}</dd></div>` : ""}
+              </dl>` : ""}
+              <div class="prog__actions">
+                <a class="btn prog__btn" href="/programs/${p.slug}/" data-track="program_click">View program <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only">: ${esc(p.title)}</span></a>
+                ${p.statusLabel ? badge(p.statusKey, p.statusLabel) : ""}
+              </div>
+            </div>
+          </article>
+        </li>`;
   }).join("")}
-    </ol>`;
+      </ol>
+    </div>`;
 }
 
 // For Professionals: every program as a short card (what you leave with, status), linking to its page.
@@ -349,21 +461,24 @@ const eventPhoto = (g, attrs = "") => g.photo
   : `<img${attrs} src="${esc(g.url)}" alt="${esc(g.alt)}" loading="lazy" decoding="async">`;
 const ARROW = { prev: "M15 5l-7 7 7 7", next: "M9 5l7 7-7 7" };
 const slideBtn = (dir, label) => `<button type="button" class="voices__btn event__slides-btn" data-slide-${dir} aria-label="${label}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW[dir]}"/></svg></button>`;
-// The card's picture. Two or more event images become a slideshow: Previous/Next buttons, the
-// arrow keys and a "2 / 5" count (js/main.js §20). Without script only the cover shows. Past
-// events keep their photos.
+// The card's picture. Two or more event images become a slideshow: Previous/Next buttons on the
+// photo's sides, the arrow keys and a "2 / 5" count for screen readers (js/main.js §20). Without
+// script only the cover shows. Past events keep their photos. The Workshops calendar shows the
+// same figure in its day panel (eventCalendar).
 function eventFigure(e) {
   const photos = e.gallery || [];
   if (photos.length < 2) return e.image ? `<figure class="event__img">${photos.length ? eventPhoto(photos[0]) : eventImg(e.image)}</figure>` : "";
   const n = photos.length;
   return `<figure class="event__img event__slides" data-slides role="group" aria-roledescription="slideshow" aria-label="Photos from ${esc(e.title)}">
-          <div class="event__slides-frame">${photos.map((g, i) => eventPhoto(g, `${i ? " hidden" : ""} data-slide="${i}"`)).join("")}</div>
-          <div class="event__slides-nav" data-slides-nav hidden>${slideBtn("prev", "Previous photo")}<span class="event__slides-count" aria-live="polite" data-slide-count>1 / ${n}</span>${slideBtn("next", "Next photo")}</div>
+          <div class="event__slides-frame">${photos.map((g, i) => eventPhoto(g, `${i ? " hidden" : ""} data-slide="${i}"`)).join("")}
+            <div class="event__slides-nav" data-slides-nav hidden>${slideBtn("prev", "Previous photo")}<span class="event__slides-count sr-only" aria-live="polite" data-slide-count>1 / ${n}</span>${slideBtn("next", "Next photo")}</div>
+          </div>
         </figure>`;
 }
 
 // An event card: what, when and where, the registration button (when there is one) and an
-// "Event details" link when the event has its own page and the button goes elsewhere.
+// "Event details" link when the event has its own page and the button goes elsewhere. Past
+// events show neither: only what happened and their photos.
 function eventCard(e) {
   const d = eventDate(e);
   const past = isPast(e);
@@ -374,9 +489,8 @@ function eventCard(e) {
   if (e.time) facts.push([`Time (${esc(tzAbbrev(e.timeZone))})`, esc(e.time)]);
   if (e.venue) facts.push(["Location", esc(e.venue)]);
   const cta = eventCta(e.rec, past);
-  const details = e.hasPage && e.registration.type !== "page" ? `<a class="text-link" href="/events/${esc(e.slug)}/">Event details <span class="link-arrow" aria-hidden="true">↗</span></a>` : "";
-  const pastPage = past && e.hasPage && e.registration.type === "page" ? `<a class="text-link" href="/events/${esc(e.slug)}/">Event details <span class="link-arrow" aria-hidden="true">↗</span></a>` : "";
-  const actions = cta + details + pastPage;
+  const details = !past && e.hasPage && e.registration.type !== "page" ? `<a class="text-link" href="/events/${esc(e.slug)}/">Event details <span class="link-arrow" aria-hidden="true">↗</span></a>` : "";
+  const actions = cta + details;
   return `<article class="event${past ? " event--past" : ""}" id="event-${esc(e.slug)}">
       <div class="event__date" aria-hidden="true">${d ? `<b>${fmt(d, { day: "numeric" })}</b><span>${fmt(d, { month: "short" })} ${fmt(d, { year: "numeric" })}</span>` : `<b>TBA</b><span>Date soon</span>`}</div>
       <div class="event__body">
@@ -421,24 +535,28 @@ export function eventOptions() {
 }
 
 // The data behind the Workshops calendar (js/main.js draws it) and /events/calendar.json.
-// Only what the website shows anyway: published, visible events with a date.
+// Only what the website shows anyway: published, visible events with a date. A past event keeps
+// only its title and dates (plus its photos in the embedded calendar): no details, link or button.
 export function calendarData() {
   return D.events.filter((e) => e.date).sort(byStart).map((e) => {
     const past = isPast(e);
+    const base = { id: e.slug, title: e.title, start: e.start, end: e.end, timeZone: e.timeZone, allDay: !e.rec.start_time, past };
+    if (past) return base;
     const r = e.registration;
-    const url = e.hasPage ? `/events/${e.slug}/` : !past && r.type === "external" && r.url ? r.url : `/workshops/#event-${e.slug}`;
-    const cta = past ? null : r.type === "external" && r.url ? (e.registration.label || "Register") : r.type === "page" ? (e.registration.label || "Register") : null;
-    // endsAt/pastUrl: the calendar treats the event as past once it ends, even on an older build
-    const pastUrl = e.hasPage ? `/events/${e.slug}/` : `/workshops/#event-${e.slug}`;
-    return { id: e.slug, title: e.title, summary: e.summary, start: e.start, end: e.end, endsAt: eventEndsAt(e.rec), pastUrl, timeZone: e.timeZone, allDay: !e.rec.start_time, time: e.time ? `${e.time} ${tzAbbrev(e.timeZone)}` : null, location: e.venue, url, external: /^https?:/i.test(url), past, cta };
+    const url = e.hasPage ? `/events/${e.slug}/` : r.type === "external" && r.url ? r.url : `/workshops/#event-${e.slug}`;
+    const cta = r.type === "external" && r.url ? (e.registration.label || "Register") : r.type === "page" ? (e.registration.label || "Register") : null;
+    // endsAt: the calendar treats the event as past once it ends, even on an older build
+    return { ...base, summary: e.summary, endsAt: eventEndsAt(e.rec), time: e.time ? `${e.time} ${tzAbbrev(e.timeZone)}` : null, location: e.venue, url, external: /^https?:/i.test(url), cta };
   });
 }
 // The Event Calendar (Workshops). js/main.js §8 draws the month from the embedded data: days are
 // buttons (arrow keys move between them), choosing one lists its events in the panel beside the
-// month, and "Next up" jumps to the next event. <script type="application/json"> is inert; "<"
-// is escaped so no text can close the element.
+// month, and "Next up" jumps to the next event. Each event carries its card's photos (eventFigure,
+// the same slideshow) for the panel; /events/calendar.json leaves them out.
+// <script type="application/json"> is inert; "<" is escaped so no text can close the element.
 export function eventCalendar() {
-  const json = JSON.stringify(calendarData()).replace(/</g, "\\u003c");
+  const figures = Object.fromEntries(D.events.map((e) => [e.slug, eventFigure(e)]));
+  const json = JSON.stringify(calendarData().map((ev) => (figures[ev.id] ? { ...ev, figure: figures[ev.id] } : ev))).replace(/</g, "\\u003c");
   return `<div class="cal" data-fw-calendar>
         <div class="cal__main">
           <div class="cal__head">
@@ -464,113 +582,54 @@ export function eventCalendar() {
 }
 
 /* ---- Resources and articles -------------------------------------------- */
-// Where a guide or download card leads: its own page, a download, an external link or a sign-up.
-function resourceLink(r) {
-  const attrs = r.hasPage ? "" : r.access === "download" ? ` download data-track="download_click"` : r.access === "external" ? ` target="_blank" rel="noopener"` : ` data-track="starter_kit_click"`;
-  const down = !r.hasPage && r.access === "download";
-  return { href: r.hasPage ? `/resources/${r.slug}/` : r.url, attrs, down, arrow: `<span class="btn__arrow${down ? " btn__arrow--down" : ""}" aria-hidden="true">${down ? "↓" : "↗"}</span>` };
-}
+// Every resource type is an article page; its Type is only the card badge and a filter.
 const newest = (a, b) => String(b.date || "").localeCompare(String(a.date || ""));
-
-// The newest featured article leads the Resources page as the Featured insight (a Faith Pink
-// band); any other featured articles join the featured guides. Featured items are not repeated.
-const leadInsight = () => D.articles.filter((a) => a.featured).sort(newest)[0] || null;
 const articleDate = (a) => (/^\d{4}-\d{2}-\d{2}/.test(a.date || "") ? fmt(new Date(`${a.date.slice(0, 10)}T12:00:00Z`), { day: "numeric", month: "short", year: "numeric" }) : "");
 const articleMeta = (a, ...lead) => [...lead, ...String(a.category || "").split("·").map((c) => c.trim()), articleDate(a), a.readTime].filter(Boolean);
 const metaLine = (parts) => parts.map((p) => `<span>${esc(p)}</span>`).join("");
+const TYPE_VERBS = { article: "Read", guide: "Read", playbook: "Read", tool: "Try" };
+const cardLabel = (a) => `${a.download ? "Download" : TYPE_VERBS[a.type] || "Open"} ${a.typeLabel.toLowerCase()}`;
 
-export function featuredInsight() {
-  const a = leadInsight();
-  if (!a) return EMPTY_SECTION;
-  return `<div class="wrap insight__grid">
-        <a class="insight__media" href="/resources/${a.slug}/" tabindex="-1" aria-hidden="true">${a.image ? img(a.image, "(min-width: 900px) 50vw, 100vw", "insight__img") : `<span class="insight__img insight__img--blank"></span>`}</a>
-        <div class="insight__copy" data-reveal>
-          <p class="insight__meta">${metaLine(articleMeta(a, "Featured insight"))}</p>
-          <h2 id="insight-title"><a href="/resources/${a.slug}/">${esc(a.title)}</a></h2>
-          <p class="insight__excerpt">${esc(a.excerpt)}</p>
-          <a class="btn insight__cta" href="/resources/${a.slug}/">Read article <span class="btn__arrow" aria-hidden="true">↗</span></a>
-        </div>
-      </div>`;
-}
-
-// Resources: featured guides (and any further featured articles) as large cards, the first widest.
-export function resourceFeatured() {
-  const lead = leadInsight();
-  const items = [...D.resources.filter((r) => r.featured), ...D.articles.filter((a) => a.featured && a !== lead).sort(newest)];
-  if (!items.length) return EMPTY_SECTION;
-  return `<div class="rfeat${items.length === 1 ? " rfeat--single" : ""}">${items.map((x, i) => {
-    const isArticle = D.articles.includes(x);
-    const link = isArticle ? { href: `/resources/${x.slug}/`, attrs: "", arrow: `<span class="btn__arrow" aria-hidden="true">↗</span>` } : resourceLink(x);
-    const meta = isArticle ? [x.category, x.readTime].filter(Boolean).join(" · ") : x.kind;
-    const pic = x.image ? img(x.image, i === 0 ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, 100vw", "rfeat__img") : "";
-    return `
-      <article class="rfeat__item${i === 0 ? " rfeat__item--lead" : ""}${pic ? "" : " rfeat__item--plain"}">
-        ${pic}
-        <div class="rfeat__body">
-          <p class="rfeat__meta"><span class="rfeat__flag">Featured</span>${meta ? `<span>${esc(meta)}</span>` : ""}</p>
-          <h3><a href="${esc(link.href)}"${link.attrs}>${esc(x.title)}</a></h3>
-          <p class="rfeat__summary">${esc(isArticle ? x.excerpt : x.summary)}</p>
-          ${!isArticle && x.accessLabel ? `<p class="rfeat__access">${esc(x.accessLabel)}</p>` : ""}
-          <span class="btn rfeat__cta" aria-hidden="true">${esc(isArticle ? "Read article" : x.ctaLabel)} ${link.arrow}</span>
-        </div>
-      </article>`;
-  }).join("")}
-    </div>`;
-}
-// Nothing published at all: one message in place of the empty Resources sections.
+// Nothing published at all: one message in place of the Resources cards.
 export function resourcesEmpty() {
-  if (D.resources.length || D.articles.length) return EMPTY_SECTION;
+  if (D.articles.some((a) => a.href)) return EMPTY_SECTION;
   return emptyState({
-    title: "No resources are published right now.", text: "New guides, worksheets and articles appear here as soon as they are ready. Until then, start with the free AI Workflow Starter Kit.",
-    href: "/free-ai-starter-kit/", label: "Start Your AI Journey", track: "starter_kit_click",
+    title: "No resources are published right now.", text: "New guides, worksheets and articles appear here as soon as they are ready. Until then, start your AI journey with the free AI Workflow Starter Kit.",
+    href: "/start-your-ai-journey/", label: "Start Your AI Journey", track: "starter_kit_click",
   });
 }
 
-export function resourceList() {
-  const items = D.resources.filter((r) => !r.featured);
+// Resources: every resource as one card, featured first, then newest. A search box and Type
+// filters (js/main.js §15) appear only with JavaScript; without it every card shows.
+export function resourceCards() {
+  const items = D.articles.filter((a) => a.href).sort((a, b) => (b.featured - a.featured) || newest(a, b));
   if (!items.length) return EMPTY_SECTION;
-  return `<div class="rlist">${items.map((r) => {
-    const link = resourceLink(r);
-    return `<article class="rlist__item">
-        <p class="rlist__kind">${esc(r.kind)}</p>
-        <h3>${esc(r.title)}</h3>
-        <p>${esc(r.summary)}</p>
-        <p class="rlist__access">${esc(r.accessLabel || "")}</p>
-        <a class="btn btn--light" href="${esc(link.href)}"${link.attrs}>${esc(r.ctaLabel)}${link.down ? ` ${link.arrow}` : ""}</a>
-      </article>`;
-  }).join("")}</div>`;
-}
-
-// Latest insights: every other article as an editorial row (image, meta, title, excerpt), newest
-// first, with topic filters built from the categories (js/main.js §15). Without JS all rows show.
-// Guides and worksheets: the featured ones first, then the rest, side by side in one two-column
-// row (the card lists flow into the .guides grid). Removed when both are empty.
-export function guides() {
-  const parts = [resourceFeatured(), resourceList()].filter((h) => h !== EMPTY_SECTION);
-  return parts.length ? `<div class="guides">${parts.join("")}</div>` : EMPTY_SECTION;
-}
-
-export function insightList(limit) {
-  const items = D.articles.filter((a) => !a.featured).sort(newest).slice(0, Number(limit) || 99);
-  if (!items.length) return EMPTY_SECTION;
-  const topics = (a) => String(a.category || "").split("·").map((c) => c.trim()).filter(Boolean);
-  const filters = [...new Set(items.map((a) => topics(a)[0]).filter(Boolean))];
-  const chips = filters.length > 1 ? `<div class="insights__filters" role="group" aria-label="Filter by topic" data-insight-filters hidden>
-          <button type="button" class="insights__chip" aria-pressed="true" data-topic="">All</button>${filters.map((t) => `<button type="button" class="insights__chip" aria-pressed="false" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}
-        </div>` : "";
-  return `${chips}
-      <ol class="insights__list" data-insight-list>${items.map((a) => `
-        <li class="insight-row" data-topics="${esc(topics(a).join("|"))}">
-          <a class="insight-row__media" href="/resources/${a.slug}/" tabindex="-1" aria-hidden="true">${a.image ? img(a.image, "(min-width: 900px) 30vw, 100vw", "insight-row__img") : `<span class="insight-row__img insight-row__img--blank"></span>`}</a>
-          <div class="insight-row__body">
-            <p class="insight-row__meta">${metaLine(articleMeta(a))}</p>
-            <h3><a href="/resources/${a.slug}/">${esc(a.title)}</a></h3>
-            <p class="insight-row__excerpt">${esc(a.excerpt)}</p>
-            <span class="insight-row__more" aria-hidden="true">Read article <span class="link-arrow">→</span></span>
+  const types = [...new Set(items.map((a) => a.type))];
+  const chips = types.length > 1 ? `<div class="rcards__filters" role="group" aria-label="Filter by type">
+            <button type="button" class="rcards__chip" aria-pressed="true" data-type="">All</button>${types.map((t) => `<button type="button" class="rcards__chip" aria-pressed="false" data-type="${esc(t)}">${esc(items.find((a) => a.type === t).typeLabel)}</button>`).join("")}
+          </div>` : "";
+  return `<div class="rcards__tools" data-rcards-tools hidden>
+          <label class="rcards__search"><span class="sr-only">Search resources</span><input type="search" placeholder="Search resources" autocomplete="off" data-rcards-search></label>
+          ${chips}
+        </div>
+      <ul class="rcards" data-rcards-list>${items.map((a, i) => {
+    const attrs = a.download ? ` download data-track="download_click"` : a.external ? ` target="_blank" rel="noopener"` : "";
+    const lead = i === 0 && a.featured;
+    const words = [a.title, a.excerpt, a.category, a.typeLabel, ...a.topics].filter(Boolean).join(" ").toLowerCase();
+    return `
+        <li class="rcard${lead ? " rcard--lead" : ""}" data-type="${esc(a.type)}" data-search="${esc(words)}">
+          <a class="rcard__media" href="${esc(a.href)}"${attrs} tabindex="-1" aria-hidden="true">${a.image ? img(a.image, lead ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, 100vw", "rcard__img") : `<span class="rcard__img rcard__img--blank"></span>`}</a>
+          <div class="rcard__body">
+            <p class="rcard__badges"><span class="rcard__type">${esc(a.typeLabel)}</span>${a.featured ? `<span class="rcard__flag">Featured</span>` : ""}</p>
+            <p class="rcard__meta">${metaLine(articleMeta(a))}</p>
+            <h3><a href="${esc(a.href)}"${attrs}>${esc(a.title)}${a.external ? `<span class="sr-only"> (opens in a new tab)</span>` : ""}</a></h3>
+            ${a.excerpt ? `<p class="rcard__excerpt">${esc(a.excerpt)}</p>` : ""}
+            <span class="rcard__more" aria-hidden="true">${esc(cardLabel(a))} <span class="link-arrow">${a.download ? "↓" : "→"}</span></span>
           </div>
-        </li>`).join("")}
-      </ol>
-      <p class="insights__none small" data-insight-none hidden>No insights on this topic yet.</p>`;
+        </li>`;
+  }).join("")}
+      </ul>
+      <p class="rcards__none small" data-rcards-none hidden>No resources match your search.</p>`;
 }
 
 export function block(b) {
@@ -591,11 +650,11 @@ export function block(b) {
   return "";
 }
 
-// Keep reading: three other articles, the same category first, each with its featured image.
+// Keep reading: three other resources with a page, the same category first, each with its featured image.
 // None: the whole section is removed.
 function relatedArticles(slug) {
   const self = D.articles.find((x) => x.slug === slug);
-  const others = D.articles.filter((x) => x.slug !== slug).sort(newest);
+  const others = D.articles.filter((x) => x.slug !== slug && x.hasPage).sort(newest);
   const picks = [...others.filter((x) => self && x.category === self.category), ...others.filter((x) => !self || x.category !== self.category)].slice(0, 3);
   if (!picks.length) return EMPTY_SECTION;
   return picks.map((r) => `<li><a class="kr" href="/resources/${r.slug}/">
@@ -676,16 +735,6 @@ export function articlePage(a) {
     image: a.socialImage || a.image?.social || (a.image?.base && !a.image.formats ? `/${a.image.base}-1440.jpg` : a.image?.url), ...pageFrame(a),
   };
 }
-// Guides, templates and other downloads have a page only when their page editor has content.
-export function resourcePage(r) {
-  if (!r.doc) return null;
-  const body = withBackLink(withToc(withShare(docBody(r, "resources", { "related-articles": () => relatedArticles(r.slug) }), `/resources/${r.slug}/`, r.title)));
-  return {
-    title: r.seoTitle || `${r.title} · Faith Works`, description: r.metaDescription || r.summary, path: `/resources/${r.slug}/`, nav: "resources", body,
-    socialTitle: r.seoTitle || r.title, ogType: "article",
-    image: r.socialImage || r.image?.url, ...pageFrame(r),
-  };
-}
 
 /* ---- Proof ------------------------------------------------------------- */
 // A renderer with nothing to show returns this marker; tools/build.mjs then removes the
@@ -730,13 +779,13 @@ export function storyCard(s, tone = QUOTE_TONES[0]) {
       </figure>`;
 }
 
-// Home: every published testimonial as a looping deck of cards (js/main.js §12). The active card
-// sits upright in the centre; the others turn away behind it, smaller and softer, like cards being
-// dealt. It advances on its own at a relaxed pace, with a thin line under the deck filling up for
-// the time the card has left, and follows a swipe or drag; there are no arrows or dots. Without JS
-// the cards stay a native scroll-snap row. The speaker is named exactly as given, with the role
-// from the CMS below; without one, "Faith Works participant" is all that is claimed about them (they
-// wrote it after a session). No photos here: the quote is the picture.
+// Home: every published testimonial as a stack of cards (js/main.js §12). The active card lies on
+// top; the next two sit tucked behind it, turned slightly, their edges showing below. It moves on
+// by itself at a relaxed pace, and the previous and next buttons (or a swipe, or the arrow keys)
+// flip through it: the top card swings out to the side and slips to the back. Without JS the cards
+// stay a native scroll-snap row and the buttons are hidden. The speaker is named exactly as given,
+// with the role from the CMS below; without one, "Faith Works participant" is all that is claimed
+// about them (they wrote it after a session). No photos here: the quote is the picture.
 // Cards take Faith Pink, AI Yellow and Works White in turn (see toneAt above).
 const VOICE_TONES = ["pink", "yellow", "white"];
 export function voices() {
@@ -748,12 +797,15 @@ export function voices() {
             <blockquote><p>${esc(s.quote)}</p></blockquote>
             <figcaption><b class="voice__name">${esc(s.name)}</b><span class="voice__role">${esc(s.role || "Faith Works participant")}</span></figcaption>
           </figure>`).join("");
-  const extras = n < 2 ? "" : `
-      <div class="voices__progress" aria-hidden="true"><span data-carousel-progress></span></div>
-      <p class="sr-only" aria-live="polite" aria-atomic="true" data-carousel-live></p>`;
+  const nav = n < 2 ? "" : `
+      <div class="voices__nav">
+        <button type="button" class="voices__btn" data-carousel-prev aria-controls="voices-track" aria-label="Previous testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW.prev}"/></svg></button>
+        <p class="voices__count" aria-live="polite" aria-atomic="true" data-carousel-count>1 / ${n}</p>
+        <button type="button" class="voices__btn" data-carousel-next aria-controls="voices-track" aria-label="Next testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW.next}"/></svg></button>
+      </div>`;
   return `<div class="voices${n < 2 ? " voices--single" : ""}" data-carousel role="region" aria-roledescription="carousel" aria-label="What participants said">
       <div class="voices__track" id="voices-track" tabindex="0" role="group" aria-label="Testimonials. Use the left and right arrow keys to move.">${slides}
-      </div>${extras}
+      </div>${nav}
     </div>`;
 }
 
@@ -965,11 +1017,10 @@ export function demoForm() {
 }
 
 export function contactForm() {
-  return form({
-    key: "general_contact", offer: "general-contact", offerTitle: "General inquiry",
-    purpose: "respond to your inquiry", button: "Send message",
-    success: "Thank you. We have your message and will route it to the right person.",
-    fields: FORMS.general_contact.fields,
+  return ghlFormEmbed({
+    id: "R7hcPDBmFdJBEiUyOqpK",
+    title: "General Inquiry",
+    height: 760,
   });
 }
 

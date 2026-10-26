@@ -51,7 +51,7 @@ LinkedIn *Post Inspector* (https://www.linkedin.com/post-inspector/) → paste t
 → *Debug* → *Scrape Again*. Instagram does not show link previews for website links in posts, so
 there is no equivalent check there.
 
-**Vercel (production):** `vercel.json` runs `node tools/build.mjs --deploy --content=cms --view=published
+**Vercel (production):** `vercel.mjs` runs `node tools/build.mjs --deploy --content=cms --view=published
 --out=dist` and serves `dist/`, which holds only the generated pages, `css/`, `js/` and `assets/`
 (never `cms/`, `src/`, `tools/` or `docs/`). Set `CMS_CONTENT_URL=https://faithworks-cms.netlify.app` in
 the Vercel project. If the CMS cannot be reached the build fails and Vercel keeps the previous deployment;
@@ -77,7 +77,7 @@ it never falls back to the fixtures. See `cms/README.md` §5.5.
 | `docs/01–07_*.docx` | Project documents: scope, audit, gap list, architecture, copy, forms spec, acceptance checklist. |
 
 Generated output (do not edit by hand): `index.html`, `404.html`, `sitemap.xml`, `robots.txt` and the
-route folders `about/ build/ business/ community/ contact/ free-ai-starter-kit/ learn/ privacy/ professionals/ programs/
+route folders `about/ build/ business/ community/ contact/ start-your-ai-journey/ learn/ privacy/ professionals/ programs/
 resources/ speaking/ terms/ workshops/` (and `events/` when an event has its own page content). Pages for
 content that is no longer in the build's content view are removed automatically.
 

@@ -7,9 +7,9 @@
     <!-- FOUNDER HERO. Facts on this page come from Faith Natividad's founder profile (supplied
          2026-10-20) and the existing verified About copy. Nothing here is estimated. -->
     <section class="ahero" aria-labelledby="ab-title">
-      <div class="wrap ahero__grid">
+      <div class="ahero__grid">
         <div class="ahero__copy" data-reveal>
-          <p class="eyebrow">About · Founder of the Faith Works ecosystem</p>
+          <p class="eyebrow"><span class="ahero__label">About</span> · <span class="ahero__tagline">Founder of the Faith Works ecosystem</span></p>
           <h1 id="ab-title">Faith<br>Natividad</h1>
           <ul class="ahero__roles" aria-label="Roles">
             <li>AI strategist</li><li>Entrepreneur</li><li>Speaker</li><li>Content creator</li>
@@ -22,12 +22,11 @@
         </div>
         <figure class="ahero__photo">
           {{gallery:about.hero}}
-          <figcaption><b>Human first.</b> AI empowered.</figcaption>
         </figure>
       </div>
     </section>
 
-    <!-- STORY + RECORD: the profile's biography, then the achievements it lists, as a ruled ledger -->
+    <!-- STORY + RECORD: the profile's biography, then its record as interactive stat cards beside the featured executive-education credential -->
     <section class="section wrap bio" aria-labelledby="bio-title">
       <div class="bio__main">
       <div class="bio__head">
@@ -38,19 +37,57 @@
         <p class="bio__lead">Faith Natividad is an AI strategist, international keynote speaker, content creator and the founder of the Faith Works ecosystem: an AI-powered platform that brings together education, AI implementation, media, community and content production.</p>
         <p>Recognized as one of the Top 40 Filipino Founders on LinkedIn, she has helped facilitate the placement of more than 1,000 Filipino professionals across six continents, supported over 200 local and global clients, and educated nearly 5,000 students, CEOs, founders, executives and professionals in AI literacy, prompt engineering, automation and digital transformation.</p>
         <p>Her work connects learning, leadership and practical implementation. As an AI business coach and future-of-work strategist, she helps non-technical leaders and teams move from curiosity to a working result, one real business task at a time.</p>
-        <div class="bio__study">
-          <p class="bio__label">Executive education</p>
-          <p>Prompt Engineering and AI Digitalization at the <b>Asian Institute of Management (AIM)</b>, and through the <b>University of Sydney’s Centre for Continuing Education (CCE)</b>.</p>
-        </div>
       </div>
       </div>
-      <dl class="record" aria-label="Faith Natividad’s record">
-        <div><dt>Top 40</dt><dd>Filipino Founders on LinkedIn</dd></div>
-        <div><dt>1,000+</dt><dd>Filipino professionals placed across six continents</dd></div>
-        <div><dt>200+</dt><dd>Local and global clients supported</dd></div>
-        <div><dt>~5,000</dt><dd>Students, leaders and professionals educated in AI literacy</dd></div>
-        <div><dt>4</dt><dd>Countries for keynotes: Australia, New Zealand, Taiwan, Singapore</dd></div>
-      </dl>
+      <div class="bio__proof">
+        <!-- The For Professionals stat cards (.pro-stat, js/main.js [data-stat]): hover or keyboard
+             focus on desktop, a tap on touch. Links are the site's own: Faith's LinkedIn and the
+             community group. The keynote countries live in Speaking below. -->
+        <dl class="pro-trust__record bio__record" aria-label="Faith Natividad’s record" data-reveal>
+          <div class="pro-stat" data-stat>
+            <dt>Top 40</dt>
+            <dd>Filipino Founders on LinkedIn</dd>
+            <dd class="pro-stat__reveal"><a class="pro-stat__chip" href="https://www.linkedin.com/in/faithnatividad/" target="_blank" rel="noopener"><span class="pro-stat__icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 9H4v11h3V9Zm-1.5-5.2a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5ZM10 9h2.9v1.5c.5-.9 1.6-1.7 3.1-1.7 2.8 0 4 1.8 4 5V20h-3v-5.6c0-1.6-.5-2.7-1.9-2.7-1.5 0-2.1 1.1-2.1 2.7V20h-3V9Z"/></svg></span>Faith on LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></dd>
+          </div>
+          <div class="pro-stat" data-stat>
+            <dt>1,000+</dt>
+            <dd>Filipino professionals placed across six continents</dd>
+            <dd class="pro-stat__reveal"><span class="pro-stat__flag" style="--i: 0"><svg class="flag" viewBox="0 0 30 20" role="img" aria-label="Flag of the Philippines" focusable="false"><path fill="#0038A8" d="M0 0h30v10H0z"/><path fill="#CE1126" d="M0 10h30v10H0z"/><path fill="#fff" d="M0 0l17.32 10L0 20z"/><path fill="#FCD116" d="M5.8 7L6.41 8.52L7.92 7.88L7.28 9.39L8.8 10L7.28 10.61L7.92 12.12L6.41 11.48L5.8 13L5.19 11.48L3.68 12.12L4.32 10.61L2.8 10L4.32 9.39L3.68 7.88L5.19 8.52Z"/><circle fill="#FCD116" cx="5.8" cy="10" r="1.55"/><path fill="#FCD116" d="M1.9 2.05L2.1 2.62L2.71 2.64L2.22 3.01L2.4 3.59L1.9 3.24L1.4 3.59L1.58 3.01L1.09 2.64L1.7 2.62ZM1.9 16.25L2.1 16.82L2.71 16.84L2.22 17.21L2.4 17.79L1.9 17.44L1.4 17.79L1.58 17.21L1.09 16.84L1.7 16.82ZM14.4 9.15L14.6 9.72L15.21 9.74L14.72 10.11L14.9 10.69L14.4 10.34L13.9 10.69L14.08 10.11L13.59 9.74L14.2 9.72Z"/></svg></span><span class="pro-stat__note">Philippines</span></dd>
+          </div>
+          <div class="pro-stat" data-stat>
+            <dt>200+</dt>
+            <dd>Local and global clients supported</dd>
+            <dd class="pro-stat__reveal"><span class="pro-stat__icon pro-stat__globe" style="--i: 0"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5s1.2-6.2 3.6-8.5Z"/></g></svg></span><span class="pro-stat__note">Local · Global</span></dd>
+          </div>
+          <div class="pro-stat" data-stat>
+            <dt>~5,000</dt>
+            <dd>Students, leaders and professionals educated in AI literacy</dd>
+            <dd class="pro-stat__reveal"><a class="pro-stat__chip" href="https://www.facebook.com/share/g/1DGeoshBNh/" target="_blank" rel="noopener" data-track="community_click"><span class="pro-stat__icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M13.5 21v-7.5h2.6l.4-3.1h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.2c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H7.8v3.1h2.6V21h3.1Z"/></svg></span>Join the community<span class="sr-only"> on Facebook (opens in a new tab)</span></a></dd>
+          </div>
+        </dl>
+        <!-- Featured credential. Logos are the institutions' own files (assets/images/aim*.png,
+             cce.png); each tile links to that institution's official site. -->
+        <article class="edu" aria-labelledby="edu-title" data-reveal>
+          <p class="bio__label edu__label">Executive education</p>
+          <h3 class="edu__title" id="edu-title">Prompt Engineering and AI Digitalization</h3>
+          <ul class="edu__schools">
+            <li>
+              <a class="edu__school" href="https://aim.edu/" target="_blank" rel="noopener">
+                <span class="edu__via">At</span>
+                <span class="edu__logo"><img src="/assets/images/aim-logo.png" alt="" width="395" height="287" loading="lazy" decoding="async"></span>
+                <span class="edu__name">Asian Institute of Management (AIM)<span class="sr-only"> (opens in a new tab)</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="edu__school" href="https://cce.sydney.edu.au/" target="_blank" rel="noopener">
+                <span class="edu__via">Through</span>
+                <span class="edu__logo"><img src="/assets/images/cce.png" alt="" width="459" height="160" loading="lazy" decoding="async"></span>
+                <span class="edu__name">University of Sydney’s Centre for Continuing Education (CCE)<span class="sr-only"> (opens in a new tab)</span></span>
+              </a>
+            </li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <!-- MISSION: the founder's mission statement in her words, with the Faith Works vision beside it -->
@@ -174,7 +211,7 @@
           <p>Start your AI journey with the free AI Workflow Starter Kit, or bring Faith Works to your team.</p>
         </div>
         <div class="actions">
-          <a class="btn" href="/free-ai-starter-kit/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn" href="/start-your-ai-journey/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
           <a class="btn btn--light" href="/business/">Train My Team</a>
         </div>
       </div>

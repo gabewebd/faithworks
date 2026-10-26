@@ -158,8 +158,8 @@ export function validate(collection, rec, { strict = false, tags = null, refs = 
     if (strict && rec.registration_type === "external" && !rec.registration_url) errors.registration_url = "Add the registration link (for example the GHL page), or choose another option.";
     if (strict && eventHasPage(rec) && !String(rec.body_html || "").trim()) errors.body_html = "The event page has no content yet. Build it on the Event page tab, or turn the event page off.";
   }
-  if (collection === "resources" && strict && rec.resource_type !== "article" && !rec.file_url) errors.file_url = "Guides, downloads and external resources need a file URL or link.";
-  if (collection === "resources" && strict && rec.resource_type === "article" && !String(rec.body_html || "").trim()) errors.body_html = "An article needs its content.";
+  // Every resource type is a page; only an older guide or worksheet may link its card elsewhere instead
+  if (collection === "resources" && strict && !String(rec.body_html || "").trim() && !String(rec.file_url || "").trim()) errors.body_html = "A resource needs its page content.";
   if (collection === "programs" && strict && Number(rec.doc_version) >= 2 && !String(rec.body_html || "").trim()) errors.body_html = "A program needs its page content.";
   return errors;
 }

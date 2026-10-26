@@ -5,7 +5,7 @@
    5. Program selector and showcase (learn)  6. Starter kit thank-you  7. Analytics events
    8. Event Calendar (workshops)  9. Testimonial photos  10. Hero network parallax
    11. Logo strip pause  12. Testimonial carousel  13. Video (click to load) and booking
-   14. Article contents (sticky sidebar)  15. Insight topic filters  16. Share this (articles)
+   14. Article contents (sticky sidebar)  15. Resource search and filters  16. Share this (articles)
    17. Card pager (professionals: challenges)  18. Event gallery marquee
    19. Event buttons after the event  20. Event photo slideshows
    Each module checks that its elements exist, so one file serves every page.
@@ -133,6 +133,7 @@
       e.preventDefault();
       select((next + tabs.length) % tabs.length, true);
     });
+    return select;
   }
 
   // Make it concrete: three cards (the task, AI assists, you review) change together for each task
@@ -174,13 +175,45 @@
   var scenes = $$(".scene");
   if (scenes.length) {
     var stepTabs = $$("[data-step]");
-    tablist($(".steps"), stepTabs, function (i) {
+    var journey = $("#journey.section--dark");
+    var current = 0;
+    var fromScroll = false;
+    var pinQuery = window.matchMedia("(min-width: 901px) and (min-height: 700px)");
+    var pinned = function () { return !reduceMotion && pinQuery.matches; };
+    // The pin holds from the section top meeting the header until its bottom meets the viewport bottom
+    var headH = function () { return header ? header.offsetHeight : 0; };
+    var pinRun = function () { return journey.offsetHeight - window.innerHeight + headH(); };
+    // Scroll position for stage i: the middle of that stage's slice of the pinned run
+    var stageTop = function (i) {
+      return journey.getBoundingClientRect().top + window.scrollY - headH() + pinRun() * (i + 0.5) / scenes.length;
+    };
+    var selectStep = tablist($(".steps"), stepTabs, function (i) {
+      current = i;
       scenes.forEach(function (s, n) {
         var on = n === i;
         s.hidden = !on;
         s.classList.toggle("is-active", on);
       });
+      // A click or arrow key moves the page to that stage so scrolling carries on from there
+      if (!fromScroll && pinned()) window.scrollTo({ top: stageTop(i), behavior: "smooth" });
     });
+
+    // Pinned on wide screens: scrolling through the section steps through the stages, no clicks needed
+    if (journey && selectStep) {
+      var pinTicking = false;
+      var onPinScroll = function () {
+        pinTicking = false;
+        if (!pinned()) return;
+        var p = (headH() - journey.getBoundingClientRect().top) / pinRun();
+        p = Math.min(Math.max(p, 0), 0.9999);
+        var i = Math.floor(p * scenes.length);
+        if (i !== current) { fromScroll = true; selectStep(i); fromScroll = false; }
+      };
+      var setPin = function () { journey.classList.toggle("is-pinned", pinned()); onPinScroll(); };
+      window.addEventListener("scroll", function () { if (!pinTicking) { pinTicking = true; requestAnimationFrame(onPinScroll); } }, { passive: true });
+      if (pinQuery.addEventListener) pinQuery.addEventListener("change", setPin);
+      setPin();
+    }
   }
 
   /* ---- 5. Program selector (learn) --------------------------------------- */
@@ -333,7 +366,7 @@
   }
 
   /* ---- 7. Analytics events ------------------------------------------------ */
-  if (location.pathname.indexOf("/free-ai-starter-kit/") === 0 && !dl) track("landing_view", { offer_id: "ai-workflow-starter-kit" });
+  if (location.pathname.indexOf("/start-your-ai-journey/") === 0 && !dl) track("landing_view", { offer_id: "ai-workflow-starter-kit" });
   doc.addEventListener("click", function (e) {
     var el = e.target.closest && e.target.closest("[data-track]");
     if (el) track(el.getAttribute("data-track"), { link_url: el.getAttribute("href") || "" });
@@ -348,10 +381,10 @@
   if (cal) {
     var calEvents = [];
     try { calEvents = JSON.parse($("[data-cal-data]", cal).textContent) || []; } catch (err) { calEvents = []; }
-    // An event that has ended since this page was built is shown as past, without its button
+    // An event that has ended since this page was built is shown as past: its title only
     calEvents.forEach(function (ev) {
       if (ev.past || !ev.endsAt || !(Date.parse(ev.endsAt) <= Date.now())) return;
-      ev.past = true; ev.cta = null; ev.url = ev.pastUrl || ev.url; ev.external = /^https?:/i.test(ev.url);
+      ev.past = true;
     });
     var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -435,8 +468,21 @@
       if (dir) replay(grid, dir > 0 ? "is-turning-next" : "is-turning-prev");
     };
     var eventItem = function (ev, i) {
-      var li = el("li", "cal__item");
+      var li = el("li", "cal__item" + (ev.past ? " cal__item--past" : ""));
       li.style.setProperty("--c", i);
+      // The event card's photos (built by tools/render.mjs eventFigure), slideshow and all
+      if (ev.figure) {
+        var tmp = el("div");
+        tmp.innerHTML = ev.figure;
+        var fig = tmp.firstElementChild;
+        if (fig) { fig.classList.add("cal__photo"); li.appendChild(fig); if (fig.hasAttribute("data-slides")) slideshow(fig); }
+      }
+      // A past event: its photos, "Past event" and its title only, without details or a link
+      if (ev.past) {
+        li.appendChild(el("span", "cal__count cal__count--past", countdown(ev)));
+        li.appendChild(el("h4", "", ev.title));
+        return li;
+      }
       li.appendChild(el("span", "cal__count" + (ev.past ? " cal__count--past" : ""), countdown(ev)));
       li.appendChild(el("h4", "", ev.title));
       if (ev.summary) li.appendChild(el("p", "", ev.summary));
@@ -444,7 +490,7 @@
       if (ev.time) meta.appendChild(el("span", "", ev.time));
       if (ev.location) meta.appendChild(el("span", "", ev.location));
       if (meta.childNodes.length) li.appendChild(meta);
-      var a = el("a", "btn" + (ev.cta ? "" : " btn--light"), ev.cta || (ev.past ? "See the event" : "Event details"));
+      var a = el("a", "btn" + (ev.cta ? "" : " btn--light"), ev.cta || "Event details");
       a.href = ev.url;
       if (ev.cta) a.setAttribute("data-track", "registration_start");
       if (ev.cta) {
@@ -601,139 +647,87 @@
   });
 
   /* ---- 12. Testimonial carousel -------------------------------------------- */
-  // A looping deck of cards. One number, pos, says where the deck is (2.5 = halfway between the
-  // third and fourth card); every frame each card is placed from its distance to it: the active
-  // card upright in the centre, the others turned away behind it, smaller and veiled, fading out
-  // well before they wrap round to the other side. Position, scale, veil, opacity and stacking all
-  // come from that one distance, so they always move together. pos follows a critically damped
-  // spring towards a whole-number target, so moves ease in and out and a new move mid-glide keeps
-  // its momentum; once the deck settles, both are brought back into 0…n-1 so it can loop forever.
-  // The deck advances on its own every few seconds, and a thin line under it fills for the time
-  // the card has left: one animation is both the line and the clock, so they cannot drift apart.
-  // It pauses (and the line holds) while the deck is hovered, focused, off screen or in a
-  // background tab; a swipe, drag, click or key starts the line again from empty. A swipe or mouse
-  // drag moves the deck with the pointer (vertical swipes still scroll the page); a flick carries
-  // on to the next card, a click on a side card brings it forward, and the arrow keys step through
-  // it. Reduced motion: no autoplay or line, and moves jump instead of gliding. Without JS: the
-  // scroll-snap row.
+  // A stack of cards. The active card lies on top and the next two are tucked behind it, turned a
+  // little, their edges showing below; the rest wait out of sight at the back. Each card's place in
+  // the pile is data-depth (0 on top, 1, 2, then "far"); the CSS sets the look and glides between
+  // places. Moving on, the top card swings out to the right and slips to the back of the pile;
+  // moving back, the card from the back swings in from the right onto the top (the .is-out and
+  // .is-in keyframes). The stack moves on by itself every few seconds, and pauses while it is
+  // hovered, focused, off screen or in a background tab; the buttons, a horizontal swipe and the
+  // arrow keys flip through it, and any of them starts the wait again. Reduced motion: no autoplay,
+  // and cards change place without the swing. Without JS: the scroll-snap row.
   $$("[data-carousel]").forEach(function (box) {
     var track = $(".voices__track", box);
     var slides = $$("[data-slide]", box);
     var n = slides.length;
     if (!track || n < 2) return;
-    var live = $("[data-carousel-live]", box);
-    var bar = $("[data-carousel-progress]", box);
-    var DWELL = 6000, STIFF = 46, DAMP = 2 * Math.sqrt(STIFF);
-    var pos = 0, vel = 0, target = 0, i = -1, frame = 0, last = 0, step = 1, settle = 0, top = -1;
-    var clock = null, timer = 0;
-    var hold = { hover: false, focus: false, drag: false, away: true, hidden: doc.hidden };
+    var count = $("[data-carousel-count]", box);
+    var DWELL = 6500, i = 0, timer = 0;
+    var hold = { hover: false, focus: false, away: true, hidden: doc.hidden };
     var wrap = function (x) { return ((x % n) + n) % n; };
     var held = function () { for (var key in hold) if (hold[key]) return true; return false; };
-    var order = slides.map(function (s, j) { return j; });
 
-    var measure = function () {
-      step = slides[0].offsetWidth * (window.innerWidth <= 640 ? 0.5 : 0.62);
-    };
-    var setActive = function (k, announce) {
-      if (k === i) return;
-      i = k;
+    var paint = function () {
       slides.forEach(function (s, j) {
-        s.classList.toggle("is-active", j === i);
-        s.setAttribute("aria-hidden", String(j !== i));
+        var d = wrap(j - i);
+        s.setAttribute("data-depth", d < 3 ? String(d) : "far");
+        s.style.zIndex = String(n - d);
+        s.classList.toggle("is-active", d === 0);
+        s.setAttribute("aria-hidden", String(d !== 0));
       });
-      clearTimeout(settle);
-      if (announce && live) settle = setTimeout(function () { live.textContent = "Testimonial " + (i + 1) + " of " + n; }, 350);
+      if (count) count.textContent = (i + 1) + " / " + n;
     };
-    // Signed distance of card j from the centre, between -n/2 and n/2
-    var offset = function (j) {
-      var o = wrap(j - pos);
-      return o > n / 2 ? o - n : o;
-    };
-    var place = function () {
-      var gone = Math.min(2.6, n / 2 - 0.05); // fully faded (and hidden) just before a card wraps
-      var dist = slides.map(function (s, j) { return Math.abs(offset(j)); });
-      slides.forEach(function (s, j) {
-        var o = offset(j), a = dist[j], sign = o < 0 ? -1 : 1, near = Math.min(a, 1.6);
-        var x = sign * step * (a <= 1 ? a : 1 + (a - 1) * 0.55);
-        var fade = Math.max(0, Math.min(1, (gone - a) / 0.6));
-        s.style.transform = "translate3d(" + x.toFixed(1) + "px," + (a * 10).toFixed(1) + "px," + (-a * 150).toFixed(1) + "px)" +
-          " rotateY(" + (sign * near * 20).toFixed(2) + "deg) rotateZ(" + (sign * near * 2.4).toFixed(2) + "deg) scale(" + (1 - Math.min(a, 2) * 0.07).toFixed(4) + ")";
-        s.style.opacity = fade.toFixed(3);
-        s.style.visibility = fade > 0 ? "visible" : "hidden";
-        s.style.setProperty("--veil", Math.min(1, a).toFixed(3));
-      });
-      // Stacking: nearest card on top, every card a distinct whole z-index (never a tie). The two
-      // cards crossing the centre swap at the halfway point, with a little hysteresis so a finger
-      // resting near halfway can't make them flicker; at an exact tie the card being moved to wins.
-      var goal = wrap(target);
-      order.sort(function (p, q) {
-        var dp = dist[p] - (p === top ? 0.04 : 0), dq = dist[q] - (q === top ? 0.04 : 0);
-        return dp - dq || (p === goal ? -1 : q === goal ? 1 : p - q);
-      });
-      top = order[0];
-      order.forEach(function (j, rank) { slides[j].style.zIndex = String(n - rank); });
-    };
-    var tick = function (now) {
-      frame = 0;
-      // Real elapsed time, integrated in small fixed steps: a slow frame on a phone lands where it
-      // should instead of stalling, and the first frame (whose timestamp can predate run()) can't
-      // step backwards
-      var dt = last ? Math.min(0.1, Math.max(0, (now - last) / 1000)) : 1 / 60;
-      last = now;
-      if (!hold.drag) {
-        for (var left = dt; left > 0; left -= 1 / 120) {
-          var h = Math.min(left, 1 / 120);
-          vel += (STIFF * (target - pos) - DAMP * vel) * h;
-          pos += vel * h;
-        }
-        if (Math.abs(target - pos) < 0.0005 && Math.abs(vel) < 0.0005) {
-          // Settled: the same card, back in 0…n-1, so pos never grows however long the deck loops
-          target = wrap(target);
-          pos = target;
-          vel = 0;
-        }
-      }
-      place();
-      // goTo() has already made the target active; only a drag picks the card from the position
-      if (hold.drag) setActive(wrap(Math.round(pos)), false);
-      if (hold.drag || pos !== target) frame = requestAnimationFrame(tick);
-    };
-    var run = function () {
-      if (frame) return;
-      last = 0;
-      frame = requestAnimationFrame(tick);
-    };
-
-    // Autoplay clock. The progress line's fill animation is the timer: when it finishes, the deck
-    // moves on. A pause holds it where it is; every move starts it again from empty. Without the
-    // line (or Web Animations) a plain timeout, restarted after each move and pause, does the job.
-    var restart = function () {
-      if (clock) { clock.onfinish = null; clock.cancel(); clock = null; }
+    var schedule = function () {
       clearTimeout(timer);
-      if (reduceMotion) return;
-      if (bar && bar.animate) {
-        clock = bar.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: DWELL, easing: "linear", fill: "forwards" });
-        clock.onfinish = function () { goTo(target + 1, false); };
-        if (held()) clock.pause();
-      } else if (!held()) timer = setTimeout(function () { goTo(target + 1, false); }, DWELL);
+      if (!reduceMotion && !held()) timer = setTimeout(function () { go(1); }, DWELL);
     };
     var pause = function (key, on) {
       if (hold[key] === on) return;
       hold[key] = on;
-      if (!clock) restart();
-      else if (held()) clock.pause();
-      else clock.play();
+      schedule();
     };
+    // One card on (dir 1) or back (dir -1). The card that swings is the one leaving the top going
+    // forward, or the one arriving on top going back.
+    var go = function (dir) {
+      var leaving = slides[i];
+      i = wrap(i + dir);
+      if (!reduceMotion) {
+        var card = dir > 0 ? leaving : slides[i];
+        slides.forEach(function (s) { s.classList.remove("is-out", "is-in"); });
+        void card.offsetWidth; // restart the swing if the same card swings twice in a row
+        card.classList.add(dir > 0 ? "is-out" : "is-in");
+      }
+      paint();
+      schedule();
+    };
+    slides.forEach(function (s) {
+      s.addEventListener("animationend", function () { s.classList.remove("is-out", "is-in"); });
+    });
 
-    // Move to card k (any whole number; the deck loops), announcing it when a person asked
-    var goTo = function (k, announce) {
-      target = k;
-      if (reduceMotion) { pos = target; vel = 0; place(); }
-      setActive(wrap(target), announce);
-      run();
-      restart();
-    };
-    var nearest = function (k) { var d = wrap(k - target); return target + (d > n / 2 ? d - n : d); };
+    var prev = $("[data-carousel-prev]", box), next = $("[data-carousel-next]", box);
+    if (prev) prev.addEventListener("click", function () { go(-1); });
+    if (next) next.addEventListener("click", function () { go(1); });
+    track.addEventListener("keydown", function (e) {
+      var dir = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+      if (!dir) return;
+      e.preventDefault();
+      go(dir);
+    });
+    // Swipe: the track has touch-action: pan-y, so a vertical swipe still scrolls the page; a
+    // horizontal one of 40px or more flips the stack (left for the next card, right for the last).
+    var start = null;
+    track.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      start = { x: e.clientX, y: e.clientY };
+    });
+    track.addEventListener("pointerup", function (e) {
+      if (!start) return;
+      var dx = e.clientX - start.x, dy = e.clientY - start.y;
+      start = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+    });
+    track.addEventListener("pointercancel", function () { start = null; });
+    track.addEventListener("dragstart", function (e) { e.preventDefault(); });
 
     box.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") pause("hover", true); });
     box.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") pause("hover", false); });
@@ -742,78 +736,8 @@
     doc.addEventListener("visibilitychange", function () { pause("hidden", doc.hidden); });
     new IntersectionObserver(function (entries) { pause("away", !entries[0].isIntersecting); }, { threshold: 0.35 }).observe(box);
 
-    track.addEventListener("keydown", function (e) {
-      var to = { ArrowLeft: target - 1, ArrowRight: target + 1, Home: nearest(0), End: nearest(n - 1) }[e.key];
-      if (to === undefined) return;
-      e.preventDefault();
-      goTo(to, true);
-    });
-
-    // Swipe and drag. The track has touch-action: pan-y, so a mostly vertical swipe still scrolls
-    // the page; a horizontal one belongs to the deck from the first few pixels.
-    var drag = null, dragged = false;
-    track.addEventListener("pointerdown", function (e) {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, from: pos, start: target, lastX: e.clientX, lastT: e.timeStamp, v: 0 };
-      dragged = false;
-    });
-    track.addEventListener("pointermove", function (e) {
-      if (!drag || e.pointerId !== drag.id) return;
-      var dx = e.clientX - drag.x;
-      if (!dragged) {
-        if (Math.abs(dx) < 6) return;
-        if (Math.abs(e.clientY - drag.y) > Math.abs(dx)) { drag = null; return; }
-        dragged = true;
-        try { track.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
-        box.classList.add("is-dragging");
-        var sel = window.getSelection && window.getSelection();
-        if (sel) sel.removeAllRanges();
-        drag.from = pos;
-        drag.x = e.clientX;
-        drag.start = Math.round(pos);
-        dx = 0;
-        vel = 0;
-        pause("drag", true);
-        restart(); // the line starts again from empty and waits for the release
-        run();
-      }
-      var dt = Math.max(1, e.timeStamp - drag.lastT);
-      drag.v = 0.8 * ((drag.lastX - e.clientX) / step / (dt / 1000)) + 0.2 * drag.v;
-      drag.lastX = e.clientX;
-      drag.lastT = e.timeStamp;
-      pos = drag.from - dx / step;
-    });
-    var end = function (e) {
-      if (!drag || e.pointerId !== drag.id) return;
-      var d = drag;
-      drag = null;
-      if (!dragged) return;
-      box.classList.remove("is-dragging");
-      if (e.timeStamp - d.lastT > 120) d.v = 0; // held still before letting go: no flick
-      // Where the throw would carry the deck, at most two cards on; a short flick still moves one
-      var to = Math.round(pos + d.v * 0.22);
-      to = Math.max(d.start - 2, Math.min(d.start + 2, to));
-      if (to === d.start && Math.abs(pos - d.from) > 0.12) to = d.start + (pos > d.from ? 1 : -1);
-      vel = reduceMotion ? 0 : Math.max(-12, Math.min(12, d.v));
-      hold.drag = false;
-      goTo(to, true);
-    };
-    track.addEventListener("pointerup", end);
-    track.addEventListener("pointercancel", end);
-    track.addEventListener("click", function (e) {
-      if (dragged) { dragged = false; e.preventDefault(); return; }
-      var k = slides.indexOf(e.target.closest("[data-slide]"));
-      if (k > -1 && k !== i) goTo(nearest(k), true);
-    });
-    track.addEventListener("dragstart", function (e) { e.preventDefault(); });
-
-    window.addEventListener("resize", function () { measure(); place(); });
-    box.classList.add("is-ready", "is-deck");
-    if (reduceMotion) box.classList.add("is-static"); // no autoplay, so no progress line
-    measure();
-    place();
-    setActive(0, false);
-    restart();
+    box.classList.add("is-ready", "is-stack");
+    paint();
   });
 
   /* ---- 13. Video (click to load) and booking ------------------------------- */
@@ -886,26 +810,37 @@
     tocUpdate();
   }
 
-  /* ---- 15. Insight topic filters (resources) ------------------------------- */
-  // The chips stay hidden without JS, so every article is listed. A row matches when any of its
-  // categories is the chosen topic.
-  var insightFilters = $("[data-insight-filters]");
-  if (insightFilters) {
-    var insightRows = $$("[data-insight-list] > li"), insightNone = $("[data-insight-none]");
-    var insightChips = $$("[data-topic]", insightFilters);
-    insightFilters.hidden = false;
-    insightChips.forEach(function (chip) {
-      chip.addEventListener("click", function () {
-        var topic = chip.getAttribute("data-topic"), shown = 0;
-        insightChips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
-        insightRows.forEach(function (row) {
-          var match = !topic || row.getAttribute("data-topics").split("|").indexOf(topic) >= 0;
-          row.hidden = !match;
-          if (match) shown++;
-        });
-        if (insightNone) insightNone.hidden = shown > 0;
-        track("insight_filter", { topic: topic || "all" });
+  /* ---- 15. Resource search and type filters (resources) ------------------- */
+  // The search box and chips stay hidden without JS, so every resource is listed. A card shows
+  // when it has the chosen type and every word typed appears in its title, summary or labels.
+  var rTools = $("[data-rcards-tools]");
+  if (rTools) {
+    var rCards = $$("[data-rcards-list] > li"), rNone = $("[data-rcards-none]"), rSearch = $("[data-rcards-search]", rTools);
+    var rChips = $$("[data-type]", rTools), rType = "", rTimer;
+    rTools.hidden = false;
+    var rApply = function () {
+      var words = rSearch.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
+      rCards.forEach(function (card) {
+        var text = card.getAttribute("data-search") || "";
+        var match = (!rType || card.getAttribute("data-type") === rType) && words.every(function (w) { return text.indexOf(w) >= 0; });
+        card.hidden = !match;
+        if (match) shown++;
       });
+      if (rNone) rNone.hidden = shown > 0;
+    };
+    rChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        rType = chip.getAttribute("data-type");
+        rChips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
+        rApply();
+        track("resource_filter", { type: rType || "all" });
+      });
+    });
+    rSearch.addEventListener("input", function () {
+      rApply();
+      clearTimeout(rTimer);
+      // One event per pause in typing; the words themselves are never sent
+      rTimer = setTimeout(function () { if (rSearch.value.trim()) track("resource_search", {}); }, 1200);
     });
   }
 
@@ -941,6 +876,24 @@
           if (w) { w.opener = null; e.preventDefault(); }
         }
       });
+    });
+  }
+
+  /* ---- 16b. Stat reveals --------------------------------------------------- */
+  // For Professionals record cards: hover and keyboard focus reveal each card's link or flags in
+  // CSS; a tap (touch has no hover) toggles one card open, and a tap elsewhere closes it.
+  var stats = $$("[data-stat]");
+  stats.forEach(function (card) {
+    card.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;
+      var open = !card.classList.contains("is-open");
+      stats.forEach(function (c) { c.classList.remove("is-open"); });
+      card.classList.toggle("is-open", open);
+    });
+  });
+  if (stats.length) {
+    doc.addEventListener("click", function (e) {
+      if (!e.target.closest("[data-stat]")) stats.forEach(function (c) { c.classList.remove("is-open"); });
     });
   }
 
@@ -997,19 +950,21 @@
 
   /* ---- 19. Event buttons after the event ---------------------------------- */
   // Registration buttons carry the event's end (data-event-end, from the build). A page built
-  // before the event ended drops them once it is over; the next daily rebuild does the same on
-  // the server.
+  // before the event ended drops them once it is over (on a card, with its "Event details" link,
+  // as past cards have none); the next daily rebuild does the same on the server.
   $$("[data-event-end]").forEach(function (btn) {
     if (!(Date.parse(btn.getAttribute("data-event-end")) <= Date.now())) return;
     var box = btn.parentNode;
     btn.remove();
-    if (box && box.classList.contains("event__cta") && !box.children.length) box.remove();
+    if (box && box.classList.contains("event__cta")) box.remove();
   });
 
   /* ---- 20. Event photo slideshows ------------------------------------------- */
   // Event cards with several photos: Previous/Next buttons (and the arrow keys while focus is in
   // the slideshow) show one photo at a time, wrapping round; the count is announced politely.
-  $$("[data-slides]").forEach(function (box) {
+  // The calendar panel (§8) runs the same for the photos it shows.
+  $$("[data-slides]").forEach(slideshow);
+  function slideshow(box) {
     var slides = $$("[data-slide]", box), nav = $("[data-slides-nav]", box), count = $("[data-slide-count]", box);
     if (slides.length < 2 || !nav) return;
     var at = 0;
@@ -1028,7 +983,7 @@
       e.preventDefault();
       show(at + (e.key === "ArrowLeft" ? -1 : 1));
     });
-  });
+  }
 
   window.__fwReady = true;
 })();

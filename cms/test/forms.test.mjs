@@ -51,13 +51,9 @@ const rows = (app) => app.store.list("form_submissions");
 
 /* ---- Shared definitions ---------------------------------------------------- */
 
-test("the website renders exactly the fields the server accepts; the other forms are GoHighLevel embeds", () => {
+test("the website forms are GoHighLevel embeds", () => {
   R.init({ events: [], programs: [], site: {} });
-  const html = R.contactForm();
-  assert.match(html, /data-fw-form="general_contact"/);
-  const names = [...html.matchAll(/<(?:input|select|textarea)[^>]*\bname="([^"]+)"/g)].map((m) => m[1]).filter((n) => !["website", "consent_marketing"].includes(n));
-  assert.deepEqual(names, [...FORMS.general_contact.fields.map((f) => f.name), ...(FORMS.general_contact.hidden || [])], "general_contact fields");
-  for (const embed of [R.starterKitForm(), R.proposalForm(), R.speakingForm(), R.demoForm(), R.notifyForm(), R.programForm({ title: "X" })]) {
+  for (const embed of [R.contactForm(), R.starterKitForm(), R.proposalForm(), R.speakingForm(), R.demoForm(), R.notifyForm(), R.programForm({ title: "X" })]) {
     assert.match(embed, /class="form form--ghl"[^]*<iframe[^>]+src="https:\/\/api\.faithph\.ai\/widget\/form\/[A-Za-z0-9]+"/);
     assert.doesNotMatch(embed, /data-fw-form/, "not sent to the CMS");
   }

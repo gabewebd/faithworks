@@ -153,7 +153,7 @@ test("reading time is calculated by the server; a typed value is ignored", async
   const r = await u.author.post("/api/records/resources", { data: { title: "Reading", slug: "reading", resource_type: "article", category: "AI", summary: "S", publish_date: "2026-10-16", read_time: "99 min read", body_html: `<p>${"word ".repeat(900)}</p>`, doc_version: DOC_VERSION } });
   assert.equal(rec(r).read_time, "5 min read");
   const g = await u.author.post("/api/records/resources", { data: { title: "Guide", slug: "guide-x", resource_type: "guide", category: "AI", summary: "S", publish_date: "2026-10-16", body_html: "<p>x</p>", file_url: "/files/guide.pdf" } });
-  assert.equal(rec(g).read_time, "", "no reading time for guides");
+  assert.equal(rec(g).read_time, "1 min read", "every resource type is an article page with a reading time");
   cleanup();
 });
 
@@ -217,7 +217,7 @@ test("testimonial cards: the quote, the name and role, an optional round photo; 
   cleanup();
 });
 
-test("home testimonial deck: brand colours by position, never charcoal; role below the name; a progress line", async () => {
+test("home testimonial deck: brand colours by position, never charcoal; role below the name; previous and next buttons", async () => {
   const R = await import("../../tools/render.mjs");
   const { toRenderData } = await import("../../tools/content.mjs");
   const { buildSnapshot } = await import("../shared/public.mjs");
@@ -231,9 +231,11 @@ test("home testimonial deck: brand colours by position, never charcoal; role bel
   tones.forEach((c, i) => assert.notEqual(c, tones[(i + 1) % tones.length], "neighbours differ, round the loop too"));
   assert.match(html, /<b class="voice__name">A<\/b><span class="voice__role">HR Manager<\/span>/);
   assert.match(html, /<b class="voice__name">B<\/b><span class="voice__role">Faith Works participant<\/span>/, "no role: the standard line");
-  assert.match(html, /class="voices__progress" aria-hidden="true"><span data-carousel-progress><\/span>/);
+  assert.match(html, /data-carousel-prev aria-controls="voices-track" aria-label="Previous testimonial"/);
+  assert.match(html, /data-carousel-next aria-controls="voices-track" aria-label="Next testimonial"/);
+  assert.match(html, /data-carousel-count>1 \/ 7<\/p>/);
   R.init(toRenderData(buildSnapshot({ records: { ...records, testimonials: records.testimonials.slice(0, 1) }, view: "preview" })));
-  assert.ok(!R.voices().includes("voices__progress"), "one card: no autoplay, so no line");
+  assert.ok(!R.voices().includes("voices__nav"), "one card: nothing to flip through, so no buttons");
 });
 
 test("event cards: registration buttons follow the destination; no empty buttons", async () => {
@@ -267,11 +269,13 @@ test("event cards: registration buttons follow the destination; no empty buttons
   assert.ok(R.eventPage(d.events.find((e) => e.slug === "cms-page")).body.includes("<h1>Page</h1>"));
   const cal = R.calendarData();
   assert.deepEqual(cal.map((e) => [e.id, e.start, e.end, e.url]), [
-    ["old", "2020-01-10T13:00:00+08:00", "2020-01-10T17:00:00+08:00", "/workshops/#event-old"],
+    ["old", "2020-01-10T13:00:00+08:00", "2020-01-10T17:00:00+08:00", undefined],
     ["ghl", "2099-01-10T13:00:00+08:00", "2099-01-10T17:00:00+08:00", "/events/ghl/"],
     ["info", "2099-01-11T13:00:00+08:00", "2099-01-11T17:00:00+08:00", "/workshops/#event-info"],
     ["cms-page", "2099-01-12T13:00:00+08:00", "2099-01-12T17:00:00+08:00", "/events/cms-page/"],
   ]);
+  const old = cal.find((e) => e.id === "old");
+  assert.ok(old.past && !old.cta && !old.summary && !old.time && !old.location && !old.endsAt, "a past event keeps only its title and dates");
   assert.ok(R.eventCalendar().includes("data-cal-data"), "the calendar embeds the same data");
 });
 
@@ -320,7 +324,7 @@ test("scoped Page CSS keeps its design tokens even when it starts with a comment
   assert.ok(!/\.cms-body--x \/\*/.test(scoped), "no comment glued into a selector");
 });
 
-test("listings: empty states, featured resources, Keep reading cards, article contents", async () => {
+test("listings: empty states, resource cards, Keep reading cards, article contents", async () => {
   const R = await import("../../tools/render.mjs");
   const { toRenderData } = await import("../../tools/content.mjs");
   const { buildSnapshot } = await import("../shared/public.mjs");
@@ -328,19 +332,24 @@ test("listings: empty states, featured resources, Keep reading cards, article co
   for (const html of [R.programRowsHome(), R.programLinks(), R.resourcesEmpty(), R.events("upcoming")]) {
     assert.match(html, /^<div class="empty"><p><strong>[^<]+<\/strong>/, "one empty panel everywhere");
   }
-  for (const html of [R.resourceFeatured(), R.resourceList(), R.guides(), R.featuredInsight(), R.insightList(), R.events("past"), R.voices()]) assert.equal(html, R.EMPTY_SECTION);
+  for (const html of [R.resourceCards(), R.events("past"), R.voices()]) assert.equal(html, R.EMPTY_SECTION);
   assert.equal(R.dropEmptySections(`<p>a</p><!-- label --><section><h2>X</h2>${R.EMPTY_SECTION}</section><p>b</p>`), "<p>a</p><p>b</p>");
   assert.equal(R.dropEmptySections(`<section>x</section><div>${R.EMPTY_SECTION}</div>`), "<section>x</section><div></div>", "only the section that holds it");
 
   R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings, resources: seed.resources }, view: "preview" })));
-  const feat = R.resourceFeatured();
-  const insight = R.featuredInsight();
-  assert.equal((insight.match(/<h2 id="insight-title">/g) || []).length, 1, "one featured insight");
-  assert.equal((feat.match(/class="rfeat__item/g) || []).length, seed.resources.filter((r) => r.featured).length - 1, "the lead insight is not repeated as a card");
-  assert.match(feat, /rfeat__item rfeat__item--lead/);
-  assert.ok(seed.resources.filter((r) => r.featured).every((r) => !R.resourceList().includes(`>${r.title}<`) && !R.insightList().includes(`>${r.title}<`)), "featured items are not repeated below");
-  assert.match(R.insightList(), /data-insight-filters hidden/, "topic filters appear only with JS");
+  const cards = R.resourceCards();
+  assert.equal((cards.match(/<li class="rcard/g) || []).length, seed.resources.length, "every resource, guides and worksheets included, is a card");
+  assert.equal((cards.match(/rcard--lead/g) || []).length, 1, "one wide featured card");
+  assert.match(cards, /class="rcard__type">Guide<[^]*?href="\/start-your-ai-journey\/"/, "a guide without a page keeps its Start Your AI Journey link");
+  assert.match(cards, /data-type="worksheet"[^]*?href="\/assets\/downloads\/AI_Workflow_Starter\.txt" download/, "a worksheet file still downloads");
+  assert.ok(!cards.includes("starter_kit_click") && !/sign-up/i.test(cards), "no sign-up behaviour on resource cards");
+  assert.match(cards, /data-rcards-tools hidden/, "search and filters appear only with JS");
+  assert.match(cards, /data-type="">All<\/button>[^]*data-type="guide">Guide<\/button>/, "the Type is the filter");
   assert.equal(R.resourcesEmpty(), R.EMPTY_SECTION);
+
+  const guide = toRenderData(buildSnapshot({ records: { settings: seed.settings, resources: [{ ...seed.resources.find((r) => r.resource_type === "guide"), body_html: "<p>Written like an article.</p>" }] }, view: "preview" })).articles[0];
+  assert.ok(guide.hasPage && guide.href === `/resources/${guide.slug}/`, "a guide with content is a page like any article");
+  assert.match(R.articlePage(guide).body, /class="article__body"[^]*Written like an article/);
 
   const html = `<p>Intro</p><div class="article__body"><h2>Why it works</h2><p>a</p><h2 id="kept">Kept id</h2><h2>Why it works</h2></div><p>after</p>`;
   const out = R.withToc(html);

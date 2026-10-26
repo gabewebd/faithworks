@@ -1,14 +1,14 @@
 <!--meta {
   "path": "/resources/",
   "title": "Free AI resources · Guides, worksheets and articles · Faith Works",
-  "description": "Free guides, worksheets and practical articles to help you start with one useful AI workflow. Clear labels show what downloads directly and what needs a sign-up.",
+  "description": "Free guides, worksheets and practical articles to help you start with one useful AI workflow. Search them all, or filter by type.",
   "nav": "resources"
 }-->
     <section class="phero phero--stone phero--compact" aria-labelledby="res-title">
       <div class="wrap phero__grid">
         <div class="phero__copy" data-reveal>
           <h1 id="res-title">Resources for your first workflow.</h1>
-          <p class="phero__lead">Free guides, worksheets and short articles. Each one is labelled: what downloads straight away, and what we send after a sign-up.</p>
+          <p class="phero__lead">Free guides, worksheets and short articles. Search them all, or filter by type to find what you need.</p>
         </div>
       </div>
     </section>
@@ -18,29 +18,13 @@
       {{resourcesEmpty}}
     </section>
 
-    <!-- FEATURED INSIGHT: the newest featured article on a full-width Faith Pink band -->
-    <section class="insight" aria-labelledby="insight-title">
-      {{featuredInsight}}
-    </section>
-
-    <!-- LATEST INSIGHTS: the other articles as editorial rows, filterable by topic -->
-    <section class="section wrap insights" aria-labelledby="articles-title">
-      <div class="insights__head">
-        <div>
-          <p class="eyebrow">Latest insights</p>
-          <h2 id="articles-title">Read something<br>useful today.</h2>
-        </div>
-      </div>
-      {{insightList}}
-    </section>
-
-    <!-- GUIDES: featured guides as large cards, then the rest -->
-    <section class="section section--flush-top wrap" aria-labelledby="guides-title">
+    <!-- ALL RESOURCES: one card per resource (articles, guides, worksheets…), searchable and filterable by type -->
+    <section class="section wrap rcards-section" aria-labelledby="all-title">
       <div class="section-head">
-        <h2 id="guides-title">Guides and worksheets</h2>
-        <p>Tools you can use on your own work. Each card says how you get it.</p>
+        <h2 id="all-title">All resources</h2>
+        <p>Every guide, worksheet and article in one place. The label on each card shows its type.</p>
       </div>
-      {{guides}}
+      {{resourceCards}}
     </section>
 
     <section class="section section--flush-top wrap">

@@ -166,18 +166,20 @@ export const COLLECTIONS = {
   resources: {
     label: "Resources", singular: "Resource", prefix: "res", labelField: "title", route: "/resources/{slug}/", page: "Resource page",
     description: "Articles, guides, templates, checklists and other resources.",
-    groups: { main: "Resource", dest: "Card button", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
+    groups: { main: "Resource", dest: "Link instead of a page", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
     fields: [
       f("title", "Title", "text", { group: "main", required: true, max: 160, help: "The page’s main heading. Editing the heading in the page editor changes it here too." }),
       f("slug", "URL slug", "slug", { group: "main", required: true }),
-      f("resource_type", "Type", "select", { group: "main", required: true, options: opt([["article", "Article"], ["guide", "Guide"], ["worksheet", "Worksheet"], ["template", "Template"], ["checklist", "Checklist"], ["playbook", "Playbook"], ["tool", "Free tool"], ["other", "Other"]]), help: "Articles are read on this site. Other types are listed on Resources with a button to their destination, and have their own page only when the page editor has content." }),
+      f("resource_type", "Type", "select", { group: "main", required: true, options: opt([["article", "Article"], ["guide", "Guide"], ["worksheet", "Worksheet"], ["template", "Template"], ["checklist", "Checklist"], ["playbook", "Playbook"], ["tool", "Free tool"], ["other", "Other"]]), help: "Every type is a page you write in the page editor, like an article. The Type is shown as the badge on its card and used as a filter on Resources." }),
       f("category", "Category label", "text", { group: "main", required: true, max: 80, help: "Shown on cards, e.g. “AI” or “Guide and worksheets”." }),
       f("summary", "Summary", "textarea", { group: "main", required: true, max: 500, rows: 3, help: "Shown on cards and as the article introduction." }),
       f("publish_date", "Publish date", "date", { group: "main", required: true }),
-      f("read_time", "Reading time", "text", { group: "main", computed: true, showIf: (r) => r.resource_type === "article", help: "Calculated from the article text whenever it changes." }),
+      f("read_time", "Reading time", "text", { group: "main", computed: true, help: "Calculated from the article text whenever it changes." }),
       f("featured", "Feature this resource", "boolean", { group: "main" }),
-      f("file_url", "Destination URL", "url", { group: "dest", showIf: (r) => r.resource_type !== "article", help: "Where the card’s button goes: the file, the sign-up page or the external site. The button’s label follows the Type, e.g. “Read guide” (“Download …” for a file)." }),
-      // The button label now follows the Type (tools/content.mjs resourceButton); kept for older records.
+      // Older guides and worksheets linked their card to a file or page instead of having a page.
+      // Shown only for those (or while the page is empty); a page always wins over the link.
+      f("file_url", "Card link (only without page content)", "url", { group: "dest", showIf: (r) => !!r.file_url || !String(r.body_html || "").trim(), help: "Optional. Used only while the page has no content: the card then opens this file or page (for example /start-your-ai-journey/). Leave empty and write the page instead." }),
+      // Kept for older records; the card label follows the Type.
       f("cta_label", "Button label", "text", { group: "dest", max: 80, showIf: () => false }),
       ...PAGE("Resource page"),
       f("cover_image_url", "Featured image URL", "url", { group: "media", image: true, help: "Optional. Shown on article cards and at the top of the article." }),

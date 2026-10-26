@@ -1,0 +1,403 @@
+/* ==========================================================================
+   Faith Works — hero redesign (review route /redesign-final/ only)
+   Loaded by src/pages/redesign-final.html; every rule is scoped to .rf-page, so the live
+   homepage, /home-redesign/ and every other page are untouched. Builds on css/style.css tokens:
+   the four brand colours (Faith Pink, AI Yellow, Works White, Soft Charcoal), their tints and
+   mixes only; Poppins + Inter.
+
+   The idea: one connected place. A wide morning field (pink from the lower left, yellow light
+   from above, Works White between) carries a fine circuit of rounded orthogonal lines. AI tools
+   sit on the lines, the three turning points as glowing diamonds; a few glass cards show the
+   work the lines lead to. The copy anchors the lower left on a soft Works White veil.
+
+   1. Tokens + page  2. Hero frame + sky  3. Network (lines, diamonds, tiles)  4. Cards
+   5. Copy  6. Motion  7. Responsive  8. Reduced motion
+   9. Section 02 · Pathways (its own layout, motion, responsive and reduced motion)
+   ========================================================================== */
+
+/* 1. Tokens + page ------------------------------------------------------------ */
+.rf-page {
+  --rf-line: rgb(179 131 141 / 0.66);              /* Faith Pink deepened with Charcoal: the circuit */
+  --rf-line-soft: rgb(179 131 141 / 0.3);
+  --rf-glass: rgb(255 255 255 / 0.62);
+  --rf-glass-strong: rgb(255 255 255 / 0.86);
+  --rf-glass-edge: rgb(255 255 255 / 0.92);
+  --rf-blur: blur(12px) saturate(1.35);
+  --rf-lift: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 18px 36px -20px rgb(26 26 26 / 0.32), 0 2px 5px rgb(26 26 26 / 0.04);
+  background: var(--paper);
+}
+/* Review route: the shared footer is not rendered yet */
+.rf-page .site-footer { display: none; }
+
+/* 2. Hero frame + sky --------------------------------------------------------- */
+.rf-page .rf-hero {
+  --hh: clamp(600px, calc(100svh - var(--header-h)), 900px);
+  position: relative; isolation: isolate; overflow: clip;
+  display: grid; align-content: end; height: var(--hh);
+  padding: 0 var(--edge) clamp(44px, 7vh, 80px);
+}
+.rf-page .rf-hero__sky { position: absolute; inset: 0; z-index: -2; overflow: hidden;
+  background:
+    radial-gradient(62% 80% at 0% 100%, rgb(239 172 186 / 0.85), rgb(239 172 186 / 0) 70%),
+    radial-gradient(46% 62% at 100% 52%, rgb(239 172 186 / 0.52), rgb(239 172 186 / 0) 72%),
+    radial-gradient(54% 60% at 62% -4%, rgb(251 197 34 / 0.36), rgb(251 197 34 / 0) 70%),
+    radial-gradient(38% 46% at 90% 104%, rgb(251 197 34 / 0.24), rgb(251 197 34 / 0) 72%),
+    linear-gradient(112deg, var(--pink-tint) 0%, var(--paper) 38%, var(--paper) 58%, rgb(250 235 192 / 0.55) 100%);
+}
+/* a slow bloom of AI Yellow drifting over the network side */
+.rf-page .rf-hero__light { position: absolute; left: 52%; top: 8%; width: 46vw; aspect-ratio: 1.3; border-radius: 50%; filter: blur(60px);
+  background: radial-gradient(closest-side, rgb(251 197 34 / 0.3), rgb(250 248 244 / 0.4) 55%, transparent); }
+/* fine grid and grain, strongest where the network lives */
+.rf-page .rf-hero__grid { position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(26 26 26 / 0.04) 1px, transparent 1px), linear-gradient(90deg, rgb(26 26 26 / 0.04) 1px, transparent 1px);
+  background-size: 160px 160px, 44px 44px, 44px 44px;
+  -webkit-mask-image: radial-gradient(70% 90% at 72% 40%, #000 10%, rgb(0 0 0 / 0.45) 55%, transparent 85%);
+  mask-image: radial-gradient(70% 90% at 72% 40%, #000 10%, rgb(0 0 0 / 0.45) 55%, transparent 85%); }
+
+/* The reading veil: Works White gathered behind the copy, so lines can pass under it */
+.rf-page .rf-hero__veil { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(40% 58% at 18% 70%, rgb(250 248 244 / 0.96), rgb(250 248 244 / 0.8) 50%, rgb(250 248 244 / 0) 82%); }
+
+/* 3. Network ------------------------------------------------------------------ */
+/* One 1440×880 stage. It is sized from the hero's height (so it always fills it top to bottom)
+   and centred, sliding left when the screen is narrower so the right-hand cluster stays whole.
+   Children use stage units: --x/--y place them, var(--u) (1/1440 of the stage) sizes them. */
+.rf-page .rf-hero__frame { position: absolute; inset: 0; z-index: 0; pointer-events: none; user-select: none; }
+.rf-page .rf-net {
+  --w: calc(var(--hh) * 1440 / 880);
+  --u: calc(100cqw / 1440);
+  position: absolute; top: 0; left: min((100% - var(--w)) / 2, (100% - var(--w)) * 0.8);
+  width: var(--w); aspect-ratio: 1440 / 880; container-type: inline-size;
+}
+.rf-page .rf-net__plane, .rf-page .rf-net__cards { position: absolute; inset: 0; }
+.rf-page .rf-net__lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.rf-page .rf-net__paths path { fill: none; stroke: var(--rf-line); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rf-page .rf-net__pulses path { fill: none; stroke: var(--yellow); stroke-width: 2.25; stroke-linecap: round; stroke-dasharray: 0 1; vector-effect: non-scaling-stroke; }
+.rf-page .rf-net__pulses { filter: drop-shadow(0 0 3px rgb(251 197 34 / 0.95)) drop-shadow(0 0 10px rgb(251 197 34 / 0.6)); }
+.rf-page .rf-net__dots circle { fill: var(--paper); stroke: rgb(179 131 141 / 0.85); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+
+/* Shared placement: centred on its point (margins), so scale/translate/transform stay free */
+.rf-page .rf-dia, .rf-page .rf-tile {
+  position: absolute; left: calc(var(--x) / 1440 * 100%); top: calc(var(--y) / 880 * 100%);
+  width: calc(var(--s) * var(--u)); height: calc(var(--s) * var(--u));
+  margin: calc(var(--s) * var(--u) / -2) 0 0 calc(var(--s) * var(--u) / -2);
+}
+
+/* Diamonds: a square turned 45°, lit AI Yellow from within, with a white lens for the logo */
+.rf-page .rf-dia { display: grid; place-items: center; }
+.rf-page .rf-dia::before, .rf-page .rf-dia::after { content: ""; position: absolute; inset: 0; rotate: 45deg; border-radius: 18%; }
+/* the glow behind: breathes on two of the three */
+.rf-page .rf-dia::before { inset: -28%; border-radius: 30%; background: radial-gradient(closest-side, rgb(251 197 34 / 0.55), rgb(251 197 34 / 0.18) 60%, transparent); filter: blur(6px); }
+.rf-page .rf-dia::after {
+  background: radial-gradient(70% 70% at 50% 50%, rgb(255 255 255 / 0.95) 0%, rgb(250 235 192 / 0.95) 46%, rgb(251 197 34 / 0.85) 100%);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) rgb(255 255 255 / 0.9), 0 0 0 calc(5 * var(--u)) rgb(255 255 255 / 0.4), 0 calc(14 * var(--u)) calc(28 * var(--u)) calc(-12 * var(--u)) rgb(26 26 26 / 0.3);
+}
+.rf-page .rf-dia__lens { position: relative; z-index: 1; display: grid; place-items: center; width: 50%; height: 50%; border-radius: 50%; background: var(--white); box-shadow: 0 0 0 1px rgb(26 26 26 / 0.06), 0 4px 10px -4px rgb(26 26 26 / 0.25); }
+.rf-page .rf-dia__lens img { width: 56%; height: 56%; object-fit: contain; }
+.rf-page .rf-dia--lead::after { background: radial-gradient(70% 70% at 50% 50%, rgb(255 255 255 / 0.95) 0%, rgb(250 235 192 / 0.95) 40%, rgb(251 197 34 / 0.95) 100%); }
+
+/* Tiles: one glass surface for every tool, whatever its own colours, so the set reads as one */
+.rf-page .rf-tile { display: grid; place-items: center; border-radius: 28%;
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.96), rgb(250 248 244 / 0.7));
+  box-shadow: inset 0 0 0 1px var(--rf-glass-edge), inset 0 -1px 0 rgb(26 26 26 / 0.05), 0 0 0 calc(5 * var(--u)) rgb(255 255 255 / 0.38), 0 0 0 calc(5 * var(--u) + 1px) rgb(179 131 141 / 0.16), 0 calc(14 * var(--u)) calc(26 * var(--u)) calc(-14 * var(--u)) rgb(26 26 26 / 0.34);
+  -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur); }
+.rf-page .rf-tile img { width: 46%; height: 46%; object-fit: contain; }
+.rf-page .rf-tile--app img { width: 48%; height: 48%; }
+
+/* 4. Cards ------------------------------------------------------------------- */
+/* Sized in em from one stage-relative font size, so each card keeps its proportions */
+.rf-page .rf-card { position: absolute; left: calc(var(--x) / 1440 * 100%); top: calc(var(--y) / 880 * 100%);
+  font: 500 max(calc(13 * var(--u)), 10px) / 1.3 var(--font); color: var(--ink); white-space: nowrap; }
+
+/* Chip: a single labelled step, like a tag on the line */
+.rf-page .rf-chip { display: inline-flex; align-items: center; gap: 0.7em; height: 3.08em; padding: 0 1.1em 0 0.5em; border-radius: 0.6em;
+  background: var(--rf-glass-strong); box-shadow: var(--rf-lift), inset 0 0 0 1px var(--rf-glass-edge); -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur); }
+.rf-page .rf-chip__mark { width: 2.1em; height: 2.1em; border-radius: 0.4em; background: radial-gradient(circle at 35% 30%, var(--white), rgb(250 235 192) 40%, var(--yellow) 75%, var(--pink) 120%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7); }
+
+/* Plan: the content-planning example, with its review step still to do */
+.rf-page .rf-plan { display: grid; gap: 0.55em; width: 20.6em; padding: 1em 1.05em 0.95em; border-radius: 0.95em;
+  background: linear-gradient(165deg, rgb(255 255 255 / 0.82), rgb(250 248 244 / 0.6)); box-shadow: var(--rf-lift), inset 0 0 0 1px var(--rf-glass-edge); -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur); }
+.rf-page .rf-plan__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2em; }
+.rf-page .rf-plan__title { font: 600 1.08em/1.2 var(--font-display); letter-spacing: -0.01em; }
+.rf-page .rf-plan__tag { padding: 0.25em 0.65em; border-radius: 999px; background: var(--pink-tint); font-size: 0.78em; font-weight: 600; letter-spacing: 0.04em; }
+.rf-page .rf-plan__row { display: flex; align-items: center; gap: 0.65em; padding: 0.55em 0.65em; border-radius: 0.55em; background: rgb(255 255 255 / 0.72); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.05); }
+.rf-page .rf-plan__box { flex: none; position: relative; width: 1.05em; height: 1.05em; border-radius: 0.3em; background: var(--pink); }
+.rf-page .rf-plan__box::after { content: ""; position: absolute; left: 34%; top: 16%; width: 26%; height: 48%; border: solid var(--ink); border-width: 0 0.13em 0.13em 0; rotate: 45deg; }
+.rf-page .rf-plan__foot { display: flex; align-items: center; gap: 0.6em; margin-top: 0.15em; padding: 0.45em 0.2em 0; border-top: 1px dashed rgb(179 131 141 / 0.45); font-size: 0.92em; }
+.rf-page .rf-plan__pulse { flex: none; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 0.3em rgb(251 197 34 / 0.25); }
+
+/* Steps: Learn. Implement. Scale. as a dashed group of status chips */
+.rf-page .rf-steps { display: grid; gap: 0.45em; width: 12.6em; padding: 0.55em; border-radius: 0.85em; border: 1px dashed rgb(179 131 141 / 0.6); background: rgb(255 255 255 / 0.28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.rf-page .rf-steps__label { padding: 0.1em 0.35em 0.1em; font-size: 0.78em; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+.rf-page .rf-steps__chip { display: flex; align-items: center; gap: 0.6em; height: 2.55em; padding: 0 0.75em; border-radius: 0.5em; background: var(--rf-glass-strong); box-shadow: inset 0 0 0 1px var(--rf-glass-edge), 0 8px 18px -12px rgb(26 26 26 / 0.3); }
+.rf-page .rf-steps__ico { flex: none; position: relative; width: 1.15em; height: 1.15em; border-radius: 50%; }
+.rf-page .is-done .rf-steps__ico { background: var(--ink); }
+.rf-page .is-done .rf-steps__ico::after { content: ""; position: absolute; left: 36%; top: 20%; width: 24%; height: 44%; border: solid var(--white); border-width: 0 0.12em 0.12em 0; rotate: 45deg; }
+.rf-page .is-now { box-shadow: inset 0 0 0 1px rgb(251 197 34 / 0.9), 0 0 0 0.25em rgb(251 197 34 / 0.18), 0 8px 18px -12px rgb(26 26 26 / 0.3); }
+.rf-page .is-now .rf-steps__ico { background: radial-gradient(circle, var(--yellow) 42%, rgb(251 197 34 / 0.25) 46%); }
+
+/* 5. Copy -------------------------------------------------------------------- */
+.rf-page .rf-hero__copy { position: relative; z-index: 2; max-width: 660px; }
+.rf-page .rf-eyebrow { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 clamp(18px, 2.4vh, 26px); padding: 7px 12px 7px 10px; border-radius: var(--r-sm);
+  background: rgb(255 255 255 / 0.6); box-shadow: inset 0 0 0 1px rgb(179 131 141 / 0.4); -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur);
+  font: 600 13px/1.2 var(--font); letter-spacing: 0.02em; }
+.rf-page .rf-eyebrow__dot { width: 7px; height: 7px; rotate: 45deg; border-radius: 1.5px; background: var(--pink); box-shadow: 0 0 0 3px rgb(239 172 186 / 0.3); }
+.rf-page .rf-title { margin: 0; font-weight: 700; text-wrap: initial; }
+.rf-page .rf-line { display: block; }
+.rf-page .rf-title__lead { display: block; font-size: clamp(50px, min(6.1vw, 10.6vh), 98px); line-height: 0.95; letter-spacing: -0.055em; }
+.rf-page .rf-title__sub { display: block; margin-top: clamp(10px, 1.4vh, 16px); font-size: clamp(24px, min(2.75vw, 4.8vh), 44px); font-weight: 600; line-height: 1.06; letter-spacing: -0.035em; }
+.rf-page .rf-intro { max-width: 30em; margin: clamp(20px, 2.8vh, 28px) 0 0; font-size: var(--fs-lead); line-height: 1.55; }
+.rf-page .rf-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: clamp(22px, 3vh, 32px); }
+.rf-page .rf-btn { min-height: 52px; padding: 14px 24px; font-size: 15px; }
+.rf-page .rf-btn:not(.rf-btn--glass) { box-shadow: 0 14px 28px -14px rgb(26 26 26 / 0.55); }
+.rf-page .rf-btn:not(.rf-btn--glass):hover { box-shadow: 0 18px 32px -14px rgb(26 26 26 / 0.6), 0 0 0 4px rgb(251 197 34 / 0.35); }
+.rf-page .rf-btn--glass { background: rgb(255 255 255 / 0.5); border-color: rgb(26 26 26 / 0.85); -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur); }
+.rf-page .rf-btn--glass:hover { background: var(--ink); color: var(--white); }
+.rf-page .rf-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.rf-page .rf-motto { display: flex; align-items: center; gap: 12px; margin: clamp(18px, 2.4vh, 24px) 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.rf-page .rf-motto::before { content: ""; width: 28px; height: 1px; background: var(--ink); }
+
+/* 6. Motion ------------------------------------------------------------------ */
+/* Parallax: js/redesign-final.js sets --px/--py (−1…1) on fine pointers. Three planes: the sky
+   drifts against the pointer, the network moves as one piece (lines and nodes never part), the
+   cards float a little further forward. */
+.rf-page .rf-hero__light { translate: calc(var(--px, 0) * -18px) calc(var(--py, 0) * -12px); }
+.rf-page .rf-net__plane { translate: calc(var(--px, 0) * 7px) calc(var(--py, 0) * 5px); }
+.rf-page .rf-net__cards { translate: calc(var(--px, 0) * 13px) calc(var(--py, 0) * 9px); }
+
+@keyframes rf-rise { from { opacity: 0; translate: 0 18px; } }
+@keyframes rf-draw { from { stroke-dashoffset: 1; } }
+@keyframes rf-pop { from { opacity: 0; scale: 0.7; } }
+@keyframes rf-in { from { opacity: 0; translate: 0 14px; } }
+@keyframes rf-fade { from { opacity: 0; } }
+@keyframes rf-travel { 0% { stroke-dasharray: 0.07 1; stroke-dashoffset: 0.07; } 100% { stroke-dasharray: 0.07 1; stroke-dashoffset: -1; } }
+@keyframes rf-breathe { 50% { opacity: 0.45; scale: 0.9; } }
+@keyframes rf-float { 50% { translate: 0 calc(-5 * var(--u)); } }
+@keyframes rf-drift { 50% { transform: translate(-4vw, 3vh) scale(1.08); } }
+@keyframes rf-ping { 50% { box-shadow: 0 0 0 0.55em rgb(251 197 34 / 0); } }
+
+/* Entrance: the copy is first and quick (all of it readable within ~0.7s); the network draws in behind it */
+.motion .rf-page .rf-hero__copy > * { animation: rf-rise 700ms var(--ease-expo) both; }
+.motion .rf-page .rf-hero__copy > :nth-child(2) { animation-delay: 60ms; }
+.motion .rf-page .rf-hero__copy > :nth-child(3) { animation-delay: 140ms; }
+.motion .rf-page .rf-hero__copy > :nth-child(4) { animation-delay: 200ms; }
+.motion .rf-page .rf-hero__copy > :nth-child(5) { animation-delay: 260ms; }
+.motion .rf-page .rf-net__paths path { stroke-dasharray: 1; animation: rf-draw 1800ms var(--ease-io) calc(250ms + var(--i) * 70ms) both; }
+.motion .rf-page .rf-net__dots { animation: rf-fade 600ms ease 1400ms both; }
+.motion .rf-page .rf-dia, .motion .rf-page .rf-tile { animation: rf-pop 900ms var(--ease-spring) calc(600ms + var(--i) * 90ms) both; }
+.motion .rf-page .rf-card { animation: rf-in 900ms var(--ease-expo) calc(1100ms + var(--i) * 140ms) both; }
+/* After the entrance: light travels three routes in turn, two diamonds breathe, two cards float together */
+.motion .rf-page .rf-net__pulses path { animation: rf-travel 5.4s var(--ease-io) calc(2.4s + var(--i) * 1.8s) infinite; }
+.motion .rf-page .rf-dia--lead::before, .motion .rf-page .rf-dia:nth-of-type(3)::before { animation: rf-breathe 5.4s var(--ease-io) 2.4s infinite; }
+.motion .rf-page .rf-dia:nth-of-type(3)::before { animation-delay: 5.1s; }
+.motion .rf-page .rf-card--float { animation: rf-in 900ms var(--ease-expo) calc(1100ms + var(--i) * 140ms) both, rf-float 8s var(--ease-io) calc(2.2s + var(--i) * 0.6s) infinite; }
+.motion .rf-page .rf-hero__light { animation: rf-drift 22s var(--ease-io) infinite; }
+.motion .rf-page .rf-plan__pulse { animation: rf-ping 2.4s ease-out 2.4s infinite; }
+
+/* 7. Responsive ------------------------------------------------------------- */
+/* ≤1100px: the copy comes first in flow; below it the network shows as a cropped window of the
+   same stage (--cx/--cy/--cw/--ch: the part of the 1440×880 stage on view), feathered at its edges. */
+@media (max-width: 1100px) {
+  .rf-page .rf-hero { --hh: auto; height: auto; display: flex; flex-direction: column; padding: clamp(40px, 7vw, 72px) var(--gutter) 0; }
+  .rf-page .rf-hero__copy { order: -1; }
+  .rf-page .rf-hero__veil { background: radial-gradient(90% 46% at 30% 22%, rgb(250 248 244 / 0.9), rgb(250 248 244 / 0) 80%); }
+  .rf-page .rf-hero__frame { --cx: 420; --cy: 40; --cw: 1000; --ch: 740; position: relative; inset: auto; z-index: 0;
+    margin: clamp(8px, 3vw, 24px) calc(-1 * var(--gutter)) 0; aspect-ratio: var(--cw) / var(--ch); overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent), linear-gradient(transparent, #000 14%, #000 86%, transparent);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent), linear-gradient(transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }
+  .rf-page .rf-net { --w: calc(1440 / var(--cw) * 100%); left: calc(var(--cx) / var(--cw) * -100%); top: 0; margin-top: calc(var(--cy) / var(--cw) * -100%); }
+  .rf-page .rf-hero__copy { max-width: 720px; }
+  .rf-page .rf-title__lead { font-size: clamp(44px, 8.6vw, 88px); }
+  .rf-page .rf-title__sub { font-size: clamp(24px, 3.9vw, 40px); }
+  .rf-page .rf-net__plane, .rf-page .rf-net__cards { translate: none; }
+}
+@media (max-width: 640px) {
+  .rf-page .rf-hero__frame { --cx: 740; --cy: 150; --cw: 660; --ch: 520; }
+  .rf-page .rf-net__cards .rf-chip, .rf-page .rf-steps { display: none; }
+  .rf-page .rf-card { font-size: max(calc(13 * var(--u)), 8.5px); }
+  .rf-page .rf-net__pulses path:nth-child(n+2) { display: none; }
+  .rf-page .rf-title__lead { font-size: clamp(44px, 13vw, 58px); }
+  .rf-page .rf-title__sub { font-size: clamp(24px, 7vw, 30px); }
+  .rf-page .rf-intro { font-size: 16px; }
+  .rf-page .rf-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .rf-page .rf-btn { width: 100%; }
+}
+
+/* 8. Reduced motion --------------------------------------------------------- */
+/* No .motion class: everything above is already still. Belt and braces for the infinite loops: */
+@media (prefers-reduced-motion: reduce) {
+  .rf-page .rf-net__pulses { display: none; }
+  .rf-page .rf-hero__light, .rf-page .rf-net__plane, .rf-page .rf-net__cards { translate: none; animation: none; }
+}
+
+/* 9. Section 02 · Pathways ------------------------------------------------------ */
+/* The hero's circuit, calmer. An editorial head (headline left, copy right, the audience strip
+   below), then one rail running edge to edge with a line dropping to a diamond on each panel.
+   The panels step down left to right, a path rather than a row, and each has its own surface:
+   warm glass lit pink (learn), AI Yellow pastel (build), Faith Pink tint (team). */
+.rf-page .rf-paths { position: relative; isolation: isolate; overflow: clip;
+  padding: clamp(72px, 8.4vw, 132px) var(--edge) clamp(96px, 10vw, 156px); }
+.rf-page .rf-paths__sky { position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(52% 34% at 0% 0%, rgb(239 172 186 / 0.6), rgb(239 172 186 / 0) 74%),
+    radial-gradient(40% 26% at 96% 0%, rgb(251 197 34 / 0.16), rgb(251 197 34 / 0) 72%),
+    radial-gradient(46% 44% at 92% 84%, rgb(239 172 186 / 0.42), rgb(239 172 186 / 0) 72%),
+    radial-gradient(40% 40% at 38% 96%, rgb(251 197 34 / 0.14), rgb(251 197 34 / 0) 72%),
+    var(--paper); }
+/* the hero's lower edge carried on (pink left, Works White middle, yellow right), fading down */
+.rf-page .rf-paths__sky::before { content: ""; position: absolute; inset: 0 0 auto; height: clamp(220px, 26vw, 380px);
+  background: linear-gradient(90deg, rgb(243 196 206) 0%, rgb(247 222 225) 22%, var(--paper) 46%, var(--paper) 60%, rgb(250 238 205) 100%);
+  -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
+/* the hero's fine grid, only behind the panels */
+.rf-page .rf-paths__sky::after { content: ""; position: absolute; inset: 0;
+  background-image: linear-gradient(rgb(26 26 26 / 0.035) 1px, transparent 1px), linear-gradient(90deg, rgb(26 26 26 / 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(60% 46% at 60% 74%, #000, transparent 80%);
+  mask-image: radial-gradient(60% 46% at 60% 74%, #000, transparent 80%); }
+
+/* Head: a 12-column split, headline on 7, copy on the last 4, the strip full width below */
+.rf-page .rf-paths__head { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: clamp(28px, 3.2vw, 44px); align-items: end; }
+.rf-page .rf-paths__lead { grid-column: 1 / span 7; }
+.rf-page .rf-paths__title { margin: 0; font-size: clamp(42px, 5.3vw, 84px); line-height: 0.96; letter-spacing: -0.052em; text-wrap: initial; }
+.rf-page .rf-paths__intro { grid-column: 9 / -1; max-width: 25em; margin: 0; padding-bottom: 0.4em; font-size: var(--fs-lead); line-height: 1.55; }
+
+/* Audience strip: descriptive, not a filter, so it reads as one quiet glass bar with no hover */
+.rf-page .rf-who { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px);
+  padding: 8px 8px 8px clamp(16px, 1.8vw, 24px); border-radius: var(--r-lg);
+  background: rgb(255 255 255 / 0.5); box-shadow: inset 0 0 0 1px rgb(179 131 141 / 0.3), 0 14px 30px -24px rgb(26 26 26 / 0.3);
+  -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur); }
+.rf-page .rf-who__label { flex: none; display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.rf-page .rf-who__label::after { content: ""; width: 28px; height: 1px; background: var(--ink); }
+.rf-page .rf-who__list { flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.rf-page .rf-who__list li { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: var(--r);
+  background: rgb(255 255 255 / 0.62); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9); font-size: 15px; font-weight: 500; line-height: 1.25; }
+.rf-page .rf-who__list li::before { content: ""; flex: none; width: 6px; height: 6px; rotate: 45deg; border-radius: 1.5px; background: var(--pink); }
+.rf-page .rf-who__list li:nth-child(even)::before { background: var(--yellow); }
+
+/* Routes: the rail (::before) and its light (::after); each panel steps down by --drop */
+.rf-page .rf-routes { --rail: 22px; --stem: 40px; position: relative; display: grid; grid-template-columns: 1.22fr 1fr 1fr; gap: var(--col-gap); align-items: start;
+  margin: clamp(20px, 2.4vw, 36px) 0 0; padding: calc(var(--rail) + var(--stem)) 0 0; list-style: none; }
+.rf-page .rf-routes::before, .rf-page .rf-routes::after { content: ""; position: absolute; top: var(--rail); left: calc(-1 * var(--edge)); right: calc(-1 * var(--edge)); height: 1px; pointer-events: none; }
+.rf-page .rf-routes::before { background: linear-gradient(90deg, transparent, var(--rf-line) 12%, var(--rf-line) 88%, transparent); transform-origin: left; }
+.rf-page .rf-routes::after { top: calc(var(--rail) - 1px); height: 3px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--yellow), transparent) no-repeat -240px 0 / 220px 100%;
+  filter: drop-shadow(0 0 4px rgb(251 197 34 / 0.9)); }
+
+.rf-page .rf-route { --drop: calc(var(--i) * clamp(32px, 4vw, 64px)); --nx: clamp(28px, 2.8vw, 40px); position: relative; display: flex; margin-top: var(--drop); }
+/* the stem from the rail to the panel's diamond, with a junction dot on the rail */
+.rf-page .rf-route::before { content: ""; position: absolute; left: var(--nx); bottom: 100%; width: 1px; height: calc(var(--stem) + var(--drop)); background: var(--rf-line); transform-origin: top; }
+.rf-page .rf-route::after { content: ""; position: absolute; left: var(--nx); top: calc(-1 * (var(--stem) + var(--drop))); width: 7px; height: 7px; margin: -3.5px 0 0 -3px; border-radius: 50%;
+  background: var(--paper); box-shadow: inset 0 0 0 1.25px rgb(179 131 141 / 0.85); }
+
+.rf-page .rf-route__link { --surface: linear-gradient(160deg, rgb(255 255 255 / 0.86), rgb(250 248 244 / 0.6)); --rim: var(--rf-glass-edge);
+  position: relative; display: flex; flex-direction: column; width: 100%; min-height: clamp(400px, 33vw, 500px);
+  padding: clamp(30px, 2.8vw, 44px) clamp(26px, 2.6vw, 40px) clamp(26px, 2.6vw, 40px); border-radius: 18px;
+  background: var(--surface); box-shadow: var(--rf-lift), inset 0 0 0 1px var(--rim);
+  -webkit-backdrop-filter: var(--rf-blur); backdrop-filter: var(--rf-blur);
+  color: var(--ink); text-decoration: none;
+  transition: translate var(--dur) var(--ease-expo), box-shadow var(--dur) var(--ease-out); }
+/* hover/focus light: AI Yellow rising from the lower corner */
+.rf-page .rf-route__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(70% 55% at 0% 100%, rgb(251 197 34 / 0.2), rgb(251 197 34 / 0) 70%); transition: opacity var(--dur) var(--ease-out); }
+
+.rf-page .rf-route--learn .rf-route__link { --surface:
+    radial-gradient(80% 62% at 100% 0%, rgb(239 172 186 / 0.5), rgb(239 172 186 / 0) 72%),
+    linear-gradient(160deg, rgb(255 255 255 / 0.84), rgb(250 248 244 / 0.58)); }
+.rf-page .rf-route--build .rf-route__link { --rim: rgb(251 197 34 / 0.38); --surface:
+    radial-gradient(70% 50% at 100% 0%, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0) 70%),
+    linear-gradient(168deg, rgb(250 235 192 / 0.95), rgb(250 241 214 / 0.85) 55%, rgb(250 248 244 / 0.9));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 0 0 1px var(--rim), 0 30px 50px -32px rgb(26 26 26 / 0.38), 0 2px 5px rgb(26 26 26 / 0.04); }
+.rf-page .rf-route--team .rf-route__link { --rim: rgb(239 172 186 / 0.62); --surface:
+    radial-gradient(64% 48% at 100% 0%, rgb(250 248 244 / 0.75), rgb(250 248 244 / 0) 72%),
+    linear-gradient(165deg, var(--pink-tint), rgb(247 229 230 / 0.7) 60%, rgb(250 248 244 / 0.85)); }
+
+/* the panel's diamond, on its top edge where the stem lands */
+.rf-page .rf-route__node { position: absolute; left: var(--nx); top: 0; width: 18px; height: 18px; margin: -9px 0 0 -8.5px; rotate: 45deg; border-radius: 4px;
+  background: radial-gradient(70% 70% at 50% 50%, var(--white), rgb(250 235 192) 30%, var(--yellow) 78%);
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.85), 0 0 0 3px rgb(255 255 255 / 0.4), 0 0 18px 3px rgb(251 197 34 / 0.55), 0 6px 12px -6px rgb(26 26 26 / 0.3); }
+
+.rf-page .rf-route__for { align-self: flex-start; padding: 6px 11px; border-radius: var(--r-sm); background: rgb(255 255 255 / 0.66); box-shadow: inset 0 0 0 1px rgb(179 131 141 / 0.3);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.14em; line-height: 1.3; text-transform: uppercase; }
+/* a fragment of the hero's circuit per panel: a path that turns, blocks joined, a team branching */
+.rf-page .rf-route__art { align-self: flex-end; width: clamp(120px, 11vw, 160px); height: auto; margin: clamp(8px, 1.4vw, 20px) 0 auto; overflow: visible; }
+.rf-page .rf-route__art path { fill: none; stroke: var(--rf-line); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.rf-page .rf-route__art circle, .rf-page .rf-route__art rect { fill: var(--paper); stroke: rgb(179 131 141 / 0.85); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+.rf-page .rf-route__art .is-lit { fill: var(--yellow); stroke: var(--white); stroke-width: 2; filter: drop-shadow(0 0 5px rgb(251 197 34 / 0.75)); }
+.rf-page .rf-route--build .rf-route__art rect:not(.is-lit) { fill: rgb(255 255 255 / 0.85); }
+
+.rf-page .rf-route__title { margin: clamp(24px, 3vw, 40px) 0 0; font-size: clamp(28px, 2.5vw, 40px); line-height: 1.02; letter-spacing: -0.045em; }
+.rf-page .rf-route--learn .rf-route__title { font-size: clamp(30px, 3vw, 48px); }
+.rf-page .rf-route__desc { display: block; max-width: 24em; margin-top: 14px; font-size: 16px; line-height: 1.55; }
+.rf-page .rf-route__cta { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: clamp(24px, 2.6vw, 36px); padding-top: 18px;
+  border-top: 1px solid rgb(179 131 141 / 0.32); font-size: 15px; font-weight: 600; line-height: 1.3; }
+.rf-page .rf-route__cta-text { padding-bottom: 2px; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px; transition: background-size var(--dur) var(--ease-expo); }
+.rf-page .rf-route__go { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: rgb(255 255 255 / 0.75); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.14); font-size: 17px; line-height: 1;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), translate var(--dur) var(--ease-expo); }
+
+@media (hover: hover) {
+  .rf-page .rf-route__link:hover { translate: 0 -6px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 0 0 1px rgb(26 26 26 / 0.16), 0 34px 56px -30px rgb(26 26 26 / 0.42), 0 2px 5px rgb(26 26 26 / 0.04); }
+  .rf-page .rf-route__link:hover::after { opacity: 1; }
+  .rf-page .rf-route__link:hover .rf-route__cta-text { background-size: 100% 1px; }
+  .rf-page .rf-route__link:hover .rf-route__go { background: var(--ink); color: var(--white); translate: 2px -2px; }
+}
+.rf-page .rf-route__link:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.rf-page .rf-route__link:focus-visible::after { opacity: 1; }
+.rf-page .rf-route__link:focus-visible .rf-route__go { background: var(--ink); color: var(--white); }
+
+/* Motion: held until the block is in view ([data-reveal], js/main.js); head, then rail, stems, panels */
+@keyframes rf-grow-x { from { scale: 0 1; } }
+@keyframes rf-grow-y { from { scale: 1 0; } }
+@keyframes rf-rail { 0% { opacity: 1; background-position: -240px 0; } 70%, 100% { opacity: 1; background-position: calc(100% + 240px) 0; } }
+.motion .rf-page .rf-paths__head > * { animation: rf-rise 800ms var(--ease-expo) both; }
+.motion .rf-page .rf-paths__intro { animation-delay: 120ms; }
+.motion .rf-page .rf-who { animation-delay: 220ms; }
+.motion .rf-page .rf-routes::before { animation: rf-grow-x 1400ms var(--ease-io) both; }
+.motion .rf-page .rf-route::before { animation: rf-grow-y 600ms var(--ease-out) calc(500ms + var(--i) * 160ms) both; }
+.motion .rf-page .rf-route::after { animation: rf-fade 400ms ease calc(400ms + var(--i) * 160ms) both; }
+.motion .rf-page .rf-route { animation: rf-in 900ms var(--ease-expo) calc(650ms + var(--i) * 160ms) both; }
+.motion .rf-page .rf-route__node { animation: rf-pop 700ms var(--ease-spring) calc(1000ms + var(--i) * 160ms) both; }
+.motion .rf-page .rf-routes::after { animation: rf-rail 9s var(--ease-io) 2.4s infinite; }
+
+/* ≤1100px: head stacks; the strip wraps two by two; the first panel spans the row above the
+   other two, so the rail and stems give way to the diamonds alone */
+@media (max-width: 1100px) {
+  .rf-page .rf-paths { padding: clamp(64px, 9vw, 96px) var(--gutter) clamp(80px, 11vw, 112px); }
+  .rf-page .rf-paths__lead, .rf-page .rf-paths__intro { grid-column: 1 / -1; }
+  .rf-page .rf-paths__head { row-gap: 22px; }
+  .rf-page .rf-paths__title { font-size: clamp(40px, 7.4vw, 72px); }
+  .rf-page .rf-who { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 8px 8px; }
+  .rf-page .rf-who__label { padding-left: 8px; }
+  .rf-page .rf-who__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rf-page .rf-routes { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: calc(var(--col-gap) + 12px); padding-top: 12px; }
+  .rf-page .rf-routes::before, .rf-page .rf-routes::after, .rf-page .rf-route::before, .rf-page .rf-route::after { display: none; }
+  .rf-page .rf-route { --drop: 0px; }
+  .rf-page .rf-route--learn { grid-column: 1 / -1; }
+  .rf-page .rf-route__link { min-height: 420px; }
+  .rf-page .rf-route--learn .rf-route__link { min-height: 340px; }
+}
+/* ≤680px: one column on a vertical spine, each diamond sitting on it */
+@media (max-width: 680px) {
+  .rf-page .rf-routes { grid-template-columns: minmax(0, 1fr); row-gap: 20px; padding: 8px 0 0 22px; }
+  .rf-page .rf-routes::before { display: block; top: 0; bottom: 0; left: 4px; right: auto; width: 1px; height: auto; background: linear-gradient(transparent, var(--rf-line) 4%, var(--rf-line) 92%, transparent); transform-origin: top; }
+  .motion .rf-page .rf-routes::before { animation-name: rf-grow-y; }
+  .rf-page .rf-route { --nx: 0px; }
+  .rf-page .rf-route__node { left: -18px; top: 36px; }
+  .rf-page .rf-route__link, .rf-page .rf-route--learn .rf-route__link { min-height: 0; padding: 26px 22px 22px; }
+  .rf-page .rf-route__art { position: absolute; top: 22px; right: 18px; width: 104px; margin: 0; }
+  .rf-page .rf-route__title, .rf-page .rf-route--learn .rf-route__title { margin-top: 48px; font-size: clamp(28px, 8.4vw, 34px); }
+  .rf-page .rf-route__desc { font-size: 15.5px; }
+  .rf-page .rf-who__list { grid-template-columns: minmax(0, 1fr); }
+  .rf-page .rf-who__list li { min-height: 40px; }
+}
+/* phones: the headline's two lines flow as one, so "step" never sits alone */
+@media (max-width: 480px) {
+  .rf-page .rf-paths__title { font-size: clamp(36px, 10.4vw, 46px); }
+  .rf-page .rf-paths__title .rf-line { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-page .rf-routes::after { display: none; }
+  .rf-page .rf-route__link, .rf-page .rf-route__go { transition: none; }
+  .rf-page .rf-route__link:hover, .rf-page .rf-route__link:hover .rf-route__go { translate: none; }
+}

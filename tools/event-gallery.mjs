@@ -8,8 +8,9 @@
 // of its retired paths, counts as that photo). Drafts and hidden events never reach this list:
 // the content view already leaves them out (cms/shared/public.mjs).
 //
-// {{eventGallery:home}}  18 photos, featured first, in three scroll-driven rows (homepage)
-// {{eventGallery:all}}   every photo (Workshops page)
+// {{eventGallery:home}}     18 photos, featured first, in three scroll-driven rows (homepage)
+// {{eventGallery:feature}}  the same 18 photos as editorial bands (homepage redesign, /home-redesign/)
+// {{eventGallery:all}}      every photo (Workshops page)
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -187,10 +188,36 @@ export function eventGalleryEntries(gallery = []) {
   });
 }
 
+/* ---- Editorial bands (homepage redesign) ---------------------------------------------------
+   The homepage's 18 photos as composed spreads of nine: one large photo, then tall, wide and small
+   ones fitted around it on a 12-column grid (css/home-redesign.css places each tile by position).
+   Every second band is mirrored, so the large photo alternates sides. Photos keep their captions. */
+const EDITORIAL_BAND = 9;
+const EDITORIAL_SIZES = ["(min-width: 900px) 58vw, 100vw", "(min-width: 900px) 42vw, 100vw", "(min-width: 900px) 25vw, 50vw"];
+export function editorialBands(items, { label } = {}) {
+  const bands = [];
+  for (let i = 0; i < items.length; i += EDITORIAL_BAND) bands.push(items.slice(i, i + EDITORIAL_BAND));
+  const tile = (it, i) => {
+    const sizes = EDITORIAL_SIZES[i === 0 ? 0 : i === 1 ? 1 : 2];
+    const img = it.photo
+      ? imgTag(it.photo, { sizes, alt: it.alt, position: it.position })
+      : `<img src="${esc(it.url)}" alt="${esc(it.alt || "")}" loading="lazy" decoding="async">`;
+    return `<li class="hr-photos__tile"><figure>${img}${it.caption ? `<figcaption>${esc(it.caption)}</figcaption>` : ""}</figure></li>`;
+  };
+  return `<div class="hr-photos" role="region" aria-label="${esc(label || "Photos from Faith Works events")}">
+        ${bands.map((band, b) => `<ul class="hr-photos__band${b % 2 ? " hr-photos__band--mirror" : ""}${band.length < EDITORIAL_BAND ? " hr-photos__band--short" : ""}" role="list">
+          ${band.map(tile).join("\n          ")}
+        </ul>`).join("\n        ")}
+      </div>`;
+}
+
+// {{eventGallery:home}} rows, {{eventGallery:feature}} editorial bands (same 18 photos), {{eventGallery:all}} masonry
 export function eventGallery(scope, events) {
   const all = galleryItems(events);
-  const items = scope === "home" ? [...all.filter((x) => x.featured), ...all.filter((x) => !x.featured)].slice(0, HOME_COUNT) : all;
+  const homeSet = scope === "home" || scope === "feature";
+  const items = homeSet ? [...all.filter((x) => x.featured), ...all.filter((x) => !x.featured)].slice(0, HOME_COUNT) : all;
   if (!items.length) return "";
+  if (scope === "feature") return editorialBands(items, { label: "Photos from Faith Works events" });
   if (scope === "home") return scrollRows(items, { label: "Photos from Faith Works events" });
   return masonry(items, { label: "All photos from Faith Works events" });
 }

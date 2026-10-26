@@ -333,7 +333,7 @@ export function bindingValues(collection, rec, { authorNames } = {}) {
     "event-type": rec.event_type || "", "event-date": eventDateText(rec), "event-time": eventTimeText(rec), duration: eventDuration(rec),
     timezone: TIME_ZONES.find(([k]) => k === (rec.time_zone || "Asia/Manila"))?.[1] || rec.time_zone || "", venue: rec.venue || "",
   });
-  if (collection === "resources") v["read-time"] = rec.resource_type === "article" || !rec.resource_type ? readingTime(rec.body_html) || rec.read_time || "" : "";
+  if (collection === "resources") v["read-time"] = readingTime(rec.body_html) || rec.read_time || "";
   const links = {
     "registration-url": rec.registration_url || "", "resource-url": rec.file_url || "", "map-url": rec.map_url || "", "meeting-url": rec.meeting_url || "",
   };
@@ -649,7 +649,7 @@ export function upgradeRecord(collection, rec) {
   const hasBody = !!String(rec.body_html || "").trim();
   if (collection === "programs") out.body_html = legacyProgram(rec);
   else if (collection === "events") out.body_html = hasBody ? legacyEvent(rec) : "";
-  else if (collection === "resources") out.body_html = (rec.resource_type || "article") === "article" ? legacyArticle(rec) : rec.body_html || "";
+  else if (collection === "resources") out.body_html = (rec.resource_type || "article") === "article" || hasBody ? legacyArticle(rec) : "";
   // Values the page shows from Details are written in, as the editor would.
   if (out.body_html) out.body_html = applyBindings(out.body_html, bindingValues(collection, out));
   if (collection === "events" && !hasBody) out.upgraded = false;

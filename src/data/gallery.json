@@ -185,8 +185,12 @@
       "business": { "layout": "single", "sizes": "(min-width: 901px) 80vw, 100vw", "items": [{ "image": "room-full" }] },
       "founder": { "layout": "single", "sizes": "260px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
     },
+    "homeRedesign": {
+      "business": { "layout": "single", "sizes": "100vw", "items": [{ "image": "room-full" }] },
+      "founder": { "layout": "single", "sizes": "(min-width: 901px) 30vw, 80vw", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
+    },
     "about": {
-      "hero": { "layout": "single", "sizes": "(min-width: 901px) 40vw, 100vw", "priority": true, "items": [{ "image": "founder-studio" }] },
+      "hero": { "layout": "single", "sizes": "(min-width: 901px) 44vw, 100vw", "priority": true, "items": [{ "image": "founder-studio", "position": "44% 28%" }] },
       "stage": { "layout": "single", "sizes": "(min-width: 901px) 60vw, 150vw", "items": [{ "image": "speaking-whiteboard", "alt": "Faith Natividad speaking to an audience with a microphone." }] }
     },
     "business": {
@@ -273,7 +277,7 @@
           { "image": "slides-poll" }
         ]
       },
-      "founder": { "layout": "single", "sizes": "120px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] }
+      "founder": { "layout": "single", "sizes": "(max-width: 900px) 100vw, 40vw", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] }
     },
     "starter-kit": {
       "founder": { "layout": "single", "sizes": "200px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] },

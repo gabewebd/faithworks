@@ -311,14 +311,14 @@ Use a separate domain or subdomain (e.g. `cms.faithph.ai`) and separate Developm
 
 ### 5.5 Connecting the website
 
-The website's root `vercel.json` sets the build: `node tools/build.mjs --deploy --content=cms
+The website's root `vercel.mjs` sets the build: `node tools/build.mjs --deploy --content=cms
 --view=published --out=dist`, served from `dist/`. That folder holds only the generated pages, `css/`,
 `js/` and `assets/` (not `assets/data`); `cms/`, `src/`, `tools/` and `docs/` are never served.
 
 | Setting (website project) | Value |
 | --- | --- |
 | `CMS_CONTENT_URL` | `(the CMS address; required, the build stops without it) |
-| `CONTENT_SOURCE` | `cms` (optional: `vercel.json` already passes `--content=cms`) |
+| `CONTENT_SOURCE` | `cms` (optional: `vercel.mjs` already passes `--content=cms`) |
 | `CMS_PREVIEW_TOKEN` | **never on production.** Staging site only, with its own build command using `--view=preview` |
 
 The website project needs **no** Supabase, Google or CMS secrets.

@@ -339,8 +339,8 @@ function resources() {
 
     <aside class="article__cta">
       <h2>This Is a Call to Action</h2>
-      <p>The button below uses the destination URL from Details (for downloads and guides). It is hidden when there is none.</p>
-      <a class="btn" href="#" data-cms-href="resource-url">Get the resource <span class="btn__arrow" aria-hidden="true">↗</span></a>
+      <p>Point the button at the reader’s next step, for example Start Your AI Journey, a program or another resource.</p>
+      <a class="btn" href="/start-your-ai-journey/">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
     </aside>
   </div>
 </article>

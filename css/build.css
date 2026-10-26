@@ -1,0 +1,354 @@
+/* ==========================================================================
+   Faith Works — Build with AI (/build/): use cases, kinds of build, Faith AI
+   Loaded by src/pages/build.html; every class starts bw-. Builds on css/style.css tokens:
+   the four brand colours and their tints only, as solid fills (no gradients); Poppins + Inter.
+
+   One system through three sections: solid grounds, cards on one grid, and three markers that
+   always mean the same thing: the AI chip (what AI helps to do), the person seal (what a person
+   checks), the filled square (the output). --bw-acc carries the section's one accent: Faith Pink
+   for the use cases, AI Yellow for kinds of build and Faith AI.
+   Section headings use --fs-h2, which stays below the page hero's --fs-page-h1.
+
+   1. Shared: tokens, section head, markers, skeleton lines, tags
+   2. Use cases: the scroll story (cases left, output stage right), flow, the four illustrations
+   3. Kinds of build: three cards
+   4. Faith AI: copy, the system card, the three steps
+   5. Responsive
+   ========================================================================== */
+
+/* 1. Shared ------------------------------------------------------------------ */
+.bw-uses, .bw-kinds, .bw-fai {
+  --bw-rule: rgb(26 26 26 / 0.12);
+  --bw-acc: var(--pink);
+  --bw-pad: clamp(22px, 2.4vw, 32px);
+  padding: clamp(72px, 8vw, 128px) var(--edge);
+}
+.bw-kinds, .bw-fai { --bw-acc: var(--yellow); }
+
+.bw-head { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 24px; align-items: end; margin-bottom: clamp(40px, 4.4vw, 64px); }
+.bw-head__title { grid-column: 1 / span 7; margin: 0; font-size: var(--fs-h2); line-height: var(--lh-head, 1); letter-spacing: -0.045em; }
+.bw-head__intro { grid-column: 8 / -1; max-width: 32em; margin: 0; padding-bottom: 0.35em; font-size: var(--fs-lead); line-height: 1.55; }
+
+/* the key: the three markers, read once, then used by every case */
+.bw-key { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 0; padding-top: 20px; border-top: 1px solid var(--bw-rule); font-size: 15px; font-weight: 600; }
+.bw-key__item { display: inline-flex; align-items: center; gap: 10px; }
+
+/* Markers. --m sizes them */
+.bw-mark { --m: 26px; position: relative; flex: none; display: inline-grid; place-items: center; width: var(--m); height: var(--m); }
+.bw-mark--ai { border-radius: 28%; background: var(--ink); color: var(--white); font: 700 calc(var(--m) * 0.38) / 1 var(--font-display); letter-spacing: 0.02em; }
+.bw-mark--person { border-radius: 50%; background: var(--white); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-mark--person::after { content: ""; width: 24%; height: 44%; margin-top: -12%; border: solid var(--ink); border-width: 0 1.75px 1.75px 0; rotate: 45deg; }
+.bw-mark--out::before { content: ""; position: absolute; inset: 18%; border-radius: 22%; background: var(--bw-acc); box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+/* Skeleton text lines inside the illustrations */
+.bw-lines { display: grid; gap: 0.5em; width: 100%; }
+.bw-lines i { display: block; height: 0.5em; border-radius: 0.25em; background: rgb(26 26 26 / 0.1); }
+.bw-lines i:last-child { width: 62%; }
+.bw-lines--long i:nth-child(2) { width: 88%; }
+
+.bw-tag { flex: none; padding: 0.3em 0.75em; border-radius: 999px; background: var(--stone-2); font-size: 0.82em; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.bw-tag--pink { background: var(--pink); }
+.bw-tag--done { background: var(--ink); color: var(--white); }
+
+/* 2. Use cases -------------------------------------------------------------- */
+/* Soft Charcoal, set like the homepage journey ("Don't stop at knowing"): White text, --line-dark
+   rules, Faith Pink for the numbers and progress. The outputs are the homepage example cards
+   (.fcard and .fcard__art, style.css): White, the Pink or Yellow glow over a fine grid, and the
+   journey preview's deep shadow. --glow is registered so the frame's glow can fade between cases. */
+@property --glow { syntax: "<color>"; inherits: true; initial-value: transparent; }
+.bw-uses { --bw-rule: var(--line-dark); background: var(--ink); color: var(--white); }
+.bw-uses .bw-head .bw-mark--ai, .bw-story__step .bw-mark--ai { background: var(--white); color: var(--ink); }
+.bw-uses .bw-head .bw-mark--person, .bw-story__step .bw-mark--person { background: transparent; box-shadow: inset 0 0 0 1.5px var(--white); }
+.bw-uses .bw-head .bw-mark--person::after, .bw-story__step .bw-mark--person::after { border-color: var(--white); }
+.bw-uses .bw-head .bw-mark--out::before, .bw-story__step .bw-mark--out::before { box-shadow: inset 0 0 0 1.5px var(--white); }
+
+.bw-case__title { margin: 0; font-size: clamp(34px, 3.8vw, 58px); line-height: 1; letter-spacing: -0.045em; }
+.bw-case__task { margin: 8px 0 0; font-size: 17px; line-height: 1.5; }
+.bw-case__art { display: grid; align-content: center; min-width: 0; padding: clamp(16px, 2vw, 24px); border-radius: var(--r-sm); background: var(--stone-2); font-size: clamp(11px, 0.85vw, 13px); line-height: 1.3; }
+
+/* The story. Static (the default): each case, then its output, on one grid; the wrappers step
+   aside (display: contents) so cases and outputs can be placed pair by pair. */
+.bw-story { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(48px, 6vw, 96px) var(--col-gap); align-items: center; }
+.bw-story__steps, .bw-story__stage, .bw-story__frame, .bw-story__arts { display: contents; }
+.bw-story__rail, .bw-story__bar, .bw-story__progress { display: none; }
+.bw-story__step { grid-column: 1; min-width: 0; }
+.bw-story__art { grid-column: 2; --glow: rgb(239 172 186 / 0.85); color: var(--ink); border-radius: var(--r-lg);
+  background: radial-gradient(120% 100% at 50% 0%, var(--glow), transparent 75%) var(--white); /* the .fcard__art glow */
+  box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -40px rgb(10 10 10 / 0.6); }
+.bw-story__art:nth-child(even) { --glow: rgb(251 197 34 / 0.5); }
+/* the glow and grid of .fcard__art belong to the live frame only */
+.bw-story:not(.is-live) .bw-story__arts::before, .bw-story:not(.is-live) .bw-story__arts::after { content: none; }
+.bw-story__step:nth-of-type(1), .bw-story__art:nth-child(1) { grid-row: 1; }
+.bw-story__step:nth-of-type(2), .bw-story__art:nth-child(2) { grid-row: 2; }
+.bw-story__step:nth-of-type(3), .bw-story__art:nth-child(3) { grid-row: 3; }
+.bw-story__step:nth-of-type(4), .bw-story__art:nth-child(4) { grid-row: 4; }
+.bw-story__step .bw-flow { margin-top: 24px; }
+
+.bw-story__num { display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; color: var(--pink); font: 600 13px/1 var(--font-display); transition: background-color 500ms var(--ease-out), color 500ms var(--ease-out); }
+
+/* Live (motion.js §5d, wide and tall screens): the cases scroll in the left column, past a rail
+   that fills as you go; the frame on the right stays centred on screen and shows the output of
+   the case at the centre. The frame fits the output it shows; its tallest size (motion.js
+   measures it into --frame-h) places it and paces the cases, so the pace stays even. */
+.bw-story.is-live {
+  --frame-h: 440px;
+  --step-h: max(var(--frame-h), 56vh);
+  align-items: stretch; row-gap: 0;
+}
+.bw-story.is-live .bw-story__steps { display: block; position: relative; grid-column: 1; grid-row: 1; padding-left: 56px; }
+.bw-story.is-live .bw-story__step { position: relative; display: grid; align-content: center; min-height: var(--step-h); opacity: 0.32; transition: opacity 600ms var(--ease-out); }
+.bw-story.is-live .bw-story__step.is-active { opacity: 1; }
+/* the number sits on the rail, level with the case title (it moves out of the flow's way) */
+.bw-story.is-live .bw-story__num { margin: 0 0 -32px; translate: -56px calc((clamp(34px, 3.8vw, 58px) - 32px) / 2); } /* level with the title's first line */
+.bw-story.is-live .bw-story__step.is-active .bw-story__num { background: var(--pink); color: var(--ink); box-shadow: none; }
+.bw-story.is-live .bw-story__rail { display: block; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--line-dark);
+  -webkit-mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); }
+.bw-story.is-live .bw-story__rail i { display: block; height: 100%; border-radius: inherit; background: var(--pink); transform-origin: top; }
+
+.bw-story.is-live .bw-story__stage { display: block; grid-column: 2; grid-row: 1; }
+.bw-story.is-live .bw-story__frame {
+  position: sticky; top: calc(var(--header-h) + (100vh - var(--header-h) - var(--frame-h)) / 2);
+  display: grid; color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -40px rgb(10 10 10 / 0.6);
+  --glow: rgb(239 172 186 / 0.85); transition: --glow 700ms var(--ease-out);
+}
+.bw-story[data-active="1"] .bw-story__frame, .bw-story[data-active="3"] .bw-story__frame { --glow: rgb(251 197 34 / 0.5); }
+.bw-story.is-live .bw-story__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px 0; font-size: 14px; font-weight: 600; }
+.bw-story__label { display: inline-flex; align-items: center; gap: 10px; }
+.bw-story__count { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+.bw-story.is-live .bw-story__arts { display: grid; align-items: start; height: auto; padding: 0; overflow: clip; }
+.bw-story.is-live .bw-story__art { grid-area: 1 / 1; padding: 20px 24px 18px; border-radius: 0; background: none; box-shadow: none; font-size: clamp(12px, 0.95vw, 14px); visibility: hidden; opacity: 0; }
+/* keep the four outputs close in height, so the frame never holds much empty space: the page
+   mockup's shape would otherwise grow with the column's width */
+.bw-story.is-live .bw-site__page { padding: 1.2em 1.6em; }
+.bw-story.is-live .bw-site__shape { aspect-ratio: auto; height: 11em; }
+.bw-story.is-live .bw-story__progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0 24px 22px; }
+.bw-story__progress i { height: 4px; border-radius: 2px; background: rgb(26 26 26 / 0.1); transition: background-color 500ms var(--ease-out); }
+.bw-story__progress i.is-on { background: var(--ink); }
+.bw-story__progress i.is-current { background: var(--pink); box-shadow: inset 0 0 0 1px var(--ink); }
+
+/* Small details settle once an output is shown: the reviewed posts and the page checks tick in */
+.motion .bw-story__art.is-active .bw-cal__grid .is-checked::after,
+.motion .bw-story__art.is-active .bw-site__checks i { animation: fw-pop 500ms var(--ease-out) 650ms both; }
+.motion .bw-story__art.is-active .bw-site__checks span:nth-child(2) i { animation-delay: 750ms; }
+.motion .bw-story__art.is-active .bw-site__checks span:nth-child(3) i { animation-delay: 850ms; }
+.motion .bw-story__art.is-active .bw-ask__docs .is-hit { animation: bw-hit 900ms var(--ease-out) 500ms both; }
+@keyframes bw-hit { from { box-shadow: inset 0 0 0 1px var(--line); } to { box-shadow: inset 0 0 0 1.5px var(--ink); } }
+
+/* Flow: AI → person → output, three aligned rows */
+.bw-flow { display: grid; margin: 0; border-top: 1px solid var(--bw-rule); }
+.bw-flow__step { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--bw-rule); }
+.bw-flow__step:last-child { border-bottom: 0; padding-bottom: 0; }
+.bw-flow dt { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.bw-flow dd { margin: 0; font-size: 16px; line-height: 1.45; }
+.bw-flow__step--out dd { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+
+/* surfaces shared by the illustrations */
+.bw-cal__sheet, .bw-cal__source, .bw-inbox__list, .bw-inbox__draft, .bw-ask__answer, .bw-ask__search, .bw-ask__docs span, .bw-site {
+  border-radius: 0.8em; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* 2a. Content planning */
+.bw-cal { display: grid; gap: 0.8em; }
+.bw-cal__source { display: flex; align-items: center; gap: 0.8em; justify-self: start; padding: 0.7em 1em 0.7em 0.7em; }
+.bw-cal__source .bw-mark { --m: 2.2em; }
+.bw-cal__source b, .bw-inbox__summary b, .bw-ask__body b { display: block; font-weight: 600; }
+.bw-cal__source small { display: block; font-size: 0.86em; }
+.bw-cal__sheet { padding: 1em; }
+.bw-cal__bar { display: flex; align-items: center; gap: 0.5em; padding-bottom: 0.8em; }
+.bw-cal__bar b { margin-right: auto; font: 600 1.15em/1.2 var(--font-display); }
+.bw-cal__days, .bw-cal__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.4em; }
+.bw-cal__days span { padding: 0 0.3em 0.4em; font-size: 0.82em; font-weight: 600; }
+.bw-cal__grid span { position: relative; min-height: 4.2em; padding: 0.5em 0.55em; border-radius: 0.5em; background: var(--stone-2); font-size: 0.88em; font-weight: 600; line-height: 1.2; }
+.bw-cal__grid .is-post { background: var(--pink-tint); }
+.bw-cal__grid .is-checked { background: var(--pink); }
+.bw-cal__grid .is-checked::after { content: ""; position: absolute; right: 0.45em; bottom: 0.45em; width: 1.2em; height: 1.2em; border-radius: 50%;
+  background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.5 17 18 8'/%3E%3C/svg%3E") center / 72% no-repeat; }
+
+/* 2b. Lead follow-up */
+.bw-inbox { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8em; align-items: start; }
+.bw-inbox__label { margin: 0 0 0.6em; font-size: 0.86em; font-weight: 600; }
+.bw-inbox__list { display: grid; gap: 0.4em; padding: 0.9em; }
+.bw-inbox__row { display: flex; align-items: center; gap: 0.6em; padding: 0.6em 0.7em; border-radius: 0.55em; background: var(--stone-2); }
+.bw-inbox__row i { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--stone); }
+.bw-inbox__row b { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bw-inbox__row.is-open { background: var(--white); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-inbox__row.is-open i { background: var(--pink); }
+.bw-inbox__work { display: grid; gap: 0.8em; }
+.bw-inbox__summary { display: flex; align-items: flex-start; gap: 0.8em; padding: 0.9em; border-radius: 0.8em; background: var(--pink-tint); }
+.bw-inbox__summary .bw-mark { --m: 2em; }
+.bw-inbox__summary > span:last-child { flex: 1; display: grid; gap: 0.6em; }
+.bw-inbox__draft { display: grid; gap: 0.8em; padding: 0.9em; }
+.bw-inbox__draft .bw-inbox__label { margin: 0; }
+.bw-checks { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.bw-checks span, .bw-site__checks span { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.35em 0.7em 0.35em 0.45em; border-radius: 999px; background: var(--stone-2); font-size: 0.88em; font-weight: 600; }
+.bw-checks i { width: 1em; height: 1em; border-radius: 0.25em; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-inbox__send { display: flex; align-items: center; gap: 0.6em; padding-top: 0.8em; border-top: 1px solid var(--line); font-weight: 600; }
+.bw-inbox__send .bw-mark { --m: 1.8em; }
+
+/* 2c. Team knowledge */
+.bw-ask { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 11em); gap: 0.8em; }
+.bw-ask__search { grid-column: 1 / -1; display: flex; align-items: center; gap: 0.8em; padding: 0.9em 1.2em; border-radius: 999px; }
+.bw-ask__glass { position: relative; flex: none; width: 0.9em; height: 0.9em; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--ink); }
+.bw-ask__glass::after { content: ""; position: absolute; right: -0.28em; bottom: -0.2em; width: 0.38em; height: 2px; background: var(--ink); rotate: 45deg; }
+.bw-ask__q { font-family: var(--font-display); font-size: 1.1em; font-weight: 500; }
+.bw-ask__answer { display: flex; align-items: flex-start; gap: 0.8em; padding: 1em; }
+.bw-ask__answer .bw-mark { --m: 2.1em; }
+.bw-ask__body { flex: 1; display: grid; gap: 0.75em; min-width: 0; }
+.bw-ask__refs { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.bw-ask__src { padding: 0.4em 0.8em; border-radius: 999px; background: var(--pink); font-size: 0.88em; font-weight: 600; }
+.bw-ask__esc { display: inline-flex; align-items: center; gap: 0.45em; padding: 0.25em 0.8em 0.25em 0.3em; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); font-size: 0.88em; font-weight: 600; }
+.bw-ask__esc .bw-mark { --m: 1.5em; }
+.bw-ask__docs { display: grid; gap: 0.4em; align-content: start; }
+.bw-ask__docs span { display: flex; align-items: center; gap: 0.6em; padding: 0.75em 0.9em; font-weight: 600; }
+.bw-ask__docs span::before { content: ""; flex: none; width: 0.8em; height: 1em; border-radius: 0.15em; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-ask__docs .is-hit { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-ask__docs .is-hit::before { background: var(--pink); }
+
+/* 2d. A simple web presence */
+.bw-site { overflow: hidden; }
+.bw-site__bar { display: flex; align-items: center; gap: 0.45em; padding: 0.8em 1em; border-bottom: 1px solid var(--line); }
+.bw-site__bar i { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--stone); }
+.bw-site__bar span { margin-left: 1em; padding: 0.3em 1em; border-radius: 999px; background: var(--stone-2); font-size: 0.86em; font-weight: 600; }
+.bw-site__page { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 1.2em 2em; padding: 1.4em 1.8em; }
+.bw-site__nav { grid-column: 1 / -1; display: flex; gap: 0.9em; justify-content: flex-end; }
+.bw-site__nav i { width: 3.6em; height: 0.55em; border-radius: 0.3em; background: rgb(26 26 26 / 0.12); }
+.bw-site__nav i:first-child { width: 2em; height: 2em; margin-right: auto; border-radius: 0.4em; background: var(--ink); }
+.bw-site__hero { display: grid; gap: 0.7em; align-content: center; }
+.bw-site__hero b { display: block; height: 1.9em; border-radius: 0.4em; background: var(--ink); }
+.bw-site__hero b.is-short { width: 68%; }
+.bw-site__hero .bw-lines { margin-top: 0.6em; }
+.bw-site__hero em { display: block; width: 9em; height: 2.6em; margin-top: 0.8em; border-radius: 0.5em; background: var(--pink); }
+.bw-site__shape { align-self: end; aspect-ratio: 1.15; border-radius: 50% 50% 1em 1em; background: var(--pink-tint); box-shadow: inset 0 -3.2em 0 var(--pink); }
+.bw-site__checks { display: flex; flex-wrap: wrap; gap: 0.4em; padding: 0.8em 1em; border-top: 1px solid var(--line); }
+.bw-site__checks i { width: 1.2em; height: 1.2em; border-radius: 50%;
+  background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.5 17 18 8'/%3E%3C/svg%3E") center / 72% no-repeat; }
+
+/* 3. Kinds of build --------------------------------------------------------- */
+.bw-kinds > * { position: relative; z-index: 1; }
+.bw-kinds__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--col-gap); margin: 0; padding: 0; list-style: none; }
+
+/* All three cards are identical white; the meter carries the difference */
+.bw-kind { display: flex; flex-direction: column; align-items: flex-start; padding: var(--bw-pad); border-radius: var(--r-lg); background: var(--white); box-shadow: 0 16px 36px -12px rgb(26 26 26 / 0.1), 0 4px 12px -2px rgb(26 26 26 / 0.04); }
+
+/* support level: one, two, three bars filled; empty bars are a soft grey track */
+.bw-kind__meter { display: flex; gap: 4px; margin-bottom: 20px; }
+.bw-kind__meter i { width: 22px; height: 6px; border-radius: 3px; background: var(--bw-rule); }
+/* filled bars take the brand colours in order: Faith Pink, AI Yellow, then the pink-to-yellow blend
+   (/business/ scope options reuse the cards: briefing, workshop, program fill one, two, three) */
+.bw-kind--train .bw-kind__meter i:nth-child(1),
+.bw-kind--demo .bw-kind__meter i:nth-child(1),
+.bw-kind--product .bw-kind__meter i:nth-child(1),
+.bw-kind--brief .bw-kind__meter i:nth-child(1),
+.bw-kind--team .bw-kind__meter i:nth-child(1),
+.bw-kind--program .bw-kind__meter i:nth-child(1) { background: var(--pink); }
+.bw-kind--demo .bw-kind__meter i:nth-child(2),
+.bw-kind--product .bw-kind__meter i:nth-child(2),
+.bw-kind--team .bw-kind__meter i:nth-child(2),
+.bw-kind--program .bw-kind__meter i:nth-child(2) { background: var(--yellow); }
+.bw-kind--product .bw-kind__meter i:nth-child(3),
+.bw-kind--program .bw-kind__meter i:nth-child(3) { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
+
+.bw-kind__name { margin: 0; font-size: clamp(24px, 2.2vw, 32px); line-height: 1.1; letter-spacing: -0.035em; }
+.bw-kind__cues { display: grid; width: 100%; margin: 20px 0 0; padding: 0; list-style: none; }
+.bw-kind__cues li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--bw-rule); font-size: 15px; font-weight: 600; line-height: 1.35; }
+.bw-kind__cues li:last-child { border-bottom: 1px solid var(--bw-rule); }
+.bw-kind__cues li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.bw-kind > p { margin: 20px 0 12px; font-size: 16px; line-height: 1.6; }
+.bw-kind .text-link { margin-top: auto; }
+/* labelled cues (/business/ scopes): a small label over each phrase, the card's link after them */
+.bw-kind__cues--labelled { margin-bottom: 24px; }
+.bw-kind__cues--labelled li { padding: 12px 0; }
+.bw-kind__cues--labelled li::before { content: none; }
+.bw-kind__cues--labelled small { display: block; margin-bottom: 3px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.3; }
+.bw-kinds__note { margin: clamp(24px, 2.4vw, 32px) 0 0; }
+
+/* 4. Faith AI ---------------------------------------------------------------- */
+.bw-fai { background: var(--paper); }
+.bw-fai__top { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 40px; align-items: center; }
+.bw-fai__copy { grid-column: 1 / span 5; }
+.bw-fai__brand { height: clamp(40px, 4vw, 60px); margin-bottom: clamp(20px, 2.2vw, 32px); }
+.bw-fai__lead { max-width: 28em; margin: 24px 0 0; font-size: var(--fs-lead); line-height: 1.5; }
+.bw-fai__body { max-width: 34em; margin: 16px 0 0; font-size: 16px; line-height: 1.65; }
+
+/* The system card: the process, its three kinds of work, the person who approves */
+.bw-stage { grid-column: 7 / -1; margin: 0; }
+.bw-sys { display: grid; gap: 10px; padding: var(--bw-pad); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; line-height: 1.3; }
+/* The homepage example card's glow and grid (.fcard__art, style.css), its Pink and Yellow glows
+   together: Pink from the top left, Yellow from the top right, at the homepage cards' strengths.
+   The panels are glass so the glow shows through. motion.js §5e brings the card in. */
+.bw-sys.fcard__art { height: auto; overflow: hidden; }
+.bw-sys.fcard__art::before {
+  background: radial-gradient(90% 85% at 15% 0%, rgb(239 172 186 / 0.85), transparent 75%),
+              radial-gradient(90% 85% at 85% 0%, rgb(251 197 34 / 0.5), transparent 75%); }
+.bw-sys .bw-panel { background: var(--glass); }
+.motion .bw-sys.is-active .bw-sys__human .bw-mark { animation: fw-pop 500ms var(--ease-out) 1100ms both; }
+.bw-sys__hub { display: grid; gap: 2px; padding: 14px 18px; border-radius: var(--r-sm); background: var(--ink); color: var(--white); }
+.bw-sys__hub small { font-size: 12px; }
+.bw-sys__hub b { font-family: var(--font-display); font-size: 17px; font-weight: 600; }
+
+.bw-panel { display: grid; grid-template-columns: minmax(0, 13em) minmax(0, 1fr); gap: 16px; align-items: center; padding: 14px 16px; border-radius: var(--r-sm); background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.bw-panel__head { display: flex; align-items: center; gap: 10px; }
+.bw-panel__head b { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+.bw-logo { flex: none; width: 32px; height: 32px; padding: 6px; border-radius: 8px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.bw-panel__body { display: grid; gap: 6px; min-width: 0; }
+.bw-panel__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 8px; border-radius: 6px; background: var(--white); font-size: 13px; }
+.bw-panel__row em { flex: none; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-style: normal; font-weight: 600; }
+.bw-panel__row .is-new { background: var(--stone); }
+.bw-panel__row .is-follow { background: var(--yellow); }
+.bw-panel__row .is-done { background: var(--ink); color: var(--white); }
+.bw-panel__msg { display: grid; gap: 7px; padding: 8px 10px; border-radius: 6px; background: var(--white); }
+.bw-panel__msg small, .bw-panel__foot { font-size: 12px; font-weight: 600; }
+.bw-panel__foot { display: flex; align-items: center; gap: 6px; }
+.bw-panel__foot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-panel__search { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; }
+.bw-panel__search::before { content: ""; width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-panel__hit small { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--yellow); font-size: 12px; font-weight: 600; }
+
+.bw-sys__human { display: flex; align-items: center; gap: 10px; padding-top: 6px; }
+.bw-sys__human b { display: block; font-weight: 600; }
+.bw-sys__human small { display: block; font-size: 13px; }
+.bw-stage__cap { margin: 12px 0 0; font-size: 13px; line-height: 1.4; }
+
+/* The three steps, then the demo request */
+/* steps reuse the .promise__* cards from style.css (each carries its own top rule) */
+.bw-fai__path { margin-top: clamp(56px, 6vw, 96px); }
+
+.bw-fai__end { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; margin-top: clamp(40px, 4vw, 56px); }
+.bw-fai__note { flex: 1 1 22em; max-width: 40em; margin: 0; font-size: 14px; line-height: 1.6; }
+
+/* 5. Responsive ------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .bw-fai__copy { grid-column: 1 / span 6; }
+  .bw-stage { grid-column: 7 / -1; }
+  .bw-panel { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+
+@media (max-width: 960px) {
+  .bw-head__title, .bw-head__intro { grid-column: 1 / -1; }
+  .bw-head { row-gap: 16px; }
+  /* one column: case 1, its output, case 2, its output… */
+  .bw-story { grid-template-columns: minmax(0, 1fr); row-gap: 24px; }
+  .bw-story__step, .bw-story__art { grid-column: 1; }
+  .bw-story__step:nth-of-type(1) { grid-row: 1; } .bw-story__art:nth-child(1) { grid-row: 2; }
+  .bw-story__step:nth-of-type(2) { grid-row: 3; } .bw-story__art:nth-child(2) { grid-row: 4; }
+  .bw-story__step:nth-of-type(3) { grid-row: 5; } .bw-story__art:nth-child(3) { grid-row: 6; }
+  .bw-story__step:nth-of-type(4) { grid-row: 7; } .bw-story__art:nth-child(4) { grid-row: 8; }
+  .bw-story__step:not(:nth-of-type(1)) { margin-top: clamp(32px, 6vw, 56px); }
+  .bw-case__art { font-size: clamp(11px, 1.7vw, 14px); }
+  .bw-kinds__list { grid-template-columns: minmax(0, 1fr); }
+  .bw-fai__copy, .bw-stage { grid-column: 1 / -1; }
+  .bw-panel { grid-template-columns: minmax(0, 13em) minmax(0, 1fr); gap: 16px; }
+}
+
+@media (max-width: 680px) {
+  .bw-key { flex-direction: column; gap: 10px; }
+  .bw-flow__step { grid-template-columns: minmax(0, 1fr); }
+  .bw-flow dd { margin-left: 36px; }
+  .bw-cal__days { display: none; }
+  .bw-cal__grid { gap: 0.3em; }
+  .bw-cal__grid span { min-height: 4.4em; padding: 0.45em; font-size: 0.8em; }
+  .bw-cal__bar .bw-tag:not(.bw-tag--done) { display: none; }
+  .bw-inbox, .bw-ask { grid-template-columns: minmax(0, 1fr); }
+  .bw-site__page { padding: 1.2em; gap: 1em; }
+  .bw-panel { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}

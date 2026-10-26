@@ -10,7 +10,7 @@ import { dirname, join, resolve, relative, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import { layout } from "./layout.mjs";
 import * as R from "./render.mjs";
-import { loadSnapshot, toRenderData } from "./content.mjs";
+import { loadSnapshot, toRenderData, SITE_REDIRECTS, currentUrl } from "./content.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
@@ -88,6 +88,8 @@ function emit(path, html) {
   // path is the public route: "/" → index.html, "/learn/" → learn/index.html, "/404.html" → 404.html
   // A renderer with nothing to show leaves R.EMPTY_SECTION; the <section> around it is removed.
   html = R.dropEmptySections(html);
+  // Links to a renamed page (also inside CMS content) point at its new address
+  html = html.replace(/(\shref)="(\/[^"]*)"/g, (all, attr, url) => `${attr}="${currentUrl(url)}"`);
   for (const m of html.matchAll(/\/assets\/images\/[^"'\s),?#]+/g)) imagesUsed.add(decodeURI(m[0].slice(1)));
   const file = path.endsWith("/") ? join(OUT, path, "index.html") : join(OUT, path);
   mkdirSync(dirname(file), { recursive: true });
@@ -120,14 +122,10 @@ for (const p of data.programs) {
   emit(`/programs/${p.slug}/`, layout({ ...page, site: data.site }));
 }
 
-// One shared template for every article (resources/{slug})
+// One shared template for every resource, whatever its type (resources/{slug})
 for (const a of data.articles) {
   const page = R.articlePage(a);
   if (page) emit(`/resources/${a.slug}/`, layout({ ...page, site: data.site }));
-}
-// Guides, downloads and other resources get a page only when their page editor has content.
-for (const r of data.resources.filter((x) => x.hasPage)) {
-  emit(`/resources/${r.slug}/`, layout({ ...R.resourcePage(r), site: data.site }));
 }
 
 // One shared template for events that have their own page (a CMS event page, or "its own page"
@@ -144,9 +142,10 @@ mkdirSync(join(OUT, "events"), { recursive: true });
 writeFileSync(join(OUT, "events", "calendar.json"), JSON.stringify({ generated_at: snapshot.generated_at, events: R.calendarData() }, null, 2) + "\n");
 
 // Old URLs of renamed pages keep working: a small redirect page at each old route, plus a
-// _redirects file (Netlify; other hosts ignore it) for real 301s in deploy mode.
-// Site renames live here (the CMS adds its own): For Individuals became For Professionals.
-const SITE_REDIRECTS = [{ from: "/individuals/", to: "/professionals/" }];
+// _redirects file (Netlify) for real 301s in deploy mode. On Vercel, vercel.mjs serves the same
+// redirects as 308s before these pages are reached.
+// Site renames come from tools/content.mjs SITE_REDIRECTS (shared with vercel.mjs; the CMS adds
+// its own): For Individuals became For Professionals, the Free AI Starter Kit became Start Your AI Journey.
 const redirects = [...SITE_REDIRECTS, ...data.redirects].filter((r) => r.from && r.to && r.from !== r.to && !written.includes(r.from));
 for (const r of redirects) {
   // The refresh URL is not an href, so relativize() leaves it alone: point it at the page here.

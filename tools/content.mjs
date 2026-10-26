@@ -17,7 +17,7 @@ import { dirname, join } from "node:path";
 import { buildSnapshot, checkSnapshot } from "../cms/shared/public.mjs";
 import { sanitizeHtml } from "../cms/shared/sanitize-html.mjs";
 import { sanitizeCss, scopeCss } from "../cms/shared/sanitize-css.mjs";
-import { upgradeRecord, isDoc, extractList, extractText, readingTime, featuredImage, bylineOf, timeRange, eventInstant } from "../cms/shared/page-doc.mjs";
+import { upgradeRecord, extractList, extractText, readingTime, featuredImage, bylineOf, timeRange, eventInstant } from "../cms/shared/page-doc.mjs";
 import { eventHasPage } from "../cms/shared/schema.mjs";
 import { resolveImage } from "./gallery.mjs";
 import { eventGalleryEntries } from "./event-gallery.mjs";
@@ -122,24 +122,23 @@ function pageDoc(collection, p) {
 }
 const seo = (p) => ({ seoTitle: nz(p.seo_title), metaDescription: nz(p.meta_description), socialImage: nz(p.social_image_url) }); // each template falls back to its own image
 
-// Resource cards: how the button opens its destination. Older records chose this by hand
-// ("Access"); it now follows from the destination itself.
-function accessOf(r) {
-  if (!isDoc(r) && r.access_rule) return r.access_rule;
-  const u = String(r.file_url || "");
-  if (/^https?:\/\//i.test(u)) return "external";
-  if (/\.(pdf|docx?|xlsx?|pptx?|zip|csv|txt|png|jpe?g)([?#]|$)/i.test(u)) return "download";
-  return "open";
+// Resources: every type (article, guide, worksheet…) is the same kind of page, edited and
+// rendered like an article. The Type is only the badge on its card and a filter on Resources.
+export const TYPE_LABELS = { article: "Article", guide: "Guide", worksheet: "Worksheet", template: "Template", checklist: "Checklist", playbook: "Playbook", tool: "Free tool", other: "Resource" };
+export const typeOf = (r) => (TYPE_LABELS[r.resource_type] ? r.resource_type : r.resource_type ? "other" : "article");
+// Renamed site pages: links saved in the CMS before a rename point at the new address
+// (tools/build.mjs and vercel.mjs redirect the old one too).
+export const SITE_REDIRECTS = [
+  { from: "/individuals/", to: "/professionals/" },
+  { from: "/free-ai-starter-kit/", to: "/start-your-ai-journey/" },
+  { from: "/free-ai-starter-kit/thank-you/", to: "/start-your-ai-journey/thank-you/" },
+];
+export function currentUrl(u) {
+  if (!u) return u;
+  const r = SITE_REDIRECTS.find((x) => u === x.from || u.startsWith(x.from));
+  return r ? r.to + u.slice(r.from.length) : u;
 }
-
-// The card button says what the resource is, from its Type in the CMS; a file the button
-// downloads says "Download" instead.
-const TYPE_NAMES = { article: "article", guide: "guide", worksheet: "worksheet", template: "template", checklist: "checklist", playbook: "playbook", tool: "tool", other: "resource" };
-const TYPE_VERBS = { article: "Read", guide: "Read", playbook: "Read", tool: "Try" };
-export function resourceButton(type, access) {
-  const t = TYPE_NAMES[type] ? type : "other";
-  return `${access === "download" ? "Download" : TYPE_VERBS[t] || "Open"} ${TYPE_NAMES[t]}`;
-}
+const isFile = (u) => /\.(pdf|docx?|xlsx?|pptx?|zip|csv|txt|png|jpe?g)([?#]|$)/i.test(String(u || ""));
 
 export function toRenderData(snap) {
   const programs = snap.programs.map((p) => {
@@ -174,7 +173,6 @@ export function toRenderData(snap) {
     };
   });
 
-  const isArticle = (r) => (r.resource_type || "article") === "article";
   // A cover that points at a retired image (or at a registered photo) is pointed at that photo's
   // web files on the record itself, so cards, the article's own cover block and its link preview
   // all show the same picture (tools/gallery.mjs, src/data/gallery.json "replaces").
@@ -185,18 +183,16 @@ export function toRenderData(snap) {
     return { ...r, cover_image_url: `/${photo.base}-1280.webp`, cover_image_alt: alt, cover_image_meta: meta };
   };
   snap = { ...snap, resources: snap.resources.map(covered) };
-  const articles = snap.resources.filter(isArticle).map((a) => ({
-    id: a.slug, rid: a.id, slug: a.slug, title: a.title, category: a.category, topics: list(a.tags), date: a.publish_date, author: bylineOf(a),
-    readTime: readingTime(a.body_html) || a.read_time || "", featured: !!a.featured, excerpt: a.summary,
-    image: resolveImage(featuredImage("resources", a)), doc: pageDoc("resources", a), rec: a, status: a.status, ...seo(a),
-  }));
-  const resources = snap.resources.filter((r) => !isArticle(r)).map((r) => {
-    const doc = pageDoc("resources", r);
-    const access = accessOf(r);
+  // Each resource's card opens its page. A guide or worksheet saved without page content
+  // keeps its older link instead (a file, or a page such as Start Your AI Journey).
+  const articles = snap.resources.map((a) => {
+    const doc = pageDoc("resources", a), type = typeOf(a);
+    const link = doc ? null : nz(currentUrl(String(a.file_url || "").trim()));
     return {
-      id: r.slug, rid: r.id, slug: r.slug, title: r.title, kind: r.category, summary: r.summary, access,
-      accessLabel: !isDoc(r) ? nz(r.access_label) : null, url: r.file_url, ctaLabel: resourceButton(r.resource_type, doc ? "open" : access), featured: !!r.featured,
-      image: resolveImage(featuredImage("resources", r)), doc, hasPage: !!doc, rec: r, ...seo(r),
+      id: a.slug, rid: a.id, slug: a.slug, title: a.title, type, typeLabel: TYPE_LABELS[type], category: a.category, topics: list(a.tags),
+      date: a.publish_date, author: bylineOf(a), readTime: readingTime(a.body_html) || a.read_time || "", featured: !!a.featured, excerpt: a.summary,
+      href: doc ? `/resources/${a.slug}/` : link, external: !!link && /^https?:\/\//i.test(link), download: !!link && isFile(link),
+      image: resolveImage(featuredImage("resources", a)), doc, hasPage: !!doc, rec: a, status: a.status, ...seo(a),
     };
   });
 
@@ -211,10 +207,10 @@ export function toRenderData(snap) {
     origin: siteOrigin(s.origin), staging: s.staging === true, brand: s.brand, contactEmail: s.contact_email, contactPhone: nz(s.contact_phone),
     responseTime: nz(s.response_time), social: list(s.social), community: { name: s.community_name, url: s.community_url },
     starterKitReady: s.starter_kit_ready === true, logo: nz(s.logo_url), logoReversed: nz(s.logo_reversed_url),
-    primaryCta: { label: nz(s.primary_cta_label), url: nz(s.primary_cta_url) }, footerTagline: nz(s.footer_tagline), footerMotto: nz(s.footer_motto),
+    primaryCta: { label: nz(s.primary_cta_label), url: nz(currentUrl(s.primary_cta_url)) }, footerTagline: nz(s.footer_tagline), footerMotto: nz(s.footer_motto),
     // Booking link (Calendly) and the homepage video: both optional; nothing renders until set
     bookingUrl: nz(s.booking_url), video: s.featured_video_url ? { url: s.featured_video_url, title: nz(s.featured_video_title), poster: nz(s.featured_video_poster_url) } : null,
     privacyUrl: nz(s.privacy_url), termsUrl: nz(s.terms_url), tracking: { ga4: nz(s.ga4_id), gtm: nz(s.gtm_id), metaPixel: nz(s.meta_pixel_id) },
   };
-  return { site, programs, events, resources, articles, stories, redirects: snap.redirects || [] };
+  return { site, programs, events, articles, stories, redirects: snap.redirects || [] };
 }
