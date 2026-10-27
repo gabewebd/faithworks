@@ -129,9 +129,11 @@
 .pp-path__flow.is-live .pp-step > .btn, .pp-path__flow.is-live .pp-step > .text-link, .pp-path__flow.is-live .pp-step__links { grid-row: 4; }
 .pp-path__flow.is-live .pp-step__num { grid-row: 2; grid-column: 1; align-self: center; margin: 16px 0 0 -64px; background: var(--ink); box-shadow: inset 0 0 0 1.5px var(--pink), 0 0 0 6px var(--ink); }
 .pp-path__flow.is-live .pp-step.is-active .pp-step__num { background: var(--pink); color: var(--ink); box-shadow: 0 0 0 6px var(--ink); }
-.pp-path__flow.is-live .pp-path__rail { display: block; position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--line-dark);
+.pp-path__flow.is-live .pp-path__rail { display: block; position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; border-radius: 1px; }
+.pp-path__flow.is-live .pp-path__rail::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--line-dark);
   -webkit-mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); }
-.pp-path__flow.is-live .pp-path__rail i { display: block; height: 100%; border-radius: inherit; background: var(--pink); transform-origin: top; }
+/* the AI Yellow line between the numbers (motion.js §5g sets its ends and draws it step by step) */
+.pp-path__flow.is-live .pp-path__rail i { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: inherit; background: var(--yellow); transform: scaleY(0); transform-origin: top; }
 
 .pp-path__flow.is-live .pp-path__stage { display: block; grid-column: 2; grid-row: 1; }
 .pp-path__flow.is-live .pp-orb { display: block; position: sticky; top: calc(var(--header-h) + (100vh - var(--header-h) - var(--orb-max) - 40px) / 2); width: var(--orb); margin-inline: auto; transition: --glow 700ms var(--ease-out); }

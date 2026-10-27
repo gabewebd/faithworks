@@ -71,7 +71,7 @@
     blocks.push.apply(blocks, $$(".article__fig", main));
   }
   blocks = blocks.filter(function (el) {
-    return el.getBoundingClientRect().top > window.innerHeight && getComputedStyle(el).animationName === "none" && !el.matches(".goals__item");
+    return el.getBoundingClientRect().top > window.innerHeight && getComputedStyle(el).animationName === "none" && !el.matches(".goals__item, [data-approach] .journey-list--rail > li");
   });
 
   var pending = blocks.slice();
@@ -399,6 +399,12 @@
       gsap.fromTo($$(".pp-live__bar b", art), { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.inOut", delay: delay + 0.5, overwrite: true });
     };
     var jmm = gsap.matchMedia();
+    var jrail = journey.querySelector("[data-journey-rail]"), jnums = $$(".pp-step__num", journey), jnodes = [];
+    var fillRail = function (i, instant) {
+      if (!jrail || jnodes.length < 2) return;
+      var to = (jnodes[i] - jnodes[0]) / (jnodes[jnodes.length - 1] - jnodes[0]);
+      gsap.to(jrail, { scaleY: to, duration: instant ? 0 : 0.7, ease: "power2.inOut", overwrite: true });
+    };
 
     jmm.add("(min-width: 961px) and (min-height: 680px)", function () {
       journey.classList.add("is-live");
@@ -410,6 +416,7 @@
         jsteps.forEach(function (s, n) { s.classList.toggle("is-active", n === i); });
         jsegs.forEach(function (s, n) { s.classList.toggle("is-on", n <= i); s.classList.toggle("is-current", n === i); });
         if (jcount) jcount.textContent = ("0" + (i + 1)).slice(-2);
+        fillRail(i, instant);
         journey.setAttribute("data-active", i); // the orb's glow: Pink, Yellow, Pink, Yellow
         var art = jarts[i];
         // Every other visual still showing turns away (more than one when a scroll skips a step)
@@ -431,10 +438,18 @@
           onEnterBack: function () { show(i, -1); }
         });
       });
-      gsap.fromTo("[data-journey-rail]", { scaleY: 0 }, {
-        scaleY: 1, ease: "none",
-        scrollTrigger: { trigger: journey, start: "top 55%", end: "bottom 55%", scrub: 0.4 }
-      });
+      // The rail's yellow line runs from number to number, as on the About approach steps
+      // (5h): it spans the first number to the last, and draws down to the active step's number
+      // (back up when scrolling back)
+      var placeRail = function () {
+        if (!jrail) return;
+        var box = jrail.parentNode.getBoundingClientRect().top;
+        jnodes = jnums.map(function (n) { var r = n.getBoundingClientRect(); return r.top + r.height / 2 - box; });
+        gsap.set(jrail, { top: jnodes[0], height: jnodes[jnodes.length - 1] - jnodes[0] });
+        if (current > -1) fillRail(current, true);
+      };
+      placeRail();
+      ScrollTrigger.addEventListener("refresh", placeRail);
       gsap.fromTo("[data-journey-ticks]", { rotation: 0 }, {
         rotation: 120, svgOrigin: "200 200", ease: "none",
         scrollTrigger: { trigger: journey, start: "top bottom", end: "bottom top", scrub: 0.6 }
@@ -455,6 +470,8 @@
       journey.addEventListener("focusin", onFocus);
 
       return function () {
+        ScrollTrigger.removeEventListener("refresh", placeRail);
+        if (jrail) gsap.set(jrail, { clearProps: "all" });
         journey.removeEventListener("focusin", onFocus);
         journey.classList.remove("is-live");
         journey.removeAttribute("data-active");
@@ -483,6 +500,39 @@
       gsap.set(jarts.concat($$(JPARTS, journey)), { autoAlpha: 1, scale: 1, rotation: 0 });
     });
   }
+
+
+  /* ---- 5h. Our approach steps (about) ------------------------------------- */
+  // The heading and intro arrive with the section reveals (5); the five steps (Learn → Improve)
+  // then come in one at a time as each one scrolls up: the yellow line from the step before draws
+  // down, the step's pink node pops, and the row rises in with its label a beat behind.
+  // Scrolling back above a step winds it back. Nothing is pinned; steps already on screen at load
+  // stay as they are.
+  // A fast scroll that brings in several steps at once still plays them in order, a beat apart.
+  var approachTls = [], approachNext = 0;
+  var playStep = function (tl) {
+    var now = gsap.ticker.time, at = Math.max(now, approachNext);
+    approachNext = at + 0.18;
+    gsap.delayedCall(at - now, function () { if (!tl.reversed()) tl.play(); });
+  };
+  $$("[data-approach] .journey-list--rail").forEach(function (list) {
+    var steps = $$(":scope > li", list);
+    steps.forEach(function (step, i) {
+      if (step.getBoundingClientRect().top < window.innerHeight) return;
+      var tl = gsap.timeline({ paused: true });
+      if (i) tl.fromTo(steps[i - 1], { "--jl-line": 0 }, { "--jl-line": 1, duration: 0.6, ease: "power2.inOut" }, 0);
+      tl.fromTo(step, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out" }, i ? 0.3 : 0)
+        .fromTo(step, { "--jl-node": 0 }, { "--jl-node": 1, duration: 0.55, ease: "back.out(2.2)" }, i ? 0.4 : 0.1)
+        .fromTo(step.querySelector("b"), { x: -10, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power2.out" }, i ? 0.45 : 0.15);
+      approachTls.push(tl);
+      ScrollTrigger.create({
+        trigger: step, start: "top 82%",
+        onEnter: function () { tl.reversed(false); playStep(tl); },
+        onLeaveBack: function () { tl.reverse(); }
+      });
+    });
+  });
+  if (approachTls.length) window.addEventListener("beforeprint", function () { approachTls.forEach(function (tl) { tl.progress(1); }); });
 
 
   /* ---- 6. Keeping measurements fresh -------------------------------------- */

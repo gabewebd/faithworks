@@ -191,13 +191,12 @@ code { font-size: 0.9em; }
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border: 1px solid rgb(255 255 255 / 0.9);
-  box-shadow: 0 16px 36px -12px rgb(26 26 26 / 0.1), 0 4px 12px -2px rgb(26 26 26 / 0.04), inset 0 0 0 1px rgb(255 255 255 / 0.8);
-  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), border-color var(--dur-fast);
+  box-shadow: none;
+  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast);
 }
 .band--gradient-textured .pro-pain:hover {
   transform: translateY(-3px);
   border-color: rgb(251 197 34 / 0.5);
-  box-shadow: 0 22px 48px -14px rgb(26 26 26 / 0.15), 0 6px 16px -2px rgb(26 26 26 / 0.06), 0 0 0 1px rgb(239 172 186 / 0.4);
 }
 .band--gradient-textured .pro-pain::before {
   background: linear-gradient(90deg, var(--pink), var(--yellow));
@@ -1185,7 +1184,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 
 /* About (redesign 2026-10-20). Founder-led editorial page: name-led hero beside the studio
    portrait, a long-form story with a ruled record of achievements, the mission in Faith's words,
-   speaking topics, and the ecosystem as a ruled index rather than cards. Accent: Faith Pink for
+   speaking topics, and the ecosystem as one lead panel with four brands beside it. Accent: Faith Pink for
    the founder/human sections; AI Yellow stays with the "where Faith Works teaches" band. */
 /* Founder hero: Soft Charcoal ground; the portrait is a full-bleed editorial column that runs
    the section's full height and meets the viewport's right edge. The copy keeps the page edge. */
@@ -1275,23 +1274,65 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .talks__topics li { counter-increment: topic; display: flex; gap: 14px; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--line); font-family: var(--font-display); font-size: 17px; font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; }
 .talks__topics li::before { content: counter(topic, decimal-leading-zero); flex: none; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
 
-.ecosys { list-style: none; border-top: 1.5px solid var(--ink); }
-.ecosys__row { display: grid; grid-template-columns: minmax(0, 0.85fr) 120px minmax(0, 1.6fr) 150px; gap: 12px clamp(20px, 3vw, 48px); align-items: center; padding: clamp(22px, 2.4vw, 32px) 0; border-bottom: 1px solid var(--line); }
-.ecosys__brand { height: 34px; margin: 0; line-height: 0; }
-.ecosys__brand--ai { height: 28px; }
-.ecosys__brand--community { height: 44px; }
-.ecosys__brand--type { height: auto; font-size: clamp(22px, 2vw, 27px); line-height: 1.1; letter-spacing: -0.035em; }
-.ecosys__role { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
-.ecosys__role::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); }
-.ecosys__desc { max-width: 58ch; margin: 0; color: var(--muted); }
-.ecosys__link { justify-self: end; white-space: nowrap; }
+/* Ecosystem (2026-10-27): one mission, five brands. Faith Works leads as a tall Charcoal panel
+   with its reversed wordmark; Faith AI and Faith Studio, then Faith Talks and Faith Works
+   Community, sit beside it in two staggered rows, on the shared Pink & Yellow textured band
+   (.band--gradient-textured). The cards are flat White: no shadows, glass or numbers.
+   Accent: Faith Pink. */
+/* The five brand cards page through the card pager (.pro-pains): three to a view on desktop,
+   two on tablets, one on phones */
+.pro-pains.eco5-pager { --per: 3; }
+.eco5__item { --act-mark: var(--pink); position: relative; flex: 0 0 calc((100% - (var(--per) - 1) * var(--gap)) / var(--per)); min-width: 0; scroll-snap-align: start; display: flex; flex-direction: column; gap: 14px; padding: clamp(22px, 2.2vw, 32px); border: 1px solid transparent; border-radius: var(--r-lg); background: var(--white); color: var(--ink); transition: border-color var(--dur) var(--ease-out); }
+/* Action word, with a Faith Pink highlighter that fills on hover and focus */
+.eco5__act { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.eco5__word { display: inline-block; padding: 3px 7px; margin-left: -7px; border-radius: 4px; background: linear-gradient(var(--act-mark), var(--act-mark)) left / 0 100% no-repeat; transition: background-size 500ms var(--ease-out), color 500ms var(--ease-out); }
+/* The logos lead each card; in a narrow card the mark scales down whole rather than squashing */
+.eco5__brand { height: 54px; margin: 0; line-height: 0; }
+.eco5__brand .brandmark { object-fit: contain; object-position: left center; }
+.eco5__brand--talks { height: 50px; }
+.eco5__brand--community { height: 76px; }
+.eco5__brand--studio { height: 54px; }
+.eco5__desc { max-width: 52ch; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
+.eco5__link { align-self: flex-start; margin-top: auto; padding-top: 6px; }
+.eco5__link::after { transform-origin: left; }
+/* Hover and keyboard focus: the action word is marked, the card's edge firms up, the link's rule redraws */
+.eco5__item:is(:hover, :focus-within) .eco5__word { background-size: 100% 100%; color: var(--ink); }
+.eco5__item:is(:hover, :focus-within) { border-color: var(--pink); }
+@media (hover: hover) {
+  .eco5__item:hover .eco5__link::after { animation: eco5-rule 600ms var(--ease-out); }
+}
+@keyframes eco5-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .eco__note { margin: 20px 0 0; max-width: 80ch; }
+@media (max-width: 1100px) {
+  .pro-pains.eco5-pager { --per: 2; }
+}
+@media (max-width: 640px) {
+  .pro-pains.eco5-pager { --per: 1; --gap: 12px; }
+  .eco5__brand, .eco5__brand--studio { height: 44px; }
+  .eco5__brand--talks { height: 42px; }
+  .eco5__item--community .eco5__brand { height: 62px; }
+}
 /* The sessions list sits in a narrow column here: one session per row keeps titles readable */
 .creds .sessions { margin-top: 32px; }
 .creds .sessions__list { grid-template-columns: minmax(0, 1fr); }
 .journey-list { list-style: none; display: grid; gap: 10px; }
 .journey-list li { display: flex; gap: 14px; align-items: baseline; padding: 16px 20px; border-radius: var(--r); background: var(--ink-2); color: var(--muted-dark); font-size: 17px; }
 .journey-list b { min-width: 7.5em; color: var(--yellow); font-size: 19px; }
+/* About, Our approach: a rail beside the steps. Each step has a Faith Pink node, joined to the
+   next by a line that fills AI Yellow (js/motion.js §5h animates --jl-node and --jl-line as the
+   steps scroll in). No JS or reduced motion: every node and line drawn. */
+.journey-list--rail { --jl-x: 40px; --jl-gap: clamp(16px, 2vw, 24px); gap: var(--jl-gap); padding-left: var(--jl-x); }
+/* Each step is a milestone and the section's main focus: its name set large in Poppins, its
+   line beneath it */
+.journey-list--rail li { position: relative; flex-direction: column; align-items: flex-start; gap: 8px; padding: clamp(24px, 2.6vw, 36px) clamp(22px, 2.6vw, 36px); font-size: clamp(17px, 1.3vw, 19px); line-height: 1.4; }
+.journey-list--rail b { min-width: 0; font-family: var(--font-display); font-size: clamp(34px, 3.6vw, 56px); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+/* Wide screens: the headline and intro hold beside the steps while they scroll past */
+@media (min-width: 901px) and (min-height: 640px) {
+  .approach__intro { position: sticky; top: calc(var(--header-h) + 40px); }
+}
+.journey-list--rail li::before { content: ""; position: absolute; left: calc(-1 * var(--jl-x) + 5px); top: 50%; width: 14px; height: 14px; border: 2px solid var(--pink); border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 6px rgb(239 172 186 / 0.12); translate: 0 -50%; scale: var(--jl-node, 1); opacity: var(--jl-node, 1); }
+.journey-list--rail li::after { content: ""; position: absolute; left: calc(-1 * var(--jl-x) + 11px); top: calc(50% + 11px); width: 2px; height: calc(100% + var(--jl-gap) - 22px); border-radius: 2px; background: linear-gradient(var(--yellow), var(--yellow)) top / 100% calc(var(--jl-line, 1) * 100%) no-repeat, rgb(250 248 244 / 0.12); }
+.journey-list--rail li:last-child::after { display: none; }
 /* About: where Faith Works teaches. Copy and recent sessions beside an editorial set: the event
    poster upright, two session photos stacked beside it, captions on glass. */
 .creds { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
@@ -1668,11 +1709,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .bio__proof { grid-template-columns: minmax(0, 1fr); }
   .talks__photo { width: min(100%, 420px); }
   .talks__photo img { aspect-ratio: 4 / 4.4; }
-  .ecosys__row { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
-  .ecosys__brand { grid-column: 1; }
-  .ecosys__role { grid-column: 2; grid-row: 1; align-self: center; }
-  .ecosys__desc { grid-column: 1 / -1; }
-  .ecosys__link { grid-column: 1 / -1; justify-self: start; }
   .site-footer__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .flow__cards { grid-template-columns: minmax(0, 1fr); }
 }
@@ -1767,9 +1803,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .edu__logo { height: 64px; padding: 6px 8px; }
   .edu__name { font-size: 14px; }
   .talks__topics { grid-template-columns: minmax(0, 1fr); }
-  .ecosys__brand { height: 28px; }
-  .ecosys__brand--ai { height: 24px; }
-  .ecosys__brand--community { height: 38px; }
   .sessions__item time { grid-row: auto; }
   /* Agent network: stacked on phones (agents, then the workflow, then you approve) */
   .agents__canvas { aspect-ratio: auto; display: grid; gap: 10px; padding: 16px; }
@@ -1780,6 +1813,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .agents__hub::before, .agents__human::before { content: ""; position: absolute; left: 50%; top: -17px; height: 14px; border-left: 1.5px dashed rgb(26 26 26 / 0.4); }
   .agents__pulse { display: none; }
   .journey-list b { min-width: 6em; }
+  .journey-list--rail { --jl-x: 30px; }
+  .journey-list--rail li { gap: 6px; padding: 22px 22px 24px; }
+  .journey-list--rail b { font-size: clamp(30px, 8.6vw, 36px); }
   .proof__head { display: block; }
   .proof__head > p { max-width: 44ch; margin-top: 18px; padding: 0; }
   .site-footer__legal { flex-wrap: wrap; }

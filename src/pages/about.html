@@ -128,58 +128,73 @@
       </div>
     </section>
 
-    <!-- ECOSYSTEM: five brands, one mission. Descriptions from the founder profile and existing copy.
-         Faith Talks and Faith Studio have no page or logo yet, so they are set as type and not linked. -->
-    <section class="section wrap" aria-labelledby="eco-title">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">One mission, five brands</p>
-          <h2 id="eco-title">The Faith Works ecosystem</h2>
+    <!-- ECOSYSTEM: one mission, the brands around Faith Works. Descriptions from the founder profile
+         and existing copy. The five cards page through the For Professionals card pager (js/main.js
+         §17, style.css .pro-pains), on the shared Pink & Yellow textured band. Faith Talks and
+         Faith Studio have no page yet, so they are not linked. -->
+    <section class="section band--gradient-textured" aria-labelledby="eco-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">One mission, five brands</p>
+            <h2 id="eco-title">The Faith Works ecosystem</h2>
+          </div>
+          <p>Faith Works PH is the main education, workshops, coaching and strategy brand. Around it, each brand has its own role in helping people work better with AI.</p>
         </div>
-        <p>Faith Works PH is the main education, workshops, coaching and strategy brand. Around it, each brand has its own role in helping people work better with AI.</p>
+        <div class="pro-pains eco5-pager" data-pager data-reveal>
+          <ul class="pro-pains__track eco5" id="eco5-track" data-pager-track tabindex="0" aria-label="The Faith Works brands">
+            <li class="eco5__item eco5__item--works">
+              <p class="eco5__act"><span class="eco5__word">Learn</span></p>
+              <h3 class="eco5__brand"><img class="brandmark" src="/assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385" loading="lazy" decoding="async"></h3>
+              <p class="eco5__desc">Education, strategy, leadership development and long-term business growth, through workshops, coaching and programs.</p>
+              <a class="text-link eco5__link" href="/learn/">Learn AI</a>
+            </li>
+            <li class="eco5__item eco5__item--ai">
+              <p class="eco5__act"><span class="eco5__word">Implement</span></p>
+              <h3 class="eco5__brand eco5__brand--ai"><img class="brandmark" src="/assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3>
+              <p class="eco5__desc">AI literacy, automation, AI implementation and technology solutions for business, starting with a discovery conversation about your use case.</p>
+              <a class="text-link eco5__link" href="/build/#faith-ai">About Faith AI</a>
+            </li>
+            <li class="eco5__item eco5__item--talks">
+              <p class="eco5__act"><span class="eco5__word">Converse</span></p>
+              <h3 class="eco5__brand eco5__brand--talks"><img class="brandmark" src="/assets/icons/faith-talks.svg" alt="Faith Talks" width="2852" height="525" loading="lazy" decoding="async"></h3>
+              <p class="eco5__desc">Storytelling, a podcast and meaningful conversations: real-life lessons and future-ready insights.</p>
+            </li>
+            <li class="eco5__item eco5__item--community">
+              <p class="eco5__act"><span class="eco5__word">Connect</span></p>
+              <h3 class="eco5__brand eco5__brand--community"><img class="brandmark" src="/assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3>
+              <p class="eco5__desc">Connection, collaboration, mentorship and growth for founders, entrepreneurs, professionals and emerging leaders, who keep learning and applying between sessions.</p>
+              <a class="text-link eco5__link" href="/community/">The community</a>
+            </li>
+            <li class="eco5__item eco5__item--studio">
+              <p class="eco5__act"><span class="eco5__word">Create</span></p>
+              <h3 class="eco5__brand eco5__brand--studio"><img class="brandmark" src="/assets/icons/faith-studio.svg" alt="Faith Studio" width="3005" height="602" loading="lazy" decoding="async"></h3>
+              <p class="eco5__desc">Content production, campaigns and creative storytelling that power the ecosystem and its advocacy.</p>
+            </li>
+          </ul>
+          <div class="pro-pains__controls">
+            <span class="sr-only" aria-live="polite" data-pager-live></span>
+            <div class="pro-pains__progress" aria-hidden="true"><span data-pager-progress></span></div>
+            <button type="button" class="voices__btn" data-pager-prev aria-controls="eco5-track" aria-label="Previous brands"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button type="button" class="voices__btn" data-pager-next aria-controls="eco5-track" aria-label="Next brands"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <p class="small eco__note">Digital GrowthScale is a separate implementation and staffing business. Inquiries for those services are referred to it with a clear handoff, and its results are not presented as Faith Works results.</p>
       </div>
-      <ol class="ecosys">
-        <li class="ecosys__row">
-          <h3 class="ecosys__brand"><img class="brandmark" src="/assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385" loading="lazy" decoding="async"></h3>
-          <p class="ecosys__role">Learn</p>
-          <p class="ecosys__desc">Education, strategy, leadership development and long-term business growth, through workshops, coaching and programs.</p>
-          <a class="text-link ecosys__link" href="/learn/">Learn AI <span class="link-arrow" aria-hidden="true">↗</span></a>
-        </li>
-        <li class="ecosys__row">
-          <h3 class="ecosys__brand ecosys__brand--ai"><img class="brandmark" src="/assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3>
-          <p class="ecosys__role">Implement</p>
-          <p class="ecosys__desc">AI literacy, automation, AI implementation and technology solutions for business, starting with a discovery conversation about your use case.</p>
-          <a class="text-link ecosys__link" href="/build/#faith-ai">About Faith AI <span class="link-arrow" aria-hidden="true">↗</span></a>
-        </li>
-        <li class="ecosys__row">
-          <h3 class="ecosys__brand ecosys__brand--type">Faith Talks</h3>
-          <p class="ecosys__role">Converse</p>
-          <p class="ecosys__desc">Storytelling, a podcast and meaningful conversations: real-life lessons and future-ready insights.</p>
-        </li>
-        <li class="ecosys__row">
-          <h3 class="ecosys__brand ecosys__brand--community"><img class="brandmark" src="/assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3>
-          <p class="ecosys__role">Connect</p>
-          <p class="ecosys__desc">Connection, collaboration, mentorship and growth for founders, entrepreneurs, professionals and emerging leaders, who keep learning and applying between sessions.</p>
-          <a class="text-link ecosys__link" href="/community/">The community <span class="link-arrow" aria-hidden="true">↗</span></a>
-        </li>
-        <li class="ecosys__row">
-          <h3 class="ecosys__brand ecosys__brand--type">Faith Studio</h3>
-          <p class="ecosys__role">Create</p>
-          <p class="ecosys__desc">Content production, campaigns and creative storytelling that power the ecosystem and its advocacy.</p>
-        </li>
-      </ol>
-      <p class="small eco__note">Digital GrowthScale is a separate implementation and staffing business. Inquiries for those services are referred to it with a clear handoff, and its results are not presented as Faith Works results.</p>
     </section>
 
+    <!-- Our approach: the headline and intro hold (sticky on wide screens) while the five steps
+         arrive one by one as they scroll in, a yellow rail filling beside them (js/motion.js §5h).
+         No JS or reduced motion: all shown. -->
     <section class="section section--dark" aria-labelledby="approach-title">
-      <div class="wrap split split--dark">
-        <div>
+      <div class="wrap split split--dark" data-approach>
+        <div class="approach__intro">
           <p class="eyebrow">Our approach</p>
           <h2 id="approach-title">Before AI tools, upgrade the human.</h2>
           <p class="split__lead">Better judgment, clarity and work habits come first. Tools change; the way you think about your work lasts.</p>
           <p>For non-technical founders, professionals and teams who feel overwhelmed by tools, Faith Works provides practical learning and guided implementation that turns one business task into a useful, reviewable workflow.</p>
         </div>
-        <ol class="journey-list">
+        <ol class="journey-list journey-list--rail">
           <li><b>Learn</b>the foundations.</li>
           <li><b>Apply</b>AI to a real task.</li>
           <li><b>Build</b>a useful first version.</li>
@@ -189,19 +204,23 @@
       </div>
     </section>
 
-    <section class="section wrap split" aria-labelledby="promise-title">
-      <div>
-        <p class="eyebrow">Our promise</p>
-        <h2 id="promise-title">How we teach and what we promise</h2>
-        <p class="split__lead">Practical, honest and specific. These rules apply to every program, page and email.</p>
+    <!-- The For Business checklist: sticky heading on the left, each promise lights up as it
+         scrolls past (js/motion.js §5b) -->
+    <section class="section" aria-labelledby="promise-title">
+      <div class="wrap goals" data-goals>
+        <div class="goals__head">
+          <p class="eyebrow">Our promise</p>
+          <h2 id="promise-title">How we teach and what we promise</h2>
+          <p class="goals__lead">Practical, honest and specific. These rules apply to every program, page and email.</p>
+        </div>
+        <ul class="goals__list">
+          <li class="goals__item"><span class="goals__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" pathLength="1"/></svg></span><p class="goals__text">We explain the outcome before we name a tool.</p></li>
+          <li class="goals__item"><span class="goals__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" pathLength="1"/></svg></span><p class="goals__text">We say what each program costs, includes and leaves out.</p></li>
+          <li class="goals__item"><span class="goals__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" pathLength="1"/></svg></span><p class="goals__text">We label examples as examples, and keep learning prototypes separate from supported systems.</p></li>
+          <li class="goals__item"><span class="goals__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" pathLength="1"/></svg></span><p class="goals__text">We never promise income, instant mastery or guaranteed results.</p></li>
+          <li class="goals__item"><span class="goals__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" pathLength="1"/></svg></span><p class="goals__text">We show participant feedback only with their permission and their exact words.</p></li>
+        </ul>
       </div>
-      <ul class="ticks ticks--lg">
-        <li>We explain the outcome before we name a tool.</li>
-        <li>We say what each program costs, includes and leaves out.</li>
-        <li>We label examples as examples, and keep learning prototypes separate from supported systems.</li>
-        <li>We never promise income, instant mastery or guaranteed results.</li>
-        <li>We show participant feedback only with their permission and their exact words.</li>
-      </ul>
     </section>
 
     <section class="section section--flush-top wrap">

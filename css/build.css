@@ -228,7 +228,7 @@
 .bw-kinds__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--col-gap); margin: 0; padding: 0; list-style: none; }
 
 /* All three cards are identical white; the meter carries the difference */
-.bw-kind { display: flex; flex-direction: column; align-items: flex-start; padding: var(--bw-pad); border-radius: var(--r-lg); background: var(--white); box-shadow: 0 16px 36px -12px rgb(26 26 26 / 0.1), 0 4px 12px -2px rgb(26 26 26 / 0.04); }
+.bw-kind { display: flex; flex-direction: column; align-items: flex-start; padding: var(--bw-pad); border-radius: var(--r-lg); background: var(--white); }
 
 /* support level: one, two, three bars filled; empty bars are a soft grey track */
 .bw-kind__meter { display: flex; gap: 4px; margin-bottom: 20px; }
