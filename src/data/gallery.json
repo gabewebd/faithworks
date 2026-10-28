@@ -182,7 +182,7 @@
   },
   "pages": {
     "home": {
-      "business": { "layout": "single", "sizes": "(min-width: 901px) 80vw, 100vw", "items": [{ "image": "room-full" }] },
+      "business": { "layout": "single", "sizes": "(min-width: 901px) 50vw, 100vw", "items": [{ "image": "room-chart", "position": "56% 55%" }] },
       "founder": { "layout": "single", "sizes": "260px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
     },
     "homeRedesign": {
@@ -191,7 +191,7 @@
     },
     "about": {
       "hero": { "layout": "single", "sizes": "(min-width: 901px) 44vw, 100vw", "priority": true, "items": [{ "image": "founder-studio", "position": "44% 28%" }] },
-      "stage": { "layout": "single", "sizes": "(min-width: 901px) 60vw, 150vw", "items": [{ "image": "speaking-whiteboard", "alt": "Faith Natividad speaking to an audience with a microphone." }] }
+      "stage": { "layout": "single", "sizes": "(min-width: 901px) 60vw, 150vw", "items": [{ "image": "speaking-faith-screen", "alt": "Faith Natividad speaking with a microphone beside a screen showing the Faith Works name.", "position": "45% 35%" }] }
     },
     "business": {
       "hero": {

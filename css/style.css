@@ -73,8 +73,8 @@ body[data-page="/about/"] .section-head > p { font-size: inherit; }
 
   /* Layout grid: 12 columns inside .wrap. Section heads, editorial splits and card rows all
      sit on these columns, so headings, copy, images and CTAs share the same edges. */
-  --gutter: clamp(18px, 2.6vw, 40px);
-  --container: 1920px;
+  --gutter: clamp(20px, 2.6vw, 44px);  /* the header's side padding, so page content shares its edges */
+  --container: 100%;
   --col-gap: clamp(16px, 2.2vw, 32px);
   --grid: repeat(12, minmax(0, 1fr));
   --edge: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
@@ -147,6 +147,7 @@ code { font-size: 0.9em; }
 .phero + .section--flush-top { padding-top: clamp(40px, 4.4vw, 64px); }
 .section--rule { border-top: 1px solid var(--line); }
 .band--stone { background: var(--stone-2); }
+.band--paper { background: var(--paper); }
 .band--pink { background: var(--pink-tint); }
 .band--yellow { background: var(--yellow-pastel); }
 
@@ -306,21 +307,22 @@ code { font-size: 0.9em; }
 .staging__inner { display: flex; align-items: center; gap: 10px; min-height: 36px; padding-block: 6px; }
 .staging .dot { background: var(--yellow); }
 .site-header {
+  /* a full-width white bar on every page, no rule below; the home hero card starts at its bottom edge */
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
-  height: var(--header-h); padding-inline: var(--edge);
-  background: var(--paper); border-bottom: 1px solid var(--line);
-  transition: background-color var(--dur) var(--ease-out);
+  height: var(--header-h); padding-inline: var(--gutter);
+  background: var(--white);
 }
 .site-header--campaign { position: static; }
 .logo { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; opacity: 1; }
 .logo img { display: block; width: 168px; height: auto; object-fit: contain; }
-.site-nav { display: flex; align-items: center; gap: 28px; font-size: var(--fs-small); font-weight: 600; }
+.site-nav { display: flex; align-items: center; gap: 28px; font-family: var(--font); font-size: 15px; font-weight: 500; }
 .site-nav > a:not(.btn) { position: relative; padding-block: 10px; }
 .site-nav > a:not(.btn)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 2px; background: var(--pink); transform: scaleX(0); transform-origin: right; transition: transform var(--dur) var(--ease-out); }
 .site-nav > a:not(.btn):hover::after, .site-nav > a[aria-current="page"]::after { transform: scaleX(1); transform-origin: left; }
 .site-nav > a[aria-current="page"] { color: var(--rose); }
-.site-nav .btn { padding-inline: 18px; min-height: 44px; }
+.site-nav .btn { min-height: 48px; padding: 6px 20px 6px 22px; gap: 10px; font-size: var(--fs-small); }
+.site-nav .btn .btn__arrow { width: 18px; height: 18px; background-size: 16px; }
 .menu { display: none; position: relative; width: 44px; height: 44px; padding: 0; border: 0; background: none; }
 .menu__bars, .menu__bars::before, .menu__bars::after { position: absolute; left: 11px; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: transform var(--dur) var(--ease-spring), background-color var(--dur-fast); }
 .menu__bars { top: 21px; }
@@ -353,90 +355,118 @@ code { font-size: 0.9em; }
 .site-footer--campaign { padding: 0 0 8px; }
 
 /* 5. Home: hero ------------------------------------------------------------ */
-/* The message sits at the centre of an integration map: AI agents (round nodes) and the everyday apps
-   they help with (smaller nodes on dashed links, conceptual rather than claimed integrations).
-   Every connector is straight: horizontal and vertical runs with right-angle turns, branching off a
-   bus on each side into ports on two faint rails beside the copy, warming from Faith Pink on the left
-   to AI Yellow on the right. Logos keep their own colours; everything else is Charcoal, Pink and Yellow.
-   Wide screens: .hnet--wide holds two 440×760 halves, each anchored beside the copy and reaching out to
-   its viewport edge, where a mask feathers it into the page. Within a half, nodes (percent positions)
-   and lines (SVG) share one coordinate system; the whole half scales up with the screen (--hs).
-   ≤1100px: .hnet--compact, a smaller network in flow below the CTAs, so it never meets the text.
-   Motion settles in after the headline; js/main.js adds a small pointer parallax (--px/--py).
-   Touch, no-JS and reduced motion get the same composition, still. */
-.hero { position: relative; isolation: isolate; overflow: hidden; display: grid; align-items: center; min-height: min(52vw, 820px); padding-block: clamp(36px, 4.5vw, 64px) clamp(48px, 5vw, 72px); }
-/* a faint dot grid that fades out toward the edges, and the hub light behind the copy */
-.hero::before, .hero::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
-.hero::before { inset: 0; background: radial-gradient(rgb(26 26 26 / 0.11) 1px, transparent 1.5px) 0 0 / 24px 24px; -webkit-mask: radial-gradient(ellipse 60% 64% at 50% 50%, #000 15%, transparent 80%); mask: radial-gradient(ellipse 60% 64% at 50% 50%, #000 15%, transparent 80%); }
-.hero::after {
-  left: 50%; top: 50%; width: min(1040px, 96vw); aspect-ratio: 1.5; translate: -50% -50%; border-radius: 50%; filter: blur(28px);
-  background: radial-gradient(closest-side, rgb(250 248 244 / 0.92) 40%, transparent), radial-gradient(closest-side at 30% 50%, rgb(239 172 186 / 0.5), transparent), radial-gradient(closest-side at 70% 50%, rgb(251 197 34 / 0.3), transparent);
+/* Brand guidelines p.25 (desktop hero mockup). Centred copy on the G1 feather (p.18): Faith Pink pools
+   in the top-right corner and runs down the right edge, a Pink 60 band feathers along the top, AI
+   Yellow glows softly top-left, and the lower half stays clear Works White for the copy and node web.
+   Pink and Yellow meet only in that ground; the one gradient element is the eyebrow ring (p.11). */
+.hero { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(36px, 4.4vw, 64px) clamp(16px, 2.5vw, 40px); background: var(--paper); }
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    /* a soft Works White clearing behind the headline, so the type has room to breathe */
+    radial-gradient(52% 26% at 50% 24%, rgb(250 248 244 / 0.92) 35%, rgb(250 248 244 / 0) 100%),
+    radial-gradient(60% 80% at 104% -6%, rgb(239 172 186 / 0.66), rgb(239 172 186 / 0.5) 22%, rgb(239 172 186 / 0.18) 56%, rgb(239 172 186 / 0) 100%),
+    radial-gradient(72% 36% at 64% -4%, rgb(239 172 186 / 0.4), rgb(239 172 186 / 0) 100%),
+    radial-gradient(44% 52% at -4% -6%, rgb(251 197 34 / 0.4), rgb(251 197 34 / 0) 85%);
 }
+/* on the home page the hero is an inset card with rounded corners; its top edge meets the header's bottom edge */
+body[data-page="/"] .hero { margin: 0 clamp(8px, 1vw, 14px); border-radius: 20px; }
+/* home: the ground around the hero card starts white under the header and settles into Works White as it goes down */
+body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 0 / 100% 100vh no-repeat, var(--paper); }
 .hero__stage { position: relative; z-index: 1; display: grid; justify-items: center; }
-.hero__copy { max-width: 760px; text-align: center; }
-.hero__eyebrow { justify-content: center; }
-.hero h1 { font-size: var(--fs-h1); line-height: 0.98; letter-spacing: -0.058em; margin: 18px 0 22px; }
-.hero h1 em { font-style: normal; position: relative; z-index: 0; white-space: nowrap; }
-.hero h1 em::after { content: ""; position: absolute; z-index: -1; left: -2px; right: -2px; bottom: 0.08em; height: 0.2em; background: var(--pink); transform-origin: left; rotate: -2deg; }
-.hero__subhead { display: block; margin-top: 12px; font-size: 0.5em; line-height: 1.16; letter-spacing: -0.035em; }
-.hero__intro { margin-inline: auto; max-width: 480px; color: var(--ink); }
-.hero__actions { justify-content: center; margin: 24px 0 16px; }
-.hero__small { margin: 0; }
+.hero__copy { max-width: 1120px; text-align: center; }
 
-/* The network: decorative to pointers (it never blocks the CTAs), described once by its aria-label */
-.hnet { pointer-events: none; user-select: none; }
-.hnet--wide {
-  /* --hs scales each half (steps up with the viewport below); --gap keeps the copy clear, and grows on
-     wide screens just enough that the outer nodes sit about 56px from the edge */
-  --hs: 0.8; --gap-min: 23%; --gap: clamp(var(--gap-min), 50% - 330px * var(--hs) - 56px, 460px); --feather: clamp(120px, 11%, 220px);
-  position: absolute; inset: 0; z-index: 0;
-  /* the outer edges dissolve into the page; everything nearer the copy stays crisp */
-  -webkit-mask: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.5) calc(var(--feather) * 0.35), #000 var(--feather), #000 calc(100% - var(--feather)), rgb(0 0 0 / 0.5) calc(100% - var(--feather) * 0.35), transparent);
-  mask: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.5) calc(var(--feather) * 0.35), #000 var(--feather), #000 calc(100% - var(--feather)), rgb(0 0 0 / 0.5) calc(100% - var(--feather) * 0.35), transparent);
+/* eyebrow: a bracketed pill with the Pink-to-Yellow ring; the brackets echo the mark */
+.hero__eyebrow {
+  display: inline-flex; padding: 8px 20px; border: 1px solid transparent; border-radius: 999px;
+  background: linear-gradient(var(--paper), var(--paper)) padding-box, linear-gradient(100deg, var(--pink), var(--yellow)) border-box;
+  font-family: var(--font-display); font-size: 15px; font-weight: 500; letter-spacing: 0; text-transform: none; line-height: 1.4;
 }
-.hnet--compact { display: none; }
-.hnet__layer { position: absolute; inset: 0; translate: calc(var(--px, 0) * 7px) calc(var(--py, 0) * 5px); }
-/* each half is centred on its nodes' vertical span (y 413 of 760) and scales from its inner edge */
-.hnet__half { inset: auto; top: 50%; width: 440px; height: 760px; margin-top: -413px; scale: var(--hs); }
-.hnet__half--l { right: calc(50% + var(--gap)); transform-origin: 100% 413px; }
-.hnet__half--r { left: calc(50% + var(--gap)); transform-origin: 0 413px; }
-@media (min-width: 1280px) { .hnet--wide { --hs: 0.96; } }
-@media (min-width: 1440px) { .hnet--wide { --hs: 1.16; --gap-min: 21%; } }
-@media (min-width: 1680px) { .hnet--wide { --hs: 1.26; } }
-.hnet__lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-/* one line style throughout, like the CTA pattern: a single solid weight, rounded corners, one accent per side */
-.hnet__link { fill: none; stroke: var(--pink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.hnet__side--r .hnet__link { stroke: var(--yellow); }
-/* ports: solid dots where a line ends beside the copy */
-.hnet__port { transform-box: fill-box; transform-origin: center; }
-.hnet__port--l { fill: var(--pink); }
-.hnet__port--r { fill: var(--yellow); }
+.hero__eyebrow .dot { display: none; }
 
-/* Nodes: centred on their point with margins, so transform (parallax), translate (drift) and
-   scale (entrance) never compete */
-.hnode {
-  --k: 1; position: absolute; left: var(--x); top: var(--y); display: grid; place-items: center;
-  width: calc(var(--s) * var(--k)); height: calc(var(--s) * var(--k)); margin: calc(var(--s) * var(--k) / -2) 0 0 calc(var(--s) * var(--k) / -2);
-  border-radius: 50%; background: var(--white);
-  box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.07), 0 1px 2px rgb(26 26 26 / 0.05), 0 16px 30px -18px rgb(26 26 26 / 0.34);
-  transform: translate(calc(var(--px, 0) * var(--d, 0) * 6px), calc(var(--py, 0) * var(--d, 0) * 4px));
+/* display type: 600, tight, two lines; one idea highlighted with the yellow block */
+.hero h1 { font-size: clamp(40px, 4.7vw, 70px); font-weight: 700; line-height: 1.04; letter-spacing: -0.045em; margin: 20px 0 18px; hyphens: manual; }
+/* the reveal wrappers clip (overflow: hidden), so the hero's lines get room above for the highlight */
+.hero h1 .line { padding-top: 0.14em; margin-top: -0.14em; }
+.hero h1 em { font-style: normal; position: relative; z-index: 0; margin-left: 0.12em; white-space: nowrap; }
+.hero h1 em::after { content: ""; position: absolute; z-index: -1; inset: 0.08em -0.14em 0.02em -0.16em; border-radius: 0.16em; background: var(--yellow); transform-origin: left; }
+.hero__intro { margin-inline: auto; max-width: 700px; color: var(--muted); }
+/* the motto sits under the node web; js/motion.js §5i fills its letters in as the page scrolls */
+.hero__small { margin: 8px 0 0; font-family: var(--font-display); font-size: clamp(24px, 2.6vw, 38px); font-weight: 700; line-height: 1.1; letter-spacing: -0.04em; text-align: center; color: var(--ink); }
+
+/* buttons: --r-sm corners, never pills. Primary: flat AI Yellow with a bare Charcoal arrow.
+   Secondary: a flat Charcoal outline, no arrow. */
+/* the node web rises beside the CTAs on wide screens; the buttons stay on top of its light column */
+.hero__actions { position: relative; z-index: 1; justify-content: center; gap: 14px; margin: 28px 0 36px; }
+.hero__actions .btn { min-height: 56px; padding: 8px 30px; border: 0; border-radius: var(--r-sm); font-size: var(--fs-body); font-weight: 500; transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+/* .btn--sheen: the primary CTA, also used in the header. Flat: no gradient, highlight or shadow. */
+.btn--sheen { border: 0; border-radius: var(--r-sm); transition: transform var(--dur-fast) var(--ease-out);
+  background: var(--yellow); color: var(--ink); box-shadow: none;
 }
-.hnode img { width: 46%; height: 46%; object-fit: contain; }
-/* agents carry a faint halo in their side's accent */
-.hnode--l { box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.07), 0 0 0 5px rgb(239 172 186 / 0.16), 0 16px 30px -18px rgb(26 26 26 / 0.34); }
-.hnode--r { box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.07), 0 0 0 5px rgb(251 197 34 / 0.14), 0 16px 30px -18px rgb(26 26 26 / 0.34); }
-/* the apps: smaller and quieter, a plain white disc with a hairline edge */
-.hnode--app { box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.08), 0 10px 22px -16px rgb(26 26 26 / 0.3); }
-.hnode--app img { width: 48%; height: 48%; }
-/* the lead node gets the brand ring: a Pink-to-Yellow edge and a soft glow */
-.hnode--lead { border: 2px solid transparent; background: linear-gradient(var(--white), var(--white)) padding-box, linear-gradient(135deg, var(--pink), var(--yellow)) border-box; box-shadow: 0 0 0 7px rgb(239 172 186 / 0.14), 0 0 44px -6px rgb(239 172 186 / 0.8), 0 18px 32px -18px rgb(26 26 26 / 0.34); }
-.hnode--lead img { width: 44%; height: 44%; }
-/* "You": the person at the end of each lead line, drawn in Ink with a small label beneath */
-.hnode--you svg { width: 46%; height: 46%; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
-.hnode__label { position: absolute; top: calc(100% + 8px); left: 50%; translate: -50% 0; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.hero__actions .btn--sheen { padding: 8px 26px 8px 28px; gap: 12px; }
+.btn--sheen:hover { background: var(--yellow); box-shadow: none; }
+.btn--sheen .btn__arrow {
+  width: 20px; height: 20px; -webkit-mask: none; mask: none;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%231A1A1A'%20stroke-width%3D'2.2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5%2012h14M13%206l6%206-6%206'%2F%3E%3C%2Fsvg%3E") center / 18px no-repeat;
+}
+.btn--sheen:hover .btn__arrow { transform: translateX(2px); }
+.hero__actions .btn--light { border: 1.5px solid var(--ink); background: transparent; color: var(--ink); }
+.hero__actions .btn--light:hover { background: var(--ink); color: var(--white); }
 
-/* compact hub: where the lines start, just under the CTAs */
-.hnet__hub { position: absolute; left: 50%; top: 3%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--yellow)); box-shadow: 0 0 0 6px rgb(239 172 186 / 0.2), 0 0 26px 4px rgb(251 197 34 / 0.45); }
+/* Node web (p.21), laid out across the full width of the hero: lines come in from the left edge,
+   pass through the AI tools on three branches (the outer two angle in), merge at a junction and enter
+   the Faith Works hub; from a second junction on the right a spine fans out with rounded elbows, through
+   the everyday work apps, to the right edge. js/main.js §10 places the nodes and draws the lines (one
+   SVG across the hero) from one set of branch shapes; each line has its own weight and brand colour
+   and carries a travelling signal under .motion. The lines feather out at the very edge of the page.
+   The hub keeps the mockup's glassy outline; the web rests on a dot field (p.17: node webs only). */
+.hweb {
+  --dot: 52px; --hub: 132px;
+  position: relative; isolation: isolate; justify-self: start; width: 100vw; margin-inline: calc(50% - 50vw); height: clamp(300px, 30vw, 440px);
+  margin-top: clamp(-32px, -2vw, 0px); user-select: none;
+}
+.hweb::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(rgb(26 26 26 / 0.13) 1px, transparent 1.5px) 0 0 / 22px 22px;
+  -webkit-mask: radial-gradient(ellipse 34% 50% at 50% 50%, #000 25%, transparent 80%); mask: radial-gradient(ellipse 34% 50% at 50% 50%, #000 25%, transparent 80%);
+}
+.hero__wires {
+  position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.hweb__wire, .hweb__pulse { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.hweb__pulse { visibility: hidden; }
+.hweb__junction { stroke: var(--white); stroke-width: 3; }
+.hweb__node { position: absolute; z-index: 1; left: var(--x); top: var(--y); translate: -50% -50%; }
+/* each node is framed like the hub: a white ring, a thin line in its wire's colour and a soft glow
+   (--glow, --edge-a and --glow-a are set by js/main.js §10; a neutral hairline without JS) */
+.hweb__dot { --glow: 26 26 26; --glow-a: 0; --edge-a: 0.08; flex: none; display: grid; place-items: center; width: var(--dot); height: var(--dot); border-radius: 50%; background: var(--white); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.07), 0 0 0 6px rgb(255 255 255 / 0.72), 0 0 0 7px rgb(var(--glow) / var(--edge-a)), 0 0 14px 6px rgb(var(--glow) / var(--glow-a)), 0 14px 26px -16px rgb(26 26 26 / 0.3); }
+.hweb__dot img { width: 44%; height: 44%; object-fit: contain; }
+/* the hub: a rounded box, never a circle, in a glassy outline with a Pink 55% edge */
+.hweb__hub {
+  display: grid; place-items: center; width: var(--hub); height: var(--hub); position: absolute; z-index: 1; left: 50%; top: 50%; translate: -50% -50%; border-radius: 36px; background: var(--white);
+  box-shadow: 0 0 0 10px rgb(255 255 255 / 0.72), 0 0 0 11px rgb(239 172 186 / 0.6), 0 0 22px 10px rgb(239 172 186 / 0.22), 0 22px 44px -22px rgb(26 26 26 / 0.3);
+}
+.hweb__hub img { width: 54%; height: auto; }
+/* the hub as a small chat, in the hub's glassy outline: your message in a Charcoal bubble, the reply
+   from the Faith Works mark in a Pink 24 bubble, and an input with a Yellow send button. On phones it
+   shrinks to the mark alone. */
+.hweb__hub.hchat {
+  --chat-w: clamp(270px, 26vw, 360px);
+  width: var(--chat-w); height: auto; display: grid; place-items: initial; gap: 12px; padding: 18px; border-radius: 28px;
+  background: linear-gradient(180deg, var(--white), var(--paper)); font-family: var(--font-display); font-size: 13px; line-height: 1.4; text-align: left;
+}
+.hchat__you { justify-self: end; max-width: 84%; padding: 10px 14px; border-radius: 16px 16px 4px 16px; background: var(--ink); color: var(--white); font-weight: 500; }
+.hchat__ai { display: flex; align-items: flex-end; gap: 10px; }
+.hchat__avatar { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 30%; background: var(--white); box-shadow: 0 0 0 1px rgb(239 172 186 / 0.6), 0 6px 14px -8px rgb(26 26 26 / 0.35); }
+.hweb__hub .hchat__avatar img { width: 66%; }
+.hchat__bubble { max-width: 84%; padding: 10px 14px; border-radius: 16px 16px 16px 4px; background: var(--pink-tint); color: var(--ink); }
+.hchat__input { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; padding: 6px 6px 6px 14px; border-radius: 999px; background: var(--white); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.08); color: rgb(26 26 26 / 0.5); }
+.hchat__send { flex: none; width: 30px; height: 30px; border-radius: 50%; background: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%231A1A1A'%20stroke-width%3D'2.4'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M12%2019V5M5%2012l7-7%207%207'%2F%3E%3C%2Fsvg%3E") center / 14px no-repeat, var(--yellow); }
+@media (max-width: 1100px) {
+  .hweb { --dot: 46px; }
+  .hweb__hub.hchat { --chat-w: 240px; gap: 10px; padding: 14px; font-size: 12px; }
+}
 
 .strip { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px var(--edge); border-block: 1px solid var(--line); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
 .strip__label { margin: 0; color: var(--muted); }
@@ -465,11 +495,10 @@ code { font-size: 0.9em; }
 .route__arrow { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1.5px solid var(--ink); border-radius: 50%; }
 
 /* 7. Home: make it concrete ------------------------------------------------ */
-/* One strip of three tasks above three cards (the task → AI assists → you review). Each card has a
-   graphic area on a soft Faith Pink + AI Yellow glow that fades into the White card, then one title and one line. */
+/* One strip of three tasks, each on a filled icon tile, above three cards. Each card is a brand field panel (p.19: field and glassy content) with its step and copy set below. Fields rotate Rose, Sun, Dawn. */
 #examples .section-head h2 { font-size: var(--fs-h2); }
 .flow__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: clamp(14px, 1.4vw, 20px); border-radius: var(--r); overflow: hidden; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
-.flow__tabs button { position: relative; display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 14px 22px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 600; transition: color var(--dur-fast); }
+.flow__tabs button { position: relative; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 18px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 600; transition: color var(--dur-fast); }
 .flow__tabs button + button { box-shadow: inset 1px 0 0 var(--line); }
 .flow__tabs button::before { content: ""; position: absolute; inset: 0; z-index: 0; background: var(--ink); transform: scaleY(0); transform-origin: bottom; transition: transform 420ms var(--ease-expo); }
 .flow__tabs button > * { position: relative; z-index: 1; }
@@ -478,40 +507,39 @@ code { font-size: 0.9em; }
 .flow__tabs button[aria-selected="true"]::before { transform: scaleY(1); }
 .flow__tabs button:focus-visible { outline-offset: -5px; }
 .flow__tabs button[aria-selected="true"]:focus-visible { outline-color: var(--yellow); }
-.flow__tab-num { font-size: 13px; color: var(--muted); }
-.flow__tabs button[aria-selected="true"] .flow__tab-num { color: var(--yellow); }
+/* each task's icon sits on its own filled tile: Faith Pink, AI Yellow, Charcoal */
+.flow__tab-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--tab-tile); color: var(--ink); }
+.flow__tabs button:nth-child(1) { --tab-tile: var(--pink); }
+.flow__tabs button:nth-child(2) { --tab-tile: var(--yellow); }
+.flow__tabs button:nth-child(3) .flow__tab-icon { --tab-tile: var(--ink); color: var(--white); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22); }
+.flow__tabs button:nth-child(3)[aria-selected="true"] .flow__tab-icon { --tab-tile: var(--white); color: var(--ink); box-shadow: none; }
+.flow__tab-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 
-.flow__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); transition: opacity 200ms var(--ease-out); }
+.flow__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); transition: opacity 200ms var(--ease-out); }
 .flow__cards.is-swapping { opacity: 0; }
-.fcard { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
-.fcard__art { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; justify-content: center; height: clamp(224px, 17vw, 248px); padding: 24px 24px 4px; }
-/* the glow: one brand colour per card (Pink, Yellow, Pink), masked so the bottom melts into the card instead of ending in an edge */
-.fcard__art::before { content: ""; position: absolute; inset: 0; z-index: -2;
-  background: radial-gradient(120% 100% at 50% 0%, var(--glow), transparent 75%);
-  -webkit-mask-image: linear-gradient(180deg, #000 35%, transparent 96%); mask-image: linear-gradient(180deg, #000 35%, transparent 96%); }
-/* fine grid and grain, strongest behind the illustration */
-.fcard__art::after { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.6;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(rgb(26 26 26 / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(26 26 26 / 0.05) 1px, transparent 1px);
-  background-size: 140px 140px, 22px 22px, 22px 22px; background-position: 0 0, 50% 11px, 11px 50%;
-  -webkit-mask-image: radial-gradient(70% 65% at 50% 38%, #000, transparent 78%); mask-image: radial-gradient(70% 65% at 50% 38%, #000, transparent 78%); }
-.fcard--task { --glow: rgb(239 172 186 / 0.85); }
-.fcard--ai { --glow: rgb(251 197 34 / 0.5); }
-.fcard--review { --glow: rgb(239 172 186 / 0.85); }
-.fcard__body { padding: 14px 26px 28px; }
+.fcard { display: flex; flex-direction: column; min-width: 0; }
+/* Layer 1, the field: one of three painted grounds, built only from Faith Pink, AI Yellow and White */
+.fcard__art { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: clamp(236px, 18vw, 264px); padding: 28px 24px; border-radius: var(--r-lg); background: var(--field); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5); }
+.fcard--task { --field: radial-gradient(85% 110% at 0% 0%, rgb(239 172 186 / 0.5), transparent 78%), radial-gradient(80% 90% at 100% 100%, rgb(251 197 34 / 0.34), transparent 80%), linear-gradient(135deg, #F9E2E6, #FCF1EC 55%, #FDF1D4); --tile: var(--pink); }
+.fcard--ai { --field: radial-gradient(90% 100% at 85% 0%, rgb(251 197 34 / 0.42), transparent 78%), radial-gradient(80% 90% at 0% 100%, rgb(239 172 186 / 0.45), transparent 78%), linear-gradient(160deg, #FDF4DC, #FCF7F2 60%, #FAE7EA); --tile: var(--yellow); }
+.fcard--review { --field: radial-gradient(70% 90% at 0% 35%, rgb(239 172 186 / 0.4), transparent 78%), radial-gradient(70% 80% at 85% 100%, rgb(251 197 34 / 0.28), transparent 78%), linear-gradient(180deg, #FFFFFF, #FCF6F3); --tile: var(--pink); }
+.fcard__body { padding: 20px 2px 0; }
 .fcard__step { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: var(--fs-label); font-weight: 600; letter-spacing: 0.02em; }
-.fcard__step span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--yellow); font-size: 11px; font-weight: 700; letter-spacing: 0; }
+.fcard__icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--tile); color: var(--ink); box-shadow: 0 0 0 3px rgb(255 255 255 / 0.7); }
+.fcard__icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.fcard__icon .fill { fill: currentColor; stroke: none; }
 .fcard h3 { margin-bottom: 8px; font-family: var(--font-display); font-size: clamp(19px, 1.5vw, 22px); line-height: 1.25; letter-spacing: -0.02em; }
 .fcard__body > p:last-child { max-width: 40ch; margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); }
 
 /* Card 1: the inputs as floating pills, gently staggered */
 .fpills { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.fpills li { padding: 11px 20px; border-radius: 999px; background: var(--white); font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 14px 28px -16px rgb(26 26 26 / 0.35); }
+.fpills li { padding: 11px 20px; border-radius: 999px; background: var(--white); font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: 0 0 0 6px rgb(255 255 255 / 0.42), 0 14px 28px -16px rgb(26 26 26 / 0.35); }
 .fpills li:nth-child(3n+1) { translate: -22px 0; }
 .fpills li:nth-child(3n+2) { translate: 18px 0; }
 .fpills li:nth-child(3n) { translate: -6px 0; }
 
 /* Card 2: a Charcoal drafting panel with the example tools tucked under it */
-.fdraft { position: relative; width: min(100%, 236px); padding: 16px 18px 40px; border-radius: 14px; background: var(--ink); color: var(--white); box-shadow: 0 22px 40px -20px rgb(26 26 26 / 0.55); }
+.fdraft { position: relative; width: min(100%, 236px); padding: 16px 18px 40px; border-radius: 14px; background: var(--ink); color: var(--white); box-shadow: 0 0 0 7px rgb(255 255 255 / 0.42), 0 22px 40px -20px rgb(26 26 26 / 0.55); }
 .fdraft__top { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 12px; font-weight: 600; color: var(--yellow); }
 .fdraft__top svg { width: 14px; height: 14px; fill: var(--yellow); }
 .fdraft__label { margin: 0 0 12px; font-family: var(--font-display); font-size: 16px; font-weight: 600; line-height: 1.2; }
@@ -524,7 +552,7 @@ code { font-size: 0.9em; }
 .ftools img { width: 26px; height: 26px; }
 
 /* Card 3: the reviewed result, with a Faith Pink approval seal */
-.fout { position: relative; width: min(100%, 268px); padding: 16px 18px 8px; border-radius: 12px; background: var(--white); box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 18px 34px -18px rgb(26 26 26 / 0.3); }
+.fout { position: relative; width: min(100%, 268px); padding: 16px 18px 8px; border-radius: 12px; background: var(--white); box-shadow: 0 0 0 7px rgb(255 255 255 / 0.42), 0 18px 34px -18px rgb(26 26 26 / 0.3); }
 .fout__head { margin: 0 0 6px; padding-right: 40px; font-size: 14px; font-weight: 700; }
 .fout__rows { list-style: none; margin: 0; padding: 0; }
 .fout__rows li { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 13px; font-weight: 500; }
@@ -561,6 +589,91 @@ code { font-size: 0.9em; }
   #journey.is-pinned { --pin-step: 60vh; height: calc(100vh + 4 * var(--pin-step)); padding-block: 0; }
   #journey.is-pinned .journey { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); align-content: center; }
 }
+
+/* Home journey on Works White, like the sections around it. Each scene is a brand field panel (p.19), like the
+   "make it concrete" cards: a clean field (Rose, Sun, Dawn) with glassy-outline content, no texture.
+   Scoped to #journey (stage rows to #journey.section--field): the home redesign reuses these scene classes on Charcoal. */
+.section--field { background: var(--paper); color: var(--ink); }
+/* the stages float on Works White as separate frosted rows: inactive rows are a light glass with softened text,
+   the selected row turns solid White with a Faith Pink edge, a little depth and a Pink-to-Yellow bar on its left.
+   Stage numbers alternate Faith Pink and AI Yellow fills */
+#journey.section--field .steps { gap: 10px; margin-top: 32px; }
+#journey.section--field .step { min-height: 64px; padding: 12px 20px 12px 14px; border: 1px solid rgb(26 26 26 / 0.07); border-radius: var(--r-lg); background: rgb(255 255 255 / 0.5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 1px 2px rgb(26 26 26 / 0.03); color: rgb(26 26 26 / 0.72); font-size: 21px; font-weight: 600; letter-spacing: -0.01em; transition: color var(--dur-fast), background-color var(--dur), border-color var(--dur), box-shadow var(--dur); }
+#journey.section--field .step:first-child { border-top: 1px solid rgb(26 26 26 / 0.07); }
+#journey.section--field .step::after { left: 0; right: auto; top: 14px; bottom: 14px; width: 3px; height: auto; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--pink), var(--yellow)); transform: scaleY(0); transform-origin: center; }
+#journey.section--field .step:hover { color: var(--ink); background: rgb(255 255 255 / 0.78); border-color: rgb(26 26 26 / 0.12); box-shadow: 0 8px 20px -14px rgb(26 26 26 / 0.22); }
+#journey.section--field .step[aria-selected="true"] { color: var(--ink); background: var(--white); border-color: rgb(239 172 186 / 0.9); box-shadow: 0 0 0 3px rgb(239 172 186 / 0.18), 0 14px 30px -18px rgb(26 26 26 / 0.28); }
+#journey.section--field .step[aria-selected="true"]::after { transform: scaleY(1); }
+#journey.section--field .step__name { display: inline-flex; align-items: center; }
+#journey.section--field .step__num { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; margin-right: 16px; border-radius: 50%; background: var(--pink); color: var(--ink); font-size: 13px; font-weight: 700; letter-spacing: 0; opacity: 0.8; transition: box-shadow var(--dur-fast), opacity var(--dur-fast); }
+#journey.section--field .step:nth-child(even) .step__num { background: var(--yellow); }
+#journey.section--field .step:hover .step__num, #journey.section--field .step[aria-selected="true"] .step__num { opacity: 1; }
+#journey.section--field .step[aria-selected="true"] .step__num { box-shadow: 0 0 0 3px var(--white), 0 0 0 4px rgb(26 26 26 / 0.2); }
+#journey.section--field .step__arrow { color: rgb(26 26 26 / 0.45); transition: transform var(--dur) var(--ease-spring), color var(--dur-fast); }
+#journey.section--field .step:hover .step__arrow, #journey.section--field .step[aria-selected="true"] .step__arrow { color: var(--ink); }
+#journey.section--field .step:focus-visible { outline-offset: 3px; }
+#journey .scene--learn, #journey .scene--implement { --field: radial-gradient(85% 110% at 0% 0%, rgb(239 172 186 / 0.5), transparent 78%), radial-gradient(80% 90% at 100% 100%, rgb(251 197 34 / 0.34), transparent 80%), linear-gradient(135deg, #F9E2E6, #FCF1EC 55%, #FDF1D4); }
+#journey .scene--apply, #journey .scene--improve { --field: radial-gradient(90% 100% at 85% 0%, rgb(251 197 34 / 0.42), transparent 78%), radial-gradient(80% 90% at 0% 100%, rgb(239 172 186 / 0.45), transparent 78%), linear-gradient(160deg, #FDF4DC, #FCF7F2 60%, #FAE7EA); }
+#journey .scene--build { --field: radial-gradient(70% 90% at 0% 35%, rgb(239 172 186 / 0.4), transparent 78%), radial-gradient(70% 80% at 85% 100%, rgb(251 197 34 / 0.28), transparent 78%), linear-gradient(180deg, #FFFFFF, #FCF6F3); }
+#journey .scene__art {
+  border: 0; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5); background: var(--field);
+  --frame: 0 0 0 7px rgb(255 255 255 / 0.42), 0 18px 34px -18px rgb(26 26 26 / 0.3);
+}
+/* content: white cards in a 7px glassy White frame. Lines follow the light connector language: 1px translucent
+   Charcoal hairlines that end in small Faith Pink nodes, never solid Charcoal outlines or cards. */
+#journey .scene__art { --hair: rgb(26 26 26 / 0.22); --node: radial-gradient(circle, var(--rose-dot) 2.5px, rgb(255 255 255 / 0.9) 3px 4px, transparent 4.5px); }
+#journey .learn { gap: 22px 26px; }
+#journey .learn__topics span { background: var(--white); color: var(--ink); box-shadow: 0 0 0 4px rgb(255 255 255 / 0.42); }
+#journey .learn__topics .is-on { background: var(--yellow); color: var(--ink); }
+#journey .learn__notes { padding: 14px; border-radius: 14px; background: var(--white); box-shadow: var(--frame); }
+#journey .learn__panel-title, #journey .learn__note, #journey .learn__note b { color: var(--ink); }
+#journey .learn__note { background: var(--stone-2); }
+#journey .learn__assistant { box-shadow: var(--frame); }
+#journey .learn__prompt { border: 1px solid var(--line); }
+#journey .apply__doc { background: var(--white); color: var(--ink); box-shadow: var(--frame); }
+/* the input card is frosted glass over the field: White at 55% with a bright edge */
+#journey .apply__doc--in { background: rgb(255 255 255 / 0.55); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9), 0 18px 34px -20px rgb(26 26 26 / 0.22); }
+#journey .apply__doc--in .apply__tag, #journey .apply__label { color: var(--ink); }
+#journey .apply__inputs li { background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+#journey .apply__core::before, #journey .apply__core::after { top: 45px; height: 9px; background: linear-gradient(var(--hair), var(--hair)) center / 100% 1px no-repeat; }
+#journey .apply__core::before { background: var(--node) left center / 9px 9px no-repeat, linear-gradient(var(--hair), var(--hair)) center / 100% 1px no-repeat; }
+#journey .apply__core::after { background: var(--node) right center / 9px 9px no-repeat, linear-gradient(var(--hair), var(--hair)) center / 100% 1px no-repeat; }
+#journey .apply__ring { stroke: var(--hair); stroke-width: 1.5; }
+#journey .apply__status { color: var(--ink); }
+#journey .apply__review-dot, #journey .pipe__icon--approve { background: var(--yellow); color: var(--ink); }
+#journey .proto { box-shadow: var(--frame); }
+#journey .proto__page .proto__btn { border: 1px solid rgb(26 26 26 / 0.3); }
+#journey .proto__row .is-done { background: var(--stone); color: var(--ink); }
+#journey .proto__progress b { background: var(--yellow); }
+#journey .pipe { gap: 20px; }
+#journey .pipe__step { background: var(--white); box-shadow: var(--frame); }
+#journey .pipe__step--approve { box-shadow: inset 0 0 0 1.5px var(--yellow), var(--frame); }
+#journey .pipe__step:not(:last-child)::after { left: 29px; width: 9px; height: 20px; background: var(--node) center bottom / 9px 9px no-repeat, linear-gradient(var(--hair), var(--hair)) center / 1px 100% no-repeat; }
+#journey .pipe__icon { background: var(--stone-2); color: var(--ink); }
+#journey .pipe__icon--ai { background: var(--pink-tint); }
+#journey .pipe__icon--ai .tool { filter: none; }
+#journey .pipe__icon--trigger, #journey .pipe__icon--approve { background: var(--yellow); }
+#journey .pipe__icon--owner { background: var(--pink); }
+#journey .pipe__text b, #journey .pipe__text small { color: var(--ink); }
+#journey .pipe__chip { background: var(--stone-2); color: var(--ink); }
+#journey .pipe__chip--auto { background: var(--yellow-pastel); color: var(--ink); }
+#journey .pipe__chip--approve { background: var(--yellow); color: var(--ink); }
+#journey .motif { --motif-line: rgb(26 26 26 / 0.3); }
+#journey .motif path, #journey .motif rect { stroke-width: 1.25; }
+#journey .motif rect:not(.motif-build__tile--accent) { fill: var(--white); }
+#journey .motif .motif-build__tile--accent { stroke: none; }
+#journey .motif .motif__wire { stroke: rgb(26 26 26 / 0.22); }
+#journey .motif .motif-build__check { stroke-width: 2.5; }
+#journey .motif-build__node { fill: var(--rose-dot); stroke: var(--white); stroke-width: 2; }
+#journey .motif-build__dot { fill: rgb(26 26 26 / 0.35); }
+#journey .compare { gap: 22px; }
+#journey .compare__item { background: var(--white); color: var(--ink); box-shadow: var(--frame); }
+#journey .compare__item span { color: var(--ink); }
+#journey .compare__bar { background: var(--stone-2); }
+#journey .compare__item--after .compare__bar i { background: var(--yellow); }
+#journey .compare__loop { color: var(--ink); }
+#journey .scene__copy p { color: var(--ink); }
+#journey .tag { border-color: rgb(26 26 26 / 0.18); }
 
 .motif { width: 100%; height: auto; overflow: visible; }
 .motif path { fill: none; stroke: var(--motif-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -733,8 +846,157 @@ code { font-size: 0.9em; }
 .prog--yellow .prog__art::before { content: ""; position: absolute; inset: 0; z-index: -1;
   background-image: linear-gradient(rgb(26 26 26 / 0.07) 1px, transparent 1px), linear-gradient(90deg, rgb(26 26 26 / 0.07) 1px, transparent 1px); background-size: 22px 22px; background-position: -1px -1px;
   -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 96%); mask-image: linear-gradient(180deg, #000 30%, transparent 96%); }
-.programs__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 28px; }
+.programs__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 28px; margin-top: 28px; text-align: center; }
 .programs__foot .small { flex-basis: 100%; margin: 0; }
+
+/* Home programs: scroll-driven split (tools/render.mjs programRowsHome, js/main.js §5b). One mockup
+   holds sticky on the left on a soft Pink/Yellow/White ground; the programs pass on the right and
+   the one in the middle of the screen is active. Narrower, each program shows its own view inline. */
+.pscene { display: grid; gap: 28px; }
+.pscene__stage { display: none; }
+.pscene__steps { list-style: none; display: grid; gap: 20px; margin: 0; padding: 0; }
+.pstep { border-radius: var(--r-lg); background: var(--white); border: 1px solid var(--line); overflow: hidden; }
+.pstep__body { padding: clamp(22px, 2.6vw, 34px); }
+.pstep__cat { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; font-size: 11px; font-weight: 700; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
+.pstep__num { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--white); font-family: var(--font-display); font-size: 11px; letter-spacing: 0.04em; transition: background var(--dur-fast), border-color var(--dur-fast); }
+.pstep__title { max-width: 14ch; margin: 0 0 16px; font-size: clamp(36px, 4vw, 60px); line-height: 0.98; letter-spacing: -0.045em; text-wrap: balance; }
+.pstep__title a { text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 6px; transition: text-decoration-color var(--dur-fast); }
+.pstep__title a:hover { text-decoration-color: currentColor; }
+.pstep__summary { max-width: 44ch; margin: 0; font-size: var(--fs-lead); line-height: 1.5; text-wrap: pretty; }
+.pstep__label { margin: 22px 0 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.pstep__outs { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pstep__outs li { position: relative; padding-left: 20px; font-size: 15.5px; line-height: 1.5; }
+.pstep__outs li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); }
+.pstep--yellow .pstep__outs li::before { background: var(--yellow); }
+.pstep .prog__notice { margin-top: 20px; }
+.pstep__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin-top: 26px; }
+.pstep__actions .btn { min-height: 44px; padding: 9px 18px; }
+
+/* The mockup ground: each program has its own full Pink/Yellow/White gradient; on the stage they
+   are stacked and crossfade as the active program changes (opacity only, so nothing re-lays out) */
+:root { --g0: radial-gradient(80% 70% at 0% 0%, rgb(239 172 186 / 0.95), transparent 70%), radial-gradient(70% 70% at 100% 100%, rgb(251 197 34 / 0.6), transparent 72%), linear-gradient(135deg, #F4CBD3, #F9E6E6 45%, #FBF1E4 70%, #FCE3A6);
+  --g1: radial-gradient(75% 75% at 100% 0%, rgb(251 197 34 / 0.75), transparent 70%), radial-gradient(85% 75% at 0% 100%, rgb(239 172 186 / 0.95), transparent 72%), linear-gradient(225deg, #FCE7B0, #FBF3E8 45%, #F7DCE1 75%, #F2C2CC);
+  --g2: radial-gradient(70% 80% at 10% 15%, rgb(251 197 34 / 0.7), transparent 70%), radial-gradient(80% 80% at 95% 90%, rgb(239 172 186 / 0.9), transparent 72%), radial-gradient(50% 50% at 60% 40%, rgb(250 248 244 / 0.9), transparent 70%), linear-gradient(160deg, #FCE2A0, #FAF1E6 50%, #F5D0D8);
+  --g3: radial-gradient(70% 70% at 100% 0%, rgb(239 172 186 / 0.85), transparent 70%), radial-gradient(80% 70% at 0% 100%, rgb(251 197 34 / 0.55), transparent 72%), radial-gradient(55% 55% at 45% 50%, rgb(250 248 244 / 0.85), transparent 70%), linear-gradient(200deg, #F6D3DA, #FAF4EC 50%, #FBE7B4);
+}
+.pmock { position: relative; isolation: isolate; display: grid; place-items: center; overflow: hidden; border-radius: var(--r-lg); background: var(--g0); }
+.pmock--inline[data-at="1"] { background: var(--g1); }
+.pmock--inline[data-at="2"] { background: var(--g2); }
+.pmock--inline[data-at="3"] { background: var(--g3); }
+.pmock__bg { position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 800ms var(--ease-out); }
+.pmock__bg[data-bg="0"] { background: var(--g0); }
+.pmock__bg[data-bg="1"] { background: var(--g1); }
+.pmock__bg[data-bg="2"] { background: var(--g2); }
+.pmock__bg[data-bg="3"] { background: var(--g3); }
+.pmock[data-at="0"] > [data-bg="0"], .pmock[data-at="1"] > [data-bg="1"], .pmock[data-at="2"] > [data-bg="2"], .pmock[data-at="3"] > [data-bg="3"] { opacity: 1; }
+.pmock__view { grid-area: 1 / 1; width: min(100% - 40px, 500px); padding-block: 28px; }
+/* The node network (tools/render.mjs programMock): a 480 × 440 map whose type is 1/30 of its width,
+   so every card, wire and pin keeps its place at any size. Hairline Charcoal wires with Pink pins
+   where they meet a card; frosted cards, the active one solid White with a Pink ring. */
+.pnet { container-type: inline-size; }
+.pnet__map { position: relative; width: 100%; aspect-ratio: 480 / 440; font-size: calc(100cqw / 30); }
+.pnet__wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; }
+.pnet__wire { stroke: var(--ink); stroke-opacity: 0.26; stroke-width: 1.25; stroke-linecap: square; stroke-linejoin: miter; }
+.pnet__flow { stroke: var(--pink); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 0.08 0.92; animation: pnet-flow 2.8s linear infinite; }
+.pnet__pin { fill: var(--pink); stroke: var(--white); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+@keyframes pnet-flow { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.pnet__out, .pnet__node, .pnet__cursor { position: absolute; left: calc(var(--x) / 480 * 100%); top: calc(var(--y) / 440 * 100%); }
+/* The output in the middle: a small White window with the program's result drawn inside */
+.pout { display: flex; flex-direction: column; box-sizing: border-box; width: calc(var(--w) * 1em / 16); height: calc(var(--h) * 1em / 16); transform: translate(-50%, -50%); overflow: hidden;
+  border-radius: 0.9em; background: var(--white); box-shadow: 0 0 0 0.45em rgb(255 255 255 / 0.45), 0 1.4em 2.4em -1.2em rgb(26 26 26 / 0.35); }
+.pout__bar { display: flex; align-items: center; gap: 0.25em; flex: none; height: 1.5em; padding: 0 0.6em; border-bottom: 1px solid rgb(26 26 26 / 0.07); background: var(--paper); }
+.pout__bar i { width: 0.36em; height: 0.36em; border-radius: 50%; background: rgb(26 26 26 / 0.16); }
+.pout__bar i:first-child { background: var(--pink); }
+.pout__bar em { margin-left: 0.4em; font-size: 0.6em; font-style: normal; font-weight: 500; opacity: 0.6; white-space: nowrap; }
+.pout__body { display: flex; flex-direction: column; gap: 0.4em; flex: 1; min-height: 0; padding: 0.6em 0.7em; }
+.pout__title { font-family: var(--font-display); font-size: 0.75em; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.pout__row { display: flex; align-items: center; gap: 0.45em; padding: 0.3em 0.4em; border-radius: 0.4em; font-size: 0.625em; font-weight: 500; line-height: 1.2; white-space: nowrap; }
+.pout__row i { flex: none; width: 1.1em; height: 1.1em; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgb(26 26 26 / 0.25); }
+.pout__row.is-done { opacity: 0.6; text-decoration: line-through; }
+.pout__row.is-done i { box-shadow: none; background: var(--pink); }
+.pout__row.is-now { background: var(--pink-tint); }
+.pout__row.is-now i { box-shadow: inset 0 0 0 0.3em var(--yellow); }
+.pout__line { flex: none; height: 0.32em; border-radius: 1em; background: rgb(26 26 26 / 0.12); }
+.pout__line--short { width: 64%; }
+.pout__author { display: flex; align-items: center; gap: 0.4em; }
+.pout__author > i { flex: none; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--pink); }
+.pout__author > span { display: grid; gap: 0.25em; flex: 1; }
+.pout__author em { height: 0.32em; border-radius: 1em; background: var(--ink); opacity: 0.75; }
+.pout__author em + em { width: 60%; opacity: 0.2; }
+.pout__media { flex: 1; min-height: 0; border-radius: 0.45em; background: linear-gradient(135deg, var(--pink), #F7DCE1 55%, var(--yellow)); }
+.pout__head { flex: none; width: 80%; height: 0.6em; border-radius: 0.2em; background: var(--ink); }
+.pout__form { display: flex; gap: 0.3em; margin-top: auto; }
+.pout__field { flex: 1; height: 1.5em; border-radius: 0.35em; box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.18); }
+.pout__btn { display: grid; place-items: center; padding: 0 0.9em; border-radius: 0.35em; background: var(--yellow); font-size: 0.6em; font-weight: 600; white-space: nowrap; height: 2.5em; }
+.pnet__node { display: flex; align-items: center; gap: 0.6em; box-sizing: border-box; width: calc(var(--w) * 1em / 16); height: calc(var(--h) * 1em / 16); padding: 0 0.75em 0 0.6em; transform: translate(-50%, -50%);
+  border-radius: 0.9em; background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 1px var(--glass-edge), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); }
+.pnet__node.is-on { background: var(--white); box-shadow: 0 0 0 1px var(--white), 0 0 0 0.3em rgb(239 172 186 / 0.55), 0 1.2em 2em -1em rgb(26 26 26 / 0.35); }
+.pnet__icon { display: grid; place-items: center; flex: none; width: 2.2em; height: 2.2em; border-radius: 0.6em; background: var(--white); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.08); }
+.pnet__icon img, .pnet__icon svg { width: 1.3em; height: 1.3em; }
+.pnet__txt { display: grid; gap: 0.15em; min-width: 0; flex: 1; }
+.pnet__txt b { overflow: hidden; font-family: var(--font-display); font-size: 0.875em; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; text-overflow: ellipsis; }
+.pnet__txt small { overflow: hidden; font-size: 0.75em; line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; opacity: 0.72; }
+.pnet__meter { position: relative; height: 0.32em; margin-top: 0.25em; border-radius: 1em; background: rgb(26 26 26 / 0.08); overflow: hidden; }
+.pnet__meter::after { content: ""; position: absolute; inset: 0; width: calc(var(--p) * 100%); border-radius: inherit; background: linear-gradient(90deg, var(--pink), var(--yellow)); }
+.pnet__live { flex: none; width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 0.22em rgb(251 197 34 / 0.3); }
+.pnet__node--chip { gap: 0.5em; justify-content: center; width: calc(var(--w) * 1em / 13); height: calc(var(--h) * 1em / 13); padding: 0 0.8em; border-radius: 2em; font-family: var(--font-display); font-size: 0.8125em; font-weight: 600; white-space: nowrap; }
+.pnet__tick { flex: none; width: 1.3em; height: 1.3em; border-radius: 50%; background: var(--pink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.4l2.7 2.6L14 7.6' fill='none' stroke='%231A1A1A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat; }
+/* The cursor rests on the active node with its tool's name beside it */
+.pnet__cursor { display: flex; align-items: flex-start; gap: 0.15em; animation: pnet-hover 3.2s var(--ease-out) infinite alternate; }
+.pnet__cursor svg { width: 1.4em; height: 1.4em; filter: drop-shadow(0 2px 3px rgb(26 26 26 / 0.25)); }
+.pnet__tip { margin-top: 1em; padding: 0.3em 0.65em; border-radius: 0.5em; background: var(--ink); color: var(--white); font-size: 0.75em; font-weight: 600; line-height: 1.3; white-space: nowrap; }
+@keyframes pnet-hover { from { translate: 0 0; } to { translate: 0.35em 0.25em; } }
+/* Small maps: drop the second line so the titles stay legible */
+@container (max-width: 380px) {
+  .pnet__txt small { display: none; }
+  .pnet__node .pnet__meter { margin-top: 0.35em; }
+}
+.pmock__dots { display: none; }
+.pstep__visual .pmock { border-radius: 0; }
+
+/* Wide: two columns, the stage sticky beside the steps; each step is tall enough to read on its own */
+@media (min-width: 1024px) {
+  .pscene { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); column-gap: clamp(32px, 4vw, 64px); align-items: start; }
+  .pscene__stage { display: block; position: sticky; top: calc(var(--header-h) + 24px); height: min(640px, calc(100vh - var(--header-h) - 48px)); }
+  .pscene__stage .pmock { height: 100%; }
+  .pscene__steps { gap: 0; }
+  .pstep { display: flex; align-items: center; min-height: min(640px, calc(100vh - var(--header-h) - 48px)); border: 0; border-radius: 0; background: none; overflow: visible; }
+  .pstep__visual { display: none; }
+  .pstep__body { padding: 0; }
+  /* The active program: its number fills; the others recede */
+  .pstep.is-active .pstep__num { background: var(--pink); border-color: var(--pink); }
+  .pstep--yellow.is-active .pstep__num { background: var(--yellow); border-color: var(--yellow); }
+  .pscene.is-live .pstep__body > * { transition: opacity 500ms var(--ease-out); }
+  .pscene.is-live .pstep:not(.is-active) .pstep__body > * { opacity: 0.38; }
+  .pscene.is-live .pstep:not(.is-active) .pstep__body:focus-within > * { opacity: 1; }
+
+  /* Only the active view shows; it lifts in a little and its tray tiles follow */
+  .pscene__stage .pmock__view { opacity: 0; visibility: hidden; transform: translateY(14px) scale(0.985); transition: opacity 450ms var(--ease-out), transform 600ms var(--ease-out), visibility 0s 450ms; }
+  .pscene__stage .pmock__view.is-active { opacity: 1; visibility: visible; transform: none; transition: opacity 450ms var(--ease-out) 120ms, transform 600ms var(--ease-out) 120ms, visibility 0s; }
+  .pscene__stage .pnet__wire { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 700ms var(--ease-out); }
+  .pscene__stage .is-active .pnet__wire { stroke-dashoffset: 0; transition-delay: calc(180ms + var(--k) * 90ms); }
+  .pscene__stage .pnet__pin, .pscene__stage .pnet__flow { opacity: 0; transition: opacity 400ms var(--ease-out); }
+  .pscene__stage .is-active .pnet__pin { opacity: 1; transition-delay: calc(560ms + var(--k) * 90ms); }
+  .pscene__stage .is-active .pnet__flow { opacity: 1; transition-delay: 900ms; }
+  .pscene__stage .pnet__node { opacity: 0; scale: 0.94; transition: opacity 400ms var(--ease-out), scale 500ms var(--ease-out); }
+  .pscene__stage .is-active .pnet__node { opacity: 1; scale: 1; transition-delay: calc(320ms + var(--k) * 80ms); }
+  .pscene__stage .pnet__cursor { opacity: 0; transition: opacity 400ms var(--ease-out); }
+  .pscene__stage .is-active .pnet__cursor { opacity: 1; transition-delay: 820ms; }
+  .pscene__stage .pmock__view { width: min(100% - 40px, 560px, (100vh - var(--header-h) - 150px) * 480 / 440); }
+  .pmock__dots { position: absolute; left: 50%; bottom: 20px; display: flex; gap: 8px; transform: translateX(-50%); }
+  .pmock__dots span { width: 7px; height: 7px; border-radius: 4px; background: rgb(26 26 26 / 0.18); transition: background 400ms, width 400ms var(--ease-out); }
+  .pmock[data-at="0"] .pmock__dots span:nth-child(1), .pmock[data-at="1"] .pmock__dots span:nth-child(2), .pmock[data-at="2"] .pmock__dots span:nth-child(3), .pmock[data-at="3"] .pmock__dots span:nth-child(4) { width: 20px; background: var(--ink); }
+}
+@media (min-width: 1024px) and (max-height: 640px) {
+  .pmock__view { scale: 0.88; }
+}
+@media (max-width: 480px) {
+  .pmock__view { width: calc(100% - 28px); padding-block: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pmock, .pscene__stage .pmock__view, .pscene__stage .pmock__view *, .pmock__bg, .pscene.is-live .pstep__body > * { transition: none !important; }
+  .pnet__flow, .pnet__cursor { animation: none; }
+}
 
 /* Illustrative output previews (static interface fragments) */
 .preview { margin: 0; padding: 16px; border-radius: var(--r); background: var(--stone-2); }
@@ -760,17 +1022,19 @@ code { font-size: 0.9em; }
 /* Home: For your organization. The copy and the four verbs of an engagement on Faith Pink; a real
    session fills the other half, so the block reads people first. */
 #business { padding-bottom: var(--section); }
-.business { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(24px, 4vw, 64px); padding: clamp(12px, 1.3vw, 18px); background: var(--pink); border-radius: 24px; }
-.business__copy { padding: clamp(16px, 3vw, 44px) 0 clamp(16px, 3vw, 44px) clamp(12px, 2.6vw, 40px); }
-.business__copy h2 + p { margin-top: 16px; max-width: 520px; font-size: var(--fs-lead); }
-.business__ways { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; max-width: 560px; margin: 28px 0 0; }
-.business__ways li { padding: 13px 0 16px; border-top: 1.5px solid var(--ink); font-size: 15px; line-height: 1.4; }
+.business { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; background: var(--pink); color: var(--ink); border-radius: 32px; }
+/* the copy's left edge lines up with the header logo */
+.business__copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(36px, 5vw, 76px) clamp(28px, 4.6vw, 72px) clamp(36px, 5vw, 76px) var(--gutter); }
+.business__copy h2 + p { margin-top: 18px; max-width: 520px; font-size: var(--fs-lead); }
+.business__ways { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; max-width: 560px; margin: 32px 0 0; padding: 0; }
+.business__ways li { padding: 14px 0 18px; border-top: 1.5px solid var(--ink); font-size: 15px; line-height: 1.4; }
 .business__ways b { display: block; margin-bottom: 2px; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.2; letter-spacing: -0.03em; }
-.business__for { margin: 14px 0 0; max-width: 46ch; font-size: var(--fs-small); color: var(--muted); }
-.business .actions { margin-bottom: 0; }
-.business__photo { overflow: hidden; min-height: 340px; border-radius: var(--r-lg); background: var(--pink-tint); }
+.business__for { margin: 18px 0 0; max-width: 46ch; font-size: var(--fs-small); color: var(--muted); }
+.business .actions { margin: 28px 0 0; }
+/* The photo fills its whole column; the wrapper's overflow + radius rounds its outer-right corners */
+.business__photo { position: relative; overflow: hidden; min-height: 560px; margin: 0; border-radius: 0; background: var(--pink-tint); }
 .business__photo picture { display: contents; }
-.business__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 55%; }
+.business__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* 10b. Trusted by (logo strip) and the Events gallery (masonry) -------------
    Trusted by: the logo list is written twice (tools/trusted-by.mjs), so sliding the track by
@@ -953,7 +1217,9 @@ code { font-size: 0.9em; }
 .voices.is-stack .voice[data-depth="2"] { transform: translate(1.5%, 48px) rotate(1.6deg) scale(0.92); }
 .voices.is-stack .voice[data-depth="far"] { transform: translateY(60px) scale(0.88); opacity: 0; visibility: hidden; transition: transform 0.7s var(--ease-out), opacity 0.5s var(--ease-out), visibility 0s 0.5s; }
 .voices.is-stack .voice:not(.is-active) { pointer-events: none; }
-.voices.is-stack .voice:not(.is-active) > * { opacity: 0; transition: opacity 0.3s; }
+/* --reveal: set by the drag, to fade the next quote up as the top card moves aside */
+.voices.is-stack .voice:not(.is-active) > * { opacity: var(--reveal, 0); transition: opacity 0.3s; }
+.voices.is-stack .is-dragging .voice > * { transition: none; }
 .voices.is-stack .voice.is-out, .voices.is-stack .voice.is-in { visibility: visible; }
 .voices.is-stack .voice.is-out > *, .voices.is-stack .voice.is-in > * { opacity: 1; }
 .voices.is-stack .voice.is-out { animation: voice-out 0.8s var(--ease-out); }
@@ -969,6 +1235,9 @@ code { font-size: 0.9em; }
   40% { opacity: 1; }
   100% { z-index: 50; }
 }
+.voices.is-stack .voice.is-active { cursor: grab; }
+.voices.is-stack .voices__track.is-dragging { cursor: grabbing; user-select: none; }
+.voices.is-stack .voices__track.is-dragging .voice.is-active { cursor: grabbing; z-index: 60 !important; }
 .voices.is-stack .voices__track:focus-visible .voice.is-active { outline: 3px solid var(--focus); outline-offset: 5px; }
 /* Previous / count / next, under the pile. Hidden without JS (the row scrolls by itself then). */
 .voices__nav { display: none; justify-content: center; align-items: center; gap: 14px; }
@@ -1232,9 +1501,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .edu__label::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); }
 .edu__title { max-width: 16ch; margin: 0 0 clamp(12px, 2vw, 28px); font-size: clamp(26px, 2.5vw, 38px); line-height: 1.12; letter-spacing: -0.035em; }
 .edu__schools { display: grid; gap: 10px; margin-top: auto; list-style: none; }
-.edu__school { display: grid; grid-template-columns: clamp(104px, 9vw, 132px) minmax(0, 1fr); grid-template-areas: "logo via" "logo name"; align-content: center; column-gap: 18px; row-gap: 2px; padding: 10px 18px 10px 10px; border-radius: var(--r); background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1); transition: background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
-.edu__via { grid-area: via; align-self: end; font-size: 11.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pink); }
-.edu__name { grid-area: name; align-self: start; font-size: 15px; font-weight: 600; line-height: 1.35; text-decoration: underline transparent 1px; text-underline-offset: 3px; transition: text-decoration-color var(--dur-fast) var(--ease-out); }
+.edu__school { display: grid; grid-template-columns: clamp(104px, 9vw, 132px) minmax(0, 1fr); grid-template-areas: "logo name"; align-items: center; column-gap: 20px; padding: 10px 18px 10px 10px; border-radius: var(--r); background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1); transition: background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+.edu__name { grid-area: name; font-family: var(--font-display); font-size: clamp(17px, 1.5vw, 20px); font-weight: 600; line-height: 1.3; text-decoration: underline transparent 1px; text-underline-offset: 3px; transition: text-decoration-color var(--dur-fast) var(--ease-out); }
 .edu__logo { grid-area: logo; display: grid; place-items: center; height: clamp(72px, 6.4vw, 88px); padding: 8px 10px; border-radius: var(--r-sm); background: var(--white); transition: transform var(--dur) var(--ease-expo), box-shadow var(--dur) var(--ease-out); }
 .edu__logo img { width: 100%; height: 100%; object-fit: contain; }
 .edu__school:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
@@ -1315,24 +1583,16 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 /* The sessions list sits in a narrow column here: one session per row keeps titles readable */
 .creds .sessions { margin-top: 32px; }
 .creds .sessions__list { grid-template-columns: minmax(0, 1fr); }
-.journey-list { list-style: none; display: grid; gap: 10px; }
-.journey-list li { display: flex; gap: 14px; align-items: baseline; padding: 16px 20px; border-radius: var(--r); background: var(--ink-2); color: var(--muted-dark); font-size: 17px; }
-.journey-list b { min-width: 7.5em; color: var(--yellow); font-size: 19px; }
-/* About, Our approach: a rail beside the steps. Each step has a Faith Pink node, joined to the
-   next by a line that fills AI Yellow (js/motion.js §5h animates --jl-node and --jl-line as the
-   steps scroll in). No JS or reduced motion: every node and line drawn. */
-.journey-list--rail { --jl-x: 40px; --jl-gap: clamp(16px, 2vw, 24px); gap: var(--jl-gap); padding-left: var(--jl-x); }
-/* Each step is a milestone and the section's main focus: its name set large in Poppins, its
-   line beneath it */
-.journey-list--rail li { position: relative; flex-direction: column; align-items: flex-start; gap: 8px; padding: clamp(24px, 2.6vw, 36px) clamp(22px, 2.6vw, 36px); font-size: clamp(17px, 1.3vw, 19px); line-height: 1.4; }
-.journey-list--rail b { min-width: 0; font-family: var(--font-display); font-size: clamp(34px, 3.6vw, 56px); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
-/* Wide screens: the headline and intro hold beside the steps while they scroll past */
-@media (min-width: 901px) and (min-height: 640px) {
-  .approach__intro { position: sticky; top: calc(var(--header-h) + 40px); }
-}
-.journey-list--rail li::before { content: ""; position: absolute; left: calc(-1 * var(--jl-x) + 5px); top: 50%; width: 14px; height: 14px; border: 2px solid var(--pink); border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 6px rgb(239 172 186 / 0.12); translate: 0 -50%; scale: var(--jl-node, 1); opacity: var(--jl-node, 1); }
-.journey-list--rail li::after { content: ""; position: absolute; left: calc(-1 * var(--jl-x) + 11px); top: calc(50% + 11px); width: 2px; height: calc(100% + var(--jl-gap) - 22px); border-radius: 2px; background: linear-gradient(var(--yellow), var(--yellow)) top / 100% calc(var(--jl-line, 1) * 100%) no-repeat, rgb(250 248 244 / 0.12); }
-.journey-list--rail li:last-child::after { display: none; }
+/* About, Our approach on Works White: heading left, intro right, the stage cards below */
+.approach-band { background: var(--paper); }
+.approach__intro { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 20px; align-items: end; margin-bottom: clamp(40px, 4.6vw, 72px); }
+.approach__intro > div:first-child { grid-column: 1 / span 6; }
+.approach__intro > div:last-child { grid-column: 7 / -1; max-width: 46ch; }
+.approach-band .approach__intro .eyebrow { margin: 0 0 18px; }
+.approach-band h2 { margin: 0; letter-spacing: -0.03em; line-height: 1.04; }
+.approach-band .split__lead { margin-top: 0; }
+.approach-band .approach__intro p:last-child { margin: 14px 0 0; }
+@media (max-width: 900px) { .approach__intro > div:first-child, .approach__intro > div:last-child { grid-column: 1 / -1; } }
 /* About: where Faith Works teaches. Copy and recent sessions beside an editorial set: the event
    poster upright, two session photos stacked beside it, captions on glass. */
 .creds { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
@@ -1421,7 +1681,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .form.is-done .form__grid, .form.is-done .check, .form.is-done .form__privacy, .form.is-done .form__submit, .form.is-done .form__note { display: none; }
 
 /* 16. Starter kit funnel --------------------------------------------------- */
-.page-campaign .site-header { background: var(--white); }
 .kit-hero { padding-block: clamp(32px, 4.5vw, 64px); background: var(--pink-tint); }
 .kit-hero__grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); grid-template-areas: "copy card" "preview card"; gap: 28px clamp(28px, 5vw, 72px); align-items: start; }
 .kit-hero__copy { grid-area: copy; }
@@ -1536,29 +1795,14 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .motion .hero h1 .line > span { animation: fw-line 1000ms var(--ease-expo) both; }
 .motion .hero h1 > .line:nth-child(1) > span { animation-delay: 120ms; }
 .motion .hero h1 > .line:nth-child(2) > span { animation-delay: 220ms; }
-.motion .hero__subhead .line:nth-child(1) > span { animation-delay: 360ms; }
-.motion .hero__subhead .line:nth-child(2) > span { animation-delay: 440ms; }
-.motion .hero h1 em::after { animation: fw-grow-x 700ms var(--ease-expo) 900ms both; }
-.motion .hero__intro { animation: fw-rise 800ms var(--ease-out) 560ms both; }
-.motion .hero__actions { animation: fw-rise 800ms var(--ease-out) 660ms both; }
-.motion .hero__small { animation: fw-fade 800ms var(--ease-out) 760ms both; }
-/* Hero network: nodes settle in while the headline is still rising, lines draw toward the copy, then
-   a few things keep a slow, independent life: some nodes float a few pixels, junctions light up in
-   turn, ports breathe. The lines themselves stay still. */
-.motion .hero::after { animation: fw-fade 1400ms var(--ease-out) 150ms both, hnet-breathe 12s var(--ease-io) 1600ms infinite alternate; }
-.motion .hero.is-off::after, .motion .hero:not(.is-in)::after { animation-play-state: paused; }
-.motion .hnode { animation: hnode-in 900ms var(--ease-expo) calc(520ms + var(--i) * 70ms) both; }
-.motion .hnode--float { animation: hnode-in 900ms var(--ease-expo) calc(520ms + var(--i) * 70ms) both, hnode-drift var(--fd) var(--ease-io) calc(var(--i) * -1.9s) infinite alternate; }
-.motion .hnet__link--app { animation: fw-fade 1200ms var(--ease-out) calc(1300ms + var(--i, 0) * 60ms) both; }
-.motion .hnet__link:not(.hnet__link--app) { stroke-dasharray: 1 1.02; animation: fw-draw 1500ms var(--ease-io) calc(760ms + var(--i) * 70ms) both; }
-.motion .hnet__port { animation: fw-pop 500ms var(--ease-out) calc(1500ms + var(--i) * 80ms) both, hnet-port 6s var(--ease-io) calc(2400ms + var(--i) * 1.1s) infinite; }
-.motion .hnet__hub { animation: fw-pop 600ms var(--ease-spring) 640ms both; }
-/* the compact lines stretch with their box (non-scaling strokes), where pathLength dashes break: they fade in instead */
-.motion .hnet--compact .hnet__link:not(.hnet__link--app) { stroke-dasharray: none; animation: fw-fade 1200ms var(--ease-out) calc(760ms + var(--i) * 70ms) both; }
-@keyframes hnode-in { from { opacity: 0; scale: 0.82; } to { opacity: 1; scale: 1; } }
-@keyframes hnode-drift { from { translate: 0 -3px; } to { translate: 0 3px; } }
-@keyframes hnet-breathe { to { scale: 1.06; } }
-@keyframes hnet-port { 0%, 100% { scale: 1; } 50% { scale: 1.45; } }
+.motion .hero h1 em::after { animation: fw-grow-x 700ms var(--ease-expo) 700ms both; }
+.motion .hero__intro { animation: fw-rise 800ms var(--ease-out) 400ms both; }
+.motion .hero__actions { animation: fw-rise 800ms var(--ease-out) 480ms both; }
+.motion .hero__small { animation: fw-fade 800ms var(--ease-out) 560ms both; }
+.motion .hweb { animation: fw-rise 900ms var(--ease-out) 640ms both; }
+.motion .hero__wires { animation: fw-fade 1200ms var(--ease-out) 900ms both; }
+.motion .hweb__pulse { visibility: visible; stroke-dasharray: 0.08 1.2; stroke-dashoffset: 0.08; animation: hweb-pulse 6.5s var(--ease-io) var(--delay, 1.6s) infinite; }
+@keyframes hweb-pulse { 0% { stroke-dashoffset: 0.08; } 38%, 100% { stroke-dashoffset: -1; } }
 
 /* Make it concrete: replays when the visitor picks a task */
 .motion .flow__tabs { animation: fw-rise 700ms var(--ease-out) 100ms both; }
@@ -1632,9 +1876,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
    --fw-p is never set, so everything stays put. */
 :root { --fw-k: 1; }
 @media (max-width: 760px) { :root { --fw-k: 0.5; } }
-/* Home hero: the glow sinks fastest, the network a little less, the copy holds still */
-.motion .hero::after { translate: -50% calc(-50% + var(--fw-p, 0) * var(--fw-k) * 72px); }
-.motion .hnet--wide { translate: 0 calc(var(--fw-p, 0) * 36px); }
 /* Photos drift inside their frames (scaled just enough to never show an edge) */
 .motion :is(.phero__photo, .founder__photo, .business__photo, .talks__photo, .kit-by__photos figure:first-child) img { scale: 1.08; translate: 0 calc(var(--fw-p, 0) * var(--fw-k) * 3%); }
 /* Layered compositions: the backing plate and floating cards part slightly */
@@ -1647,7 +1888,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 /* 19. Responsive ----------------------------------------------------------- */
 @media (max-width: 1240px) {
   .menu { display: block; }
-  .site-nav { position: absolute; top: var(--header-h); left: 0; right: 0; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: 8px var(--gutter) 24px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: var(--float); max-height: calc(100vh - var(--header-h)); overflow-y: auto; }
+  .site-nav { position: absolute; top: 100%; left: 0; right: 0; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: 8px var(--gutter) 24px; background: var(--white); border-bottom: 1px solid var(--line); box-shadow: var(--float); max-height: calc(100vh - var(--header-h)); overflow-y: auto; }
   .site-nav.is-open { display: flex; }
   .site-nav > a:not(.btn) { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-body); }
   .site-nav > a:not(.btn)::after { display: none; }
@@ -1659,12 +1900,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .site-footer__top { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Hero: below 1100px the network moves under the CTAs and simplifies (see 5. Home: hero) */
-@media (max-width: 1100px) {
-  .hero { min-height: 0; }
-  .hnet--wide { display: none; }
-  .hnet--compact { display: block; position: relative; width: min(100%, 680px); height: clamp(250px, 36vw, 310px); margin-top: clamp(22px, 3vw, 34px); }
-}
 @media (max-width: 900px) {
   /* Programs: one column in source order (featured, LinkedIn, Websites); the featured art moves above its copy */
   .pstack { grid-template-columns: minmax(0, 1fr); }
@@ -1686,8 +1921,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .section-head > p { max-width: var(--measure); margin-top: 16px; padding-bottom: 0; }
   .journey, .resource, .faq { grid-template-columns: minmax(0, 1fr); }
   .faq__head { position: static; }
-  .business__copy { padding: 18px 10px 4px; }
-  .business__photo { min-height: 0; aspect-ratio: 16 / 9; }
+  .business__copy { padding: clamp(32px, 6vw, 48px) var(--gutter); }
+  .business__photo { min-height: 0; aspect-ratio: 4 / 3; }
   .strip { flex-wrap: wrap; justify-content: start; gap: 8px 22px; }
   .strip__label { width: 100%; }
   .ecosystem__list { grid-template-columns: minmax(0, 1fr); }
@@ -1726,19 +1961,27 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .site-header--campaign .text-link { font-size: 13px; }
   .staging__inner { font-size: 12px; align-items: start; }
   .staging .dot { margin-top: 6px; }
-  .hero { padding-block: 24px 44px; }
-  .hero h1 { font-size: 46px; letter-spacing: -0.05em; }
-  .hero__subhead { font-size: 25px; }
-  .hnet--compact { height: clamp(220px, 64vw, 270px); }
-  .hnet--compact .is-t2 { display: none; }
-  .hnet--compact .hnode { --k: 0.86; }
+  .hero { padding-block: 32px 16px; }
+  .hero h1 { font-size: 36px; }
+  /* blooms simplify to one radial field on small screens, held to the top of the hero (p.29) */
+  .hero::before { background: radial-gradient(130% 400px at 100% -40px, rgb(239 172 186 / 0.56), rgb(239 172 186 / 0.18) 55%, rgb(239 172 186 / 0) 100%); }
   .hero__actions .btn { width: 100%; }
-  .flow__tabs button { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-height: 64px; padding: 10px 12px; font-size: 14px; line-height: 1.25; }
-  .flow__tab-num { font-size: 11px; }
-  .fcard__art { height: 216px; padding: 22px 18px 4px; }
-  .fcard__body { padding: 14px 20px 24px; }
+  /* the node web tightens: no labels, shorter wires, a smaller hub */
+  .hweb { --dot: 36px; --hub: 72px; height: 280px; }
+  .hweb__node[data-k="c"] { display: none; } /* the middle branch keeps one tool on phones */
+  .hweb__hub.hchat { --chat-w: 72px; height: 72px; padding: 0; place-items: center; border-radius: 22px; }
+  .hchat__you, .hchat__bubble, .hchat__input { display: none; }
+  .hchat__avatar { width: 46px; height: 46px; box-shadow: none; }
+  .hweb__hub { border-radius: 22px; box-shadow: 0 0 0 7px rgb(255 255 255 / 0.72), 0 0 0 8px rgb(239 172 186 / 0.6), 0 0 16px 7px rgb(239 172 186 / 0.22), 0 16px 32px -18px rgb(26 26 26 / 0.3); }
+  .flow__tabs button { flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; min-height: 64px; padding: 12px; font-size: 14px; line-height: 1.25; }
+  .flow__tab-icon { width: 32px; height: 32px; border-radius: 9px; }
+  .flow__tab-icon svg { width: 17px; height: 17px; }
+  .fcard__art { height: 224px; padding: 24px 18px; }
   .flow__foot { justify-content: flex-start; }
   .step { font-size: 17px; }
+  #journey.section--field .steps { gap: 8px; margin-top: 24px; }
+  #journey.section--field .step { min-height: 56px; padding: 10px 16px 10px 12px; font-size: 18px; }
+  #journey.section--field .step__num { width: 32px; height: 32px; margin-right: 14px; font-size: 12px; }
   .scene__art { min-height: 0; padding: 18px; }
   .apply { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .apply__core { grid-template-columns: 64px auto; align-items: center; justify-content: center; }
@@ -1761,7 +2004,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .preview__table th, .preview__table td { padding: 7px 6px; }
   .founder { grid-template-columns: minmax(0, 1fr) 110px; padding: 16px; }
   .resource { padding: 24px 18px; border-radius: var(--r-lg); }
-  .business { padding: 10px; border-radius: var(--r-lg); }
+  .business { border-radius: 24px; }
   .business h2, .resource h2 { font-size: var(--fs-h2); }
   .kitart { padding: 40px 22px 40px 60px; }
   .kitart__back { inset: -18px -12px 40px 36px; }
@@ -1801,7 +2044,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .bio__proof { gap: 8px; }
   .edu__school { grid-template-columns: 96px minmax(0, 1fr); column-gap: 14px; padding-right: 14px; }
   .edu__logo { height: 64px; padding: 6px 8px; }
-  .edu__name { font-size: 14px; }
+  .edu__name { font-size: 16px; }
   .talks__topics { grid-template-columns: minmax(0, 1fr); }
   .sessions__item time { grid-row: auto; }
   /* Agent network: stacked on phones (agents, then the workflow, then you approve) */
@@ -1812,10 +2055,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .agents__human { margin-top: 12px; }
   .agents__hub::before, .agents__human::before { content: ""; position: absolute; left: 50%; top: -17px; height: 14px; border-left: 1.5px dashed rgb(26 26 26 / 0.4); }
   .agents__pulse { display: none; }
-  .journey-list b { min-width: 6em; }
-  .journey-list--rail { --jl-x: 30px; }
-  .journey-list--rail li { gap: 6px; padding: 22px 22px 24px; }
-  .journey-list--rail b { font-size: clamp(30px, 8.6vw, 36px); }
   .proof__head { display: block; }
   .proof__head > p { max-width: 44ch; margin-top: 18px; padding: 0; }
   .site-footer__legal { flex-wrap: wrap; }
@@ -2234,7 +2473,14 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .ecosystem__list h3.ecosystem__brand:has(.brandmark--community) { height: 42px; }
 
 /* Navigation: six links plus the button fit at desktop widths */
-@media (min-width: 1241px) and (max-width: 1440px) { .site-nav { gap: 20px; } }
+/* Desktop header: a three-part grid. The nav dissolves into it (display: contents) so the six links sit
+   centred between two equal outer columns: the logo on the left, the CTA on the right. */
+@media (min-width: 1241px) {
+  .site-header:not(.site-header--campaign) { display: grid; grid-template-columns: minmax(max-content, 1fr) repeat(6, auto) minmax(max-content, 1fr); column-gap: 28px; }
+  .site-header .site-nav { display: contents; }
+  .site-header .site-nav .btn { justify-self: end; }
+}
+@media (min-width: 1241px) and (max-width: 1440px) { .site-header:not(.site-header--campaign) { column-gap: 20px; } }
 
 
 /* Keep reading: article cards with their featured image */
@@ -2460,9 +2706,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 }
 
 /* 24. Learn page (2026-10-22) ================================================
-   Editorial hero with a layered photo collage; Programs as a vertical sequence of cards
-   (.prog, tools/render.mjs programGrid) that stack as you scroll on wide screens (js/motion.js
-   §5f); the goal finder; what every program page answers; the closing starter-kit step. The hero leads with Faith Pink, the close with AI Yellow. */
+   Editorial hero with a layered photo collage; Programs as the home Programs split,
+   mirrored (tools/render.mjs programGrid; js/main.js §5b); the goal finder; what every program page answers; the closing starter-kit step. The hero leads with Faith Pink, the close with AI Yellow. */
 
 /* Hero: an oversized two-line headline beside the clean workshop gallery */
 .lhero { padding-block: clamp(48px, 6vw, 84px) clamp(52px, 6vw, 92px); }
@@ -2475,12 +2720,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .lhero__lead { max-width: 44ch; margin-top: clamp(20px, 2.2vw, 32px); font-size: clamp(17px, 1.25vw, 19.5px); line-height: 1.55; text-wrap: pretty; }
 .lhero__actions { gap: 14px; margin: clamp(24px, 2.8vw, 36px) 0 0; }
 .lhero__actions .btn { min-height: 52px; padding: 14px 26px; font-size: 15px; }
-
-/* 4-step strip for professionals below hero */
-.pro-strip { margin-block: clamp(28px, 3.5vw, 44px) clamp(36px, 4.5vw, 56px); }
-.pro-strip__steps { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; }
-.pro-strip__steps li { display: flex; flex-direction: column; gap: 4px; padding: clamp(16px, 1.8vw, 22px) clamp(16px, 1.8vw, 20px); border-radius: var(--r); background: var(--white); border: 1px solid var(--line); box-shadow: 0 2px 8px -2px rgb(26 26 26 / 0.06); font-size: 14.5px; line-height: 1.4; }
-.pro-strip__steps li b { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--ink); }
 
 /* Workshop & showcase photo gallery: clean stage image over thumbnail row with zoom & parallax */
 .pgallery { display: flex; flex-direction: column; gap: 12px; width: 100%; }
@@ -2503,61 +2742,58 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 
 /* Programs section: header, the five stages as one circuit trace, and the card grid it branches into.
    --drop is the gap between the strip and the cards, where the trace splits to each column. */
-.lprograms { --drop: clamp(48px, 5vw, 72px); --node: 40px; --strip-pad: clamp(20px, 2.6vw, 36px); --rail-x: calc(var(--strip-pad) + var(--node) / 2); padding-top: var(--section); padding-bottom: clamp(48px, 5vw, 80px); }
+.lprograms { --drop: clamp(48px, 5vw, 72px); --node: 64px; --strip-pad: clamp(18px, 1.8vw, 28px); --rail-x: calc(var(--strip-pad) + var(--node) / 2); padding-top: var(--section); padding-bottom: clamp(48px, 5vw, 80px); }
 .lprograms__head { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 14px; align-items: end; margin-bottom: clamp(28px, 3.2vw, 44px); }
 .lprograms__head h2 { grid-column: 1 / span 6; margin: 0; font-size: var(--fs-h2); line-height: 0.95; letter-spacing: -0.05em; }
 .lprograms__head p { grid-column: 7 / -1; max-width: 44ch; margin: 0; padding-bottom: 0.3em; font-size: var(--fs-lead); color: var(--muted); }
 
-/* Five stages: square nodes on one straight trace; each step's line runs from its node to the next */
-.journey-strip { position: relative; margin-bottom: var(--drop); padding: clamp(24px, 2.6vw, 36px) var(--strip-pad) clamp(26px, 2.8vw, 38px); border-radius: var(--r-lg); background: var(--ink); color: var(--white); }
-.journey-strip__head { margin: 0 0 clamp(20px, 2.2vw, 28px); font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(255 255 255 / 0.72); }
-.journey-strip__steps { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; }
-.journey-strip__step { position: relative; display: grid; align-content: start; gap: 4px; padding-right: clamp(10px, 1.4vw, 22px); }
-.journey-strip__step:not(:last-child)::before { content: ""; position: absolute; top: calc(var(--node) / 2 - 1px); left: calc(var(--node) / 2); width: 100%; height: 2px; background: rgb(255 255 255 / 0.3); }
-.journey-strip__num { position: relative; display: grid; place-items: center; width: var(--node); height: var(--node); margin-bottom: 14px; border: 2px solid var(--yellow); border-radius: 50%; background: var(--ink); font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--yellow); }
-.journey-strip__step:last-child .journey-strip__num { background: var(--yellow); color: var(--ink); }
-.journey-strip__title { display: block; color: var(--white); font-family: var(--font-display); font-size: clamp(19px, 1.8vw, 23px); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
-.journey-strip__desc { display: block; font-size: 14px; line-height: 1.45; color: rgb(255 255 255 / 0.72); }
+/* Five stages: the For Business step cards (css/professionals.css pp-gain) in five columns, Faith Pink
+   and AI Yellow in turn. Each leads with a line icon (.route__* strokes) on a glass tile, its number on
+   the right; the body opens on hover or focus. --rail-x sits on the first icon's centre so the trace
+   below drops from it. */
+.journey-strip { --node: 64px; --strip-pad: clamp(18px, 1.8vw, 28px); position: relative; }
+.lprograms .journey-strip { margin-bottom: var(--drop); }
+.journey-strip__head { margin: 0 0 clamp(18px, 2vw, 24px); font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.journey-strip__steps { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 16px); margin: 0; padding: 0; }
+.journey-strip__step { --muted: var(--ink); position: relative; display: flex; flex-direction: column; min-height: clamp(260px, 22vw, 330px); padding: var(--strip-pad); border-radius: var(--r-lg); background: var(--pink); color: var(--ink); outline: none; --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
+.journey-strip__step:nth-child(even) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
+.journey-strip__step:focus-visible { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+.journey-strip__icon { display: grid; place-items: center; width: var(--node); height: var(--node); border-radius: 18px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); }
+.journey-strip__icon svg { width: 36px; height: 36px; overflow: visible; }
+.journey-strip__tick { fill: none; stroke: var(--white); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.journey-strip__num { position: absolute; top: var(--strip-pad); right: var(--strip-pad); font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; }
+.journey-strip__title { display: block; margin-top: auto; padding-top: 32px; font-family: var(--font-display); font-size: clamp(24px, 2.1vw, 34px); font-weight: 600; line-height: 1.05; letter-spacing: -0.045em; }
+.journey-strip__desc { display: grid; grid-template-rows: 0fr; opacity: 0; transform: translateY(6px); font-size: 15px; line-height: 1.5; transition: grid-template-rows 360ms var(--ease-out), opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+.journey-strip__desc > span { overflow: hidden; }
+.journey-strip__desc > span::before { content: ""; display: block; height: 12px; }
+.journey-strip__step:hover .journey-strip__desc, .journey-strip__step:focus-within .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
+@media (hover: none) { .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .journey-strip__desc { transition: none; } }
 /* The trace leaves the strip below its first node and drops straight to the programs */
-.journey-strip::after { content: ""; position: absolute; top: 100%; left: calc(var(--rail-x) - 1px); width: 2px; height: var(--drop); background: var(--ink); }
+.lprograms .journey-strip::after { content: ""; position: absolute; top: 100%; left: calc(var(--rail-x) - 1px); width: 2px; height: var(--drop); background: var(--ink); }
 
-/* Programs: one column of cards, one program after another down the page. On wide, tall screens
-   (and motion allowed) each card holds below the header, a step lower than the one before, while
-   the next scrolls up over it; js/motion.js (5f) settles the covered card back. No drop shadows
-   anywhere: cards separate by a hairline edge and the pink-to-yellow wash behind their art. */
-.pgrid { list-style: none; display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 32px); margin: 0; padding: 0; }
+/* Programs: the home Programs split (.pscene, tools/render.mjs programGrid) mirrored. The programs
+   pass on the left on the page ground, with no card fill; one mockup holds sticky on the right and
+   js/main.js (§5b) shows the view of the program crossing the middle of the screen. Narrower,
+   each program is a card with its own copy of its view above its text. */
+.pgrid { list-style: none; margin: 0; padding: 0; }
 
-/* Every card's art sits on the same Faith Pink to AI Yellow wash; the tone only picks the accent
-   its nodes, number and status use. --mix is the pink-to-yellow blend the outcome panel shares. */
-.pgrid .prog { --ground: var(--white); --fade: var(--wash-fade); --accent: var(--pink);
-  --bloom: radial-gradient(70% 90% at 6% 0%, rgb(239 172 186 / 0.7), rgb(239 172 186 / 0) 70%), radial-gradient(70% 90% at 96% 10%, rgb(251 197 34 / 0.5), rgb(251 197 34 / 0) 70%), linear-gradient(105deg, rgb(239 172 186 / 0.45), rgb(250 235 192 / 0.55) 55%, rgb(251 197 34 / 0.32));
+/* The tone only picks the accent the outcome uses. --mix is the pink-to-yellow
+   blend the outcome panel uses. */
+.pgrid .prog { --accent: var(--pink);
   --mix: linear-gradient(110deg, rgb(239 172 186 / 0.42), rgb(250 235 192 / 0.62) 55%, rgb(251 197 34 / 0.3));
   position: relative; display: block; }
 .pgrid .prog--yellow, .pgrid .prog--ink { --accent: var(--yellow); }
-/* The stem from the strip lands on a node at the top of the list (not on a card, which may hold) */
+/* The stem from the strip lands on a node at the top of the list */
 .pgrid { position: relative; }
 .pgrid::before { content: ""; position: absolute; z-index: 4; top: -6px; left: calc(var(--rail-x) - 6px); width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
 
-.pgrid .prog__card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; border-radius: var(--r-lg); background: var(--white); border: 1px solid var(--line); overflow: hidden; box-shadow: none; transform-origin: 50% 0; }
-/* Settling back: a Works White veil the script raises as the next card covers this one */
-.pgrid .prog__card::after { content: ""; position: absolute; inset: 0; z-index: 3; background: var(--paper); opacity: var(--dim, 0); pointer-events: none; }
 
-/* Circuit art: the tone bloom fading into the card, with a light grain */
-.pgrid .prog__art { aspect-ratio: 2 / 1; padding: 0; background: var(--fade), var(--bloom), var(--ground); }
-.pgrid .prog__art::before { content: none; }
-.pgrid .prog__art::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0.2; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .1 1.8 0 0 0 -.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.pgrid .prog__art svg { transition: none; }
-.pgrid .prog:hover .prog__art svg { transform: none; }
-
-/* Body, top to bottom: the label (number + category), the title and line lead; the outcome is
+/* Body, top to bottom: the category label, the title and line lead; the outcome is
    the one highlighted panel; For and Format are a small spec table, label left, answer right;
-   the footer pairs the CTA with the intake status. */
+   the footer holds the CTA. */
 .pgrid .prog__body { display: flex; flex-direction: column; padding: clamp(26px, 2.8vw, 44px) clamp(24px, 2.8vw, 44px) clamp(24px, 2.6vw, 40px); }
 .pgrid .prog__cat { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; font-size: 11px; font-weight: 700; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
-/* The number sits on an accent pad, joined to the category by a short trace */
-.pgrid .prog__num { position: relative; display: inline-grid; place-items: center; width: 30px; height: 30px; margin-right: 22px; padding: 0; border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 1.5px var(--ink); font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink); }
-.pgrid .prog__num::after { content: ""; position: absolute; left: calc(100% + 4px); top: calc(50% - 1px); width: 16px; height: 2px; background: var(--ink); opacity: 0.3; }
 .pgrid .prog__title { max-width: none; margin: 0 0 14px; font-size: clamp(32px, 3.1vw, 48px); line-height: 1.02; letter-spacing: -0.045em; text-wrap: balance; }
 .pgrid .prog__summary { max-width: 46ch; margin: 0 0 clamp(22px, 2.2vw, 28px); font-size: 18px; line-height: 1.5; color: var(--ink); opacity: 0.78; text-wrap: pretty; }
 
@@ -2583,40 +2819,14 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 }
 
 .pgrid .prog__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; margin-top: clamp(22px, 2.4vw, 30px); }
-.pgrid .prog__actions .badge { min-height: 34px; padding: 6px 14px 6px 12px; gap: 9px; font-size: 13px; background: var(--white); color: var(--ink); box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.14); }
-.pgrid .prog__actions .badge::before { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); outline: 1.5px solid var(--ink); }
-.pgrid .prog__actions .badge--open { background: var(--yellow); box-shadow: none; }
 
-/* Side by side from tablet width: details left, the circuit right on its bloom, a hairline seam
-   with a node where the two meet */
-@media (min-width: 900px) {
-  .pgrid .prog__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "body art"; min-height: min(560px, calc(100vh - var(--header-h) - 120px)); }
-  .pgrid .prog__body { grid-area: body; justify-content: center; }
-  .pgrid .prog__art { grid-area: art; display: grid; place-items: center; aspect-ratio: auto; padding: clamp(24px, 3vw, 48px); border-left: 1px solid rgb(26 26 26 / 0.08); background: var(--bloom), var(--ground); }
-  .pgrid .prog__art::before { content: ""; position: absolute; z-index: 1; left: -6px; top: calc(50% - 6px); width: 12px; height: 12px; border-radius: 50%; background: var(--accent); outline: 1.5px solid var(--ink); -webkit-mask-image: none; mask-image: none; }
-  .pgrid .prog__art svg { width: 100%; height: auto; }
-}
-
-/* The stacked sequence: wide, tall screens with motion allowed. Each card holds a step lower than
-   the last, and the gap between them is the stretch of scroll that brings the next one up.
-   js/motion.js sets --card-h to the tallest card so the stack's edges line up, and .is-flat
-   when that card can't fit the screen, which leaves the cards in plain order. */
-@media (min-width: 1100px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
-  .pscroll:not(.is-flat) .pgrid { gap: 18vh; padding-bottom: 4vh; }
-  .pscroll:not(.is-flat) .pgrid .prog { position: sticky; top: calc(var(--header-h) + 28px + var(--i) * 14px); }
-  .pscroll:not(.is-flat) .pgrid .prog__card { min-height: var(--card-h, 0); }
-}
-/* Laptop heights: the same card on a tighter vertical rhythm, so the stack still fits */
-@media (min-width: 1100px) and (min-height: 700px) and (max-height: 900px) and (prefers-reduced-motion: no-preference) {
-  .pgrid .prog__body { padding-block: 26px 24px; }
-  .pgrid .prog__cat { margin-bottom: 12px; }
-  .pgrid .prog__title { margin-bottom: 10px; font-size: clamp(30px, 5vh, 40px); }
-  .pgrid .prog__summary { margin-bottom: 16px; font-size: 16.5px; line-height: 1.45; }
-  .pgrid .prog__outcome { margin-bottom: 14px; padding-block: 11px; }
-  .pgrid .prog__fact { padding-block: 8px; }
-  .pgrid .prog__facts dd { font-size: 15px; line-height: 1.42; }
-  .pgrid .prog__for { gap: 2px; }
-  .pgrid .prog__actions { margin-top: 18px; }
+/* Wide: the stage on the right, the programs on the left */
+@media (min-width: 1024px) {
+  .pscene--learn { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+  .pscene--learn .pscene__stage { grid-column: 2; grid-row: 1; }
+  .pscene--learn .pscene__steps { grid-column: 1; grid-row: 1; }
+  .pscene--learn .prog { flex: 1; min-width: 0; }
+  .pscene--learn .prog__body { padding: 0; }
 }
 
 /* Goal finder: four clean radio rows beside the recommendation preview */
@@ -2692,13 +2902,11 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .promise__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
 }
 @media (max-width: 720px) {
-  /* The stages stack: nodes down the left, the trace running vertically between them */
+  /* The stages stack, each card with its body showing */
   .journey-strip__steps { grid-template-columns: minmax(0, 1fr); }
-  .journey-strip__step { grid-template-columns: var(--node) minmax(0, 1fr); column-gap: 16px; row-gap: 2px; padding: 0 0 20px; }
-  .journey-strip__step:last-child { padding-bottom: 0; }
-  .journey-strip__step:not(:last-child)::before { top: calc(var(--node) / 2); left: calc(var(--node) / 2 - 1px); width: 2px; height: 100%; }
-  .journey-strip__num { grid-row: 1 / span 2; margin: 0; }
-  .journey-strip__title { padding-top: 7px; font-size: 19px; }
+  .journey-strip__step { min-height: 0; }
+  .journey-strip__title { padding-top: 24px; font-size: 28px; }
+  .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
   .pgrid .art__mono { font-size: 13px; }
   .pgrid .art__label { font-size: 17px; }
 }

@@ -1,7 +1,8 @@
 /* ==========================================================================
    Faith Works — Build with AI (/build/): use cases, kinds of build, Faith AI
    Loaded by src/pages/build.html; every class starts bw-. Builds on css/style.css tokens:
-   the four brand colours and their tints only, as solid fills (no gradients); Poppins + Inter.
+   the four brand colours and their tints only, as solid fills (gradients only behind the use-case
+   outputs, the Learn mockup grounds); Poppins + Inter.
 
    One system through three sections: solid grounds, cards on one grid, and three markers that
    always mean the same thing: the AI chip (what AI helps to do), the person seal (what a person
@@ -51,16 +52,9 @@
 .bw-tag--done { background: var(--ink); color: var(--white); }
 
 /* 2. Use cases -------------------------------------------------------------- */
-/* Soft Charcoal, set like the homepage journey ("Don't stop at knowing"): White text, --line-dark
-   rules, Faith Pink for the numbers and progress. The outputs are the homepage example cards
-   (.fcard and .fcard__art, style.css): White, the Pink or Yellow glow over a fine grid, and the
-   journey preview's deep shadow. --glow is registered so the frame's glow can fade between cases. */
-@property --glow { syntax: "<color>"; inherits: true; initial-value: transparent; }
-.bw-uses { --bw-rule: var(--line-dark); background: var(--ink); color: var(--white); }
-.bw-uses .bw-head .bw-mark--ai, .bw-story__step .bw-mark--ai { background: var(--white); color: var(--ink); }
-.bw-uses .bw-head .bw-mark--person, .bw-story__step .bw-mark--person { background: transparent; box-shadow: inset 0 0 0 1.5px var(--white); }
-.bw-uses .bw-head .bw-mark--person::after, .bw-story__step .bw-mark--person::after { border-color: var(--white); }
-.bw-uses .bw-head .bw-mark--out::before, .bw-story__step .bw-mark--out::before { box-shadow: inset 0 0 0 1.5px var(--white); }
+/* Works White with Charcoal text; Faith Pink numbers on a rail that fills AI Yellow. The outputs sit on the Learn
+   mockup gradients (--g0 to --g3, style.css), one per case, behind a glassy White edge. */
+.bw-uses { background: var(--paper); color: var(--ink); }
 
 .bw-case__title { margin: 0; font-size: clamp(34px, 3.8vw, 58px); line-height: 1; letter-spacing: -0.045em; }
 .bw-case__task { margin: 8px 0 0; font-size: 17px; line-height: 1.5; }
@@ -70,12 +64,12 @@
    aside (display: contents) so cases and outputs can be placed pair by pair. */
 .bw-story { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(48px, 6vw, 96px) var(--col-gap); align-items: center; }
 .bw-story__steps, .bw-story__stage, .bw-story__frame, .bw-story__arts { display: contents; }
-.bw-story__rail, .bw-story__bar, .bw-story__progress { display: none; }
+.bw-story__rail { display: none; }
 .bw-story__step { grid-column: 1; min-width: 0; }
-.bw-story__art { grid-column: 2; --glow: rgb(239 172 186 / 0.85); color: var(--ink); border-radius: var(--r-lg);
-  background: radial-gradient(120% 100% at 50% 0%, var(--glow), transparent 75%) var(--white); /* the .fcard__art glow */
-  box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -40px rgb(10 10 10 / 0.6); }
-.bw-story__art:nth-child(even) { --glow: rgb(251 197 34 / 0.5); }
+.bw-story__art { grid-column: 2; color: var(--ink); border-radius: var(--r-lg); background: var(--g0); box-shadow: var(--bw-glass); }
+.bw-story__art:nth-child(2) { background: var(--g1); }
+.bw-story__art:nth-child(3) { background: var(--g2); }
+.bw-story__art:nth-child(4) { background: var(--g3); }
 /* the glow and grid of .fcard__art belong to the live frame only */
 .bw-story:not(.is-live) .bw-story__arts::before, .bw-story:not(.is-live) .bw-story__arts::after { content: none; }
 .bw-story__step:nth-of-type(1), .bw-story__art:nth-child(1) { grid-row: 1; }
@@ -83,49 +77,52 @@
 .bw-story__step:nth-of-type(3), .bw-story__art:nth-child(3) { grid-row: 3; }
 .bw-story__step:nth-of-type(4), .bw-story__art:nth-child(4) { grid-row: 4; }
 .bw-story__step .bw-flow { margin-top: 24px; }
+/* The glassy edge: a White hairline and a softer inner highlight, no drop shadow */
+.bw-uses { --bw-glass: inset 0 0 0 1px rgb(255 255 255 / 0.85), inset 0 1px 0 1px rgb(255 255 255 / 0.5); }
 
-.bw-story__num { display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; color: var(--pink); font: 600 13px/1 var(--font-display); transition: background-color 500ms var(--ease-out), color 500ms var(--ease-out); }
+.bw-story__num { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; color: var(--pink); font: 600 13px/1 var(--font-display); transition: background-color 500ms var(--ease-out), color 500ms var(--ease-out); }
 
 /* Live (motion.js §5d, wide and tall screens): the cases scroll in the left column, past a rail
    that fills as you go; the frame on the right stays centred on screen and shows the output of
-   the case at the centre. The frame fits the output it shows; its tallest size (motion.js
-   measures it into --frame-h) places it and paces the cases, so the pace stays even. */
+   the case at the centre. The frame keeps one height, the Learn Programs stage's (style.css,
+   .pscene__stage), or the tallest output's if that is taller (motion.js measures it into
+   --fit-h); it also paces the cases, so the pace stays even. */
 .bw-story.is-live {
-  --frame-h: 440px;
+  --frame-h: max(var(--fit-h, 0px), min(640px, calc(100vh - var(--header-h) - 48px)));
   --step-h: max(var(--frame-h), 56vh);
   align-items: stretch; row-gap: 0;
 }
-.bw-story.is-live .bw-story__steps { display: block; position: relative; grid-column: 1; grid-row: 1; padding-left: 56px; }
+.bw-story.is-live .bw-story__steps { display: block; position: relative; grid-column: 1; grid-row: 1; padding-left: 64px; }
 .bw-story.is-live .bw-story__step { position: relative; display: grid; align-content: center; min-height: var(--step-h); opacity: 0.32; transition: opacity 600ms var(--ease-out); }
 .bw-story.is-live .bw-story__step.is-active { opacity: 1; }
 /* the number sits on the rail, level with the case title (it moves out of the flow's way) */
-.bw-story.is-live .bw-story__num { margin: 0 0 -32px; translate: -56px calc((clamp(34px, 3.8vw, 58px) - 32px) / 2); } /* level with the title's first line */
-.bw-story.is-live .bw-story__step.is-active .bw-story__num { background: var(--pink); color: var(--ink); box-shadow: none; }
-.bw-story.is-live .bw-story__rail { display: block; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--line-dark);
+/* as on For Professionals (css/professionals.css .pp-step__num): the page ground behind it and a
+   ring of it round it, so the number cuts the rail cleanly */
+.bw-story.is-live .bw-story__num { position: relative; margin: 0 0 -36px; translate: -64px calc((clamp(34px, 3.8vw, 58px) - 36px) / 2); background: var(--paper); box-shadow: inset 0 0 0 1.5px var(--pink), 0 0 0 6px var(--paper); } /* level with the title's first line */
+.bw-story.is-live .bw-story__step.is-active .bw-story__num { background: var(--pink); color: var(--ink); box-shadow: 0 0 0 6px var(--paper); }
+.bw-story.is-live .bw-story__rail { display: block; position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--line);
   -webkit-mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); }
-.bw-story.is-live .bw-story__rail i { display: block; height: 100%; border-radius: inherit; background: var(--pink); transform-origin: top; }
+.bw-story.is-live .bw-story__rail i { display: block; height: 100%; border-radius: inherit; background: var(--yellow); transform-origin: top; }
 
 .bw-story.is-live .bw-story__stage { display: block; grid-column: 2; grid-row: 1; }
 .bw-story.is-live .bw-story__frame {
   position: sticky; top: calc(var(--header-h) + (100vh - var(--header-h) - var(--frame-h)) / 2);
-  display: grid; color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -40px rgb(10 10 10 / 0.6);
-  --glow: rgb(239 172 186 / 0.85); transition: --glow 700ms var(--ease-out);
+  display: grid; isolation: isolate; overflow: hidden; border-radius: var(--r-lg); color: var(--ink); box-shadow: var(--bw-glass);
 }
-.bw-story[data-active="1"] .bw-story__frame, .bw-story[data-active="3"] .bw-story__frame { --glow: rgb(251 197 34 / 0.5); }
-.bw-story.is-live .bw-story__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px 0; font-size: 14px; font-weight: 600; }
-.bw-story__label { display: inline-flex; align-items: center; gap: 10px; }
-.bw-story__count { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
-.bw-story.is-live .bw-story__arts { display: grid; align-items: start; height: auto; padding: 0; overflow: clip; }
+/* The frame's ground: one gradient per case, crossfading as the shown case changes */
+.bw-story__bg { display: none; }
+.bw-story.is-live .bw-story__bg { display: block; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 800ms var(--ease-out); }
+.bw-story__bg[data-bg="0"] { background: var(--g0); }
+.bw-story__bg[data-bg="1"] { background: var(--g1); }
+.bw-story__bg[data-bg="2"] { background: var(--g2); }
+.bw-story__bg[data-bg="3"] { background: var(--g3); }
+.bw-story:not([data-active]) [data-bg="0"], .bw-story[data-active="0"] [data-bg="0"], .bw-story[data-active="1"] [data-bg="1"], .bw-story[data-active="2"] [data-bg="2"], .bw-story[data-active="3"] [data-bg="3"] { opacity: 1; }
+.bw-story.is-live .bw-story__arts { display: grid; align-items: center; height: var(--frame-h); padding: 0; overflow: clip; border-radius: 0; background: none; box-shadow: none; }
 .bw-story.is-live .bw-story__art { grid-area: 1 / 1; padding: 20px 24px 18px; border-radius: 0; background: none; box-shadow: none; font-size: clamp(12px, 0.95vw, 14px); visibility: hidden; opacity: 0; }
 /* keep the four outputs close in height, so the frame never holds much empty space: the page
    mockup's shape would otherwise grow with the column's width */
 .bw-story.is-live .bw-site__page { padding: 1.2em 1.6em; }
 .bw-story.is-live .bw-site__shape { aspect-ratio: auto; height: 11em; }
-.bw-story.is-live .bw-story__progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0 24px 22px; }
-.bw-story__progress i { height: 4px; border-radius: 2px; background: rgb(26 26 26 / 0.1); transition: background-color 500ms var(--ease-out); }
-.bw-story__progress i.is-on { background: var(--ink); }
-.bw-story__progress i.is-current { background: var(--pink); box-shadow: inset 0 0 0 1px var(--ink); }
 
 /* Small details settle once an output is shown: the reviewed posts and the page checks tick in */
 .motion .bw-story__art.is-active .bw-cal__grid .is-checked::after,
@@ -133,7 +130,7 @@
 .motion .bw-story__art.is-active .bw-site__checks span:nth-child(2) i { animation-delay: 750ms; }
 .motion .bw-story__art.is-active .bw-site__checks span:nth-child(3) i { animation-delay: 850ms; }
 .motion .bw-story__art.is-active .bw-ask__docs .is-hit { animation: bw-hit 900ms var(--ease-out) 500ms both; }
-@keyframes bw-hit { from { box-shadow: inset 0 0 0 1px var(--line); } to { box-shadow: inset 0 0 0 1.5px var(--ink); } }
+@keyframes bw-hit { from { box-shadow: inset 0 0 0 1px var(--glass-edge), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); } to { box-shadow: 0 0 0 1px var(--white), 0 0 0 0.3em rgb(239 172 186 / 0.55), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); } }
 
 /* Flow: AI → person → output, three aligned rows */
 .bw-flow { display: grid; margin: 0; border-top: 1px solid var(--bw-rule); }
@@ -143,9 +140,11 @@
 .bw-flow dd { margin: 0; font-size: 16px; line-height: 1.45; }
 .bw-flow__step--out dd { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
 
-/* surfaces shared by the illustrations */
-.bw-cal__sheet, .bw-cal__source, .bw-inbox__list, .bw-inbox__draft, .bw-ask__answer, .bw-ask__search, .bw-ask__docs span, .bw-site {
-  border-radius: 0.8em; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+/* surfaces shared by the illustrations: the Learn mockup cards (.pout, .pnet__node in style.css),
+   White with a translucent White ring and a soft shadow; the small document chips are frosted */
+.bw-cal__sheet, .bw-cal__source, .bw-inbox__list, .bw-inbox__draft, .bw-ask__answer, .bw-ask__search, .bw-site {
+  border-radius: 0.8em; background: var(--white); box-shadow: 0 0 0 0.45em rgb(255 255 255 / 0.45), 0 1.4em 2.4em -1.2em rgb(26 26 26 / 0.35); }
+.bw-ask__docs span { border-radius: 0.8em; background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 0 0 1px var(--glass-edge), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); }
 
 /* 2a. Content planning */
 .bw-cal { display: grid; gap: 0.8em; }
@@ -171,7 +170,7 @@
 .bw-inbox__row { display: flex; align-items: center; gap: 0.6em; padding: 0.6em 0.7em; border-radius: 0.55em; background: var(--stone-2); }
 .bw-inbox__row i { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--stone); }
 .bw-inbox__row b { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bw-inbox__row.is-open { background: var(--white); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-inbox__row.is-open { background: var(--white); box-shadow: 0 0 0 1px var(--white), 0 0 0 0.3em rgb(239 172 186 / 0.55), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); }
 .bw-inbox__row.is-open i { background: var(--pink); }
 .bw-inbox__work { display: grid; gap: 0.8em; }
 .bw-inbox__summary { display: flex; align-items: flex-start; gap: 0.8em; padding: 0.9em; border-radius: 0.8em; background: var(--pink-tint); }
@@ -201,7 +200,7 @@
 .bw-ask__docs { display: grid; gap: 0.4em; align-content: start; }
 .bw-ask__docs span { display: flex; align-items: center; gap: 0.6em; padding: 0.75em 0.9em; font-weight: 600; }
 .bw-ask__docs span::before { content: ""; flex: none; width: 0.8em; height: 1em; border-radius: 0.15em; box-shadow: inset 0 0 0 1.5px var(--ink); }
-.bw-ask__docs .is-hit { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.bw-ask__docs .is-hit { background: var(--white); box-shadow: 0 0 0 1px var(--white), 0 0 0 0.3em rgb(239 172 186 / 0.55), 0 0.9em 1.6em -1em rgb(26 26 26 / 0.28); }
 .bw-ask__docs .is-hit::before { background: var(--pink); }
 
 /* 2d. A simple web presence */
@@ -273,14 +272,16 @@
 /* The system card: the process, its three kinds of work, the person who approves */
 .bw-stage { grid-column: 7 / -1; margin: 0; }
 .bw-sys { display: grid; gap: 10px; padding: var(--bw-pad); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; line-height: 1.3; }
-/* The homepage example card's glow and grid (.fcard__art, style.css), its Pink and Yellow glows
-   together: Pink from the top left, Yellow from the top right, at the homepage cards' strengths.
-   The panels are glass so the glow shows through. motion.js §5e brings the card in. */
-.bw-sys.fcard__art { height: auto; overflow: hidden; }
-.bw-sys.fcard__art::before {
-  background: radial-gradient(90% 85% at 15% 0%, rgb(239 172 186 / 0.85), transparent 75%),
-              radial-gradient(90% 85% at 85% 0%, rgb(251 197 34 / 0.5), transparent 75%); }
-.bw-sys .bw-panel { background: var(--glass); }
+/* The use-case outputs' treatment: a Learn mockup gradient (--g1, style.css) behind a glassy
+   White edge. The panels stay solid White with a frosted White ring around them. motion.js §5e
+   brings the card in. */
+.bw-fai { --bw-glass: inset 0 0 0 1px rgb(255 255 255 / 0.85), inset 0 1px 0 1px rgb(255 255 255 / 0.5);
+  --bw-ring: 0 0 0 1px var(--glass-edge), 0 0 0 5px rgb(255 255 255 / 0.4); }
+.bw-sys.fcard__art { gap: 16px; height: auto; overflow: hidden; background: var(--g1); box-shadow: var(--bw-glass); }
+.bw-sys.fcard__art::before, .bw-sys.fcard__art::after { content: none; }
+.bw-sys .bw-panel { background: var(--white); box-shadow: var(--bw-ring); }
+.bw-sys .bw-panel__row, .bw-sys .bw-panel__msg { background: var(--paper); }
+.bw-sys__hub { box-shadow: var(--bw-ring); }
 .motion .bw-sys.is-active .bw-sys__human .bw-mark { animation: fw-pop 500ms var(--ease-out) 1100ms both; }
 .bw-sys__hub { display: grid; gap: 2px; padding: 14px 18px; border-radius: var(--r-sm); background: var(--ink); color: var(--white); }
 .bw-sys__hub small { font-size: 12px; }

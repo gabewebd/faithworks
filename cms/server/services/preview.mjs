@@ -50,7 +50,7 @@ export function createPreview({ store, cfg }) {
       try { mods = await siteModules(); } catch (e) { throw new HttpError(501, `Page preview is unavailable on this deployment (${e.message}).`, "no_renderer"); }
       const { R, L, C } = mods;
       const d = C.toRenderData(snap);
-      d.site.staging = true; // always shows the "Staging preview" bar
+      d.site.staging = true; // noindex + drafts allowed
       R.init(d);
       const rid = rec.id;
       let page;

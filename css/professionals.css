@@ -3,7 +3,7 @@
    Loaded by src/pages/professionals.html; every class starts pp-. Builds on css/style.css tokens:
    the four brand colours and their tints only; Poppins + Inter.
 
-   Three grounds in turn: Works White (with Pink and Yellow cards), Works White, Soft Charcoal.
+   Three grounds in turn: Works White (with Pink and Yellow cards), Works White, Works White.
    Accents: Pink and Yellow cards, Faith Pink, AI Yellow. No card shadows, no dot patterns: hairline rules carry the
    structure. Gradients, texture and glass are kept for the journey alone.
    Section headings use --fs-h2 (below the page hero) with the Build with AI hero's tight
@@ -12,7 +12,7 @@
    1. Shared: section grounds, heading
    2. What changes for you: the 2×2 grid
    3. Who it's for: the list and the team callout
-   4. Your AI journey: Charcoal ground, a Faith Pink rail, the output card, the four circular visuals
+   4. Your AI journey: Works White ground, the numbered rail, the gradient stage, the four circular visuals
    5. Motion (CSS part; the journey's is js/motion.js §5g)
    6. Responsive
    ========================================================================== */
@@ -28,23 +28,33 @@
 .pp-head__intro { grid-column: 9 / -1; max-width: 36ch; margin: 0; padding-bottom: 0.3em; font-size: var(--fs-lead); line-height: 1.55; }
 
 /* 2. What changes for you ---------------------------------------------------- */
-/* Works White ground, solid cards: Faith Pink and AI Yellow in a checkerboard on desktop (1 and 4
-   Pink, 2 and 3 Yellow), alternating once they stack (1 and 3 Pink, 2 and 4 Yellow), as the user
-   asked. Each card leads with a line icon in the homepage pathway style (.route__* strokes and
-   fills, style.css) on the same tile as the homepage (.route--pink / .route--yellow --icon-bg and
-   .route__icon's highlight and shadow, at the user's request), its number on the right. */
-.pp-gain__grid { list-style: none; counter-reset: g; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--col-gap); margin: 0; padding: 0; }
-.pp-gain__item { counter-increment: g; position: relative; display: flex; flex-direction: column; min-height: clamp(280px, 26vw, 380px); padding: clamp(28px, 3vw, 44px) clamp(24px, 3.4vw, 56px) clamp(36px, 4vw, 60px); border-radius: var(--r-lg); background: var(--pink); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
-.pp-gain__item:nth-child(2), .pp-gain__item:nth-child(3) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
+/* Four stage cards in one row, in the Learn AI "How every program works" style (.journey-strip,
+   style.css): Faith Pink and AI Yellow alternating, line icon in the homepage pathway style
+   (.route__* strokes, style.css) on a white tile, number on the right, title at the foot. The body
+   reveals on hover or keyboard focus; on touch and narrow screens it always shows. Two columns on
+   tablets, one stack on phones. Cards keep the Learn strip's portrait shape (5:6) in the row of four. */
+.pp-gain__grid { --gain-pad: clamp(18px, 1.8vw, 28px); list-style: none; counter-reset: g; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 16px); margin: 0; padding: 0; }
+.pp-gain__item { --muted: var(--ink); counter-increment: g; position: relative; display: flex; flex-direction: column; min-height: clamp(260px, 22vw, 330px); aspect-ratio: 5 / 6; padding: var(--gain-pad); color: var(--ink); border-radius: var(--r-lg); background: var(--pink); outline: none; --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
+.pp-gain__item:nth-child(even) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
+.pp-gain__item:focus-visible { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
 .pp-gain__icon { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 24px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); }
 .pp-gain__icon svg { width: 48px; height: 48px; overflow: visible; }
+.pp-gain__item .pp-gain__icon { width: 64px; height: 64px; border-radius: 18px; }
+.pp-gain__item .pp-gain__icon svg { width: 36px; height: 36px; }
 .pp-gain__tick { fill: none; stroke: var(--white); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pp-gain__item::before { content: counter(g, decimal-leading-zero); position: absolute; top: clamp(28px, 3vw, 44px); right: clamp(24px, 3.4vw, 56px); font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 0.08em; }
-.pp-gain__item h3 { max-width: 13ch; margin: auto 0 0; padding-top: clamp(48px, 6vw, 96px); font-size: clamp(30px, 3vw, 48px); line-height: 1.02; letter-spacing: -0.045em; }
-.pp-gain__item p { max-width: 40ch; margin: 18px 0 0; font-size: 17px; line-height: 1.6; }
-/* For Business, How we work with your team: the same cards; longer step titles get room so
-   "implementation" is never hyphenated */
-.pp-gain--steps .pp-gain__item h3 { max-width: 15ch; -webkit-hyphens: manual; hyphens: manual; }
+.pp-gain__item::before { content: counter(g, decimal-leading-zero); position: absolute; top: var(--gain-pad); right: var(--gain-pad); font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; }
+.pp-gain__item h3 { display: block; margin: auto 0 0; padding-top: 32px; font-family: var(--font-display); font-size: clamp(24px, 2.1vw, 34px); font-weight: 600; line-height: 1.05; letter-spacing: -0.045em; text-wrap: wrap; -webkit-hyphens: manual; hyphens: manual; }
+.pp-gain__item p { max-height: 0; margin: 0; overflow: hidden; opacity: 0; transform: translateY(6px); font-size: 15px; line-height: 1.5; transition: max-height 360ms var(--ease-out), margin 360ms var(--ease-out), opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+.pp-gain__item:hover p, .pp-gain__item:focus-within p { max-height: 10em; margin-top: 12px; opacity: 1; transform: none; }
+@media (hover: none) { .pp-gain__item p { max-height: none; margin-top: 12px; opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pp-gain__item p { transition: none; } }
+@media (max-width: 1024px) {
+  .pp-gain__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pp-gain__item { aspect-ratio: auto; }
+  .pp-gain__item:nth-child(3) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
+  .pp-gain__item:nth-child(4) { background: var(--pink); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
+  .pp-gain__item p { max-height: none; margin-top: 12px; opacity: 1; transform: none; }
+}
 
 /* 3. Who it's for ------------------------------------------------------------ */
 /* The heading and checklist are the For Business .goals (style.css); only the ground and the callout are set here */
@@ -55,31 +65,21 @@
 .pp-who__note a.inline:hover { color: var(--ink); text-decoration-thickness: 2px; }
 
 /* 4. Your AI journey ----------------------------------------------------------- */
-/* Soft Charcoal ground, set like the Build with AI use cases (css/build.css §2): the steps on
-   the left past a Faith Pink rail at the far left, the output card on the right. Faith Pink leads
-   (rail, numbers, tags); the card's glow alternates Pink and AI Yellow as on Build with AI, and
-   small Yellow marks sit inside the visuals, at the user's request. The ground carries the
-   challenges band's texture (the fine grid with crosshairs, a scanline raster and grain), lit by
-   soft Pink glows. The visuals are circular compositions: rings, discs, pills and faces. Sizes
-   inside a visual are in cqi, so a visual scales as one piece from a phone to the desktop card. */
-.pp-path { --pp-acc: var(--pink); isolation: isolate; overflow: clip; background-color: var(--ink); color: var(--white); --muted: var(--white);
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 48 0 L 0 0 0 48' fill='none' stroke='rgb(255 255 255 / 0.035)' stroke-width='1'/%3E%3Cpath d='M -4 0 L 4 0 M 0 -4 L 0 4' fill='none' stroke='rgb(255 255 255 / 0.09)' stroke-width='1'/%3E%3Ccircle cx='24' cy='24' r='1.2' fill='rgb(255 255 255 / 0.05)'/%3E%3C/svg%3E"),
-    radial-gradient(50% 40% at 82% 24%, rgb(239 172 186 / 0.16), transparent 70%),
-    radial-gradient(45% 40% at 4% 96%, rgb(239 172 186 / 0.1), transparent 70%),
-    linear-gradient(160deg, rgb(255 255 255 / 0.03), transparent 45%); }
-.pp-path::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(180deg, transparent 0 3px, rgb(255 255 255 / 0.015) 3px 4px); }
-.pp-path .eyebrow { color: var(--white); }
+/* Works White, set like the Build with AI use cases (css/build.css §2): the steps on the left
+   past a rail at the far left (Faith Pink numbers, an AI Yellow line between them), on the right
+   a glassy-edged stage on the Learn mockup gradients (--g0 to --g3, style.css), one per step,
+   holding a frosted White orb. Small Yellow marks sit inside the visuals, at the user's request.
+   The visuals are circular compositions: rings, discs, pills and faces. Sizes inside a visual
+   are in cqi, so a visual scales as one piece from a phone to the desktop stage. */
+.pp-path { --pp-acc: var(--pink); --pp-rule: var(--line); background: var(--paper); color: var(--ink); }
 .pp-path .btn { background: var(--yellow); border-color: var(--yellow); color: var(--ink); } /* AI Yellow, like the header CTA */
-.pp-path .btn:hover { background: var(--white); border-color: var(--white); color: var(--ink); }
+.pp-path .btn:hover { background: var(--ink); border-color: var(--ink); color: var(--white); }
 
 /* The flow. Static (the default): each step, then its visual, on one grid; the wrappers step
    aside (display: contents) so steps and visuals can be placed pair by pair. */
 .pp-path__flow { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(48px, 6vw, 96px) var(--col-gap); align-items: center; }
 .pp-path__steps, .pp-path__stage, .pp-orb, .pp-orb__arts { display: contents; }
-.pp-path__rail, .pp-orb__bezel, .pp-orb__count { display: none; }
+.pp-path__rail, .pp-path__bg, .pp-orb__bezel { display: none; }
 .pp-step { grid-column: 1; display: flex; flex-direction: column; align-items: start; min-width: 0; }
 .pp-art { grid-column: 2; }
 .pp-step:nth-of-type(1), .pp-art:nth-child(1) { grid-row: 1; }
@@ -88,22 +88,24 @@
 .pp-step:nth-of-type(4), .pp-art:nth-child(4) { grid-row: 4; }
 
 .pp-step__num { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 20px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--pink); color: var(--pink); font: 600 13px/1 var(--font-display); transition: background-color 500ms var(--ease-out), color 500ms var(--ease-out); }
-.pp-step__tag { margin: 0; color: var(--pink); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.pp-step__tag { margin: 0; color: var(--ink); opacity: 0.72; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 /* step titles share the Build with AI case titles' size (css/build.css .bw-case__title) */
 .pp-step h3 { max-width: 14ch; margin: 16px 0 0; font-size: clamp(34px, 3.8vw, 58px); line-height: 1; letter-spacing: -0.045em; }
 .pp-step > p:not(.pp-step__tag) { max-width: 40ch; margin: 18px 0 0; font-size: 17px; line-height: 1.6; }
 .pp-step > .btn, .pp-step > .text-link, .pp-step__links { margin-top: 24px; }
 .pp-step__links { display: flex; flex-wrap: wrap; gap: 0 24px; }
 
-/* The orb: a White disc lit like the homepage example cards (.fcard__art, style.css), a glow
-   over a fine grid with grain. Faith Pink for steps 1 and 3, AI Yellow for 2 and 4, as on Build
-   with AI. Each visual wears it as its own disc until the stage takes it over. --glow is
-   registered so the orb's glow can fade between steps. */
-@property --glow { syntax: "<color>"; inherits: true; initial-value: transparent; }
-.pp-art, .pp-path__flow.is-live .pp-orb { --glow: rgb(239 172 186 / 0.85); position: relative; isolation: isolate; aspect-ratio: 1; border-radius: 50%; color: var(--ink);
-  background: radial-gradient(100% 85% at 50% 0%, var(--glow), transparent 75%) var(--white);
-  box-shadow: inset 0 0 0 1px var(--line), 0 50px 90px -45px rgb(0 0 0 / 0.75); }
-.pp-art:nth-child(even) { --glow: rgb(251 197 34 / 0.5); }
+/* The orb: a frosted White disc with the Learn mockup cards' edge (.pout, style.css): a White
+   hairline, a translucent White ring and a soft shadow, over a fine grid with grain. Each visual
+   wears it as its own disc, on its step's gradient, until the stage takes it over. */
+.pp-art, .pp-path__flow.is-live .pp-orb { position: relative; isolation: isolate; aspect-ratio: 1; border-radius: 50%; color: var(--ink);
+  background: radial-gradient(100% 85% at 50% 0%, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.62) 75%);
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.85), 0 0 0 10px rgb(255 255 255 / 0.35), 0 40px 70px -40px rgb(26 26 26 / 0.35); }
+.pp-art { background: radial-gradient(closest-side, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.62) 70%, transparent 71%), var(--g0); }
+.pp-art:nth-child(2) { background: radial-gradient(closest-side, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.62) 70%, transparent 71%), var(--g1); }
+.pp-art:nth-child(3) { background: radial-gradient(closest-side, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.62) 70%, transparent 71%), var(--g2); }
+.pp-art:nth-child(4) { background: radial-gradient(closest-side, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.62) 70%, transparent 71%), var(--g3); }
 .pp-art::before, .pp-path__flow.is-live .pp-orb::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0.6;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(rgb(26 26 26 / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(26 26 26 / 0.05) 1px, transparent 1px);
   background-size: 140px 140px, 22px 22px, 22px 22px; background-position: 0 0, 50% 11px, 11px 50%;
@@ -115,11 +117,12 @@
 .pp-art__svg { inset: 0; width: 100%; height: 100%; overflow: visible; }
 
 /* Live (motion.js §5g, wide and tall screens): the steps scroll in the left column past a rail
-   at the far left that fills as you go; the orb on the right stays centred on screen and shows
-   the visual of the step at the centre. The orb is a fixed circle, so it never resizes. */
-.pp-path__flow.is-live { --orb-max: min(calc(100vh - var(--header-h) - 200px), 540px); --orb: min(86%, var(--orb-max)); align-items: stretch; row-gap: 0; }
+   at the far left that fills as you go; the stage on the right holds below the header at the
+   Learn Programs stage's height (style.css, .pscene__stage) and shows the visual of the step at
+   the centre. The orb is a fixed circle inside it, so nothing resizes. */
+.pp-path__flow.is-live { --stage-h: min(640px, calc(100vh - var(--header-h) - 48px)); --orb-max: min(calc(var(--stage-h) - 120px), 500px); --orb: min(78%, var(--orb-max)); align-items: stretch; row-gap: 0; }
 .pp-path__flow.is-live .pp-path__steps { display: block; position: relative; grid-column: 1; grid-row: 1; padding-left: 64px; }
-.pp-path__flow.is-live .pp-step { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: start; position: relative; min-height: max(calc(var(--orb-max) + 80px), 64vh); /* no % here: it would resolve against the grid row */ opacity: 0.32; transition: opacity 600ms var(--ease-out); }
+.pp-path__flow.is-live .pp-step { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: start; position: relative; min-height: max(var(--stage-h), 64vh); /* no % here: it would resolve against the grid row */ opacity: 0.32; transition: opacity 600ms var(--ease-out); }
 .pp-path__flow.is-live .pp-step.is-active { opacity: 1; }
 /* the number sits on the rail, level with the step's title */
 .pp-path__flow.is-live .pp-step > * { grid-column: 1; }
@@ -127,26 +130,32 @@
 .pp-path__flow.is-live .pp-step h3 { grid-row: 2; }
 .pp-path__flow.is-live .pp-step > p:not(.pp-step__tag) { grid-row: 3; }
 .pp-path__flow.is-live .pp-step > .btn, .pp-path__flow.is-live .pp-step > .text-link, .pp-path__flow.is-live .pp-step__links { grid-row: 4; }
-.pp-path__flow.is-live .pp-step__num { grid-row: 2; grid-column: 1; align-self: center; margin: 16px 0 0 -64px; background: var(--ink); box-shadow: inset 0 0 0 1.5px var(--pink), 0 0 0 6px var(--ink); }
-.pp-path__flow.is-live .pp-step.is-active .pp-step__num { background: var(--pink); color: var(--ink); box-shadow: 0 0 0 6px var(--ink); }
-.pp-path__flow.is-live .pp-path__rail { display: block; position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; border-radius: 1px; }
-.pp-path__flow.is-live .pp-path__rail::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--line-dark);
+.pp-path__flow.is-live .pp-step__num { grid-row: 2; grid-column: 1; align-self: center; margin: 16px 0 0 -64px; background: var(--paper); box-shadow: inset 0 0 0 1.5px var(--pink), 0 0 0 6px var(--paper); }
+.pp-path__flow.is-live .pp-step.is-active .pp-step__num { background: var(--pink); color: var(--ink); box-shadow: 0 0 0 6px var(--paper); }
+/* the rail, as on Build with AI (css/build.css .bw-story__rail): the full height of the steps,
+   fading out at both ends, its AI Yellow line filling with the scroll (motion.js §5g) */
+.pp-path__flow.is-live .pp-path__rail { display: block; position: absolute; left: 17px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--line);
   -webkit-mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); mask: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent); }
-/* the AI Yellow line between the numbers (motion.js §5g sets its ends and draws it step by step) */
-.pp-path__flow.is-live .pp-path__rail i { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: inherit; background: var(--yellow); transform: scaleY(0); transform-origin: top; }
+.pp-path__flow.is-live .pp-path__rail i { display: block; height: 100%; border-radius: inherit; background: var(--yellow); transform-origin: top; }
 
-.pp-path__flow.is-live .pp-path__stage { display: block; grid-column: 2; grid-row: 1; }
-.pp-path__flow.is-live .pp-orb { display: block; position: sticky; top: calc(var(--header-h) + (100vh - var(--header-h) - var(--orb-max) - 40px) / 2); width: var(--orb); margin-inline: auto; transition: --glow 700ms var(--ease-out); }
-.pp-path__flow[data-active="1"] .pp-orb, .pp-path__flow[data-active="3"] .pp-orb { --glow: rgb(251 197 34 / 0.5); }
+.pp-path__flow.is-live .pp-path__stage { display: grid; place-items: center; grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: calc(var(--header-h) + 24px); height: var(--stage-h);
+  isolation: isolate; overflow: hidden; border-radius: var(--r-lg); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.85), inset 0 1px 0 1px rgb(255 255 255 / 0.5); }
+/* The stage's ground: one gradient per step, crossfading as the shown step changes */
+.pp-path__flow.is-live .pp-path__bg { display: block; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 800ms var(--ease-out); }
+.pp-path__bg[data-bg="0"] { background: var(--g0); }
+.pp-path__bg[data-bg="1"] { background: var(--g1); }
+.pp-path__bg[data-bg="2"] { background: var(--g2); }
+.pp-path__bg[data-bg="3"] { background: var(--g3); }
+.pp-path__flow:not([data-active]) [data-bg="0"], .pp-path__flow[data-active="0"] [data-bg="0"], .pp-path__flow[data-active="1"] [data-bg="1"], .pp-path__flow[data-active="2"] [data-bg="2"], .pp-path__flow[data-active="3"] [data-bg="3"] { opacity: 1; }
+.pp-path__flow.is-live .pp-orb { display: block; width: var(--orb); }
 .pp-path__flow.is-live .pp-orb__arts { display: grid; position: absolute; inset: 0; }
 .pp-path__flow.is-live .pp-art { grid-area: 1 / 1; width: 100%; background: none; box-shadow: none; visibility: hidden; opacity: 0; }
 .pp-path__flow.is-live .pp-art::before { content: none; }
 .pp-path__flow.is-live .pp-orb__bezel { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.pp-path__flow.is-live .pp-orb__count { display: block; position: absolute; top: calc(100% + 36px); left: 50%; translate: -50% 0; margin: 0; padding: 8px 16px; border-radius: 999px; background: rgb(255 255 255 / 0.08); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16); color: var(--white); font: 600 14px/1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* the dial: a ring of ticks inside the rim that turns with the scroll, and outside it four arcs,
-   one per step, lit Faith Pink as the steps are reached */
+   one per step, White until the step is reached, then Faith Pink */
 .pp-orb__ticks { stroke: rgb(26 26 26 / 0.16); stroke-width: 6; stroke-dasharray: 0.12 0.88; }
-.pp-orb__seg { stroke: rgb(255 255 255 / 0.14); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0.86 3.14; transform: rotate(calc(-87deg + var(--i) * 90deg)); transform-origin: 200px 200px; transition: stroke 500ms var(--ease-out); }
+.pp-orb__seg { stroke: rgb(255 255 255 / 0.7); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0.86 3.14; transform: rotate(calc(-87deg + var(--i) * 90deg)); transform-origin: 200px 200px; transition: stroke 500ms var(--ease-out); }
 .pp-orb__seg.is-on { stroke: var(--pink); }
 
 /* Shared parts of the visuals: Charcoal lines on the White field, White discs and pills, one
@@ -258,13 +267,14 @@
 @media (max-width: 640px) {
   .pp-gain, .pp-who, .pp-path { padding-block: 72px; }
   .pp-gain__grid { grid-template-columns: minmax(0, 1fr); }
-  .pp-gain__item { min-height: 0; padding: 24px 24px 32px; }
-  .pp-gain__item::before { top: 24px; right: 24px; }
+  .pp-gain__item { min-height: 0; }
   .pp-gain__item:nth-child(3) { background: var(--pink); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
   .pp-gain__item:nth-child(4) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
-  .pp-gain__item h3 { padding-top: 36px; }
+  .pp-gain__item h3 { padding-top: 24px; font-size: 28px; }
   .pp-gain__icon { width: 76px; height: 76px; border-radius: 20px; }
   .pp-gain__icon svg { width: 42px; height: 42px; }
+  .pp-gain__item .pp-gain__icon { width: 64px; height: 64px; border-radius: 18px; }
+  .pp-gain__item .pp-gain__icon svg { width: 36px; height: 36px; }
   .pp-gain__grid { gap: 12px; }
   .pp-gain__item p, .pp-step > p:not(.pp-step__tag) { font-size: 16px; }
 
@@ -272,5 +282,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pp-step, .pp-step__num, .pp-orb, .pp-orb__seg { transition: none; }
+  .pp-step, .pp-step__num, .pp-path__bg, .pp-orb__seg { transition: none; }
 }

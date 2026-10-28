@@ -1,6 +1,6 @@
 /* ==========================================================================
    Faith Works — scroll motion (every page)
-   1. Setup  4. Depth (parallax)  5. Section reveals  5b. Checklist rows  5c. Gallery rows  6. Keeping measurements fresh
+   1. Setup  4. Depth (parallax)  5. Section reveals  5b. Checklist rows  5c. Gallery rows  5i. Inked motto  6. Keeping measurements fresh
    The page scrolls natively (same-page #links glide with CSS scroll-behavior, stopping below the
    sticky header via scroll-padding-top); ScrollTrigger follows the native scroll. The CSS
    reveals (style.css §18, [data-reveal]) stay as they are: this file only reveals sections they
@@ -205,7 +205,6 @@
   var story = doc.querySelector("[data-story]");
   if (story) {
     var steps = $$("[data-story-step]", story), arts = $$("[data-story-art]", story);
-    var segs = $$("[data-story-seg]", story), count = story.querySelector("[data-story-count]");
     // The small pieces of each output (not its top-level blocks, which arrive first)
     var PARTS = ".bw-cal__grid .is-post, .bw-inbox__row, .bw-inbox__summary, .bw-checks > span, .bw-inbox__send, .bw-ask__docs span, .bw-ask__refs > span, .bw-site__hero > *, .bw-site__shape, .bw-site__checks span";
     var settleArt = function (art, delay, dir) { settle(kids(art.firstElementChild), $$(PARTS, art), delay, dir); };
@@ -213,30 +212,22 @@
 
     mm.add("(min-width: 961px) and (min-height: 680px)", function () {
       story.classList.add("is-live");
-      // The frame fits the output it shows (its height glides from one to the next). Its tallest
-      // size, with the tallest output, paces the cases and places it on screen, so neither moves
-      // when the shown output changes.
-      var frame = story.querySelector("[data-story-frame]"), box = story.querySelector(".bw-story__arts");
+      // The frame keeps one height (css/build.css), at least the tallest output's, which also
+      // paces the cases and places it on screen; the outputs sit centred in it.
       var current = -1;
-      var fit = function (instant) {
-        if (current < 0) return;
-        gsap.to(box, { height: arts[current].offsetHeight, duration: instant ? 0 : 0.6, ease: "expo.out", overwrite: true });
-      };
       var measureFrame = function () {
         var tallest = Math.max.apply(null, arts.map(function (a) { return a.offsetHeight; }));
-        story.style.setProperty("--frame-h", frame.offsetHeight - box.offsetHeight + tallest + "px");
+        story.style.setProperty("--fit-h", tallest + "px");
       };
       measureFrame();
-      var frameObs = "ResizeObserver" in window ? new ResizeObserver(function () { measureFrame(); fit(true); refresh(); }) : null;
+      var frameObs = "ResizeObserver" in window ? new ResizeObserver(function () { measureFrame(); refresh(); }) : null;
       if (frameObs) arts.forEach(function (a) { frameObs.observe(a); });
       var show = function (i, dir, instant) {
         if (i === current) return;
         var prev = arts[current];
         current = i;
         steps.forEach(function (s, n) { s.classList.toggle("is-active", n === i); });
-        segs.forEach(function (s, n) { s.classList.toggle("is-on", n <= i); s.classList.toggle("is-current", n === i); });
-        if (count) count.textContent = ("0" + (i + 1)).slice(-2);
-        story.setAttribute("data-active", i); // the frame's glow: Pink, Yellow, Pink, Yellow (css/build.css)
+        story.setAttribute("data-active", i); // the frame's gradient, one per case (css/build.css)
         var art = arts[i];
         // Every other output still showing leaves (more than one when a scroll skips a case)
         arts.forEach(function (a) {
@@ -245,7 +236,6 @@
           gsap.to(a, { autoAlpha: 0, y: -20 * dir, scale: 0.985, duration: 0.4, ease: "power2.in", overwrite: true });
         });
         art.classList.add("is-active");
-        fit(instant);
         if (instant) { gsap.set(art, { autoAlpha: 1, y: 0, scale: 1 }); return; }
         gsap.fromTo(art, { autoAlpha: 0, y: 28 * dir, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.85, ease: "expo.out", delay: prev ? 0.2 : 0, overwrite: true });
         settleArt(art, prev ? 0.25 : 0.05, dir);
@@ -273,10 +263,10 @@
 
       return function () {
         if (frameObs) frameObs.disconnect();
-        story.style.removeProperty("--frame-h");
+        story.style.removeProperty("--fit-h");
         story.removeAttribute("data-active");
         story.classList.remove("is-live");
-        steps.concat(arts, segs).forEach(function (el) { el.classList.remove("is-active", "is-on", "is-current"); });
+        steps.concat(arts).forEach(function (el) { el.classList.remove("is-active"); });
       };
     });
 
@@ -311,72 +301,6 @@
   }
 
 
-  /* ---- 5f. Programs, one after another (learn) --------------------------- */
-  // The program cards follow one another down the page (style.css, "Programs"). At every size a
-  // card's circuit draws in along its traces as the card arrives. Where the cards stack (wide,
-  // tall screens) the card being covered settles back, shrinking a touch under a rising Works
-  // White veil, in step with the next card coming up over it.
-  // Sticky cards can't be ScrollTrigger triggers (their measured position moves with the scroll),
-  // so every position comes from the list, which never sticks: its top plus each card's place in it.
-  var pscroll = doc.querySelector("[data-pscroll]");
-  if (pscroll) {
-    var plist = pscroll.querySelector(".pgrid");
-    var pitems = $$("[data-pscroll-item]", pscroll);
-    var pcards = pitems.map(function (it) { return it.querySelector(".prog__card"); });
-    var pn = pitems.length, listTop = 0, tops = [], holds = [], drawn = [], stacked = false;
-
-    var measure = function () {
-      // Stacked, every card takes the tallest one's height; if that can't fit the screen, no stack
-      pscroll.classList.remove("is-flat");
-      pscroll.style.removeProperty("--card-h");
-      if (pn && getComputedStyle(pitems[0]).position === "sticky") {
-        var tallest = Math.max.apply(null, pcards.map(function (c) { return c.offsetHeight; }));
-        var room = window.innerHeight - (parseFloat(getComputedStyle(pitems[pn - 1]).top) || 0) - 16;
-        if (tallest > room) pscroll.classList.add("is-flat");
-        else pscroll.style.setProperty("--card-h", tallest + "px");
-      }
-      var gap = parseFloat(getComputedStyle(plist).rowGap) || 0, y = 0;
-      listTop = plist.getBoundingClientRect().top + window.scrollY;
-      stacked = false;
-      pitems.forEach(function (it, i) {
-        var cs = getComputedStyle(it);
-        tops[i] = y;
-        y += it.offsetHeight + gap;
-        holds[i] = cs.position === "sticky" ? parseFloat(cs.top) || 0 : null;
-        if (holds[i] !== null) stacked = true;
-      });
-      if (!stacked) gsap.set(pcards, { scale: 1, "--dim": 0 });
-    };
-    var draw = function (item) {
-      gsap.to($$(".ckt-trace", item), { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", stagger: 0.07, clearProps: "strokeDasharray,strokeDashoffset" });
-    };
-    var update = function () {
-      var vh = window.innerHeight, sy = window.scrollY;
-      pitems.forEach(function (it, i) {
-        var top = listTop + tops[i] - sy; // where the card's top would be if it never held
-        if (!drawn[i] && top < vh * 0.8) { drawn[i] = true; draw(it); }
-        if (i > 0 && stacked && holds[i] !== null) {
-          var p = Math.max(0, Math.min(1, (vh - top) / (vh - holds[i])));
-          gsap.set(pcards[i - 1], { scale: 1 - 0.05 * p, "--dim": 0.55 * p });
-        }
-      });
-    };
-
-    measure();
-    // Circuits already on screen stay drawn; the rest wait for their card
-    pitems.forEach(function (it, i) {
-      if (listTop + tops[i] - window.scrollY < window.innerHeight * 0.8) { drawn[i] = true; return; }
-      gsap.set($$(".ckt-trace", it), { strokeDasharray: "1 1", strokeDashoffset: 1 });
-    });
-    ScrollTrigger.create({
-      trigger: plist, start: "top bottom", end: "bottom top",
-      onUpdate: update,
-      onRefresh: function () { measure(); update(); }
-    });
-    update();
-  }
-
-
   /* ---- 5g. Your AI journey (professionals) -------------------------------- */
   // The Build with AI story (5d) with circular visuals. Wide, tall screens: .is-live turns the
   // section into a scroll story (css/professionals.css §4). The step crossing the middle of the
@@ -386,7 +310,7 @@
   var journey = doc.querySelector("[data-journey]");
   if (journey) {
     var jsteps = $$("[data-journey-step]", journey), jarts = $$("[data-journey-art]", journey);
-    var jsegs = $$(".pp-orb__seg", journey), jcount = journey.querySelector("[data-journey-count]");
+    var jsegs = $$(".pp-orb__seg", journey);
     var JPARTS = ".pp-disc, .pp-chip, .pp-art__field > .pp-face, .pp-hub__doc, .pp-hub__core";
     // Each visual's parts pop in a beat apart while its arcs, weeks and traces draw round
     var settleJourney = function (art, delay) {
@@ -399,12 +323,6 @@
       gsap.fromTo($$(".pp-live__bar b", art), { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.inOut", delay: delay + 0.5, overwrite: true });
     };
     var jmm = gsap.matchMedia();
-    var jrail = journey.querySelector("[data-journey-rail]"), jnums = $$(".pp-step__num", journey), jnodes = [];
-    var fillRail = function (i, instant) {
-      if (!jrail || jnodes.length < 2) return;
-      var to = (jnodes[i] - jnodes[0]) / (jnodes[jnodes.length - 1] - jnodes[0]);
-      gsap.to(jrail, { scaleY: to, duration: instant ? 0 : 0.7, ease: "power2.inOut", overwrite: true });
-    };
 
     jmm.add("(min-width: 961px) and (min-height: 680px)", function () {
       journey.classList.add("is-live");
@@ -415,9 +333,7 @@
         current = i;
         jsteps.forEach(function (s, n) { s.classList.toggle("is-active", n === i); });
         jsegs.forEach(function (s, n) { s.classList.toggle("is-on", n <= i); s.classList.toggle("is-current", n === i); });
-        if (jcount) jcount.textContent = ("0" + (i + 1)).slice(-2);
-        fillRail(i, instant);
-        journey.setAttribute("data-active", i); // the orb's glow: Pink, Yellow, Pink, Yellow
+        journey.setAttribute("data-active", i); // the stage's gradient, one per step (css/professionals.css)
         var art = jarts[i];
         // Every other visual still showing turns away (more than one when a scroll skips a step)
         jarts.forEach(function (a) {
@@ -438,18 +354,11 @@
           onEnterBack: function () { show(i, -1); }
         });
       });
-      // The rail's yellow line runs from number to number, as on the About approach steps
-      // (5h): it spans the first number to the last, and draws down to the active step's number
-      // (back up when scrolling back)
-      var placeRail = function () {
-        if (!jrail) return;
-        var box = jrail.parentNode.getBoundingClientRect().top;
-        jnodes = jnums.map(function (n) { var r = n.getBoundingClientRect(); return r.top + r.height / 2 - box; });
-        gsap.set(jrail, { top: jnodes[0], height: jnodes[jnodes.length - 1] - jnodes[0] });
-        if (current > -1) fillRail(current, true);
-      };
-      placeRail();
-      ScrollTrigger.addEventListener("refresh", placeRail);
+      // The rail fills with the scroll, as on Build with AI (5d)
+      gsap.fromTo("[data-journey-rail]", { scaleY: 0 }, {
+        scaleY: 1, ease: "none",
+        scrollTrigger: { trigger: journey, start: "top 55%", end: "bottom 55%", scrub: 0.4 }
+      });
       gsap.fromTo("[data-journey-ticks]", { rotation: 0 }, {
         rotation: 120, svgOrigin: "200 200", ease: "none",
         scrollTrigger: { trigger: journey, start: "top bottom", end: "bottom top", scrub: 0.6 }
@@ -470,8 +379,6 @@
       journey.addEventListener("focusin", onFocus);
 
       return function () {
-        ScrollTrigger.removeEventListener("refresh", placeRail);
-        if (jrail) gsap.set(jrail, { clearProps: "all" });
         journey.removeEventListener("focusin", onFocus);
         journey.classList.remove("is-live");
         journey.removeAttribute("data-active");
@@ -534,6 +441,37 @@
   });
   if (approachTls.length) window.addEventListener("beforeprint", function () { approachTls.forEach(function (tl) { tl.progress(1); }); });
 
+
+  /* ---- 5i. Inked motto (home hero) ------------------------------------------ */
+  // [data-ink-scroll] text starts pale and fills in to Charcoal one letter after another as it
+  // scrolls up the screen. Screen readers get the plain text; the letters are decoration. Without
+  // this script (reduced motion, no GSAP) the text simply shows in full Charcoal.
+  $$("[data-ink-scroll]").forEach(function (el) {
+    var text = el.textContent.trim();
+    var letters = doc.createElement("span");
+    letters.setAttribute("aria-hidden", "true");
+    text.split(/(\s+)/).forEach(function (part) {
+      if (/^\s+$/.test(part)) { letters.appendChild(doc.createTextNode(" ")); return; }
+      var word = doc.createElement("span");
+      word.style.whiteSpace = "nowrap";
+      part.split("").forEach(function (ch) {
+        var c = doc.createElement("span");
+        c.textContent = ch;
+        word.appendChild(c);
+      });
+      letters.appendChild(word);
+    });
+    var label = doc.createElement("span");
+    label.className = "sr-only";
+    label.textContent = text;
+    el.textContent = "";
+    el.appendChild(label);
+    el.appendChild(letters);
+    gsap.fromTo(letters.querySelectorAll("span > span"), { opacity: 0.16 }, {
+      opacity: 1, ease: "none", stagger: 0.1,
+      scrollTrigger: { trigger: el, start: "clamp(top 92%)", end: "top 45%", scrub: true }
+    });
+  });
 
   /* ---- 6. Keeping measurements fresh -------------------------------------- */
   // ScrollTrigger re-measures on resize and load by itself. Content that changes the page's

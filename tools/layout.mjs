@@ -1,4 +1,4 @@
-// Shared page chrome: <head>, header (full or campaign), footer, staging bar.
+// Shared page chrome: <head>, header (full or campaign), footer.
 // Brief §2: launch navigation Learn AI | Build with AI | For Professionals | For Business | Resources | About,
 // logo → Home, persistent CTA → /start-your-ai-journey. Community and Contact live in the footer,
 // as its two most visible links (under the brand line).
@@ -85,11 +85,6 @@ function head({ title, description, path, site, image, noindex, socialTitle, ogT
 </head>`;
 }
 
-function stagingBar(site) {
-  if (!site.staging) return "";
-  return `<div class="staging" role="note"><div class="wrap staging__inner"><span class="dot" aria-hidden="true"></span><span><strong>Staging preview.</strong> Forms are not connected yet, so nothing you enter is sent or stored. Draft content is shown here before it is published.</span></div></div>`;
-}
-
 function header(nav, variant, site) {
   if (variant === "campaign") {
     return `<header class="site-header site-header--campaign">
@@ -104,7 +99,7 @@ function header(nav, variant, site) {
     <button class="menu" type="button" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false"><span class="menu__bars" aria-hidden="true"></span></button>
     <nav id="main-navigation" class="site-nav" aria-label="Main navigation">
       ${links}
-      <a class="btn btn--yellow" href="${esc(site.primaryCta?.url || "/start-your-ai-journey/")}" data-track="starter_kit_click">${esc(site.primaryCta?.label || "Start Your AI Journey")}</a>
+      <a class="btn btn--sheen" href="${esc(site.primaryCta?.url || "/start-your-ai-journey/")}" data-track="starter_kit_click">${esc(site.primaryCta?.label || "Start Your AI Journey")} <span class="btn__arrow" aria-hidden="true">↗</span></a>
     </nav>
   </header>`;
 }
@@ -146,7 +141,7 @@ function footer(site, variant) {
 }
 
 // chrome: false renders a CMS page with "Custom page layout": no global header or footer (the
-// page brings its own). The head, styles, scripts and staging bar stay.
+// page brings its own). The head, styles and scripts stay.
 export function layout({ title, description, path, nav, header: variant, bodyClass, body, site, image, noindex, socialTitle, ogType, chrome = true }) {
   if (!chrome) {
     return `<!doctype html>
@@ -154,7 +149,6 @@ export function layout({ title, description, path, nav, header: variant, bodyCla
 <html lang="en">
 ${head({ title, description, path, site, image, noindex, socialTitle, ogType })}
 <body class="page--custom${bodyClass ? ` ${bodyClass}` : ""}" data-page="${esc(path)}">
-  ${stagingBar(site)}
   <div id="main-content">
 ${body}
   </div>
@@ -168,7 +162,6 @@ ${body}
 ${head({ title, description, path, site, image, noindex, socialTitle, ogType })}
 <body${bodyClass ? ` class="${bodyClass}"` : ""} data-page="${esc(path)}">
   <a class="skip-link" href="#main-content">Skip to content</a>
-  ${stagingBar(site)}
   ${header(nav, variant, site)}
   <main id="main-content" tabindex="-1">
 ${body}

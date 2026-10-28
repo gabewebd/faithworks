@@ -42,7 +42,6 @@
 </head>
 <body data-page="/build/">
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <div class="staging" role="note"><div class="wrap staging__inner"><span class="dot" aria-hidden="true"></span><span><strong>Staging preview.</strong> Forms are not connected yet, so nothing you enter is sent or stored. Draft content is shown here before it is published.</span></div></div>
   <header class="site-header">
     <a class="logo" href="../index.html" aria-label="Faith Works home"><img src="../assets/icons/wordmark.svg" alt="" width="168" height="34"></a>
     <button class="menu" type="button" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false"><span class="menu__bars" aria-hidden="true"></span></button>
@@ -53,7 +52,7 @@
       <a href="../business/index.html">For Business</a>
       <a href="../resources/index.html">Resources</a>
       <a href="../about/index.html">About</a>
-      <a class="btn btn--yellow" href="../start-your-ai-journey/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
+      <a class="btn btn--sheen" href="../start-your-ai-journey/index.html" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
@@ -88,10 +87,10 @@
     <!-- Use cases, kinds of build and Faith AI share one visual system (css/build.css, every class bw-):
          flat brand colours on solid grounds, cards on one grid, and three markers that always mean
          the same thing: the AI chip (what AI helps to do), the person seal (what a person checks), the filled square (the output). Accents: Faith Pink leads the use cases, AI Yellow leads Faith AI. -->
-    <link rel="stylesheet" href="../css/build.css?v=12">
+    <link rel="stylesheet" href="../css/build.css?v=17">
 
-    <!-- USE CASES: a scroll story on solid Soft Charcoal; the output frame is the
-         homepage example card (.fcard, its glow and grid in .fcard__art, style.css).
+    <!-- USE CASES: a scroll story on Works White; the output frame is a glassy edge over the
+         Learn mockup gradients, one per case (.bw-story__bg, css/build.css).
          Left, the four cases (title, task, the facts in its <dl>); right, the output of each, an
          illustrative interface (role="img"). js/motion.js (§5d) adds .is-live on wide, tall screens:
          the output stage stays put while the cases scroll past, and the one at the centre of the
@@ -164,10 +163,7 @@
         <!-- The output stage: one frame, the four outputs stacked in it, the shown one in step with the case -->
         <div class="bw-story__stage">
           <div class="bw-story__frame fcard" data-story-frame>
-            <div class="bw-story__bar" aria-hidden="true">
-              <span class="bw-story__label"><span class="bw-mark bw-mark--out"></span>The output</span>
-              <span class="bw-story__count"><b data-story-count>01</b> / 04</span>
-            </div>
+            <span class="bw-story__bg" data-bg="0" aria-hidden="true"></span><span class="bw-story__bg" data-bg="1" aria-hidden="true"></span><span class="bw-story__bg" data-bg="2" aria-hidden="true"></span><span class="bw-story__bg" data-bg="3" aria-hidden="true"></span>
             <div class="bw-story__arts fcard__art">
               <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: a month content calendar drafted from approved notes, with each post marked for review." data-story-art>
                 <div class="bw-cal">
@@ -230,7 +226,6 @@
                 </div>
               </div>
             </div>
-            <span class="bw-story__progress" aria-hidden="true"><i data-story-seg></i><i data-story-seg></i><i data-story-seg></i><i data-story-seg></i></span>
           </div>
         </div>
       </div>

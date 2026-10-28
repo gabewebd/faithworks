@@ -42,7 +42,6 @@
 </head>
 <body data-page="/about/">
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <div class="staging" role="note"><div class="wrap staging__inner"><span class="dot" aria-hidden="true"></span><span><strong>Staging preview.</strong> Forms are not connected yet, so nothing you enter is sent or stored. Draft content is shown here before it is published.</span></div></div>
   <header class="site-header">
     <a class="logo" href="../index.html" aria-label="Faith Works home"><img src="../assets/icons/wordmark.svg" alt="" width="168" height="34"></a>
     <button class="menu" type="button" aria-label="Open navigation" aria-controls="main-navigation" aria-expanded="false"><span class="menu__bars" aria-hidden="true"></span></button>
@@ -53,7 +52,7 @@
       <a href="../business/index.html">For Business</a>
       <a href="../resources/index.html">Resources</a>
       <a href="../about/index.html" aria-current="page">About</a>
-      <a class="btn btn--yellow" href="../start-your-ai-journey/index.html" data-track="starter_kit_click">Start Your AI Journey</a>
+      <a class="btn btn--sheen" href="../start-your-ai-journey/index.html" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
@@ -126,14 +125,12 @@
           <ul class="edu__schools">
             <li>
               <a class="edu__school" href="https://aim.edu/" target="_blank" rel="noopener">
-                <span class="edu__via">At</span>
                 <span class="edu__logo"><img src="../assets/images/aim-logo.png" alt="" width="395" height="287" loading="lazy" decoding="async"></span>
                 <span class="edu__name">Asian Institute of Management (AIM)<span class="sr-only"> (opens in a new tab)</span></span>
               </a>
             </li>
             <li>
               <a class="edu__school" href="https://cce.sydney.edu.au/" target="_blank" rel="noopener">
-                <span class="edu__via">Through</span>
                 <span class="edu__logo"><img src="../assets/images/cce.png" alt="" width="459" height="160" loading="lazy" decoding="async"></span>
                 <span class="edu__name">University of Sydney’s Centre for Continuing Education (CCE)<span class="sr-only"> (opens in a new tab)</span></span>
               </a>
@@ -161,7 +158,7 @@
     <!-- SPEAKING: keynote markets and topics from the founder profile -->
     <section class="section wrap talks" aria-labelledby="talks-title">
       <figure class="talks__photo">
-        <img src="../assets/images/web/speaking-whiteboard-1280.webp" srcset="../assets/images/web/speaking-whiteboard-640.webp 640w, ../assets/images/web/speaking-whiteboard-1280.webp 1280w, ../assets/images/web/speaking-whiteboard-1920.webp 1920w" sizes="(min-width: 901px) 60vw, 150vw" width="1920" height="1280" alt="Faith Natividad speaking to an audience with a microphone." loading="lazy" decoding="async" style="object-position:38% 30%">
+        <img src="../assets/images/web/speaking-faith-screen-1280.webp" srcset="../assets/images/web/speaking-faith-screen-640.webp 640w, ../assets/images/web/speaking-faith-screen-1280.webp 1280w, ../assets/images/web/speaking-faith-screen-1920.webp 1920w" sizes="(min-width: 901px) 60vw, 150vw" width="1920" height="1280" alt="Faith Natividad speaking with a microphone beside a screen showing the Faith Works name." loading="lazy" decoding="async" style="object-position:45% 35%">
       </figure>
       <div class="talks__copy">
         <p class="eyebrow">Speaking</p>
@@ -236,24 +233,54 @@
       </div>
     </section>
 
-    <!-- Our approach: the headline and intro hold (sticky on wide screens) while the five steps
-         arrive one by one as they scroll in, a yellow rail filling beside them (js/motion.js §5h).
-         No JS or reduced motion: all shown. -->
-    <section class="section section--dark" aria-labelledby="approach-title">
-      <div class="wrap split split--dark" data-approach>
-        <div class="approach__intro">
-          <p class="eyebrow">Our approach</p>
-          <h2 id="approach-title">Before AI tools, upgrade the human.</h2>
-          <p class="split__lead">Better judgment, clarity and work habits come first. Tools change; the way you think about your work lasts.</p>
-          <p>For non-technical founders, professionals and teams who feel overwhelmed by tools, Faith Works provides practical learning and guided implementation that turns one business task into a useful, reviewable workflow.</p>
+    <!-- Our approach: the intro, then the five stages as the Learn page's stage cards
+         (style.css .journey-strip): Pink and Yellow, icon and number, body on hover or focus -->
+    <section class="section approach-band" aria-labelledby="approach-title">
+      <div class="wrap">
+        <div class="approach__intro" data-reveal>
+          <div>
+            <p class="eyebrow">Our approach</p>
+            <h2 id="approach-title">Before AI tools, upgrade the human.</h2>
+          </div>
+          <div>
+            <p class="split__lead">Better judgment, clarity and work habits come first. Tools change; the way you think about your work lasts.</p>
+            <p>For non-technical founders, professionals and teams who feel overwhelmed by tools, Faith Works provides practical learning and guided implementation that turns one business task into a useful, reviewable workflow.</p>
+          </div>
         </div>
-        <ol class="journey-list journey-list--rail">
-          <li><b>Learn</b>the foundations.</li>
-          <li><b>Apply</b>AI to a real task.</li>
-          <li><b>Build</b>a useful first version.</li>
-          <li><b>Implement</b>it in your work.</li>
-          <li><b>Improve</b>it through feedback and results.</li>
-        </ol>
+        <div class="journey-strip">
+          <ol class="journey-strip__steps" data-reveal>
+            <li class="journey-strip__step" tabindex="0">
+              <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><path class="route__node" d="M24 12c-5-4-12-4.5-19-3v28c7-1.5 14-1 19 3 5-4 12-4.5 19-3V9c-7-1.5-14-1-19 3Z"/><path class="route__line" d="M24 12v28M10 17h8M10 23h8M10 29h5"/><circle class="route__head route__head--lead" cx="34" cy="21" r="3"/></svg></span>
+              <span class="journey-strip__num" aria-hidden="true">01</span>
+              <b class="journey-strip__title">Learn</b>
+              <span class="journey-strip__desc"><span>Plain-language foundations: what AI does well, where it fails and how to use it safely.</span></span>
+            </li>
+            <li class="journey-strip__step" tabindex="0">
+              <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><rect class="route__node" x="7" y="5" width="26" height="34" rx="3.5"/><path class="route__line" d="M13 14h14M13 20h14M13 26h8"/><path class="route__node route__node--lead" d="M36 26l2.2 5.8L44 34l-5.8 2.2L36 42l-2.2-5.8L28 34l5.8-2.2Z"/></svg></span>
+              <span class="journey-strip__num" aria-hidden="true">02</span>
+              <b class="journey-strip__title">Apply</b>
+              <span class="journey-strip__desc"><span>Bring a real task from your own work and practise on it with guidance, not a made-up example.</span></span>
+            </li>
+            <li class="journey-strip__step" tabindex="0">
+              <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><rect class="route__node" x="5" y="28" width="17" height="13" rx="2.5"/><rect class="route__node" x="26" y="28" width="17" height="13" rx="2.5"/><rect class="route__node route__node--lead" x="15.5" y="13" width="17" height="13" rx="2.5"/><path class="route__line" d="M24 4v5"/></svg></span>
+              <span class="journey-strip__num" aria-hidden="true">03</span>
+              <b class="journey-strip__title">Build</b>
+              <span class="journey-strip__desc"><span>Turn what works into a useful first version: a workflow, a prompt set or a prototype.</span></span>
+            </li>
+            <li class="journey-strip__step" tabindex="0">
+              <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><rect class="route__node" x="7" y="8" width="34" height="23" rx="3"/><path class="route__line" d="M3 37.5h42M13 16h12M13 22h8"/><circle class="route__head route__head--lead" cx="35" cy="33" r="8"/><path class="journey-strip__tick" d="M31.5 33l2.5 2.5 5-5"/></svg></span>
+              <span class="journey-strip__num" aria-hidden="true">04</span>
+              <b class="journey-strip__title">Implement</b>
+              <span class="journey-strip__desc"><span>Put it to work in your real week, with a clear first use and a way to check the output.</span></span>
+            </li>
+            <li class="journey-strip__step" tabindex="0">
+              <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><path class="route__ring" d="M39 19A16 16 0 0 0 9 20M9 29a16 16 0 0 0 30 0"/><path class="route__line" d="M39 10v9h-9M9 38v-9h9M17 29l5-5 4 3 5-6"/><circle class="route__head route__head--lead" cx="31" cy="21" r="3"/></svg></span>
+              <span class="journey-strip__num" aria-hidden="true">05</span>
+              <b class="journey-strip__title">Improve</b>
+              <span class="journey-strip__desc"><span>Review how it went, gather feedback and refine it through feedback and results.</span></span>
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
 

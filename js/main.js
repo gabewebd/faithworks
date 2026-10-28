@@ -2,8 +2,8 @@
    Faith Works — site interactions (every page)
    1. Helpers  2. Motion setup (split headings, draw paths, reveals)
    3. Header + navigation  4. Tablists (home: examples, journey)
-   5. Program selector and showcase (learn)  6. Starter kit thank-you  7. Analytics events
-   8. Event Calendar (workshops)  9. Testimonial photos  10. Hero network parallax
+   5. Program selector and showcase (learn), 5b. programs split (home)  6. Starter kit thank-you  7. Analytics events
+   8. Event Calendar (workshops)  9. Testimonial photos  10. Hero node web wires
    11. Logo strip pause  12. Testimonial carousel  13. Video (click to load) and booking
    14. Article contents (sticky sidebar)  15. Resource search and filters  16. Share this (articles)
    17. Card pager (professionals: challenges)  18. Event gallery marquee
@@ -175,7 +175,7 @@
   var scenes = $$(".scene");
   if (scenes.length) {
     var stepTabs = $$("[data-step]");
-    var journey = $("#journey.section--dark");
+    var journey = $("#journey");
     var current = 0;
     var fromScroll = false;
     var pinQuery = window.matchMedia("(min-width: 901px) and (min-height: 700px)");
@@ -214,6 +214,30 @@
       if (pinQuery.addEventListener) pinQuery.addEventListener("change", setPin);
       setPin();
     }
+  }
+
+  /* ---- 5b. Programs split (home) ----------------------------------------- */
+  // The program crossing a thin band at the middle of the screen becomes active, and the sticky
+  // mockup shows its view. Between programs nothing is in the band, so the last one stays active:
+  // no flicker, and scrolling either way lands on the right one.
+  var pscene = $("[data-pscene]");
+  if (pscene && "IntersectionObserver" in window) {
+    var psteps = $$("[data-pstep]", pscene), pstage = $("[data-pscene-stage]", pscene);
+    var pviews = pstage ? $$(".pmock__view", pstage) : [];
+    var pactive = -1;
+    var pset = function (i) {
+      if (i === pactive) return;
+      pactive = i;
+      psteps.forEach(function (s, k) { s.classList.toggle("is-active", k === i); });
+      pviews.forEach(function (v, k) { v.classList.toggle("is-active", k === i); });
+      if (pstage) pstage.setAttribute("data-at", String(i));
+    };
+    pset(0);
+    pscene.classList.add("is-live");
+    var pio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) pset(psteps.indexOf(e.target)); });
+    }, { rootMargin: "-48% 0px -48% 0px" });
+    psteps.forEach(function (s) { pio.observe(s); });
   }
 
   /* ---- 5. Program selector (learn) --------------------------------------- */
@@ -594,43 +618,111 @@
     if (img.complete && img.naturalWidth === 0) drop(); else img.addEventListener("error", drop);
   });
 
-  /* ---- 10. Hero: network parallax --------------------------------------- */
-  // The agent network leans gently toward the cursor: the whole layer moves a few pixels and each
-  // node a little more by its depth (--d), so the lines stay attached. The values trail the pointer
-  // on a damped spring (ω 5, ζ 1) instead of snapping. Mouse/trackpad only: touch and reduced motion
-  // stay still, and the loop sleeps once settled or when the hero is off screen.
+  /* ---- 10. Hero: node web wires ------------------------------------------ */
+  // The home hero's node web (css/style.css, 5. Home: hero) runs the full width of the hero. One set
+  // of branch shapes drives both the node positions and the lines, so the lines always pass through
+  // their nodes. Left x values are fractions of the space between the edge and the left junction;
+  // right x values, of the space between the right junction and the far edge; y values, of the web's
+  // height. Lines are straight runs with softly rounded corners, each in its own weight and brand
+  // colour (Pink, Yellow or Charcoal), drawn in one SVG across the hero and redrawn on resize. A twin
+  // path carries the travelling signal, which CSS animates under .motion only.
   var hero = $(".hero");
-  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var nets = hero ? $$(".hnet", hero) : [];
-  if (nets.length && !reduceMotion && finePointer && "IntersectionObserver" in window) {
-    var aim = { x: 0, y: 0 }, pos = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
-    var heroOn = false, raf = 0, prev = 0;
-    var loop = function (now) {
-      var dt = Math.min(0.1, (now - (prev || now)) / 1000);
-      prev = now;
-      for (var s = 0; s < 4; s++) {
-        ["x", "y"].forEach(function (k) { vel[k] += (25 * (aim[k] - pos[k]) - 10 * vel[k]) * dt / 4; pos[k] += vel[k] * dt / 4; });
-      }
-      nets.forEach(function (n) {
-        n.style.setProperty("--px", pos.x.toFixed(3));
-        n.style.setProperty("--py", pos.y.toFixed(3));
-      });
-      var settled = Math.abs(aim.x - pos.x) + Math.abs(aim.y - pos.y) + Math.abs(vel.x) + Math.abs(vel.y) < 0.002;
-      raf = heroOn && !settled ? requestAnimationFrame(loop) : 0;
-      if (!raf) prev = 0;
+  var web = hero && $(".hweb", hero);
+  var hub = web && $(".hweb__hub", web);
+  if (web && hub && window.SVGElement) {
+    var NS = "http://www.w3.org/2000/svg";
+    var TONES = ["239 172 186", "251 197 34", "26 26 26", "251 197 34", "239 172 186", "26 26 26", "251 197 34", "239 172 186"];
+    var WEIGHTS = [1.75, 1.25, 1.5, 1, 2, 1.25, 1.5, 1];
+    // [x, y] points from the edge inward; "J" is the junction. Nodes: [key, x, y] on those lines.
+    var LEFT = [
+      { pts: [[0, 0.14], [0.66, 0.14], [0.84, 0.3], "J"], nodes: [["a", 0.36, 0.14], ["b", 0.84, 0.3]] },
+      { pts: [[0, 0.5], "J"], nodes: [["c", 0.22, 0.5], ["d", 0.56, 0.5]] },
+      { pts: [[0, 0.86], [0.66, 0.86], [0.84, 0.7], "J"], nodes: [["e", 0.84, 0.7], ["f", 0.36, 0.86]] }
+    ];
+    var RIGHT = [0.12, 0.37, 0.63, 0.88].map(function (y, i) {
+      return { pts: ["S", [0.22, 0.5], [0.22, y], [1, y]], nodes: [["ghij".charAt(i), 0.6, y]] };
+    });
+    var svg = doc.createElementNS(NS, "svg");
+    svg.setAttribute("class", "hero__wires");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    web.insertBefore(svg, web.firstChild);
+    var el = function (name, attrs) {
+      var n = doc.createElementNS(NS, name);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      return n;
     };
-    var wake = function () { if (heroOn && !raf) raf = requestAnimationFrame(loop); };
-    hero.addEventListener("pointermove", function (e) {
-      var r = hero.getBoundingClientRect();
-      aim.x = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
-      aim.y = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height - 0.5) * 2));
-      wake();
-    }, { passive: true });
-    hero.addEventListener("pointerleave", function () { aim.x = 0; aim.y = 0; wake(); });
-    new IntersectionObserver(function (entries) {
-      heroOn = entries[0].isIntersecting;
-      wake();
-    }).observe(hero);
+    var f = function (n) { return n.toFixed(1); };
+    // a polyline with its corners rounded (radius r, or less where a segment is short)
+    var rounded = function (pts, r) {
+      var d = "M" + f(pts[0][0]) + " " + f(pts[0][1]);
+      for (var i = 1; i < pts.length - 1; i++) {
+        var p = pts[i - 1], c = pts[i], q = pts[i + 1];
+        var l1 = Math.hypot(c[0] - p[0], c[1] - p[1]), l2 = Math.hypot(q[0] - c[0], q[1] - c[1]);
+        var k = Math.min(r, l1 / 2, l2 / 2);
+        var a = [c[0] - (c[0] - p[0]) / l1 * k, c[1] - (c[1] - p[1]) / l1 * k];
+        var b = [c[0] + (q[0] - c[0]) / l2 * k, c[1] + (q[1] - c[1]) / l2 * k];
+        d += "L" + f(a[0]) + " " + f(a[1]) + "Q" + f(c[0]) + " " + f(c[1]) + " " + f(b[0]) + " " + f(b[1]);
+      }
+      var z = pts[pts.length - 1];
+      return d + "L" + f(z[0]) + " " + f(z[1]);
+    };
+    var drawWires = function () {
+      var W = web.clientWidth, H = web.clientHeight;
+      if (!W) return;
+      var hubW = hub.offsetWidth, cy = H / 2;
+      var reach = Math.max(28, Math.min(84, W * 0.05));
+      var jx = W / 2 - hubW / 2 - 14 - reach, sx = W / 2 + hubW / 2 + 14 + reach;
+      var L = function (pt) { return pt === "J" ? [jx, cy] : [pt[0] * jx, pt[1] * H]; };
+      var R = function (pt) { return pt === "S" ? [sx, cy] : [sx + pt[0] * (W - sx), pt[1] * H]; };
+      var defs = el("defs", {});
+      var paths = [];
+      var n = 0;
+      var line = function (pts, inward) {
+        var i = n++, tone = TONES[i % TONES.length], ink = tone === "26 26 26", w = WEIGHTS[i % WEIGHTS.length];
+        var a = pts[0], z = pts[pts.length - 1], d = rounded(pts, 22);
+        var grad = el("linearGradient", { id: "hweb-g" + i, gradientUnits: "userSpaceOnUse", x1: a[0], y1: a[1], x2: z[0], y2: z[1] });
+        grad.appendChild(el("stop", { offset: "0", "stop-color": "rgb(" + tone + " / " + (ink ? (inward ? 0.14 : 0.38) : (inward ? 0.45 : 0.95)) + ")" }));
+        grad.appendChild(el("stop", { offset: "1", "stop-color": "rgb(" + tone + " / " + (ink ? (inward ? 0.38 : 0.14) : (inward ? 0.95 : 0.45)) + ")" }));
+        defs.appendChild(grad);
+        paths.push(el("path", { class: "hweb__wire", d: d, stroke: "url(#hweb-g" + i + ")", "stroke-width": w }));
+        paths.push(el("path", { class: "hweb__pulse", d: d, pathLength: "1", stroke: "rgb(" + (ink ? "239 172 186" : tone) + ")",
+          "stroke-width": w + 1.25, style: "--delay:" + (1.6 + i * 0.7).toFixed(1) + "s" }));
+        return tone;
+      };
+      var place = function (key, xy, tone) {
+        var node = $(".hweb__node[data-k='" + key + "']", web);
+        if (!node) return;
+        node.style.left = f(xy[0]) + "px";
+        node.style.top = f(xy[1]) + "px";
+        var dot = $(".hweb__dot", node), ink = tone === "26 26 26";
+        // the node glows softly in its line's colour (css: .hweb__dot --glow)
+        dot.style.setProperty("--glow", tone);
+        dot.style.setProperty("--glow-a", ink ? "0.08" : "0.22");
+        dot.style.setProperty("--edge-a", ink ? "0.16" : "0.6");
+      };
+      LEFT.forEach(function (b) {
+        var tone = line(b.pts.map(L), true);
+        b.nodes.forEach(function (nd) { place(nd[0], L([nd[1], nd[2]]), tone); });
+      });
+      line([[jx, cy], [W / 2 - hubW / 2 - 12, cy]], true);
+      line([[W / 2 + hubW / 2 + 12, cy], [sx, cy]], false);
+      RIGHT.forEach(function (b) {
+        var tone = line(b.pts.map(R), false);
+        b.nodes.forEach(function (nd) { place(nd[0], R([nd[1], nd[2]]), tone); });
+      });
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+      svg.appendChild(defs);
+      paths.forEach(function (p) { svg.appendChild(p); });
+      svg.appendChild(el("circle", { class: "hweb__junction", cx: jx, cy: cy, r: 6, fill: "rgb(26 26 26)" }));
+      svg.appendChild(el("circle", { class: "hweb__junction", cx: sx, cy: cy, r: 6, fill: "rgb(26 26 26)" }));
+    };
+    var queued = 0;
+    var redraw = function () { if (!queued) queued = requestAnimationFrame(function () { queued = 0; drawWires(); }); };
+    drawWires();
+    if ("ResizeObserver" in window) new ResizeObserver(redraw).observe(web);
+    else window.addEventListener("resize", redraw, { passive: true });
   }
 
   /* ---- 11. Logo strip pause ----------------------------------------------- */
@@ -653,8 +745,8 @@
   // places. Moving on, the top card swings out to the right and slips to the back of the pile;
   // moving back, the card from the back swings in from the right onto the top (the .is-out and
   // .is-in keyframes). The stack moves on by itself every few seconds, and pauses while it is
-  // hovered, focused, off screen or in a background tab; the buttons, a horizontal swipe and the
-  // arrow keys flip through it, and any of them starts the wait again. Reduced motion: no autoplay,
+  // hovered, focused, dragged, off screen or in a background tab; the buttons, dragging the top card
+  // off and the arrow keys flip through it, and any of them starts the wait again. Reduced motion: no autoplay,
   // and cards change place without the swing. Without JS: the scroll-snap row.
   $$("[data-carousel]").forEach(function (box) {
     var track = $(".voices__track", box);
@@ -663,7 +755,7 @@
     if (!track || n < 2) return;
     var count = $("[data-carousel-count]", box);
     var DWELL = 6500, i = 0, timer = 0;
-    var hold = { hover: false, focus: false, away: true, hidden: doc.hidden };
+    var hold = { hover: false, focus: false, away: true, hidden: doc.hidden, drag: false };
     var wrap = function (x) { return ((x % n) + n) % n; };
     var held = function () { for (var key in hold) if (hold[key]) return true; return false; };
 
@@ -688,10 +780,10 @@
     };
     // One card on (dir 1) or back (dir -1). The card that swings is the one leaving the top going
     // forward, or the one arriving on top going back.
-    var go = function (dir) {
+    var go = function (dir, thrown) {
       var leaving = slides[i];
       i = wrap(i + dir);
-      if (!reduceMotion) {
+      if (!reduceMotion && !thrown) {
         var card = dir > 0 ? leaving : slides[i];
         slides.forEach(function (s) { s.classList.remove("is-out", "is-in"); });
         void card.offsetWidth; // restart the swing if the same card swings twice in a row
@@ -713,20 +805,97 @@
       e.preventDefault();
       go(dir);
     });
-    // Swipe: the track has touch-action: pan-y, so a vertical swipe still scrolls the page; a
-    // horizontal one of 40px or more flips the stack (left for the next card, right for the last).
-    var start = null;
+    // Drag: the top card follows the pointer, turning a little as it goes, and the cards under it
+    // rise toward their next places as it moves aside, the next quote fading up on the card below.
+    // Let go past a quarter of the card's width (or with a quick flick) and it is thrown off that
+    // side, still showing its words, fading as it goes, and then turns up at the back of the pile;
+    // let go short of that and everything settles back. The track has touch-action: pan-y, so a
+    // vertical swipe still scrolls the page (pointercancel).
+    // Each place in the pile as [x as a share of the card's width, y px, turn deg, scale, opacity]:
+    // the same values as the data-depth rules in css/style.css.
+    var POSE = [[0, 0, 0, 1, 1], [-0.015, 26, -1.8, 0.96, 1], [0.015, 48, 1.6, 0.92, 1], [0, 60, 0, 0.88, 0]];
+    var drag = null, flying = null;
+    var mix = function (a, b, p) { return a + (b - a) * p; };
+    // The cards under the top one, as [card, its place now]: up to three of them.
+    var under = function () {
+      var list = [];
+      for (var k = 1; k < Math.min(4, n); k++) list.push([slides[wrap(i + k)], k]);
+      return list;
+    };
+    var unstyle = function (s) {
+      ["transition", "transform", "opacity", "visibility", "--reveal"].forEach(function (p) { s.style.removeProperty(p); });
+    };
+    var land = function () { // the thrown card, now out of sight, joins the back of the pile
+      if (!flying) return;
+      var s = flying.card;
+      clearTimeout(flying.timer);
+      flying = null;
+      s.style.transition = "none";
+      s.style.removeProperty("transform");
+      s.style.removeProperty("--reveal");
+      paint();
+      void s.offsetWidth;
+      unstyle(s); // fades in where it now sits
+    };
+    var release = function (e, cancel) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var card = drag.card, rest = drag.rest, dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      var w = card.offsetWidth || 1, fast = Math.abs(e.clientX - drag.sx) / Math.max(1, e.timeStamp - drag.st) > 0.5;
+      var moved = drag.moved;
+      drag = null;
+      track.classList.remove("is-dragging");
+      pause("drag", false);
+      if (!moved) return;
+      rest.forEach(function (r) { unstyle(r[0]); }); // they glide on, or back, from where the drag left them
+      if (cancel || !(Math.abs(dx) > w / 4 || (fast && Math.abs(dx) > 30))) { unstyle(card); return; }
+      if (reduceMotion) { unstyle(card); go(1, true); return; }
+      var side = dx < 0 ? -1 : 1;
+      go(1, true);
+      card.style.zIndex = String(n + 1);
+      card.style.setProperty("--reveal", "1");
+      card.style.visibility = "visible";
+      card.style.transition = "transform 0.5s var(--ease-out), opacity 0.4s ease-in 0.1s";
+      card.style.transform = "translate(" + side * (w * 0.9 + Math.abs(dx) * 0.4) + "px, " + (dy * 0.2 + 40) + "px) rotate(" + side * 16 + "deg)";
+      card.style.opacity = "0";
+      flying = { card: card, timer: setTimeout(land, 500) };
+    };
     track.addEventListener("pointerdown", function (e) {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      start = { x: e.clientX, y: e.clientY };
+      if (drag || (e.pointerType === "mouse" && e.button !== 0)) return;
+      land();
+      var card = slides[i];
+      if (!card.contains(e.target)) return;
+      card.classList.remove("is-out", "is-in");
+      drag = { id: e.pointerId, card: card, x: e.clientX, y: e.clientY, sx: e.clientX, st: e.timeStamp, moved: false, rest: [] };
     });
-    track.addEventListener("pointerup", function (e) {
-      if (!start) return;
-      var dx = e.clientX - start.x, dy = e.clientY - start.y;
-      start = null;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+    track.addEventListener("pointermove", function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y, w = drag.card.offsetWidth || 1;
+      if (!drag.moved) {
+        if (Math.abs(dx) < 6) return;
+        drag.moved = true;
+        track.setPointerCapture(e.pointerId);
+        track.classList.add("is-dragging");
+        pause("drag", true);
+        drag.rest = under();
+        drag.card.style.transition = "none";
+        drag.rest.forEach(function (r) {
+          r[0].classList.remove("is-out", "is-in");
+          r[0].style.transition = "none";
+          r[0].style.visibility = "visible";
+        });
+      }
+      if (e.timeStamp - drag.st > 80) { drag.sx = e.clientX; drag.st = e.timeStamp; } // flick speed: last ~80ms
+      drag.card.style.transform = "translate(" + dx + "px, " + dy * 0.2 + "px) rotate(" + dx / w * 12 + "deg)";
+      var p = Math.min(1, Math.abs(dx) / (w * 0.5));
+      drag.rest.forEach(function (r) {
+        var a = POSE[r[1]], b = POSE[r[1] - 1], s = r[0];
+        s.style.transform = "translate(" + mix(a[0], b[0], p) * w + "px, " + mix(a[1], b[1], p) + "px) rotate(" + mix(a[2], b[2], p) + "deg) scale(" + mix(a[3], b[3], p) + ")";
+        s.style.opacity = String(mix(a[4], b[4], p));
+        if (r[1] === 1) s.style.setProperty("--reveal", String(p));
+      });
     });
-    track.addEventListener("pointercancel", function () { start = null; });
+    track.addEventListener("pointerup", function (e) { release(e, false); });
+    track.addEventListener("pointercancel", function (e) { release(e, true); });
     track.addEventListener("dragstart", function (e) { e.preventDefault(); });
 
     box.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") pause("hover", true); });

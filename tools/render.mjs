@@ -240,164 +240,192 @@ const PROGRAM_COVER = {
       </g>`,
   },
 };
-// Learn: each program drawn as a circuit board on its card's flat tone ground. Straight traces
-// with 90° corners only, vias and pads at every junction, and the AI step as real tool marks
-// (ChatGPT, Claude, NotebookLM) sitting on the pathway: input → branch → AI → merge → output.
-const K = { ink: "#1A1A1A", paper: "#FAF8F4", white: "#FFFFFF", pink: "#EFACBA", yellow: "#FBC522" };
-// pathLength="1" lets js/motion.js (5f) draw every trace in as its card arrives
-const TRACE = (d, c = K.ink, o = 1) => `<path class="ckt-trace" pathLength="1" d="${d}" fill="none" stroke="${c}"${o < 1 ? ` stroke-opacity="${o}"` : ""} stroke-width="2" stroke-linejoin="miter" stroke-linecap="square"/>`;
-const VIA = (x, y, c = K.ink, fill = K.paper) => `<circle cx="${x}" cy="${y}" r="4.5" fill="${fill}" stroke="${c}" stroke-width="2"/>`;
-const PAD = (x, y, c = K.ink) => `<circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`;
-// A tool mark on a white tile, 44 units square, in the tool's real colour
-const TILE = (name, x, y, size = 44) => {
-  const m = Math.round(size * 0.55);
-  return `<rect x="${x + 0.5}" y="${y + 0.5}" width="${size - 1}" height="${size - 1}" rx="9" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>${MARK(name, x + (size - m) / 2, y + (size - m) / 2, m, name === "claude" ? "#D97757" : "#000000")}`;
-};
-const PANEL = (x, y, w, h) => `<rect x="${x + 0.5}" y="${y + 0.5}" width="${w - 1}" height="${h - 1}" rx="8" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>`;
-const LINE = (d, c = K.ink, o = 0.24) => `<path d="${d}" stroke="${c}" stroke-opacity="${o}" stroke-width="3" stroke-linecap="round"/>`;
-const PROGRAM_CIRCUIT = {
-  // One task branched across three assistants, merged back into a workflow that runs Map → Design → Prototype
+
+// Home: the open-track programs as a scroll-driven split. On wide screens one mockup holds sticky on
+// the left while the programs pass on the right; js/main.js (§5b) marks the program in the middle
+// of the screen active and the mockup shows its view. Narrower, each program carries its own copy
+// of its view above its text. The mockups are aria-hidden: the tools and statuses are examples,
+// so they say nothing the text doesn't.
+// Each view is a node network: the output the program leads to (a small interface: a workflow doc,
+// a LinkedIn post, a landing page) in the middle, wired by straight hairlines to the tools and
+// statuses around it, one layout per program (a left-right split, a top-down cluster, a radial
+// spread). Coordinates are in a 480 × 440 map; 16 map units are 1em of the map's type, so the cards
+// scale with the map (style.css, "pnet"). A node's wire meets it at the side named by `from`.
+// `wire`: h runs level and steps at the trunk (`trunk`, or the midpoint), v runs down and steps at the midpoint, r leaves
+// the output level and turns once into the node. Every wire is straight runs and square corners.
+// `at` picks the output's side a wire leaves from; `in` reverses it, so its flow runs into the
+// output (an input trigger).
+const NET_W = 480, NET_H = 440;
+const PROGRAM_NET = {
   "ai-workforce-accelerator": {
-    tone: "pink",
-    svg: `<text x="28" y="84" class="art__mono" fill="${K.ink}">TASK</text>
-      ${PANEL(28, 96, 116, 88)}${LINE("M42 118 H124")}${LINE("M42 134 H110")}${LINE("M42 150 H118")}
-      <rect x="42" y="162" width="34" height="10" rx="2" fill="${K.pink}"/>
-      ${TRACE("M144 140 H214 M178 140 V62 H214 M178 140 V218 H214")}
-      ${TRACE("M258 62 H300 V218 H258 M258 140 H344")}
-      ${VIA(144, 140)}${PAD(178, 140)}${PAD(300, 140)}
-      <text x="214" y="28" class="art__mono" fill="${K.ink}">AI STEP</text>
-      ${TILE("chatgpt", 214, 40)}${TILE("claude", 214, 118)}${TILE("notebooklm", 214, 196)}
-      ${PANEL(344, 72, 188, 136)}
-      <text x="360" y="98" class="art__mono" fill="${K.ink}">WORKFLOW</text>
-      <path d="M344 110.5 H532" stroke="${K.ink}" stroke-opacity="0.12"/>
-      ${TRACE("M344 140 H368 M368 130 V186")}
-      <circle cx="368" cy="130" r="6" fill="${K.ink}"/><circle cx="368" cy="158" r="6" fill="${K.ink}"/>
-      <circle cx="368" cy="186" r="7" fill="${K.pink}" stroke="${K.ink}" stroke-width="2"/>
-      <g class="art__label"><text x="386" y="134.5">Map</text><text x="386" y="162.5">Design</text><text x="386" y="190.5">Prototype</text></g>`,
+    layout: "split", out: "steps", hub: [118, 220, 172, 140], trunk: 236, cursor: [318, 246], tip: "Claude",
+    nodes: [
+      { x: 350, y: 84, icon: "gmail", t: "Gmail", s: "12 requests in", from: "l", wire: "h" },
+      { x: 372, y: 220, w: 176, icon: "claude-color", t: "Claude", s: "Drafting steps", from: "l", wire: "h", on: true },
+      { x: 342, y: 356, h: 66, icon: "google-sheets", t: "Prototype", s: "2 of 3 stages", meter: 0.66, from: "l", wire: "h" },
+      { x: 118, y: 366, w: 152, h: 40, chip: "Readiness map", from: "t", wire: "v" },
+    ],
   },
-  // One post drafted with two assistants, routed through LinkedIn to the client it was written for
   "ai-linkedin-b2b-growth": {
-    tone: "white",
-    svg: `<text x="28" y="46" class="art__mono" fill="${K.ink}">POST</text>
-      ${PANEL(28, 58, 150, 164)}
-      <rect x="42" y="72" width="122" height="58" rx="5" fill="${K.pink}"/>
-      <rect x="42" y="146" width="96" height="9" rx="2" fill="${K.ink}"/><rect x="42" y="162" width="66" height="9" rx="2" fill="${K.ink}"/>
-      ${LINE("M42 194 H150", K.ink, 0.18)}
-      ${TRACE("M178 140 H210 M210 140 V86 H240 M210 140 V194 H240")}
-      ${TRACE("M284 86 H322 V194 H284 M322 140 H360")}
-      ${VIA(178, 140)}${PAD(210, 140)}${PAD(322, 140)}
-      <text x="240" y="52" class="art__mono" fill="${K.ink}">AI DRAFT</text>
-      ${TILE("chatgpt", 240, 64)}${TILE("claude", 240, 172)}
-      <rect x="360.5" y="118.5" width="43" height="43" rx="9" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>${LINKEDIN(369, 127, 26)}
-      ${TRACE("M404 140 H440")}
-      <clipPath id="ckt-avatar"><circle cx="480" cy="140" r="28"/></clipPath>
-      <circle cx="480" cy="140" r="39.5" fill="${K.white}" stroke="${K.ink}" stroke-opacity="0.16"/>
-      <g clip-path="url(#ckt-avatar)"><circle cx="480" cy="140" r="28" fill="${K.pink}"/><circle cx="480" cy="132" r="10" fill="${K.ink}"/><path d="M458 172 C460 154, 500 154, 502 172 Z" fill="${K.ink}"/></g>
-      <circle cx="509" cy="169" r="11" fill="${K.ink}"/><path d="M503.5 169.5 l4 4 l7 -7.5" fill="none" stroke="${K.pink}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="480" y="210" text-anchor="middle" class="art__mono" fill="${K.ink}">CLIENT</text>`,
+    layout: "cluster", out: "post", hub: [240, 88, 184, 140], cursor: [300, 278], tip: "LinkedIn",
+    nodes: [
+      { x: 82, y: 242, w: 150, icon: "chatgpt", t: "ChatGPT", s: "Hook ideas", from: "t", wire: "v" },
+      { x: 240, y: 256, w: 150, icon: "linkedin", t: "LinkedIn", s: "Queued", from: "t", wire: "v", on: true },
+      { x: 398, y: 242, w: 150, icon: "claude-color", t: "Claude", s: "In your voice", from: "t", wire: "v" },
+      { x: 240, y: 386, w: 176, h: 66, icon: "google-calendar", t: "Content plan", s: "Week 2 of 4", meter: 0.5, from: "t", wire: "v", parent: 1 },
+    ],
   },
-  // A landing page whose form routes through an assistant into a lead tracker, with a review switch on top
   "ai-websites-workflow-building": {
-    tone: "yellow",
-    svg: `<text x="28" y="38" class="art__mono" fill="${K.ink}">PAGE</text>
-      ${PANEL(28, 50, 196, 180)}
-      <path d="M28 70.5 H224" stroke="${K.ink}" stroke-opacity="0.12"/>
-      <circle cx="42" cy="60" r="3" fill="${K.ink}" fill-opacity="0.3"/><circle cx="52" cy="60" r="3" fill="${K.ink}" fill-opacity="0.18"/><circle cx="62" cy="60" r="3" fill="${K.ink}" fill-opacity="0.18"/>
-      <rect x="44" y="86" width="110" height="12" rx="2" fill="${K.ink}"/>${LINE("M44 114 H170")}${LINE("M44 126 H140")}
-      <rect x="44.5" y="142.5" width="120" height="20" rx="4" fill="none" stroke="${K.ink}" stroke-opacity="0.28"/>
-      <rect x="44" y="174" width="70" height="24" rx="5" fill="${K.ink}"/>${LINE("M56 186 H100", K.paper, 1)}
-      ${TRACE("M114 186 H246 V140 H334")}
-      ${VIA(114, 186, K.ink, K.yellow)}${PAD(246, 186)}
-      ${TILE("claude", 262, 118)}
-      ${TRACE("M464 100 V68")}${PAD(464, 100)}
-      <rect x="334" y="100" width="198" height="148" rx="8" fill="${K.ink}"/>
-      <text x="350" y="125" class="art__mono" fill="${K.paper}">LEADS</text>
-      <path d="M334 136.5 H532 M350 172.5 H516 M350 200.5 H516" stroke="${K.white}" stroke-opacity="0.12"/>
-      <g stroke="${K.paper}" stroke-width="3" stroke-linecap="round"><path d="M350 158 H420"/><path d="M350 186 H402" stroke-opacity="0.5"/><path d="M350 214 H428" stroke-opacity="0.5"/></g>
-      <rect x="468" y="151" width="46" height="14" rx="7" fill="${K.yellow}"/><rect x="468.5" y="179.5" width="45" height="13" rx="6.5" fill="none" stroke="${K.paper}" stroke-opacity="0.5"/><rect x="468" y="207" width="46" height="14" rx="7" fill="${K.yellow}"/>
-      ${PANEL(396, 24, 136, 44)}
-      <text x="410" y="50" class="art__mono" fill="${K.ink}">REVIEW</text>
-      <rect x="488" y="37" width="34" height="18" rx="9" fill="${K.ink}"/><circle cx="513" cy="46" r="6" fill="${K.yellow}"/>`,
+    layout: "radial", out: "page", hub: [240, 222, 156, 124], cursor: [296, 110], tip: "Claude Code",
+    nodes: [
+      { x: 108, y: 86, w: 168, icon: "google-sheets", t: "Lead tracker", s: "24 new rows", from: "b", wire: "r" },
+      { x: 366, y: 84, w: 184, icon: "claude-code", t: "Claude Code", s: "Building the page", from: "b", wire: "r", on: true },
+      { x: 366, y: 358, w: 164, h: 66, icon: "check", t: "Review", s: "3 of 5 checks", meter: 0.6, from: "t", wire: "r" },
+      { x: 108, y: 356, w: 168, icon: "gmail", t: "Gmail", s: "New lead alerts", from: "t", wire: "r" },
+    ],
   },
-  // A use-case brief into an assistant chip fed by three knowledge tools, stopping at a review checkpoint
+  // Learn only: Custom AI Systems & Automation. One trigger feeds the AI logic and rules card,
+  // which fans out to the systems it keeps in step
   "ai-agent-builder-bootcamp": {
-    tone: "ink",
-    svg: `<text x="28" y="58" class="art__mono" fill="${K.ink}">USE CASE</text>
-      ${PANEL(28, 70, 150, 140)}
-      <rect x="42" y="88" width="84" height="10" rx="2" fill="${K.ink}"/>${LINE("M42 114 H160", K.ink, 0.22)}${LINE("M42 128 H146", K.ink, 0.22)}${LINE("M42 142 H154", K.ink, 0.22)}
-      <rect x="42" y="164" width="64" height="20" rx="10" fill="${K.yellow}"/>${LINE("M54 174 H94", K.ink, 1)}
-      ${TRACE("M178 140 H226")}${VIA(178, 140, K.ink, K.yellow)}
-      ${TILE("notebooklm", 240, 20, 40)}${TILE("claude", 296, 20, 40)}${TILE("chatgpt", 352, 20, 40)}
-      ${TRACE("M260 60 V100 M316 60 V100 M372 60 V100")}
-      <text x="410" y="45" class="art__mono" fill="${K.ink}">SOURCES</text>
-      <rect x="226" y="100" width="180" height="114" rx="8" fill="${K.ink}"/>
-      ${PAD(260, 100, K.yellow)}${PAD(316, 100, K.yellow)}${PAD(372, 100, K.yellow)}
-      <circle cx="250" cy="124" r="9" fill="${K.yellow}"/><path d="M245 124 h10 M250 119 v10" stroke="${K.ink}" stroke-width="2" stroke-linecap="round"/>
-      <text x="266" y="128" class="art__mono" fill="${K.paper}">ASSISTANT</text>
-      <path d="M226 142.5 H406" stroke="${K.white}" stroke-opacity="0.12"/>
-      <rect x="242" y="154" width="96" height="20" rx="6" fill="${K.white}" fill-opacity="0.12"/>${LINE("M252 164 H324", K.paper, 0.6)}
-      <rect x="282" y="182" width="110" height="22" rx="6" fill="${K.paper}"/>${LINE("M292 193 H372", K.ink, 0.35)}
-      ${TRACE("M406 157 H470 V200")}${VIA(470, 157, K.ink, K.yellow)}
-      ${PANEL(414, 200, 118, 44)}
-      <text x="428" y="226" class="art__mono" fill="${K.ink}">REVIEW</text>
-      <rect x="488" y="213" width="34" height="18" rx="9" fill="${K.ink}"/><circle cx="513" cy="222" r="6" fill="${K.yellow}"/>`,
+    layout: "flow", out: "rules", hub: [186, 250, 196, 150], cursor: [312, 288], tip: "Runs automatically",
+    nodes: [
+      { x: 140, y: 64, w: 176, icon: "form", t: "Website form", s: "New enquiry", from: "b", at: "t", wire: "v", in: true },
+      { x: 392, y: 112, w: 164, icon: "google-sheets", t: "CRM sync", s: "Contact added", from: "l", wire: "h" },
+      { x: 392, y: 250, w: 164, icon: "gmail", t: "Auto-reply", s: "Sent in 2 min", from: "l", wire: "h", on: true },
+      { x: 392, y: 392, w: 164, h: 66, icon: "chart", t: "Analytics", s: "Weekly report", meter: 0.72, from: "l", wire: "h" },
+    ],
   },
 };
+// The output in the middle, drawn as a small window
+const NET_OUT = {
+  steps: { file: "workflow.doc", body: `<b class="pout__title">Workflow design</b>
+              <span class="pout__row is-done"><i></i>Map the task</span><span class="pout__row is-now"><i></i>Design the steps</span><span class="pout__row"><i></i>Prototype</span>` },
+  post: { file: "linkedin.com", body: `<span class="pout__author"><i></i><span><em></em><em></em></span></span>
+              <span class="pout__line"></span><span class="pout__line pout__line--short"></span><span class="pout__media"></span>` },
+  page: { file: "yourbusiness.ph", body: `<span class="pout__head"></span><span class="pout__line"></span><span class="pout__line pout__line--short"></span>
+              <span class="pout__form"><span class="pout__field"></span><span class="pout__btn">Get started</span></span>` },
+  rules: { file: "automation.ai", body: `<b class="pout__title">AI logic &amp; rules</b>
+              <span class="pout__row is-done"><i></i>If a new enquiry arrives</span><span class="pout__row is-now"><i></i>Classify and score it</span><span class="pout__row"><i></i>Sync, reply, report</span>` },
+};
+const LINKEDIN_IMG = `<svg viewBox="0 0 24 24" focusable="false"><rect width="24" height="24" rx="4.5" fill="#0A66C2"/><path transform="translate(3.6 3.6) scale(0.7)" fill="#FFFFFF" d="M7 9H4v11h3V9Zm-1.5-5.2a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5ZM10 9h2.9v1.5c.5-.9 1.6-1.7 3.1-1.7 2.8 0 4 1.8 4 5V20h-3v-5.6c0-1.6-.5-2.7-1.9-2.7-1.5 0-2.1 1.1-2.1 2.7V20h-3V9Z"/></svg>`;
+const CHECK_IMG = `<svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="#EFACBA"/><path d="M7.5 12.4l3 2.9 6-6.3" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const FORM_IMG = `<svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="#EFACBA"/><path d="M7.5 8.8h9M7.5 12h6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round"/><rect x="7.5" y="14.6" width="5.5" height="2.8" rx="1.4" fill="#1A1A1A"/></svg>`;
+const CHART_IMG = `<svg viewBox="0 0 24 24" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="#FBC522"/><path d="M8 16.5v-3M12 16.5v-8M16 16.5v-5.5" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/></svg>`;
+const NET_IMG = { linkedin: LINKEDIN_IMG, check: CHECK_IMG, form: FORM_IMG, chart: CHART_IMG };
+const netIcon = (icon) => NET_IMG[icon]
+  || `<img src="/assets/icons/tools/${icon}.svg" alt="" width="24" height="24" loading="lazy">`;
+// Where a wire meets a node, and the wire itself from (sx, sy) to that point
+const netSize = (n) => [n.w || 156, n.h || 56];
+function netAnchor(n) {
+  const [w, h] = netSize(n);
+  return { l: [n.x - w / 2, n.y], r: [n.x + w / 2, n.y], t: [n.x, n.y - h / 2], b: [n.x, n.y + h / 2] }[n.from];
+}
+function netWire([sx, sy], [ax, ay], wire, trunk) {
+  if (sx === ax || sy === ay) return `M${sx} ${sy} L${ax} ${ay}`;
+  if (wire === "h") { const mx = trunk || (sx + ax) / 2; return `M${sx} ${sy} H${mx} V${ay} H${ax}`; }
+  if (wire === "v") { const my = (sy + ay) / 2; return `M${sx} ${sy} V${my} H${ax} V${ay}`; }
+  return `M${sx} ${sy} H${ax} V${ay}`;
+}
+function programMock(p, i) {
+  const m = PROGRAM_NET[p.slug] || PROGRAM_NET["ai-workforce-accelerator"];
+  const [hx, hy, hw, hh] = m.hub;
+  const out = NET_OUT[m.out];
+  const wires = m.nodes.map((n, k) => {
+    // From the output's edge on the wire's way out (or from a parent node's far side)
+    const parent = n.parent != null ? m.nodes[n.parent] : null;
+    const start = parent ? [parent.x, parent.y + netSize(parent)[1] / 2]
+      : n.at ? { l: [hx - hw / 2, hy], r: [hx + hw / 2, hy], t: [hx, hy - hh / 2], b: [hx, hy + hh / 2] }[n.at]
+      : n.wire === "h" ? [hx + hw / 2, hy] : n.wire === "v" ? [hx, hy + hh / 2] : [hx + Math.sign(n.x - hx) * hw / 2, hy];
+    const a = netAnchor(n);
+    const d = n.in ? netWire(a, start, n.wire, m.trunk) : netWire(start, a, n.wire, m.trunk);
+    return `<path class="pnet__wire" d="${d}" pathLength="1" style="--k:${k}"/>${n.on ? `<path class="pnet__flow" d="${d}" pathLength="1"/>` : ""}<circle class="pnet__pin" cx="${a[0]}" cy="${a[1]}" r="3.5" style="--k:${k}"/>`;
+  }).join("");
+  const nodes = m.nodes.map((n, k) => {
+    const [w, h] = netSize(n);
+    const pos = `--x:${n.x}; --y:${n.y}; --w:${w}; --h:${h}; --k:${k}`;
+    if (n.chip) return `<span class="pnet__node pnet__node--chip" style="${pos}"><span class="pnet__tick"></span>${esc(n.chip)}</span>`;
+    return `<span class="pnet__node${n.on ? " is-on" : ""}" style="${pos}"><span class="pnet__icon">${netIcon(n.icon)}</span><span class="pnet__txt"><b>${esc(n.t)}</b><small>${esc(n.s)}</small>${n.meter ? `<span class="pnet__meter" style="--p:${n.meter}"></span>` : ""}</span>${n.on ? `<span class="pnet__live"></span>` : ""}</span>`;
+  }).join("");
+  return `<div class="pmock__view pnet pnet--${m.layout}" data-pmock="${i}">
+          <div class="pnet__map">
+            <svg class="pnet__wires" viewBox="0 0 ${NET_W} ${NET_H}" focusable="false">${wires}</svg>
+            <span class="pnet__out pout pout--${m.out}" style="--x:${hx}; --y:${hy}; --w:${hw}; --h:${hh}">
+              <span class="pout__bar"><i></i><i></i><i></i><em>${out.file}</em></span>
+              <span class="pout__body">${out.body}</span>
+            </span>
+            ${nodes}
+            <span class="pnet__cursor" style="--x:${m.cursor[0]}; --y:${m.cursor[1]}"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 3l14 8-6.2 1.6L9.6 19z" fill="#1A1A1A" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="pnet__tip">${esc(m.tip)}</span></span>
+          </div>
+        </div>`;
+}
 
 export function programRowsHome() {
   const picks = D.programs.filter((p) => PROGRAM_COVER[p.slug] && PROGRAM_COVER[p.slug].home !== false)
     .sort((a, b) => !!PROGRAM_COVER[b.slug].feature - !!PROGRAM_COVER[a.slug].feature);
   if (!picks.length) return noPrograms();
-  return `<ol class="pstack">${picks.map((p, i) => {
-    const { tone, feature, view, line, svg } = PROGRAM_COVER[p.slug];
+  const num = (i) => String(i + 1).padStart(2, "0");
+  return `<div class="pscene" data-pscene style="--n:${picks.length}">
+      <div class="pscene__stage" aria-hidden="true">
+        <div class="pmock" data-pscene-stage data-at="0">
+          ${picks.map((_, i) => `<span class="pmock__bg" data-bg="${i}"></span>`).join("")}
+          ${picks.map((p, i) => programMock(p, i)).join("")}
+          <div class="pmock__dots">${picks.map((_, i) => `<span style="--i:${i}"></span>`).join("")}</div>
+        </div>
+      </div>
+      <ol class="pscene__steps">${picks.map((p, i) => {
+    const { tone, feature, line } = PROGRAM_COVER[p.slug];
     const cta = ctaFor(p);
     const external = /^https?:/i.test(p.rec.cta_url || "");
     const ctaUrl = external ? p.rec.cta_url : `/programs/${p.slug}/#register`;
+    const outs = (p.outputs || []).slice(0, 3);
     return `
-      <li class="prog prog--${tone}${feature ? " prog--feature" : ""}" style="--i:${i}" data-reveal>
-        <article class="prog__card" aria-labelledby="prog-${p.slug}">
-          <div class="prog__art">
-            <svg viewBox="${view}" aria-hidden="true" focusable="false">${svg}</svg>
-          </div>
-          <div class="prog__body">
-            <h3 class="prog__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
-            <p class="prog__summary">${esc(line || p.summary)}</p>
+        <li class="pstep pstep--${tone}${i === 0 ? " is-active" : ""}" data-pstep="${i}">
+          <div class="pstep__visual" aria-hidden="true"><div class="pmock pmock--inline" data-at="${i}">${programMock(p, i)}</div></div>
+          <article class="pstep__body" aria-labelledby="prog-${p.slug}">
+            <p class="pstep__cat"><span class="pstep__num" aria-hidden="true">${num(i)}</span>${esc(p.category)}</p>
+            <h3 class="pstep__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
+            <p class="pstep__summary">${esc(line || p.summary)}</p>
+            ${outs.length ? `<p class="pstep__label">You leave with</p>
+            <ul class="pstep__outs">${outs.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>` : ""}
             ${feature && p.statusLabel && p.statusLabel !== cta ? `<p class="prog__notice">${esc(p.statusLabel)}</p>` : ""}
-            <div class="prog__actions">
-              <a class="btn prog__btn" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <div class="pstep__actions">
+              <a class="btn" href="/programs/${p.slug}/" data-track="program_click">See the program <span class="btn__arrow" aria-hidden="true">↗</span></a>
               <a class="text-link" href="${esc(ctaUrl)}"${external ? ' target="_blank" rel="noopener"' : ""} data-track="program_click">${esc(cta)} <span class="link-arrow" aria-hidden="true">↗</span>${external ? '<span class="sr-only"> (opens in a new tab)</span>' : ""}</a>
             </div>
-          </div>
-        </article>
-      </li>`;
+          </article>
+        </li>`;
   }).join("")}
-    </ol>`;
+      </ol>
+    </div>`;
 }
 
-// Learn: every program as a card (.prog, with the PROGRAM_CIRCUIT art). A card carries only what
-// helps someone choose: category, title, one line, the first thing you leave with, who it is for,
-// the format, the way in and the status; requirements and fees stay on each program page.
-// The cards follow one another down the page. On wide, tall screens each one holds below the
-// header while the next scrolls up over it (style.css, "Programs"); js/motion.js (5f) adds the
-// depth as one card settles behind the next, and the circuit drawing in.
+// Learn: every program, with the home Programs split (programRowsHome) mirrored: the programs
+// pass on the left, on the page ground, while one mockup holds sticky on the right and shows the
+// view of the program in the middle of the screen (js/main.js §5b). Narrower, each program carries
+// its own copy of its view above its text. A program carries only what helps someone choose:
+// category, title, one line, the first thing you leave with, who it is for, the format and
+// the way in; status, requirements and fees stay on each program page.
 export function programGrid() {
   if (!D.programs.length) return noPrograms();
-  const num = (i) => String(i + 1).padStart(2, "0");
-  return `<div class="pscroll" data-pscroll style="--n: ${D.programs.length}">
-      <ol class="pstack pgrid">${D.programs.map((p, i) => {
+  return `<div class="pscene pscene--learn" data-pscene style="--n:${D.programs.length}">
+      <div class="pscene__stage" aria-hidden="true">
+        <div class="pmock" data-pscene-stage data-at="0">
+          ${D.programs.map((_, i) => `<span class="pmock__bg" data-bg="${i}"></span>`).join("")}
+          ${D.programs.map((p, i) => programMock(p, i)).join("")}
+          <div class="pmock__dots">${D.programs.map((_, i) => `<span style="--i:${i}"></span>`).join("")}</div>
+        </div>
+      </div>
+      <ol class="pscene__steps pgrid">${D.programs.map((p, i) => {
     const cover = PROGRAM_COVER[p.slug];
-    const art = PROGRAM_CIRCUIT[p.slug];
     const audience = (p.audience && p.audience.length) ? p.audience.slice(0, 2) : [];
     const outcome = (p.outputs && p.outputs.length) ? p.outputs[0] : "";
     return `
-        <li class="prog prog--${art ? art.tone : "white"}" id="${p.slug}" style="--i:${i}" data-reveal data-pscroll-item>
-          <article class="prog__card" aria-labelledby="prog-${p.slug}">
-            <div class="prog__art">${art ? `
-              <svg viewBox="0 0 560 280" aria-hidden="true" focusable="false">${art.svg}</svg>` : ""}
-            </div>
-            <div class="prog__body">
+        <li class="pstep${i === 0 ? " is-active" : ""}" id="${p.slug}" data-pstep="${i}">
+          <div class="pstep__visual" aria-hidden="true"><div class="pmock pmock--inline" data-at="${i}">${programMock(p, i)}</div></div>
+          <article class="prog prog--${cover ? cover.tone : "white"}" aria-labelledby="prog-${p.slug}">
+            <div class="prog__body pstep__body">
               <div class="prog__intro">
-                <p class="prog__cat"><span class="prog__num" aria-hidden="true">${num(i)}</span>${esc(p.category)}</p>
+                <p class="prog__cat">${esc(p.category)}</p>
                 <h3 class="prog__title" id="prog-${p.slug}"><a href="/programs/${p.slug}/" data-track="program_click">${esc(p.title)}</a></h3>
                 <p class="prog__summary">${esc(cover?.line || p.summary)}</p>
               </div>
@@ -408,7 +436,6 @@ export function programGrid() {
               </dl>` : ""}
               <div class="prog__actions">
                 <a class="btn prog__btn" href="/programs/${p.slug}/" data-track="program_click">View program <span class="btn__arrow" aria-hidden="true">↗</span><span class="sr-only">: ${esc(p.title)}</span></a>
-                ${p.statusLabel ? badge(p.statusKey, p.statusLabel) : ""}
               </div>
             </div>
           </article>
@@ -781,9 +808,9 @@ export function storyCard(s, tone = QUOTE_TONES[0]) {
 
 // Home: every published testimonial as a stack of cards (js/main.js §12). The active card lies on
 // top; the next two sit tucked behind it, turned slightly, their edges showing below. It moves on
-// by itself at a relaxed pace, and the previous and next buttons (or a swipe, or the arrow keys)
-// flip through it: the top card swings out to the side and slips to the back. Without JS the cards
-// stay a native scroll-snap row and the buttons are hidden. The speaker is named exactly as given,
+// by itself at a relaxed pace, and a swipe or the arrow keys flip through it: the top card swings
+// out to the side and slips to the back. No prev/next buttons. Without JS the cards stay a native
+// scroll-snap row. The speaker is named exactly as given,
 // with the role from the CMS below; without one, "Faith Works participant" is all that is claimed
 // about them (they wrote it after a session). No photos here: the quote is the picture.
 // Cards take Faith Pink, AI Yellow and Works White in turn (see toneAt above).
@@ -797,15 +824,9 @@ export function voices() {
             <blockquote><p>${esc(s.quote)}</p></blockquote>
             <figcaption><b class="voice__name">${esc(s.name)}</b><span class="voice__role">${esc(s.role || "Faith Works participant")}</span></figcaption>
           </figure>`).join("");
-  const nav = n < 2 ? "" : `
-      <div class="voices__nav">
-        <button type="button" class="voices__btn" data-carousel-prev aria-controls="voices-track" aria-label="Previous testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW.prev}"/></svg></button>
-        <p class="voices__count" aria-live="polite" aria-atomic="true" data-carousel-count>1 / ${n}</p>
-        <button type="button" class="voices__btn" data-carousel-next aria-controls="voices-track" aria-label="Next testimonial"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${ARROW.next}"/></svg></button>
-      </div>`;
   return `<div class="voices${n < 2 ? " voices--single" : ""}" data-carousel role="region" aria-roledescription="carousel" aria-label="What participants said">
       <div class="voices__track" id="voices-track" tabindex="0" role="group" aria-label="Testimonials. Use the left and right arrow keys to move.">${slides}
-      </div>${nav}
+      </div>
     </div>`;
 }
 
