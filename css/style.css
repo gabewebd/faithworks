@@ -473,25 +473,38 @@ body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 
 .strip__list { display: contents; list-style: none; }
 
 /* 6. Home: pathways -------------------------------------------------------- */
-.routes { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto minmax(clamp(150px, 14vw, 200px), 1fr) auto auto auto; gap: 0 16px; }
-/* Each card spans five shared rows (label, icon, title, text, CTA) so they line up across all three */
-.route { display: grid; grid-row: span 5; grid-template-rows: subgrid; }
+.routes { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+/* Each card is its own column (label, icon, title, text, CTA) at one fixed height, so the text opening on
+   hover takes room from around the icon and never changes the card or the page height */
+.route { display: flex; }
 .route--stone { --route-bg: var(--white); --route-edge: inset 0 0 0 1px var(--line);--icon-bg: linear-gradient(160deg, var(--pink-tint), rgb(247 229 230 / 0.55)); }
 .route--pink { --route-bg: var(--pink); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
 .route--yellow { --route-bg: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
-.route__link { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-row: span 5; grid-template-rows: subgrid; width: 100%; padding: 26px 28px 22px; border-radius: var(--r-lg); background: var(--route-bg); box-shadow: var(--route-edge, none); transition: transform var(--dur) var(--ease-out); }
+.route__link { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; width: 100%; min-height: clamp(440px, 33vw, 480px); padding: 28px 28px 32px; border-radius: var(--r-lg); background: var(--route-bg); box-shadow: var(--route-edge, none); transition: transform var(--dur) var(--ease-out); }
 .route__link:hover { transform: translateY(-4px); }
-.route__num { font-size: 14px; font-weight: 600; color: var(--muted); }
-.route__icon { align-self: center; justify-self: center; display: grid; place-items: center; width: 88px; height: 88px; margin: 28px 0; border-radius: 24px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); transition: transform var(--dur) var(--ease-spring); }
+.route__num { position: absolute; top: 28px; right: 28px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.route__icon { flex: none; align-self: flex-start; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 22px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); transition: transform var(--dur) var(--ease-spring); }
 .route__link:hover .route__icon { transform: scale(1.05); }
-.route__icon svg { width: 48px; height: 48px; overflow: visible; }
+.route__icon svg { width: 46px; height: 46px; overflow: visible; }
 .route__line, .route__ring { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .route__node, .route__head, .route__needle { fill: var(--white); stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
 .route__node--lead, .route__head--lead { fill: var(--ink); }
 .route__needle--lead { fill: var(--pink); }
-.route__title { align-self: start; margin-bottom: 10px; font-size: clamp(26px, 2.3vw, 34px); line-height: 1.1; letter-spacing: -0.045em; }
-.route__desc { align-self: start; max-width: 34ch; padding-bottom: 24px; color: var(--muted); line-height: 1.55; }
-.route__cta { align-self: end; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid rgb(26 26 26 / 0.14); font-size: 14px; font-weight: 600; }
+.route__title { margin: auto 0 0; padding-top: 32px; font-size: clamp(26px, 2.3vw, 34px); font-weight: 600; line-height: 1.05; letter-spacing: -0.045em; }
+/* Laid out like the step cards (.journey-strip, .pp-gain): icon top left, label top right, title at the foot.
+   The body and the button reveal on hover or keyboard focus; the card keeps its height. Touch and
+   narrow screens always show them. */
+.route__desc { display: grid; grid-template-rows: 0fr; max-width: 34ch; color: var(--muted); line-height: 1.55; opacity: 0; transform: translateY(6px); transition: grid-template-rows 360ms var(--ease-out), opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+.route__desc > span { overflow: hidden; }
+.route__desc > span::before { content: ""; display: block; height: 10px; }
+.route__link:hover .route__desc, .route__link:focus-visible .route__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
+.route__cta { flex: none; display: flex; max-height: 0; margin-top: 0; overflow: hidden; justify-content: space-between; align-items: center; gap: 12px; padding-top: 0; border-top: 1px solid transparent; font-size: 14px; font-weight: 600; opacity: 0; transform: translateY(6px); transition: max-height 360ms var(--ease-out), margin-top 360ms var(--ease-out), padding-top 360ms var(--ease-out), border-color 360ms var(--ease-out), opacity 360ms var(--ease-out), transform 360ms var(--ease-out); }
+.route__link:hover .route__cta, .route__link:focus-visible .route__cta { max-height: 64px; margin-top: 20px; padding-top: 14px; border-top-color: rgb(26 26 26 / 0.14); opacity: 1; transform: none; }
+@media (hover: none) {
+  .route__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
+  .route__cta { max-height: none; margin-top: 20px; padding-top: 14px; border-top-color: rgb(26 26 26 / 0.14); opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .route__desc, .route__cta { transition: none; } }
 .route__arrow { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1.5px solid var(--ink); border-radius: 50%; }
 
 /* 7. Home: make it concrete ------------------------------------------------ */
@@ -1914,9 +1927,13 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .routes, .scopes, .formats, .cm-grid, .how { grid-template-columns: minmax(0, 1fr); }
   .routes { grid-template-rows: none; gap: 12px; }
   .route, .route__link { grid-row: auto; grid-template-rows: none; }
-  .route__link { padding: 24px 22px 20px; }
-  .route__icon { width: 76px; height: 76px; margin: 24px 0 26px; border-radius: 20px; }
-  .route__icon svg { width: 42px; height: 42px; }
+  .route__link { padding: 24px 22px 26px; }
+  .route__num { top: 24px; right: 22px; }
+  .route__link { min-height: 0; }
+  .route__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
+  .route__cta { max-height: none; margin-top: 20px; padding-top: 14px; border-top-color: rgb(26 26 26 / 0.14); opacity: 1; transform: none; }
+  .route__icon { width: 72px; height: 72px; border-radius: 20px; }
+  .route__icon svg { width: 40px; height: 40px; }
   .section-head { display: block; }
   .section-head > p { max-width: var(--measure); margin-top: 16px; padding-bottom: 0; }
   .journey, .resource, .faq { grid-template-columns: minmax(0, 1fr); }
@@ -2742,7 +2759,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 
 /* Programs section: header, the five stages as one circuit trace, and the card grid it branches into.
    --drop is the gap between the strip and the cards, where the trace splits to each column. */
-.lprograms { --drop: clamp(48px, 5vw, 72px); --node: 64px; --strip-pad: clamp(18px, 1.8vw, 28px); --rail-x: calc(var(--strip-pad) + var(--node) / 2); padding-top: var(--section); padding-bottom: clamp(48px, 5vw, 80px); }
+.lprograms { --drop: clamp(48px, 5vw, 72px); --node: 76px; --strip-pad: clamp(18px, 1.8vw, 28px); --rail-x: calc(var(--strip-pad) + var(--node) / 2); padding-top: var(--section); padding-bottom: clamp(48px, 5vw, 80px); }
 .lprograms__head { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 14px; align-items: end; margin-bottom: clamp(28px, 3.2vw, 44px); }
 .lprograms__head h2 { grid-column: 1 / span 6; margin: 0; font-size: var(--fs-h2); line-height: 0.95; letter-spacing: -0.05em; }
 .lprograms__head p { grid-column: 7 / -1; max-width: 44ch; margin: 0; padding-bottom: 0.3em; font-size: var(--fs-lead); color: var(--muted); }
@@ -2751,15 +2768,15 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
    and AI Yellow in turn. Each leads with a line icon (.route__* strokes) on a glass tile, its number on
    the right; the body opens on hover or focus. --rail-x sits on the first icon's centre so the trace
    below drops from it. */
-.journey-strip { --node: 64px; --strip-pad: clamp(18px, 1.8vw, 28px); position: relative; }
+.journey-strip { --node: 76px; --strip-pad: clamp(18px, 1.8vw, 28px); position: relative; }
 .lprograms .journey-strip { margin-bottom: var(--drop); }
 .journey-strip__head { margin: 0 0 clamp(18px, 2vw, 24px); font-family: var(--font); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .journey-strip__steps { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 16px); margin: 0; padding: 0; }
 .journey-strip__step { --muted: var(--ink); position: relative; display: flex; flex-direction: column; min-height: clamp(260px, 22vw, 330px); padding: var(--strip-pad); border-radius: var(--r-lg); background: var(--pink); color: var(--ink); outline: none; --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3)); }
 .journey-strip__step:nth-child(even) { background: var(--yellow); --icon-bg: linear-gradient(160deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.32)); }
 .journey-strip__step:focus-visible { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
-.journey-strip__icon { display: grid; place-items: center; width: var(--node); height: var(--node); border-radius: 18px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); }
-.journey-strip__icon svg { width: 36px; height: 36px; overflow: visible; }
+.journey-strip__icon { display: grid; place-items: center; width: var(--node); height: var(--node); border-radius: 20px; background: var(--icon-bg); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(26 26 26 / 0.06), 0 8px 18px -12px rgb(26 26 26 / 0.35); }
+.journey-strip__icon svg { width: 42px; height: 42px; overflow: visible; }
 .journey-strip__tick { fill: none; stroke: var(--white); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .journey-strip__num { position: absolute; top: var(--strip-pad); right: var(--strip-pad); font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; }
 .journey-strip__title { display: block; margin-top: auto; padding-top: 32px; font-family: var(--font-display); font-size: clamp(24px, 2.1vw, 34px); font-weight: 600; line-height: 1.05; letter-spacing: -0.045em; }

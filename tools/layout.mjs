@@ -16,7 +16,7 @@ const NAV = [
   ["about", "/about/", "About"],
 ];
 
-const VERSION = "36";
+const VERSION = "38";
 
 // Site settings come from the CMS (tools/content.mjs). Each has a default equal to the
 // approved copy, so an unset value never blanks the header or footer.
