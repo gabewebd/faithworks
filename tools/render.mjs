@@ -13,7 +13,7 @@ export { img, preview };
 export { gallery } from "./gallery.mjs";
 export { trustedBy } from "./trusted-by.mjs";
 import { eventGallery as eventGalleryOf } from "./event-gallery.mjs";
-import { imgTag } from "./gallery.mjs";
+import { imgTag, gallerySlot } from "./gallery.mjs";
 
 let D;
 export function init(data) { D = data; }
@@ -461,13 +461,179 @@ export function programLinks() {
     </ul>`;
 }
 
+// Program pages: the hero's right side shows the program's node network from the Programs split
+// (same view and ground as on Home and Learn) on a Works White hero; the facts move to a details
+// panel under the hero (programInfo).
+export function programHeroArt(p, html) {
+  const i = D.programs.indexOf(p);
+  const art = `<div class="pmock pmock--inline phero__art" data-at="${i}" data-reveal aria-hidden="true">${programMock(p, i)}</div>`;
+  return html.replace(/(<section class="phero[^"]*phero--program[\s\S]*?)(<aside class="facts"[\s\S]*?<\/aside>)([\s\S]*?<\/section>)/,
+    (_, head, facts, tail) => `${head.replace(/phero--\w+ phero--program/, "phero--paper phero--program")}${art}${tail}\n${programInfo(facts)}`);
+}
+
+// Line icons in the journey strip's set (as on Learn's .promise__icon), on a 48 grid
+const INFO_ICON = {
+  "Next intake": `<rect class="route__node" x="6" y="9" width="36" height="32" rx="3.5"/><path class="route__line" d="M6 18h36M15 5v8M33 5v8"/><rect class="route__node route__node--lead" x="13" y="25" width="8" height="8" rx="1.5"/>`,
+  Format: `<path class="route__node" d="M24 22 5 31.5 24 41l19-9.5Z"/><path class="route__node route__node--lead" d="M24 7 5 16.5 24 26l19-9.5Z"/>`,
+  "Time commitment": `<circle class="route__node" cx="24" cy="24" r="18"/><path class="route__line" d="M24 13v11l7 5"/><circle class="route__head route__head--lead" cx="24" cy="24" r="2.5"/>`,
+  Location: `<path class="route__node" d="M24 44s14-12 14-23a14 14 0 0 0-28 0c0 11 14 23 14 23Z"/><circle class="route__head route__head--lead" cx="24" cy="21" r="5"/>`,
+  Fee: `<path class="route__node" d="M7 7h15l20 20-15 15L7 22Z"/><circle class="route__head route__head--lead" cx="15" cy="15" r="3"/>`,
+};
+// The program facts as one card under the hero: a grid of label/value pairs with filled icon
+// tiles (as on the Home flow cards), and the instructor with Faith's portrait when she teaches. The
+// status badge is left out here: the hero button and the form section below already carry it. The dd elements are kept as the page document wrote them, so bound values and
+// "To be confirmed" text carry over.
+function programInfo(facts) {
+  const rows = new Map([...facts.matchAll(/<div><dt>([\s\S]*?)<\/dt>(<dd[\s\S]*?<\/dd>)<\/div>/g)].map((m) => [textOf(m[1]).trim(), m[2]]));
+  const icon = (paths) => `<span class="pinfo__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">${paths}</svg></span>`;
+  const item = (k, mark = INFO_ICON[k] ? icon(INFO_ICON[k]) : "") => `<div class="pinfo__${k === "Instructor" && mark.includes("pinfo__photo") ? "teacher" : k.split(" ")[0].toLowerCase()}"><dt>${mark}${esc(k)}</dt>${rows.get(k)}</div>`;
+  const teacher = rows.get("Instructor");
+  const face = teacher && /Faith Natividad/.test(textOf(teacher))
+    ? `<span class="pinfo__photo">${imgTag("founder-studio", { sizes: "128px", alt: "" })}</span>`
+    : icon(`<path class="route__node" d="M9 41c0-8.3 6.7-14 15-14s15 5.7 15 14Z"/><circle class="route__head route__head--lead" cx="24" cy="14" r="7"/>`);
+  const order = ["Next intake", "Format", "Time commitment", "Location", "Fee", ...[...rows.keys()].filter((k) => !["Status", "Instructor", ...Object.keys(INFO_ICON)].includes(k))];
+  return `<section class="wrap pinfo" aria-label="Program details">
+  <dl class="pinfo__grid">
+    ${order.filter((k) => rows.has(k)).map((k) => item(k)).join("")}${teacher ? item("Instructor", face) : ""}
+  </dl>
+</section>`;
+}
+
+// "Who it's for" as an editorial three-column band (css/style.css .pfor): a workshop photo either
+// side of the heading, lead and the audience as Faith Pink / AI Yellow badges. Each program gets
+// its own pair of landscape photos so neighbouring program pages don't repeat the same room.
+const AUD_PHOTOS = {
+  "ai-workforce-accelerator": ["room-chart", "bgc-laptops"],
+  "ai-linkedin-b2b-growth": ["roundtable", "talk-big-screen"],
+  "ai-websites-workflow-building": ["talk-laptops", "bgc-room"],
+  "ai-agent-builder-bootcamp": ["open-qa", "room-wide"],
+};
+function programAudience(p, html) {
+  return html.replace(/<section class="section wrap split" aria-labelledby="for-title">\s*<div>\s*<h2[^>]*>([\s\S]*?)<\/h2>\s*<p class="split__lead">([\s\S]*?)<\/p>\s*<\/div>\s*<div><ul class="ticks"([^>]*)>([\s\S]*?)<\/ul><\/div>\s*<\/section>/,
+    (all, h2, lead, attrs, items) => {
+      const titles = [...items.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
+      if (!titles.length) return all;
+      const [a, b] = AUD_PHOTOS[p.slug] || ["room-hotel", "bgc-room"];
+      // sizes overstates the desktop slot so high-DPI screens get the full 1920px file, not a soft 1280
+      const photo = (id, side) => `<figure class="pfor__photo pfor__photo--${side}" data-reveal>${imgTag(id, { sizes: "(min-width: 1024px) 1280px, (min-width: 640px) 50vw, 100vw" })}</figure>`;
+      return `<section class="section pfor" aria-labelledby="for-title">
+  <div class="wrap pfor__grid">
+    <div class="pfor__media">
+      ${photo(a, "a")}
+      ${photo(b, "b")}
+    </div>
+    <div class="pfor__copy" data-reveal>
+      <h2 id="for-title">${h2}</h2>
+      <p class="pfor__lead">${lead}</p>
+      <ul class="pfor__checks"${attrs}>${titles.map((t) => `<li>${t}</li>`).join("")}</ul>
+    </div>
+  </div>
+</section>`;
+    });
+}
+
+// "What you'll learn" and "What you leave with" as a two-step scroll story, the Build with AI use
+// cases' pattern (css/build.css §2 and §6, js/motion.js §5d): the learning steps, then the outputs,
+// pass on the left while the output frame on the right shows the learning path, then the example
+// output (the program's own preview, restyled). Only programs listed here; the rest keep the plain
+// band. Each path row is drawn from the program's own "How it runs" step: its title, then chips,
+// tick chips or a draft sketch, an optional AI or person mark, and `now` for the step where AI
+// does the drafting.
+const LEARN_PATH = {
+  "ai-websites-workflow-building": {
+    alt: "Pick a small, useful project that is safe to test; build the first version with AI; check accuracy, privacy and accessibility before you share.",
+    rows: [
+      { chips: ["Small", "Useful", "Safe to test"] },
+      { mini: true, mark: "ai", now: true },
+      { ticks: ["Accuracy", "Privacy", "Accessibility"], mark: "person" },
+    ],
+  },
+  "ai-workforce-accelerator": {
+    alt: "See what AI can and cannot do in your role; compare tasks by frequency, effort, risk and ease of review; design the workflow with AI steps and human checks; build and test a first prototype.",
+    rows: [
+      { chips: ["AI can", "AI can’t", "Your judgment"] },
+      { chips: ["Frequency", "Effort", "Risk", "Review"] },
+      { chips: ["Inputs", "AI steps", "Human checks", "Output"], mark: "ai", now: true },
+      { ticks: ["First version", "Low-risk test", "What to improve"], mark: "person" },
+    ],
+  },
+  "ai-linkedin-b2b-growth": {
+    alt: "Clarify who you serve, the problem you solve and your proof; plan content drafted with AI and edited by you; follow up in a way you review before anything is sent.",
+    rows: [
+      { chips: ["Who you serve", "The problem", "Your proof"] },
+      { mini: true, mark: "ai", now: true },
+      { ticks: ["Reviewed first", "Your voice", "Human-led"], mark: "person" },
+    ],
+  },
+  "ai-agent-builder-bootcamp": {
+    alt: "Define one assistant use case with clear inputs and limits; build the first version with AI; test it with review points and a path to a person.",
+    rows: [
+      { chips: ["Clear inputs", "Limits"] },
+      { mini: true, mark: "ai", now: true },
+      { ticks: ["Review points", "Hand-off to a person"], mark: "person" },
+    ],
+  },
+};
+const pathRow = (r, i, label) => {
+  const chips = (list, cls = "") => `<span class="bw-path__chips${cls}">${list.map((c) => `<span>${c}</span>`).join("")}</span>`;
+  const art = r.mini ? `<span class="bw-path__mini"><i></i><span class="bw-lines"><i></i><i></i></span></span>` : r.ticks ? chips(r.ticks, " bw-path__chips--ticks") : chips(r.chips || []);
+  const mark = r.mark === "ai" ? `<span class="bw-mark bw-mark--ai">AI</span>` : r.mark === "person" ? `<span class="bw-mark bw-mark--person"></span>` : "";
+  return `<div class="bw-path__row${r.now ? " is-now" : ""}"><span class="bw-path__num">${String(i + 1).padStart(2, "0")}</span><span class="bw-path__body"><b>${label}</b>${art}</span>${mark}</div>`;
+};
+function programOutcomes(p, html) {
+  const path = LEARN_PATH[p.slug];
+  if (!path) return html;
+  return html.replace(/<section class="section band band--stone" aria-labelledby="outcomes-title">\s*<div class="wrap outcomes">\s*<div>\s*<h2 id="outcomes-title">([\s\S]*?)<\/h2>\s*<ol class="numbered"([^>]*)>([\s\S]*?)<\/ol>\s*<\/div>\s*<div class="outcomes__leave">\s*<h3>([\s\S]*?)<\/h3>\s*<ul class="ticks"([^>]*)>([\s\S]*?)<\/ul>\s*(<figure class="preview[\s"][\s\S]*?<\/figure>)\s*(<p class="small">[\s\S]*?<\/p>)?\s*<\/div>\s*<\/div>\s*<\/section>/,
+    (all, h2, olAttrs, outcomes, h3, ulAttrs, outputs, figure, note = "") => {
+      const agenda = [...(html.match(/<section[^>]*aria-labelledby="agenda-title"[^>]*>([\s\S]*?)<\/section>/)?.[1] || "").matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/g)].map((m) => m[1]);
+      if (agenda.length !== path.rows.length) return all; // the agenda changed shape in the CMS: keep the plain band
+      const label = agenda;
+      return `<link rel="stylesheet" href="/css/build.css?v=24">
+<section class="section band band--stone bw-learn" aria-labelledby="outcomes-title">
+  <div class="wrap">
+    <div class="bw-story" data-story>
+      <div class="bw-story__steps">
+        <span class="bw-story__rail" aria-hidden="true"><i data-story-rail></i></span>
+        <div class="bw-story__step" data-story-step>
+          <span class="bw-story__num" aria-hidden="true">01</span>
+          <h2 id="outcomes-title" class="bw-case__title" data-reveal>${h2}</h2>
+          <ol class="numbered"${olAttrs}>${outcomes}</ol>
+        </div>
+        <div class="bw-story__step" data-story-step>
+          <span class="bw-story__num" aria-hidden="true">02</span>
+          <h3 class="bw-case__title">${h3}</h3>
+          <ul class="ticks"${ulAttrs}>${outputs}</ul>
+          ${note}
+        </div>
+      </div>
+      <div class="bw-story__stage">
+        <div class="bw-story__frame fcard" data-story-frame>
+          <span class="bw-story__bg" data-bg="0" aria-hidden="true"></span><span class="bw-story__bg" data-bg="1" aria-hidden="true"></span>
+          <div class="bw-story__arts fcard__art">
+            <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: the ${["three", "four", "five"][path.rows.length - 3] || path.rows.length} learning steps as a path. ${path.alt}" data-story-art>
+              <div class="bw-path">
+                ${path.rows.map((r, i) => pathRow(r, i, label[i])).join("\n                ")}
+              </div>
+            </div>
+            <div class="bw-case__art bw-story__art bw-learn__out" data-story-art>
+              ${figure}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>`;
+    });
+}
+
 export function programPage(p) {
   if (!p.doc) return null;
   const others = D.programs.filter((o) => o.slug !== p.slug);
-  const body = docBody(p, "programs", {
+  const body = programOutcomes(p, programAudience(p, programHeroArt(p, docBody(p, "programs", {
     "program-form": () => programForm(p),
     "other-programs": () => others.length ? others.map((o) => `<li><a href="/programs/${o.slug}/" data-track="program_click"><span>${esc(o.title)}</span>${badge(o.statusKey, o.statusLabel)}</a></li>`).join("") : EMPTY_SECTION,
-  });
+  }))));
   return {
     title: p.seoTitle || `${p.title} · Faith Works`,
     description: p.metaDescription || p.summary,

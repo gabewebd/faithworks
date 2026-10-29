@@ -344,7 +344,20 @@ export const STATIC_PROGRAMS = [
     "enrollment_status": "planned",
     "enrollment_label": "Planned, not yet open",
     "next_intake": "",
-    "agenda": [],
+    "agenda": [
+      {
+        "title": "Define the use case",
+        "text": "One task for the assistant, with clear inputs, limits and what it should never decide."
+      },
+      {
+        "title": "Build the first version",
+        "text": "Set up the assistant step by step with guidance, using AI tools."
+      },
+      {
+        "title": "Test with review points",
+        "text": "Check its answers, mark where a person reviews, and set a path to hand off to a person."
+      }
+    ],
     "faq": [
       {
         "q": "Can I register now?",

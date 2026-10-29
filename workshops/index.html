@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="../css/style.css?v=38">
+  <link rel="stylesheet" href="../css/style.css?v=52">
   <script>
     /* Motion is opt-in: html.motion only while main.js runs, so content can never stay hidden */
     (function (h) {
@@ -33,12 +33,12 @@
       setTimeout(function () { if (!window.__fwReady) h.classList.remove("motion"); }, 3000);
     })(document.documentElement);
   </script>
-  <script src="../js/config.js?v=38" defer></script>
+  <script src="../js/config.js?v=52" defer></script>
   <script src="../js/vendor/gsap-3.15.0.min.js" defer></script>
   <script src="../js/vendor/ScrollTrigger-3.15.0.min.js" defer></script>
-  <script src="../js/main.js?v=38" defer></script>
-  <script src="../js/motion.js?v=38" defer></script>
-  <script src="../js/forms.js?v=38" defer></script>
+  <script src="../js/main.js?v=52" defer></script>
+  <script src="../js/motion.js?v=52" defer></script>
+  <script src="../js/forms.js?v=52" defer></script>
 </head>
 <body data-page="/workshops/">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -56,7 +56,7 @@
     </nav>
   </header>
   <main id="main-content" tabindex="-1">
-<section class="phero phero--yellow" aria-labelledby="ws-title">
+<section class="phero phero--pink" aria-labelledby="ws-title">
       <div class="wrap phero__grid">
         <div class="phero__copy" data-reveal>
           <nav class="crumbs" aria-label="Breadcrumb"><a href="../learn/index.html">Learn AI</a><span aria-hidden="true">/</span><span aria-current="page">Workshops</span></nav>
@@ -79,12 +79,13 @@
       </div>
     </section>
 
-    <section class="section wrap" id="calendar" aria-labelledby="cal-title">
-      <div class="section-head">
-        <h2 id="cal-title">Event Calendar</h2>
-        <p>Pick a day to see what is on, or jump straight to the next event. Times show their time zone.</p>
-      </div>
-      <div class="cal" data-fw-calendar>
+    <section class="section band--gradient-textured" id="calendar" aria-labelledby="cal-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="cal-title">Event Calendar</h2>
+          <p>Pick a day to see what is on, or jump straight to the next event. Times show their time zone.</p>
+        </div>
+        <div class="cal" data-fw-calendar>
         <div class="cal__main">
           <div class="cal__head">
             <h3 class="cal__title" data-cal-title aria-live="polite"></h3>
@@ -105,6 +106,7 @@
         <aside class="cal__panel" data-cal-panel aria-live="polite" aria-label="Selected day"></aside>
         <noscript><p class="small">The calendar needs JavaScript. Every event is listed below.</p></noscript>
         <script type="application/json" data-cal-data>[{"id":"ai-for-business-2026-09-25","title":"AI for Business: Hands-On Workshop","start":"2026-09-25","end":"2026-09-25","timeZone":"Asia/Manila","allDay":true,"past":true,"figure":"\u003cfigure class=\"event__img\">\u003cimg src=\"/assets/images/masterclass-batch3-960.webp\" alt=\"Participants of a Faith Works masterclass posing together in the session room\" loading=\"lazy\" decoding=\"async\">\u003c/figure>"},{"id":"ai-linkedin-b2b-growth-accelerator-2026","title":"AI + LinkedIn B2B Growth Accelerator","start":"2026-09-30T13:00:00+08:00","end":"2026-09-30T18:00:00+08:00","timeZone":"Asia/Manila","allDay":false,"past":true,"figure":"\u003cfigure class=\"event__img\">\u003cimg src=\"/assets/images/ai-linkedin-960.webp\" alt=\"Event poster for the AI + LinkedIn B2B Growth Accelerator with Faith Natividad and CAP Hernandez\" loading=\"lazy\" decoding=\"async\">\u003c/figure>"}]</script>
+      </div>
       </div>
     </section>
 

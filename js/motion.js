@@ -26,7 +26,7 @@
   // it scrolls away. style.css §18b turns --fw-p into a few pixels of movement (halved on small
   // screens), on the independent translate/scale properties. Add [data-depth] (optionally with
   // style="--depth: 30") to give another decorative element the same treatment.
-  var DEPTH = ".hero, .ahero__photo, .phero__photo, .founder__photo, .business__photo, .talks__photo, .kit-by__photos figure:first-child, .kitart, .cta, [data-depth]";
+  var DEPTH = ".hero, .ahero__photo, .phero__photo, .founder__photo, .business__photo, .talks__photo, .kitart, .cta, [data-depth]";
   $$(DEPTH).forEach(function (el) {
     var hero = el.classList.contains("hero");
     var atLoad = el.getBoundingClientRect().top + window.scrollY < window.innerHeight;
@@ -197,7 +197,7 @@
     gsap.fromTo(parts, { autoAlpha: 0, y: 8 * dir }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.035, delay: delay + 0.25, overwrite: true });
   };
 
-  /* ---- 5d. Use-case story (build) ----------------------------------------- */
+  /* ---- 5d. Use-case story (build; also the program pages and the starter kit) */
   // Wide, tall screens: .is-live turns the section into a scroll story (css/build.css §2). The
   // case crossing the middle of the screen is the active one; its output glides into the frame
   // (the old one leaves the way the page is moving) and the output's parts settle in a beat
@@ -206,7 +206,7 @@
   if (story) {
     var steps = $$("[data-story-step]", story), arts = $$("[data-story-art]", story);
     // The small pieces of each output (not its top-level blocks, which arrive first)
-    var PARTS = ".bw-cal__grid .is-post, .bw-inbox__row, .bw-inbox__summary, .bw-checks > span, .bw-inbox__send, .bw-ask__docs span, .bw-ask__refs > span, .bw-site__hero > *, .bw-site__shape, .bw-site__checks span";
+    var PARTS = ".bw-cal__grid .is-post, .bw-inbox__row, .bw-inbox__summary, .bw-checks > span, .bw-inbox__send, .bw-ask__docs span, .bw-ask__refs > span, .bw-site__hero > *, .bw-site__shape, .bw-site__checks span, .bw-path__chips > span, .bw-path__mini, .bw-path__row > .bw-mark, .proto__page > span, .proto__row, .preview__table tbody tr, .preview__plan li, .preview__msg, .bw-kitpage .bw-path__row, .bw-kitpage__table tbody tr, .bw-kitscene__side > *, .bw-kitflow__step, .bw-kitfaces > *, .bw-kitpage__field, .bw-kitpage__prompt > span, .bw-kitpage__next li";
     var settleArt = function (art, delay, dir) { settle(kids(art.firstElementChild), $$(PARTS, art), delay, dir); };
     var mm = gsap.matchMedia();
 

@@ -109,7 +109,7 @@ p { margin: 0 0 1em; line-height: 1.65; }
 /* Poppins for headlines and prominent titles (card titles, quotes, big numerals); Inter for the rest */
 h1, h2, h3, h4, .h3, .route__title, .fit__name,
 .business__ways b, .kitart__title, .kit-preview__title, .event__date b, .notfound__code,
-.how li::before, blockquote { font-family: var(--font-display); }
+blockquote { font-family: var(--font-display); }
 blockquote cite { font-family: var(--font); font-style: normal; }
 h1, h2, h3, h4 { margin: 0; font-weight: 700; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; }
 h2 { font-size: var(--fs-h2); line-height: var(--lh-head); letter-spacing: -0.045em; margin: 16px 0 0; }
@@ -340,7 +340,7 @@ code { font-size: 0.9em; }
 .site-footer__links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; font-size: var(--fs-small); }
 /* Community and Contact: the footer's two most visible links */
 .site-footer__brand .site-footer__reach { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; max-width: none; }
-.site-footer__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1.5px solid rgb(255 255 255 / 0.55); border-radius: 999px; color: var(--white); font-size: 15px; font-weight: 600; white-space: nowrap; transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast); }
+.site-footer__cta { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1.5px solid rgb(255 255 255 / 0.55); border-radius: var(--r-sm); color: var(--white); font-size: 15px; font-weight: 600; white-space: nowrap; transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast); }
 .site-footer__cta:hover { border-color: var(--white); background: rgb(255 255 255 / 0.08); }
 .site-footer__cta--pink { border-color: var(--pink); background: var(--pink); color: var(--ink); }
 .site-footer__cta--pink:hover { border-color: var(--white); background: var(--white); color: var(--ink); }
@@ -521,12 +521,11 @@ body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 
 .flow__tabs button:focus-visible { outline-offset: -5px; }
 .flow__tabs button[aria-selected="true"]:focus-visible { outline-color: var(--yellow); }
 /* each task's icon sits on its own filled tile: Faith Pink, AI Yellow, Charcoal */
-.flow__tab-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--tab-tile); color: var(--ink); }
-.flow__tabs button:nth-child(1) { --tab-tile: var(--pink); }
-.flow__tabs button:nth-child(2) { --tab-tile: var(--yellow); }
-.flow__tabs button:nth-child(3) .flow__tab-icon { --tab-tile: var(--ink); color: var(--white); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22); }
-.flow__tabs button:nth-child(3)[aria-selected="true"] .flow__tab-icon { --tab-tile: var(--white); color: var(--ink); box-shadow: none; }
-.flow__tab-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+/* line icons as on Learn's .promise__icon, on tiles alternating Faith Pink and AI Yellow */
+.flow__tab-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--pink); }
+.flow__tabs button:nth-child(even) .flow__tab-icon { background: var(--yellow); }
+.flow__tab-icon svg { width: 25px; height: 25px; overflow: visible; }
+.flow__tab-icon :is(.route__line, .route__node, .route__head) { stroke-width: 3.1; }
 
 .flow__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 24px); transition: opacity 200ms var(--ease-out); }
 .flow__cards.is-swapping { opacity: 0; }
@@ -539,8 +538,8 @@ body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 
 .fcard__body { padding: 20px 2px 0; }
 .fcard__step { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: var(--fs-label); font-weight: 600; letter-spacing: 0.02em; }
 .fcard__icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--tile); color: var(--ink); box-shadow: 0 0 0 3px rgb(255 255 255 / 0.7); }
-.fcard__icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.fcard__icon .fill { fill: currentColor; stroke: none; }
+.fcard__icon svg { width: 20px; height: 20px; overflow: visible; }
+.fcard__icon :is(.route__line, .route__node, .route__head) { stroke-width: 3.6; }
 .fcard h3 { margin-bottom: 8px; font-family: var(--font-display); font-size: clamp(19px, 1.5vw, 22px); line-height: 1.25; letter-spacing: -0.02em; }
 .fcard__body > p:last-child { max-width: 40ch; margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); }
 
@@ -608,22 +607,24 @@ body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 
    Scoped to #journey (stage rows to #journey.section--field): the home redesign reuses these scene classes on Charcoal. */
 .section--field { background: var(--paper); color: var(--ink); }
 /* the stages float on Works White as separate frosted rows: inactive rows are a light glass with softened text,
-   the selected row turns solid White with a Faith Pink edge, a little depth and a Pink-to-Yellow bar on its left.
-   Stage numbers alternate Faith Pink and AI Yellow fills */
+   the selected row turns solid Charcoal, flat. Stage icon tiles alternate Faith Pink and AI Yellow fills */
 #journey.section--field .steps { gap: 10px; margin-top: 32px; }
 #journey.section--field .step { min-height: 64px; padding: 12px 20px 12px 14px; border: 1px solid rgb(26 26 26 / 0.07); border-radius: var(--r-lg); background: rgb(255 255 255 / 0.5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 1px 2px rgb(26 26 26 / 0.03); color: rgb(26 26 26 / 0.72); font-size: 21px; font-weight: 600; letter-spacing: -0.01em; transition: color var(--dur-fast), background-color var(--dur), border-color var(--dur), box-shadow var(--dur); }
 #journey.section--field .step:first-child { border-top: 1px solid rgb(26 26 26 / 0.07); }
 #journey.section--field .step::after { left: 0; right: auto; top: 14px; bottom: 14px; width: 3px; height: auto; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--pink), var(--yellow)); transform: scaleY(0); transform-origin: center; }
-#journey.section--field .step:hover { color: var(--ink); background: rgb(255 255 255 / 0.78); border-color: rgb(26 26 26 / 0.12); box-shadow: 0 8px 20px -14px rgb(26 26 26 / 0.22); }
-#journey.section--field .step[aria-selected="true"] { color: var(--ink); background: var(--white); border-color: rgb(239 172 186 / 0.9); box-shadow: 0 0 0 3px rgb(239 172 186 / 0.18), 0 14px 30px -18px rgb(26 26 26 / 0.28); }
-#journey.section--field .step[aria-selected="true"]::after { transform: scaleY(1); }
+#journey.section--field .step:hover { color: var(--ink); background: rgb(255 255 255 / 0.78); border-color: rgb(26 26 26 / 0.12); }
+/* the selected row turns Charcoal, like the selected tab in "One real task" (.flow__tabs) */
+#journey.section--field .step[aria-selected="true"] { color: var(--white); background: var(--ink); border-color: var(--ink); box-shadow: none; }
 #journey.section--field .step__name { display: inline-flex; align-items: center; }
-#journey.section--field .step__num { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; margin-right: 16px; border-radius: 50%; background: var(--pink); color: var(--ink); font-size: 13px; font-weight: 700; letter-spacing: 0; opacity: 0.8; transition: box-shadow var(--dur-fast), opacity var(--dur-fast); }
+/* the Learn AI stage icons (.journey-strip__icon set) on square tiles */
+#journey.section--field .step__num { display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; margin-right: 16px; border-radius: 10px; background: var(--pink); color: var(--ink); opacity: 0.8; transition: box-shadow var(--dur-fast), opacity var(--dur-fast); }
 #journey.section--field .step:nth-child(even) .step__num { background: var(--yellow); }
 #journey.section--field .step:hover .step__num, #journey.section--field .step[aria-selected="true"] .step__num { opacity: 1; }
-#journey.section--field .step[aria-selected="true"] .step__num { box-shadow: 0 0 0 3px var(--white), 0 0 0 4px rgb(26 26 26 / 0.2); }
+#journey.section--field .step__num svg { width: 27px; height: 27px; overflow: visible; }
+#journey.section--field .step__num :is(.route__line, .route__ring, .route__node, .route__head, .journey-strip__tick) { stroke-width: 2.8; }
 #journey.section--field .step__arrow { color: rgb(26 26 26 / 0.45); transition: transform var(--dur) var(--ease-spring), color var(--dur-fast); }
-#journey.section--field .step:hover .step__arrow, #journey.section--field .step[aria-selected="true"] .step__arrow { color: var(--ink); }
+#journey.section--field .step:hover .step__arrow { color: var(--ink); }
+#journey.section--field .step[aria-selected="true"] .step__arrow { color: var(--white); }
 #journey.section--field .step:focus-visible { outline-offset: 3px; }
 #journey .scene--learn, #journey .scene--implement { --field: radial-gradient(85% 110% at 0% 0%, rgb(239 172 186 / 0.5), transparent 78%), radial-gradient(80% 90% at 100% 100%, rgb(251 197 34 / 0.34), transparent 80%), linear-gradient(135deg, #F9E2E6, #FCF1EC 55%, #FDF1D4); }
 #journey .scene--apply, #journey .scene--improve { --field: radial-gradient(90% 100% at 85% 0%, rgb(251 197 34 / 0.42), transparent 78%), radial-gradient(80% 90% at 0% 100%, rgb(239 172 186 / 0.45), transparent 78%), linear-gradient(160deg, #FDF4DC, #FCF7F2 60%, #FAE7EA); }
@@ -1371,6 +1372,13 @@ details[open] summary::after { transform: rotate(45deg); background: var(--ink);
 summary:hover { color: var(--rose); }
 details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 
+/* FAQ questions: each one a flat White card with a hairline edge instead of a ruled row. Open
+   questions alternate Faith Pink and AI Yellow. */
+.faq__items { display: grid; gap: 12px; }
+.faq details, .faq details:first-child { border: 0; border-radius: var(--r-lg); background: var(--white); padding-inline: clamp(18px, 2.4vw, 28px); box-shadow: inset 0 0 0 1px var(--line); }
+.faq details[open]:nth-child(odd) summary::after { background: var(--pink); color: var(--ink); }
+.faq details[open]:nth-child(even) summary::after { background: var(--yellow); color: var(--ink); }
+
 .resource { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 96px); align-items: center; padding: clamp(28px, 4vw, 48px); background: var(--pink-tint); border-radius: 22px; }
 .resource h2 + p { margin-top: 16px; max-width: 480px; font-size: var(--fs-lead); }
 .resource .btn { margin-top: 6px; }
@@ -1542,8 +1550,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .mission__quote mark { padding: 0 0.08em; margin: 0 -0.02em; background: linear-gradient(transparent 56%, var(--yellow) 56%, var(--yellow) 94%, transparent 94%); color: inherit; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .mission__quote cite { display: block; margin-top: 28px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 .mission__vision { margin-top: clamp(8px, 1.6vw, 24px); padding-top: clamp(20px, 2.4vw, 28px); border-top: 1px solid rgba(26, 26, 26, 0.35); }
-.mission__vision p:last-child { max-width: 46ch; text-wrap: balance; }
-.mission__vision p:last-child { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.35; letter-spacing: -0.02em; }
+.mission__vision p:last-child { max-width: 30ch; margin: 0; font-family: var(--font-display); font-size: clamp(24px, 2.6vw, 36px); font-weight: 600; line-height: 1.2; letter-spacing: -0.03em; text-wrap: balance; }
 
 .talks { display: grid; grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr); gap: clamp(32px, 6vw, 104px); align-items: center; }
 .talks__photo { overflow: hidden; border-radius: var(--r-lg); background: var(--stone); }
@@ -1600,7 +1607,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .approach-band { background: var(--paper); }
 .approach__intro { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 20px; align-items: end; margin-bottom: clamp(40px, 4.6vw, 72px); }
 .approach__intro > div:first-child { grid-column: 1 / span 6; }
-.approach__intro > div:last-child { grid-column: 7 / -1; max-width: 46ch; }
+.approach__intro > div:last-child { grid-column: 7 / -1; }
 .approach-band .approach__intro .eyebrow { margin: 0 0 18px; }
 .approach-band h2 { margin: 0; letter-spacing: -0.03em; line-height: 1.04; }
 .approach-band .split__lead { margin-top: 0; }
@@ -1725,10 +1732,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .inside li::before { content: counter(i, decimal-leading-zero); grid-column: 1; grid-row: 1 / span 2; padding-top: 3px; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .inside h3 { font-size: 18px; margin-bottom: 6px; }
 .inside p { margin: 0; color: var(--muted); }
-.how { list-style: none; counter-reset: h; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
-.how li { counter-increment: h; padding: 24px; border-radius: var(--r-lg); background: var(--white); font-size: 17px; }
-.how li::before { content: counter(h); display: block; margin-bottom: 10px; font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -0.05em; color: var(--ink); }
-.how b { display: block; }
 /* Privacy on the landing page itself, before the form */
 .kit-privacy { display: flex; gap: 14px; max-width: 560px; margin-top: 28px; padding: 16px 18px; border-radius: var(--r); border: 1px solid var(--glass-edge); background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
 .kit-privacy__icon { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--pink); }
@@ -1736,20 +1739,30 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .kit-privacy h2 { margin: 0 0 4px; font-size: 16px; letter-spacing: -0.01em; }
 .kit-privacy p { margin: 0; font-size: 14.5px; line-height: 1.55; }
 .kit-privacy .text-link { min-height: 36px; font-size: 14px; }
-/* Created by Faith Works PH: the founder and recent sessions, beside photos from real sessions */
-.kit-by { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
-.kit-by__more { color: var(--muted); }
-.kit-by__photos { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; }
-.kit-by__photos figure { position: relative; margin: 0; overflow: hidden; border-radius: var(--r-lg); aspect-ratio: 4 / 5; background: var(--stone); }
-.kit-by__photos figure:first-child { aspect-ratio: auto; }
+/* Created by Faith Works PH: a light Faith Pink band, the founder's portrait on the left; who she is,
+   then photos from recent sessions and the way into the events page, on the right */
+.kit-by { background: #FCE8ED; color: var(--ink); }
+.kit-by__grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); grid-template-areas: "photo copy" "photo events"; column-gap: clamp(32px, 6vw, 104px); align-items: center; }
+.kit-by__photo { grid-area: photo; align-self: stretch; position: relative; min-height: 520px; margin: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--pink-tint); }
+.kit-by__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.kit-by__copy { grid-area: copy; align-self: end; max-width: 680px; }
+.kit-by__copy h2 { margin: 0; max-width: 13ch; }
+.kit-by__lead { margin: clamp(20px, 2vw, 28px) 0 0; font-size: var(--fs-lead); line-height: 1.55; }
+.kit-by__more { margin: 14px 0 0; font-size: 16px; line-height: 1.6; }
+.kit-by__events { grid-area: events; align-self: start; display: grid; justify-items: start; gap: 16px; max-width: 680px; margin-top: clamp(28px, 3.4vw, 44px); padding-top: clamp(20px, 2vw, 28px); border-top: 1px solid rgb(26 26 26 / 0.16); }
+.kit-by__events .sessions__label { margin: 0; }
+.kit-by__events .btn { margin-top: 8px; }
+/* Session photos: a card pager (js/main.js §17), two photos a view, Previous/Next over the photos */
+.kit-by__gallery { position: relative; width: 100%; }
+.kit-by__photos { list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 12px) / 2); gap: 12px; margin: 0; padding: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--r-lg); }
+.kit-by__photos::-webkit-scrollbar { display: none; }
+.kit-by__photos:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.kit-by__photos li { height: clamp(180px, 16vw, 240px); overflow: hidden; border-radius: var(--r-lg); background: var(--stone); scroll-snap-align: start; }
 .kit-by__photos img { width: 100%; height: 100%; object-fit: cover; }
-.kit-by__photos figure:first-child img { object-position: 30% 50%; }
-.kit-by__photos figcaption { position: absolute; left: 10px; bottom: 10px; right: 10px; width: fit-content; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--glass-edge); background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); font-size: 12.5px; font-weight: 600; }
-.kit-founder { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 32px; align-items: start; max-width: 900px; }
-.kit-founder figure { overflow: hidden; border-radius: var(--r); background: var(--pink); }
-.kit-founder img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; }
-.kit-founder > div > p { margin: 10px 0 0; font-size: 17px; }
-.kit-founder > div > .kit-by__more { font-size: 15.5px; }
+.kit-by__nav { position: absolute; top: 50%; z-index: 1; translate: 0 -50%; border-color: var(--white); box-shadow: 0 4px 14px rgb(26 26 26 / 0.18); }
+.kit-by__nav--prev { left: 12px; }
+.kit-by__nav--next { right: 12px; }
+.kit-by__nav[aria-disabled="true"] { opacity: 0; pointer-events: none; }
 .thanks { padding-block: clamp(56px, 8vw, 120px); background: var(--pink-tint); }
 .thanks__copy { max-width: 760px; }
 .thanks__check { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 0 22px; border-radius: 50%; background: var(--ink); }
@@ -1890,7 +1903,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 :root { --fw-k: 1; }
 @media (max-width: 760px) { :root { --fw-k: 0.5; } }
 /* Photos drift inside their frames (scaled just enough to never show an edge) */
-.motion :is(.phero__photo, .founder__photo, .business__photo, .talks__photo, .kit-by__photos figure:first-child) img { scale: 1.08; translate: 0 calc(var(--fw-p, 0) * var(--fw-k) * 3%); }
+.motion :is(.phero__photo, .founder__photo, .business__photo, .talks__photo) img { scale: 1.08; translate: 0 calc(var(--fw-p, 0) * var(--fw-k) * 3%); }
 /* Layered compositions: the backing plate and floating cards part slightly */
 .motion .kitart__back { translate: 0 calc(var(--fw-p, 0) * var(--fw-k) * -20px); }
 .motion .kitart__doc { translate: 0 calc(var(--fw-p, 0) * var(--fw-k) * 10px); }
@@ -1924,7 +1937,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .about, .business, .formblock, .partner, .contact { grid-template-columns: minmax(0, 1fr); }
   .formblock__intro, .contact__side { position: static; }
   .about { align-items: start; }
-  .routes, .scopes, .formats, .cm-grid, .how { grid-template-columns: minmax(0, 1fr); }
+  .routes, .scopes, .formats, .cm-grid { grid-template-columns: minmax(0, 1fr); }
   .routes { grid-template-rows: none; gap: 12px; }
   .route, .route__link { grid-row: auto; grid-template-rows: none; }
   .route__link { padding: 24px 22px 26px; }
@@ -1949,7 +1962,11 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .journey-line__steps b { font-size: 17px; min-width: 6.5em; }
   .kit-hero__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "card" "preview"; }
   .kit-card { position: static; }
-  .kit-by, .creds { grid-template-columns: minmax(0, 1fr); }
+  .creds { grid-template-columns: minmax(0, 1fr); }
+  .kit-by__grid { grid-template-areas: "photo copy" "events events"; }
+  .kit-by__copy { align-self: center; }
+  .kit-by__photo { align-self: center; min-height: 0; aspect-ratio: 4 / 5; }
+  .kit-by__events { max-width: none; }
   .bio__main, .talks { grid-template-columns: minmax(0, 1fr); }
   .ahero__grid { grid-template-columns: minmax(0, 1fr); min-height: 0; }
   .ahero__copy { grid-column: 1; padding: clamp(40px, 8vw, 64px) var(--gutter) clamp(40px, 8vw, 56px); }
@@ -1998,7 +2015,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .step { font-size: 17px; }
   #journey.section--field .steps { gap: 8px; margin-top: 24px; }
   #journey.section--field .step { min-height: 56px; padding: 10px 16px 10px 12px; font-size: 18px; }
-  #journey.section--field .step__num { width: 32px; height: 32px; margin-right: 14px; font-size: 12px; }
+  #journey.section--field .step__num { width: 36px; height: 36px; margin-right: 14px; }
+  #journey.section--field .step__num svg { width: 24px; height: 24px; }
   .scene__art { min-height: 0; padding: 18px; }
   .apply { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .apply__core { grid-template-columns: 64px auto; align-items: center; justify-content: center; }
@@ -2041,11 +2059,14 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .field--half { grid-column: 1 / -1; }
   .kit-preview { grid-template-columns: minmax(0, 1fr); }
   .kit-preview__cover { aspect-ratio: auto; min-height: 180px; }
-  .kit-founder { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; }
-  .kit-by__photos { grid-template-columns: minmax(0, 1fr); }
   .hstack__card--2 { display: none; }
   .hstack__card--1 { width: 38%; }
-  .kit-by__photos figure, .kit-by__photos figure:first-child { aspect-ratio: 16 / 10; }
+  .kit-by__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "photo" "copy" "events"; row-gap: 28px; }
+  .kit-by__photo { width: min(100%, 480px); }
+  .kit-by__photos { grid-auto-columns: 100%; }
+  .kit-by__photos li { height: auto; aspect-ratio: 16 / 10; }
+  .kit-by__events { margin-top: 8px; }
+  .kit-by__events .btn { width: 100%; }
   .routes-list--wide { grid-template-columns: minmax(0, 1fr); }
   .voices { --card-w: calc(100vw - 72px); --card-gap: 12px; }
   .voices__track { padding-inline: calc((100% - var(--card-w)) / 2); }
@@ -2158,8 +2179,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 
 /* 9. Program pages ---------------------------------------------------------- */
 /* Program detail (hero, facts, outcomes, agenda, requirements, more) */
-.phero { padding-block: clamp(40px, 5vw, 76px); background: var(--phero-bg, var(--stone-2)); }
+.phero { --phero-pad: clamp(40px, 5vw, 76px); padding-block: var(--phero-pad); background: var(--phero-bg, var(--stone-2)); }
 .phero--stone { --phero-bg: var(--stone-2); }
+.phero--paper { --phero-bg: var(--paper); }
 .phero--pink { --phero-bg: var(--pink-tint); }
 .phero--yellow { --phero-bg: var(--yellow-tint); }
 .phero--ink { --phero-bg: var(--ink); color: var(--white); }
@@ -2167,6 +2189,54 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .phero--compact .phero__grid { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 901px) { .phero--program .phero__grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr); gap: clamp(28px, 4vw, 56px); } }
 .phero--program h1 { font-size: clamp(38px, 4.6vw, 68px); max-width: none; }
+/* Program hero art: the program's node network from the Programs split (render.mjs programHeroArt) */
+@media (min-width: 901px) {
+  .phero--program .phero__grid:has(.phero__art) { --art-gap: clamp(28px, 4vw, 56px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--art-gap); }
+  /* Keep the copy clear of the art, which reaches back into the column gap */
+  .phero--program .phero__grid:has(.phero__art) .phero__copy { padding-right: clamp(24px, 4vw, 72px); }
+}
+.phero__art { width: 100%; }
+@media (min-width: 901px) {
+  /* Fills the hero's whole height, flush under the navbar and down to the hero's bottom edge, like
+     the homepage hero panel, and runs off the right edge of the screen, past the gutter. Reaching
+     back into half the column gap makes it exactly the right half of the hero. */
+  .phero--program:has(.phero__art) { overflow-x: clip; }
+  .phero__art { align-self: stretch; min-height: clamp(560px, calc(100svh - var(--header-h)), 900px); margin-block: calc(-1 * var(--phero-pad));
+    width: calc(100% + var(--gutter) + var(--art-gap) / 2); margin-left: calc(var(--art-gap) / -2); border-radius: var(--r-lg) 0 0 var(--r-lg); }
+  .phero__art .pmock__view { width: min(100% - 48px, 580px); }
+}
+/* Entrance: the same build as the Programs stage (wires draw, then cards, pins, flow and cursor) */
+.motion .phero__art .pnet__out { animation: pnet-in 600ms var(--ease-out) 80ms both; }
+.motion .phero__art .pnet__wire { stroke-dasharray: 1; animation: pnet-draw 700ms var(--ease-out) calc(180ms + var(--k) * 90ms) both; }
+.motion .phero__art .pnet__node { animation: pnet-in 500ms var(--ease-out) calc(320ms + var(--k) * 80ms) both; }
+.motion .phero__art .pnet__pin { animation: pnet-fade 400ms var(--ease-out) calc(560ms + var(--k) * 90ms) both; }
+.motion .phero__art .pnet__flow { animation: pnet-fade 400ms var(--ease-out) 900ms both, pnet-flow 2.8s linear 900ms infinite; }
+.motion .phero__art .pnet__cursor { animation: pnet-fade 400ms var(--ease-out) 820ms both, pnet-hover 3.2s var(--ease-out) 1.2s infinite alternate; }
+@keyframes pnet-in { from { opacity: 0; scale: 0.94; } }
+@keyframes pnet-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes pnet-fade { from { opacity: 0; } }
+/* The facts that sat beside the hero, under it (tools/render.mjs programInfo): one White card per
+   fact in Learn's .promise__grid--cards format (tile, label as the card title, value below). */
+.pinfo { margin-top: clamp(16px, 2vw, 28px); }
+.pinfo__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 16px); margin: 0; }
+.pinfo__grid > div { display: flex; flex-direction: column; padding: clamp(22px, 2.4vw, 32px); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-fast) var(--ease-out); }
+.pinfo__grid > div:hover { box-shadow: inset 0 0 0 1.5px var(--pink); }
+.pinfo__grid dt { display: flex; flex-direction: column; align-items: flex-start; margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(22px, 2vw, 28px); font-weight: 600; line-height: 1.15; letter-spacing: -0.035em; }
+.pinfo__grid dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+/* line icons as on Learn's .promise__icon, on tiles alternating Faith Pink and AI Yellow */
+.pinfo__icon { display: grid; place-items: center; flex: none; width: 58px; height: 58px; margin-bottom: clamp(22px, 2.2vw, 30px); border-radius: 12px; background: var(--pink); }
+.pinfo__grid > :nth-child(even) .pinfo__icon { background: var(--yellow); }
+.pinfo__icon svg { width: 36px; height: 36px; overflow: visible; }
+.pinfo__icon :is(.route__line, .route__node, .route__head) { stroke-width: 2.6; }
+/* Faith's portrait takes the tile's place when she teaches */
+.pinfo__photo { width: 58px; height: 58px; margin-bottom: clamp(22px, 2.2vw, 30px); overflow: hidden; border-radius: 50%; background: var(--stone); }
+.pinfo__photo img { width: 100%; height: 100%; object-fit: cover; }
+/* Unconfirmed details: plain text rather than italics, so they read as a status, not a gap */
+.pinfo .tbc { font-style: normal; }
+@media (max-width: 900px) { .pinfo__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .pinfo__grid { grid-template-columns: minmax(0, 1fr); }
+  }
 .phero h1 { font-size: var(--fs-page-h1); line-height: 0.98; letter-spacing: -0.055em; max-width: 16ch; }
 .phero--compact h1 { max-width: 20ch; }
 .phero__lead { margin: 20px 0 0; font-size: var(--fs-lead); line-height: 1.6; max-width: 60ch; }
@@ -2208,6 +2278,40 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .facts div:last-child { border-bottom: 0; }
 .facts dt { font-size: var(--fs-small); font-weight: 600; color: var(--muted); }
 .facts dd { margin: 0; font-weight: 500; }
+/* Program "Who it's for" (tools/render.mjs programAudience): two photos stacked on the left scroll
+   past the copy, which stays pinned on the right. Tablet puts the copy on top with the photos
+   paired below; mobile stacks everything. */
+.pfor { background: var(--paper); color: var(--ink); }
+.pfor__grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(28px, 3.4vw, 56px); align-items: start; }
+.pfor__media { display: grid; gap: 16px; }
+/* The pinned copy fills the view below the header and centres itself in it, so it rides mid-screen */
+.pfor__copy { position: sticky; top: var(--header-h); display: flex; flex-direction: column; justify-content: center; min-height: calc(100svh - var(--header-h)); }
+.pfor__photo { margin: 0; overflow: hidden; border-radius: 24px; background: var(--stone); box-shadow: 0 1px 2px rgb(26 26 26 / 0.06), 0 18px 40px -22px rgb(26 26 26 / 0.28); }
+.pfor__photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 900ms var(--ease-out); }
+.pfor__photo:hover img { transform: scale(1.04); }
+/* Both photos share one 3:2 frame, the middle of the originals' 4:3 to 16:9 range, so each loses little */
+.pfor__photo { aspect-ratio: 3 / 2; }
+/* Same weight and tracking as the program hero title (.phero--program h1) */
+.pfor__copy h2 { margin: 0; font-size: clamp(38px, 4.6vw, 68px); font-weight: 700; line-height: 0.98; letter-spacing: -0.055em; }
+.pfor__lead { margin: 18px 0 0; max-width: 36ch; font-size: var(--fs-lead); line-height: 1.55; }
+/* Audience checklist: hairline rows, each led by a Faith Pink / AI Yellow check. The check is drawn
+   in CSS so the list stays plain <li> text for the CMS (data-cms-list="audience"). */
+.pfor__checks { margin: clamp(24px, 2.4vw, 34px) 0 0; padding: 0; list-style: none; border-bottom: 1px solid var(--line); }
+.pfor__checks li { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); color: var(--ink); font-family: var(--font-display); font-size: clamp(16px, 1.15vw, 18px); font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; transition: transform 240ms var(--ease-out); }
+.pfor__checks li::before { content: ""; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--pink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 12.5 3.2 3.2L17 9'/%3E%3C/svg%3E") center / 26px no-repeat; transition: transform 240ms var(--ease-out); }
+.pfor__checks li:nth-child(even)::before { background-color: var(--yellow); }
+.pfor__checks li:hover { transform: translateX(4px); }
+.pfor__checks li:hover::before { transform: scale(1.08); }
+@media (max-width: 1023px) {
+  .pfor__grid { grid-template-columns: minmax(0, 1fr); }
+  .pfor__copy { position: static; grid-row: 1; min-height: 0; }
+  .pfor__lead { max-width: 52ch; }
+  .pfor__media { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .pfor__media { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .pfor__photo img, .pfor__checks li, .pfor__checks li::before { transition: none; } }
 
 .split { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 6vw, 96px); align-items: start; }
 .split h2 { margin-top: 0; }
@@ -2224,9 +2328,22 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .agenda li::before { content: counter(a); display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 14px; border-radius: 50%; background: var(--yellow); font-size: 14px; font-weight: 700; }
 .agenda h3 { font-size: 18px; margin-bottom: 6px; }
 .agenda p { margin: 0; color: var(--muted); }
-.needs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; padding-top: 0; }
-.needs__col { padding: 24px; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
-.needs__col h3 { font-size: 18px; margin-bottom: 14px; }
+/* Requirements and scope: two contrasting editorial panels. "What you need" is warm White with
+   Faith Pink marks; "Not included" is Soft Charcoal with AI Yellow marks. Rows sit on hairlines. */
+.needs { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(12px, 1.6vw, 20px); align-items: stretch; padding-top: 0; }
+.needs__col { padding: clamp(24px, 2.8vw, 40px); border-radius: var(--r-lg); background: var(--white); border: 1px solid var(--line); }
+.needs__col h3 { display: flex; align-items: center; gap: 12px; margin-bottom: clamp(14px, 1.6vw, 20px); font-size: var(--fs-h3); font-weight: 600; }
+.needs__col h3::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 5px var(--pink-tint); }
+.needs__col .ticks, .needs__col .crosses { gap: 0; border-top: 1px solid var(--line); }
+.needs__col .ticks li, .needs__col .crosses li { padding: 16px 0 16px 40px; border-bottom: 1px solid var(--line); color: var(--ink); }
+.needs__col .ticks li:last-child, .needs__col .crosses li:last-child { border-bottom: 0; padding-bottom: 0; }
+.needs__col .ticks li::before { top: calc(16px + 0.12em); width: 24px; height: 24px; background: var(--pink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.8 6.2 5 8.4 9.3 3.8' fill='none' stroke='%231A1A1A' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.needs__col--not { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.needs__col--not h3 { color: var(--white); }
+.needs__col--not h3::before { background: var(--yellow); box-shadow: 0 0 0 5px rgb(251 197 34 / 0.18); }
+.needs__col--not .crosses { border-top-color: var(--line-dark); }
+.needs__col--not .crosses li { border-bottom-color: var(--line-dark); color: var(--white); }
+.needs__col--not .crosses li::before { content: ""; top: calc(16px + 0.12em); width: 24px; height: 24px; margin: 0; background: var(--yellow) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4 4l4 4M8 4 4 8' fill='none' stroke='%231A1A1A' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
 .more { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 18px; }
 .more a { display: flex; flex-direction: column; align-items: start; gap: 10px; height: 100%; padding: 18px 20px; border-radius: var(--r); background: var(--stone-2); font-weight: 600; transition: background-color var(--dur-fast); }
 .more a:hover { background: var(--stone); }
@@ -2366,7 +2483,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 /* 12a. Event Calendar (Workshops). js/main.js §8 draws the month from the embedded data: day
    buttons with the day's events as chips (dots on phones), a panel listing the chosen day, and a
    "Next up" jump. AI Yellow is the one accent; the chosen day turns Charcoal. ---------------- */
-.cal { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: clamp(16px, 2.4vw, 32px); padding: clamp(16px, 2.4vw, 32px); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line), 0 40px 80px -56px rgb(26 26 26 / 0.45); }
+.cal { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: clamp(16px, 2.4vw, 32px); padding: clamp(16px, 2.4vw, 32px); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
 .cal__head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
 .cal__title { margin: 0; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.035em; }
 .cal__controls { display: flex; align-items: center; gap: 8px; }
@@ -2463,7 +2580,10 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .art__label { font-size: 20px; }
   .art__mono { font-size: 15px; }
   .facts div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-  .needs__col { padding: 20px; }
+  .needs { grid-template-columns: minmax(0, 1fr); }
+  .needs__col { padding: 22px 20px; }
+  .needs__col .ticks li, .needs__col .crosses li { padding-block: 14px; }
+  .needs__col .ticks li::before, .needs__col--not .crosses li::before { top: calc(14px + 0.12em); }
   .event { grid-template-columns: minmax(0, 1fr); }
   .event__img { grid-column: 1 / -1; max-width: none; }
   .event__date { aspect-ratio: auto; justify-content: start; grid-auto-flow: column; gap: 10px; padding: 10px 14px; }
@@ -2741,6 +2861,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 /* Workshop & showcase photo gallery: clean stage image over thumbnail row with zoom & parallax */
 .pgallery { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 .pgallery__stage { position: relative; margin: 0; border-radius: var(--r-lg); overflow: hidden; background: var(--stone); aspect-ratio: 16 / 11; border: 1px solid rgb(26 26 26 / 0.08); box-shadow: 0 4px 16px -4px rgb(26 26 26 / 0.1), 0 20px 40px -20px rgb(26 26 26 / 0.22); perspective: 1000px; }
+.phero--ink .pgallery__stage { background: var(--ink); border-color: transparent; }
 .pgallery__stage img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .pgallery__stage.is-zooming img { animation: pgallery-zoom 5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 .pgallery__dissolve-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; will-change: opacity; }
@@ -2752,13 +2873,13 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .pgallery__thumb { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; margin: 0; border: 2px solid transparent; border-radius: var(--r-sm); overflow: hidden; background: var(--stone); cursor: pointer; opacity: 0.65; transition: opacity var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast); }
 .pgallery__thumb:hover { opacity: 1; transform: translateY(-2px); }
 .pgallery__thumb[aria-pressed="true"] { opacity: 1; border-color: var(--pink); box-shadow: 0 2px 10px rgb(239 172 186 / 0.5); transform: translateY(-2px); }
-.phero--yellow .pgallery__thumb[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 2px 10px rgb(26 26 26 / 0.35); }
+.phero--yellow .pgallery__thumb[aria-pressed="true"], .phero--pink .pgallery__thumb[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 2px 10px rgb(26 26 26 / 0.35); }
 .phero--ink .pgallery__thumb[aria-pressed="true"] { border-color: var(--yellow); box-shadow: 0 2px 10px rgb(251 197 34 / 0.45); }
 .pgallery__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 400ms var(--ease-out); }
 .pgallery__thumb:hover img { transform: scale(1.06); }
 
 /* Programs section: header, the five stages as one circuit trace, and the card grid it branches into.
-   --drop is the gap between the strip and the cards, where the trace splits to each column. */
+   --drop is the gap between the strip and the cards. */
 .lprograms { --drop: clamp(48px, 5vw, 72px); --node: 76px; --strip-pad: clamp(18px, 1.8vw, 28px); --rail-x: calc(var(--strip-pad) + var(--node) / 2); padding-top: var(--section); padding-bottom: clamp(48px, 5vw, 80px); }
 .lprograms__head { display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); row-gap: 14px; align-items: end; margin-bottom: clamp(28px, 3.2vw, 44px); }
 .lprograms__head h2 { grid-column: 1 / span 6; margin: 0; font-size: var(--fs-h2); line-height: 0.95; letter-spacing: -0.05em; }
@@ -2786,8 +2907,16 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .journey-strip__step:hover .journey-strip__desc, .journey-strip__step:focus-within .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
 @media (hover: none) { .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .journey-strip__desc { transition: none; } }
-/* The trace leaves the strip below its first node and drops straight to the programs */
-.lprograms .journey-strip::after { content: ""; position: absolute; top: 100%; left: calc(var(--rail-x) - 1px); width: 2px; height: var(--drop); background: var(--ink); }
+/* Program agenda cards are as tall as the For Business step cards (.pp-gain__item, 5:6 across four
+   columns), whatever the column count; a minimum, not a ratio, so a card still grows when its body opens */
+@media (min-width: 1025px) { .journey-strip__steps--agenda .journey-strip__step { min-height: 27.5vw; } }
+/* Program pages, How it runs: the same stage cards for the agenda's three or four steps,
+   one row on wide screens and two by two for four steps on tablets */
+.journey-strip__steps--agenda { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+.journey-strip__steps--agenda .journey-strip__desc { margin: 0; }
+@media (max-width: 1100px) { .journey-strip__steps--agenda:has(> li:nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Speaking, Topics: the same cards with the topic as an h3; longer titles, so a step smaller */
+.journey-strip__steps--topics .journey-strip__title { margin: auto 0 0; font-size: clamp(22px, 1.75vw, 28px); line-height: 1.1; letter-spacing: -0.035em; }
 
 /* Programs: the home Programs split (.pscene, tools/render.mjs programGrid) mirrored. The programs
    pass on the left on the page ground, with no card fill; one mockup holds sticky on the right and
@@ -2801,17 +2930,18 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   --mix: linear-gradient(110deg, rgb(239 172 186 / 0.42), rgb(250 235 192 / 0.62) 55%, rgb(251 197 34 / 0.3));
   position: relative; display: block; }
 .pgrid .prog--yellow, .pgrid .prog--ink { --accent: var(--yellow); }
-/* The stem from the strip lands on a node at the top of the list */
-.pgrid { position: relative; }
-.pgrid::before { content: ""; position: absolute; z-index: 4; top: -6px; left: calc(var(--rail-x) - 6px); width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
-
 
 /* Body, top to bottom: the category label, the title and line lead; the outcome is
    the one highlighted panel; For and Format are a small spec table, label left, answer right;
    the footer holds the CTA. */
 .pgrid .prog__body { display: flex; flex-direction: column; padding: clamp(26px, 2.8vw, 44px) clamp(24px, 2.8vw, 44px) clamp(24px, 2.6vw, 40px); }
 .pgrid .prog__cat { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; font-size: 11px; font-weight: 700; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
-.pgrid .prog__title { max-width: none; margin: 0 0 14px; font-size: clamp(32px, 3.1vw, 48px); line-height: 1.02; letter-spacing: -0.045em; text-wrap: balance; }
+/* Each category is led by the program's number in a filled circle, pink then yellow, alternating */
+.pgrid { counter-reset: prog; }
+.pgrid > .pstep { counter-increment: prog; }
+.pgrid .prog__cat::before { content: counter(prog, decimal-leading-zero); flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--pink); color: var(--ink); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: 0; }
+.pgrid > .pstep:nth-child(even) .prog__cat::before { background: var(--yellow); }
+.pgrid .prog__title { max-width: none; margin: 0 0 14px; font-size: clamp(36px, 4.2vw, 64px); line-height: 1.02; letter-spacing: -0.045em; text-wrap: balance; }
 .pgrid .prog__summary { max-width: 46ch; margin: 0 0 clamp(22px, 2.2vw, 28px); font-size: 18px; line-height: 1.5; color: var(--ink); opacity: 0.78; text-wrap: pretty; }
 
 /* "You leave with": a glassy tinted panel led by a checked circuit node, with an accent rail */
@@ -2835,7 +2965,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .pgrid .prog__fact { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
 }
 
-.pgrid .prog__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; margin-top: clamp(22px, 2.4vw, 30px); }
+.pgrid .prog__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; margin-top: 0; padding-top: clamp(18px, 1.8vw, 24px); }
 
 /* Wide: the stage on the right, the programs on the left */
 @media (min-width: 1024px) {
@@ -2879,6 +3009,17 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .promise__grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(32px, 4vw, 56px) clamp(24px, 3.2vw, 48px); margin: 0; padding: 0; }
 .promise__item { position: relative; display: flex; flex-direction: column; padding-top: clamp(20px, 2.4vw, 28px); border-top: 2px solid var(--line); transition: border-color var(--dur-fast) var(--ease-out); }
 .promise__item:hover { border-top-color: var(--pink); }
+/* Card variant (Learn's six answers, Build's demo steps): compact White cards with a line icon
+   (the journey strip's set) on a square tile, alternating Faith Pink and AI Yellow */
+.promise__grid.promise__grid--cards { gap: clamp(10px, 1.2vw, 16px); }
+.promise__grid--cards .promise__item { padding: clamp(22px, 2.4vw, 32px); border: 0; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-fast) var(--ease-out); }
+.promise__grid--cards .promise__item:hover { box-shadow: inset 0 0 0 1.5px var(--pink); }
+.promise__icon { display: grid; place-items: center; width: 58px; height: 58px; margin-bottom: clamp(22px, 2.2vw, 30px); border-radius: 12px; background: var(--pink); }
+.promise__item:nth-child(even) .promise__icon { background: var(--yellow); }
+.promise__icon svg { width: 36px; height: 36px; overflow: visible; }
+.promise__icon :is(.route__line, .route__ring, .route__node, .route__head, .journey-strip__tick) { stroke-width: 2.6; }
+.promise__grid--cards .promise__title { margin-bottom: 8px; font-size: clamp(22px, 2vw, 28px); line-height: 1.15; letter-spacing: -0.035em; }
+.promise__grid--cards .promise__desc { font-size: 15px; }
 .promise__num { display: grid; place-items: center; width: clamp(44px, 4.2vw, 50px); height: clamp(44px, 4.2vw, 50px); border-radius: 50%; background: var(--pink); font-family: var(--font-display); font-size: clamp(17px, 1.6vw, 19px); font-weight: 800; line-height: 1; letter-spacing: -0.02em; color: var(--ink); margin-bottom: clamp(14px, 1.5vw, 20px); }
 .promise__title { margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(20px, 1.8vw, 24px); font-weight: 700; line-height: 1.2; letter-spacing: -0.03em; color: var(--ink); }
 .promise__desc { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--muted); }
@@ -2920,7 +3061,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 }
 @media (max-width: 720px) {
   /* The stages stack, each card with its body showing */
-  .journey-strip__steps { grid-template-columns: minmax(0, 1fr); }
+  .journey-strip__steps, .journey-strip__steps--agenda:has(> li:nth-child(4)) { grid-template-columns: minmax(0, 1fr); }
   .journey-strip__step { min-height: 0; }
   .journey-strip__title { padding-top: 24px; font-size: 28px; }
   .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }

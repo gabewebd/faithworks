@@ -1,10 +1,15 @@
 {
-  "_readme": "Faith Works photo registry: the one place that says which photo appears where. IMAGES lists every photo once: src (the original in assets/images/, never edited), alt, optional crop [left, top, right, bottom] as fractions of the original, position (CSS object-position focal point), social (also make a 1200px JPG for link previews) and socialDefault names the site-wide link-preview photo. replaces (retired image paths that CMS records may still point at; the build serves this photo instead). PAGES lists, per page, the galleries and photo slots the page sources call with {{gallery:page.slot}}. layout is single (one photo), stack (a main photo with floating cards), mosaic (an asymmetric grid) or figures (captioned photos). Each item names an image id and may override its alt or position (focal point) for that slot; caption is optional. The Events gallery (homepage and Workshops masonry) is listed in src/data/events.json. After adding or changing an image run `python tools/images.py` (Pillow) to make its web versions in assets/images/web/, then `node tools/build.mjs`.",
+  "_readme": "Faith Works photo registry: the one place that says which photo appears where. IMAGES lists every photo once: src (the original in assets/images/, never edited), alt, optional crop [left, top, right, bottom] as fractions of the original, position (CSS object-position focal point), social (also make a 1200px JPG for link previews) and socialDefault names the site-wide link-preview photo. replaces (retired image paths that CMS records may still point at; the build serves this photo instead). PAGES lists, per page, the galleries and photo slots the page sources call with {{gallery:page.slot}}. layout is single (one photo), stack (a main photo with floating cards), mosaic (an asymmetric grid), figures (captioned photos) or pfor (the program Who it's for photo column). Each item names an image id and may override its alt or position (focal point) for that slot; caption is optional. The Events gallery (homepage and Workshops masonry) is listed in src/data/events.json. After adding or changing an image run `python tools/images.py` (Pillow) to make its web versions in assets/images/web/, then `node tools/build.mjs`.",
   "socialDefault": "speaking-faith-screen",
   "images": {
     "founder-studio": {
       "src": "assets/images/founder-photo.JPG",
-      "crop": [0.3734, 0, 0.9067, 1],
+      "crop": [
+        0.3734,
+        0,
+        0.9067,
+        1
+      ],
       "alt": "Faith Natividad in a white blouse, smiling at a studio microphone.",
       "position": "50% 30%"
     },
@@ -29,7 +34,9 @@
       "alt": "Participants watching a slide on how different generations bring different strengths to AI learning.",
       "position": "50% 45%",
       "social": true,
-      "replaces": ["assets/images/temp-leadership"]
+      "replaces": [
+        "assets/images/temp-leadership"
+      ]
     },
     "talk-big-screen": {
       "src": "assets/images/rac5.jpg",
@@ -56,7 +63,9 @@
       "alt": "Faith Natividad on a conference stage, pointing to a live AI notebook demo on the big screen.",
       "position": "35% 50%",
       "social": true,
-      "replaces": ["assets/images/temp-faith-ai"]
+      "replaces": [
+        "assets/images/temp-faith-ai"
+      ]
     },
     "stage-prompting": {
       "src": "assets/images/wow-con2.png",
@@ -78,7 +87,9 @@
       "alt": "Participants at tables with laptops facing the screen during a Faith Works session.",
       "position": "50% 55%",
       "social": true,
-      "replaces": ["assets/images/temp-learning-to-doing"]
+      "replaces": [
+        "assets/images/temp-learning-to-doing"
+      ]
     },
     "group-selfie": {
       "src": "assets/images/workshop3.png",
@@ -110,7 +121,9 @@
       "alt": "Participants on stage holding their certificates after completing a Faith Works program.",
       "position": "50% 45%",
       "social": true,
-      "replaces": ["assets/images/temp-growth"]
+      "replaces": [
+        "assets/images/temp-growth"
+      ]
     },
     "bgc-room": {
       "src": "assets/images/bgc-workshop.jpg",
@@ -122,14 +135,19 @@
       "alt": "Workshop participants working on their laptops during a hands-on Faith Works session.",
       "position": "50% 60%",
       "social": true,
-      "replaces": ["assets/images/temp-ai-everyday-work", "assets/images/participants-laptop"]
+      "replaces": [
+        "assets/images/temp-ai-everyday-work",
+        "assets/images/participants-laptop"
+      ]
     },
     "hotel-laptops": {
       "src": "assets/images/bgc-workshop-2.jpg",
       "alt": "Participants following along on laptops in a warmly lit hotel function room.",
       "position": "50% 55%",
       "social": true,
-      "replaces": ["assets/images/temp-full-day"]
+      "replaces": [
+        "assets/images/temp-full-day"
+      ]
     },
     "masterclass-certificates": {
       "src": "assets/images/ai-claude.jpg",
@@ -162,7 +180,9 @@
       "alt": "A Faith Works facilitator presenting live poll results on screen to a seated group.",
       "position": "50% 40%",
       "social": true,
-      "replaces": ["assets/images/temp-research-workflow"]
+      "replaces": [
+        "assets/images/temp-research-workflow"
+      ]
     },
     "presenter-qr": {
       "src": "assets/images/ai-claude-2.png",
@@ -182,16 +202,71 @@
   },
   "pages": {
     "home": {
-      "business": { "layout": "single", "sizes": "(min-width: 901px) 50vw, 100vw", "items": [{ "image": "room-chart", "position": "56% 55%" }] },
-      "founder": { "layout": "single", "sizes": "260px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
+      "business": {
+        "layout": "single",
+        "sizes": "(min-width: 901px) 50vw, 100vw",
+        "items": [
+          {
+            "image": "room-chart",
+            "position": "56% 55%"
+          }
+        ]
+      },
+      "founder": {
+        "layout": "single",
+        "sizes": "260px",
+        "items": [
+          {
+            "image": "founder-studio",
+            "alt": "Portrait of Faith Natividad, founder of Faith Works PH."
+          }
+        ]
+      }
     },
     "homeRedesign": {
-      "business": { "layout": "single", "sizes": "100vw", "items": [{ "image": "room-full" }] },
-      "founder": { "layout": "single", "sizes": "(min-width: 901px) 30vw, 80vw", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad, founder of Faith Works PH." }] }
+      "business": {
+        "layout": "single",
+        "sizes": "100vw",
+        "items": [
+          {
+            "image": "room-full"
+          }
+        ]
+      },
+      "founder": {
+        "layout": "single",
+        "sizes": "(min-width: 901px) 30vw, 80vw",
+        "items": [
+          {
+            "image": "founder-studio",
+            "alt": "Portrait of Faith Natividad, founder of Faith Works PH."
+          }
+        ]
+      }
     },
     "about": {
-      "hero": { "layout": "single", "sizes": "(min-width: 901px) 44vw, 100vw", "priority": true, "items": [{ "image": "founder-studio", "position": "44% 28%" }] },
-      "stage": { "layout": "single", "sizes": "(min-width: 901px) 60vw, 150vw", "items": [{ "image": "speaking-faith-screen", "alt": "Faith Natividad speaking with a microphone beside a screen showing the Faith Works name.", "position": "45% 35%" }] }
+      "hero": {
+        "layout": "single",
+        "sizes": "(min-width: 901px) 44vw, 100vw",
+        "priority": true,
+        "items": [
+          {
+            "image": "founder-studio",
+            "position": "44% 28%"
+          }
+        ]
+      },
+      "stage": {
+        "layout": "single",
+        "sizes": "(min-width: 901px) 60vw, 150vw",
+        "items": [
+          {
+            "image": "speaking-faith-screen",
+            "alt": "Faith Natividad speaking with a microphone beside a screen showing the Faith Works name.",
+            "position": "45% 35%"
+          }
+        ]
+      }
     },
     "business": {
       "hero": {
@@ -199,11 +274,21 @@
         "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
-          { "image": "room-chart" },
-          { "image": "roundtable" },
-          { "image": "group-office" },
-          { "image": "room-full" },
-          { "image": "talk-big-screen" }
+          {
+            "image": "room-chart"
+          },
+          {
+            "image": "roundtable"
+          },
+          {
+            "image": "group-office"
+          },
+          {
+            "image": "room-full"
+          },
+          {
+            "image": "talk-big-screen"
+          }
         ]
       }
     },
@@ -213,11 +298,21 @@
         "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
-          { "image": "community-house-of-creatives" },
-          { "image": "masterclass-cheer" },
-          { "image": "group-community" },
-          { "image": "group-gala" },
-          { "image": "group-orchestrator" }
+          {
+            "image": "community-house-of-creatives"
+          },
+          {
+            "image": "masterclass-cheer"
+          },
+          {
+            "image": "group-community"
+          },
+          {
+            "image": "group-gala"
+          },
+          {
+            "image": "group-orchestrator"
+          }
         ]
       }
     },
@@ -227,11 +322,21 @@
         "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
-          { "image": "bgc-laptops" },
-          { "image": "coaching-at-tables" },
-          { "image": "slides-poll" },
-          { "image": "talk-laptops" },
-          { "image": "hotel-session" }
+          {
+            "image": "bgc-laptops"
+          },
+          {
+            "image": "coaching-at-tables"
+          },
+          {
+            "image": "slides-poll"
+          },
+          {
+            "image": "talk-laptops"
+          },
+          {
+            "image": "hotel-session"
+          }
         ]
       }
     },
@@ -241,11 +346,21 @@
         "sizes": "100vw",
         "priority": true,
         "items": [
-          { "image": "masterclass-certificates" },
-          { "image": "certificates-stage" },
-          { "image": "hotel-laptops" },
-          { "image": "hotel-session" },
-          { "image": "masterclass-stage-group" }
+          {
+            "image": "masterclass-certificates"
+          },
+          {
+            "image": "certificates-stage"
+          },
+          {
+            "image": "hotel-laptops"
+          },
+          {
+            "image": "hotel-session"
+          },
+          {
+            "image": "masterclass-stage-group"
+          }
         ]
       }
     },
@@ -255,14 +370,80 @@
         "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
-          { "image": "speaking-faith-screen" },
-          { "image": "stage-prompting" },
-          { "image": "talk-big-screen" },
-          { "image": "speaking-five-steps" },
-          { "image": "stage-notebook" }
+          {
+            "image": "speaking-faith-screen"
+          },
+          {
+            "image": "stage-prompting"
+          },
+          {
+            "image": "talk-big-screen"
+          },
+          {
+            "image": "speaking-five-steps"
+          },
+          {
+            "image": "stage-notebook"
+          }
         ]
       },
-      "qa": { "layout": "single", "sizes": "(min-width: 900px) 60vw, 100vw", "items": [{ "image": "open-qa" }] }
+      "qa": {
+        "layout": "single",
+        "sizes": "(min-width: 900px) 60vw, 100vw",
+        "items": [
+          {
+            "image": "open-qa"
+          }
+        ]
+      },
+      "audience": {
+        "layout": "pfor",
+        "sizes": "(min-width: 1024px) 1280px, (min-width: 640px) 50vw, 100vw",
+        "items": [
+          {
+            "image": "group-office"
+          },
+          {
+            "image": "roundtable"
+          },
+          {
+            "image": "group-community"
+          },
+          {
+            "image": "certificates-stage"
+          }
+        ]
+      }
+    },
+    "ai-linkedin-b2b-growth": {
+      "_note": "Program page · Who it's for mosaic: 7 landscape photos fill the picture cells between the audience tiles (tools/render.mjs programAudience); the marquee below uses tools/render.mjs AUD_MARQUEE.",
+      "audience": {
+        "layout": "audience",
+        "sizes": "(min-width: 900px) 22vw, 50vw",
+        "items": [
+          {
+            "image": "roundtable"
+          },
+          {
+            "image": "open-qa"
+          },
+          {
+            "image": "room-wide"
+          },
+          {
+            "image": "group-community"
+          },
+          {
+            "image": "hotel-session"
+          },
+          {
+            "image": "talk-laptops"
+          },
+          {
+            "image": "masterclass-stage-group"
+          }
+        ]
+      }
     },
     "professionals": {
       "hero": {
@@ -270,23 +451,164 @@
         "sizes": "(min-width: 900px) 46vw, 100vw",
         "priority": true,
         "items": [
-          { "image": "talk-laptops" },
-          { "image": "coaching-at-tables" },
-          { "image": "bgc-laptops" },
-          { "image": "masterclass-certificates" },
-          { "image": "slides-poll" }
+          {
+            "image": "talk-laptops"
+          },
+          {
+            "image": "coaching-at-tables"
+          },
+          {
+            "image": "bgc-laptops"
+          },
+          {
+            "image": "masterclass-certificates"
+          },
+          {
+            "image": "slides-poll"
+          }
         ]
       },
-      "founder": { "layout": "single", "sizes": "(max-width: 900px) 100vw, 40vw", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] }
+      "founder": {
+        "layout": "single",
+        "sizes": "(max-width: 900px) 100vw, 40vw",
+        "items": [
+          {
+            "image": "founder-studio",
+            "alt": "Portrait of Faith Natividad."
+          }
+        ]
+      }
     },
     "starter-kit": {
-      "founder": { "layout": "single", "sizes": "200px", "items": [{ "image": "founder-studio", "alt": "Portrait of Faith Natividad." }] },
-      "rooms": {
-        "layout": "figures",
-        "sizes": "(min-width: 900px) 30vw, 100vw",
+      "founder": {
+        "layout": "single",
+        "sizes": "(min-width: 641px) 36vw, 100vw",
         "items": [
-          { "image": "masterclass-certificates", "caption": "AI & Claude Masterclass graduates" },
-          { "image": "bgc-laptops", "caption": "Hands-on, on real tasks" }
+          {
+            "image": "founder-studio",
+            "alt": "Portrait of Faith Natividad."
+          }
+        ]
+      },
+      "rooms": {
+        "layout": "pager",
+        "sizes": "(min-width: 900px) 22vw, (min-width: 641px) 46vw, 100vw",
+        "items": [
+          {
+            "image": "masterclass-certificates",
+            "position": "30% 50%"
+          },
+          {
+            "image": "bgc-laptops"
+          },
+          {
+            "image": "group-community"
+          },
+          {
+            "image": "talk-laptops"
+          },
+          {
+            "image": "open-qa"
+          },
+          {
+            "image": "room-chart"
+          },
+          {
+            "image": "certificates-stage"
+          },
+          {
+            "image": "hotel-session"
+          }
+        ]
+      }
+    },
+    "ai-workforce-accelerator": {
+      "_note": "Program page · Who it's for mosaic: 7 landscape photos fill the picture cells between the audience tiles (tools/render.mjs programAudience); the marquee below uses tools/render.mjs AUD_MARQUEE.",
+      "audience": {
+        "layout": "audience",
+        "sizes": "(min-width: 900px) 22vw, 50vw",
+        "items": [
+          {
+            "image": "room-full"
+          },
+          {
+            "image": "bgc-room"
+          },
+          {
+            "image": "talk-big-screen"
+          },
+          {
+            "image": "group-office"
+          },
+          {
+            "image": "talk-generations"
+          },
+          {
+            "image": "roundtable"
+          },
+          {
+            "image": "group-gala"
+          }
+        ]
+      }
+    },
+    "ai-agent-builder-bootcamp": {
+      "_note": "Program page · Who it's for mosaic: 7 landscape photos fill the picture cells between the audience tiles (tools/render.mjs programAudience); the marquee below uses tools/render.mjs AUD_MARQUEE.",
+      "audience": {
+        "layout": "audience",
+        "sizes": "(min-width: 900px) 22vw, 50vw",
+        "items": [
+          {
+            "image": "bgc-laptops"
+          },
+          {
+            "image": "room-hotel"
+          },
+          {
+            "image": "talk-laptops"
+          },
+          {
+            "image": "group-community"
+          },
+          {
+            "image": "open-qa"
+          },
+          {
+            "image": "room-chart"
+          },
+          {
+            "image": "hotel-session"
+          }
+        ]
+      }
+    },
+    "ai-websites-workflow-building": {
+      "_note": "Program page · Who it's for mosaic: 7 landscape photos fill the picture cells between the audience tiles (tools/render.mjs programAudience); the marquee below uses tools/render.mjs AUD_MARQUEE.",
+      "audience": {
+        "layout": "audience",
+        "sizes": "(min-width: 900px) 22vw, 50vw",
+        "items": [
+          {
+            "image": "bgc-laptops"
+          },
+          {
+            "image": "room-full"
+          },
+          {
+            "image": "group-office"
+          },
+          {
+            "image": "hotel-session"
+          },
+          {
+            "image": "roundtable"
+          },
+          {
+            "image": "room-wide"
+          },
+          {
+            "image": "group-gala"
+          }
         ]
       }
     }

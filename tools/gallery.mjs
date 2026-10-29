@@ -56,6 +56,10 @@ const LAYOUTS = {
 
   figures: (g) => g.items.map((it) => `<figure>${imgTag(it.image, opts(g, it))}${it.caption ? `<figcaption>${esc(it.caption)}</figcaption>` : ""}</figure>`).join("\n        "),
 
+  // The cards of a card pager (js/main.js §17): one photo per <li>; the page supplies the
+  // <ul data-pager-track> around them and the Previous/Next buttons
+  pager: (g) => g.items.map((it) => `<li>${imgTag(it.image, opts(g, it))}</li>`).join("\n              "),
+
   // Main photo plus up to two floating cards. The cards repeat what the main photo already says
   // (more of the same sessions), so screen readers hear the first and skip the decoration.
   stack: (g) => {
@@ -89,7 +93,15 @@ const LAYOUTS = {
   mosaic: (g) => `<div class="pmosaic">
           ${g.items.slice(0, 3).map((it, i) => `<figure class="pmosaic__cell pmosaic__cell--${i + 1}"${i ? ` data-depth` : ""} style="--c: ${i}${i ? `; --depth: ${i === 1 ? 18 : -18}` : ""}">${imgTag(it.image, { ...opts(g, it, i), sizes: i ? "(min-width: 900px) 18vw, 40vw" : g.sizes, alt: i ? "" : it.alt })}</figure>`).join("\n          ")}
         </div>`,
+
+  // The program "Who it's for" photo column (css/style.css .pfor): photos stacked beside the pinned copy
+  pfor: (g) => `<div class="pfor__media">
+          ${g.items.map((it, i) => `<figure class="pfor__photo" data-reveal>${imgTag(it.image, opts(g, it, i))}</figure>`).join("\n          ")}
+        </div>`,
 };
+
+// A slot the website fills itself (not through {{gallery:...}}), or null when the page has none
+export const gallerySlot = (name) => { const [page, key] = String(name).split("."); return registry.pages[page]?.[key] || null; };
 
 // {{gallery:page.slot}}
 export function gallery(name) {

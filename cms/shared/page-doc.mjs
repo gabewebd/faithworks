@@ -511,6 +511,21 @@ export function programCtaLabel(rec) {
 // Builds the same page the old fixed template produced, as an editable document. Values
 // Details still owns are bound; everything else becomes ordinary page content.
 const arr = (v) => (Array.isArray(v) ? v : []);
+// The About "Our approach" stage icons (Learn, Apply, Build, Implement, Improve), reused in order
+// for the agenda's stage cards (style.css .journey-strip)
+const STAGE_ICONS = [
+  `<path class="route__node" d="M24 12c-5-4-12-4.5-19-3v28c7-1.5 14-1 19 3 5-4 12-4.5 19-3V9c-7-1.5-14-1-19 3Z"/><path class="route__line" d="M24 12v28M10 17h8M10 23h8M10 29h5"/><circle class="route__head route__head--lead" cx="34" cy="21" r="3"/>`,
+  `<rect class="route__node" x="7" y="5" width="26" height="34" rx="3.5"/><path class="route__line" d="M13 14h14M13 20h14M13 26h8"/><path class="route__node route__node--lead" d="M36 26l2.2 5.8L44 34l-5.8 2.2L36 42l-2.2-5.8L28 34l5.8-2.2Z"/>`,
+  `<rect class="route__node" x="5" y="28" width="17" height="13" rx="2.5"/><rect class="route__node" x="26" y="28" width="17" height="13" rx="2.5"/><rect class="route__node route__node--lead" x="15.5" y="13" width="17" height="13" rx="2.5"/><path class="route__line" d="M24 4v5"/>`,
+  `<rect class="route__node" x="7" y="8" width="34" height="23" rx="3"/><path class="route__line" d="M3 37.5h42M13 16h12M13 22h8"/><circle class="route__head route__head--lead" cx="35" cy="33" r="8"/><path class="journey-strip__tick" d="M31.5 33l2.5 2.5 5-5"/>`,
+  `<path class="route__ring" d="M39 19A16 16 0 0 0 9 20M9 29a16 16 0 0 0 30 0"/><path class="route__line" d="M39 10v9h-9M9 38v-9h9M17 29l5-5 4 3 5-6"/><circle class="route__head route__head--lead" cx="31" cy="21" r="3"/>`,
+];
+const agendaStep = (a, i) => `<li class="journey-strip__step" tabindex="0">
+      <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw>${STAGE_ICONS[i % STAGE_ICONS.length]}</svg></span>
+      <span class="journey-strip__num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
+      <h3 class="journey-strip__title">${esc(a.title)}</h3>
+      <p class="journey-strip__desc"><span>${esc(a.text)}</span></p>
+    </li>`;
 function legacyProgram(r) {
   const cta = programCtaLabel(r);
   const external = r.cta_url && !r.cta_url.startsWith("#");
@@ -573,7 +588,11 @@ ${r.body_html && r.body_html.trim() ? `
 ` : ""}${agenda.length ? `
 <section class="section wrap" aria-labelledby="agenda-title">
   <div class="section-head"><h2 id="agenda-title">How it runs</h2><p>The outline below is the planned flow. Session dates and durations are confirmed with each intake.</p></div>
-  <ol class="agenda">${agenda.map((a) => `<li><h3>${esc(a.title)}</h3><p>${esc(a.text)}</p></li>`).join("")}</ol>
+  <div class="journey-strip">
+    <ol class="journey-strip__steps journey-strip__steps--agenda" data-reveal>
+    ${agenda.map(agendaStep).join("\n    ")}
+    </ol>
+  </div>
 </section>
 ` : ""}
 <section class="section wrap needs" aria-labelledby="needs-title">
