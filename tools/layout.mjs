@@ -49,7 +49,9 @@ function tracking(site) {
 function head({ title, description, path, site, image, noindex, socialTitle, ogType = "website" }) {
   const origin = site.origin.replace(/\/$/, "");
   const canonical = origin + (path === "/404.html" ? "/" : cleanPath(path));
-  const ogImage = /^https?:\/\//i.test(image || "") ? image : origin + (image || defaultSocialImage());
+  // Share images are served from the asset CDN (not the page origin, which GHL owns); canonical and og:url stay on the site origin.
+  const cdn = (process.env.CDN_URL || "https://faithworks.vercel.app").replace(/\/$/, "");
+  const ogImage = /^https?:\/\//i.test(image || "") ? image.replace(/^https?:\/\/[^/]+(?=\/assets\/)/i, cdn) : cdn + (image || defaultSocialImage());
   const shareTitle = socialTitle || title;
   return `<head>
   <meta charset="utf-8">
