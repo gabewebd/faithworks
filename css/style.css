@@ -100,6 +100,8 @@ body[data-page="/about/"] .section-head > p { font-size: inherit; }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); -webkit-text-size-adjust: 100%; }
 body { margin: 0; overflow-x: clip; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: var(--fs-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+/* The page ground also sits on <main>: GHL paints its own white fixed layer (.bgCover.bg-fixed, z-index -1) over <body>, which would hide the Works White ground there. */
+main { background: var(--paper); }
 img, svg { display: block; max-width: 100%; }
 img { height: auto; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -373,6 +375,7 @@ code { font-size: 0.9em; }
 body[data-page="/"] .hero { margin: 0 clamp(8px, 1vw, 14px); border-radius: 20px; }
 /* home: the ground around the hero card starts white under the header and settles into Works White as it goes down */
 body[data-page="/"] { background: linear-gradient(var(--white), var(--paper)) 0 0 / 100% 100vh no-repeat, var(--paper); }
+body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper)) 0 0 / 100% 100vh no-repeat, var(--paper); }
 .hero__stage { position: relative; z-index: 1; display: grid; justify-items: center; }
 .hero__copy { max-width: 1120px; text-align: center; }
 
