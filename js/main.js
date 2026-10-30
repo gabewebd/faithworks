@@ -545,8 +545,8 @@ window.FW_CONFIG = {
       li.appendChild(el("h4", "", ev.title));
       if (ev.summary) li.appendChild(el("p", "", ev.summary));
       var meta = el("p", "cal__meta");
-      if (ev.time) meta.appendChild(el("span", "", ev.time));
-      if (ev.location) meta.appendChild(el("span", "", ev.location));
+      if (ev.time) meta.appendChild(el("span", "cal__tag cal__tag--time", ev.time));
+      if (ev.location) meta.appendChild(el("span", "cal__tag cal__tag--place", ev.location));
       if (meta.childNodes.length) li.appendChild(meta);
       var a = el("a", "btn" + (ev.cta ? "" : " btn--light"), ev.cta || "Event details");
       a.href = ev.url;
