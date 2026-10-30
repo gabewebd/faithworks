@@ -236,7 +236,6 @@ code { font-size: 0.9em; }
 .btn__arrow, .link-arrow, .route__arrow, .step__arrow { display: inline-block; transition: transform var(--dur) var(--ease-spring); }
 .btn:hover .btn__arrow { transform: translate(3px, -3px); }
 .btn:hover .btn__arrow--down { transform: translateY(3px); }
-.btn:hover .btn__arrow--up { transform: translateY(-3px); }
 .btn--light { background: transparent; color: var(--ink); }
 .btn--light:hover { background: var(--ink); color: var(--white); }
 /* Secondary buttons carry no arrow-up-right; a download arrow still says what the click does */
@@ -4629,32 +4628,4 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .preview__chat, .preview__table { max-width: 280px; margin-inline: auto; }
   .kit-preview { gap: 12px; }
   .kit-preview__cover { min-height: 140px; padding: 14px; }
-}
-
-/* 21. Phones: forms as a bottom sheet ------------------------------------------- */
-/* js/main.js §13b. Each GHL form waits below the screen and slides up full width when its
-   "Open the form" button (or a link to its section) is used. The iframe stays where it is in
-   the page, so GHL keeps working; the sheet scrolls when the form is taller than the screen.
-   Tablet and desktop keep the inline form: the sheet controls are hidden there. */
-.form-sheet__open, .form-sheet__close, .form-sheet__backdrop { display: none; }
-@media (max-width: 640px) {
-  .form-sheet__open { display: inline-flex; width: 100%; justify-content: center; }
-  .form-sheet__backdrop { display: block; position: fixed; inset: 0; z-index: 1000; background: rgb(26 26 26 / 0.45); opacity: 0; visibility: hidden; transition: opacity var(--dur) var(--ease-out), visibility 0s var(--dur); }
-  .form-sheet__backdrop.is-open { opacity: 1; visibility: visible; transition: opacity var(--dur) var(--ease-out); }
-  .form--ghl.form-sheet, .formblock .form--ghl.form-sheet, .kit-card .form--ghl.form-sheet {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001;
-    width: 100%; min-height: min(520px, calc(100dvh - 24px)) !important; max-height: calc(100dvh - max(24px, env(safe-area-inset-top)));
-    margin: 0; padding: 0 0 env(safe-area-inset-bottom); border-radius: var(--r-lg) var(--r-lg) 0 0;
-    background: var(--white); box-shadow: 0 -12px 40px rgb(26 26 26 / 0.18);
-    overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
-    transform: translateY(100%); visibility: hidden;
-    transition: transform 420ms var(--ease-out), visibility 0s 420ms;
-  }
-  .form--ghl.form-sheet.is-open { transform: none; visibility: visible; transition: transform 420ms var(--ease-out); }
-  .form-sheet__close { display: grid; place-items: center; position: sticky; top: 8px; z-index: 1; width: 44px; height: 44px; margin: 8px 12px 4px auto; padding: 0; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; }
-  .form-sheet__close:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .has-sheet, .has-sheet body { overflow: hidden; overscroll-behavior: none; }
-}
-@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
-  .form--ghl.form-sheet, .form--ghl.form-sheet.is-open, .form-sheet__backdrop, .form-sheet__backdrop.is-open { transition: none; }
 }
