@@ -236,6 +236,7 @@ code { font-size: 0.9em; }
 .btn__arrow, .link-arrow, .route__arrow, .step__arrow { display: inline-block; transition: transform var(--dur) var(--ease-spring); }
 .btn:hover .btn__arrow { transform: translate(3px, -3px); }
 .btn:hover .btn__arrow--down { transform: translateY(3px); }
+.btn:hover .btn__arrow--up { transform: translateY(-3px); }
 .btn--light { background: transparent; color: var(--ink); }
 .btn--light:hover { background: var(--ink); color: var(--white); }
 /* Secondary buttons carry no arrow-up-right; a download arrow still says what the click does */
@@ -2552,6 +2553,14 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .cal__jump { align-self: start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font: inherit; font-size: var(--fs-small); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 .cal__jump:hover { text-decoration-thickness: 2px; }
 .cal__jump:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cal__next { display: grid; gap: 0; width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-sm); background: #fff; color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: transform 240ms var(--ease-out), box-shadow 240ms var(--ease-out); }
+.cal__next:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
+.cal__next-media { display: block; aspect-ratio: 16 / 9; background: var(--line); }
+.cal__next-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cal__next-body { display: grid; gap: 6px; padding: 18px 20px 20px; }
+.cal__next-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+.cal__next-date { font-size: var(--fs-small); color: var(--muted); }
+.cal__next:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .motion .cal__grid.is-turning-next { animation: cal-from-right 420ms var(--ease-expo) both; }
 .motion .cal__grid.is-turning-prev { animation: cal-from-left 420ms var(--ease-expo) both; }
 .motion .cal__panel > * { animation: fw-rise 420ms var(--ease-out) both; }
@@ -4620,4 +4629,32 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .preview__chat, .preview__table { max-width: 280px; margin-inline: auto; }
   .kit-preview { gap: 12px; }
   .kit-preview__cover { min-height: 140px; padding: 14px; }
+}
+
+/* 21. Phones: forms as a bottom sheet ------------------------------------------- */
+/* js/main.js §13b. Each GHL form waits below the screen and slides up full width when its
+   "Open the form" button (or a link to its section) is used. The iframe stays where it is in
+   the page, so GHL keeps working; the sheet scrolls when the form is taller than the screen.
+   Tablet and desktop keep the inline form: the sheet controls are hidden there. */
+.form-sheet__open, .form-sheet__close, .form-sheet__backdrop { display: none; }
+@media (max-width: 640px) {
+  .form-sheet__open { display: inline-flex; width: 100%; justify-content: center; }
+  .form-sheet__backdrop { display: block; position: fixed; inset: 0; z-index: 1000; background: rgb(26 26 26 / 0.45); opacity: 0; visibility: hidden; transition: opacity var(--dur) var(--ease-out), visibility 0s var(--dur); }
+  .form-sheet__backdrop.is-open { opacity: 1; visibility: visible; transition: opacity var(--dur) var(--ease-out); }
+  .form--ghl.form-sheet, .formblock .form--ghl.form-sheet, .kit-card .form--ghl.form-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001;
+    width: 100%; min-height: min(520px, calc(100dvh - 24px)) !important; max-height: calc(100dvh - max(24px, env(safe-area-inset-top)));
+    margin: 0; padding: 0 0 env(safe-area-inset-bottom); border-radius: var(--r-lg) var(--r-lg) 0 0;
+    background: var(--white); box-shadow: 0 -12px 40px rgb(26 26 26 / 0.18);
+    overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    transform: translateY(100%); visibility: hidden;
+    transition: transform 420ms var(--ease-out), visibility 0s 420ms;
+  }
+  .form--ghl.form-sheet.is-open { transform: none; visibility: visible; transition: transform 420ms var(--ease-out); }
+  .form-sheet__close { display: grid; place-items: center; position: sticky; top: 8px; z-index: 1; width: 44px; height: 44px; margin: 8px 12px 4px auto; padding: 0; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; }
+  .form-sheet__close:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .has-sheet, .has-sheet body { overflow: hidden; overscroll-behavior: none; }
+}
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .form--ghl.form-sheet, .form--ghl.form-sheet.is-open, .form-sheet__backdrop, .form-sheet__backdrop.is-open { transition: none; }
 }
