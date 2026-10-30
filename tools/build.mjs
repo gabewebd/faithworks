@@ -190,6 +190,8 @@ for (const p of imagesMissing) console.warn(`Warning: missing image /${p}`);
 if (OUT !== ROOT) {
   for (const p of imagesUsed) if (existsSync(join(ROOT, p))) cpSync(join(ROOT, p), join(OUT, p));
   cpSync(join(ROOT, "assets/images/web"), join(OUT, "assets/images/web"), { recursive: true });
+  // Event graphics are linked from pasted GHL pages, not only from built pages, so they always ship.
+  cpSync(join(ROOT, "assets/images/events"), join(OUT, "assets/images/events"), { recursive: true });
 }
 
 // Search files. Staging is excluded from indexing (brief §6); flip site.staging at launch.
