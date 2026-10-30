@@ -1726,6 +1726,12 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .kit-preview__page th { padding: 6px; background: var(--ink); color: var(--white); text-align: left; font-weight: 600; }
 .kit-preview__page td { padding: 7px 6px; border-bottom: 1px solid var(--line); }
 .kit-preview__page td:nth-child(n+2):not(:last-child) { color: var(--rose-dot); letter-spacing: 1px; }
+@media (max-width: 400px) {
+  .kit-preview__page { padding: 12px; }
+  .kit-preview__page table { font-size: 11px; }
+  .kit-preview__page th, .kit-preview__page td { padding: 6px 4px; }
+  .kit-preview__page th { font-size: 10px; letter-spacing: -0.01em; }
+}
 .kit-preview__note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
 /* Kit contents as a ruled index: numeral, title, one line, hairlines between */
 .inside { list-style: none; counter-reset: i; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); column-gap: var(--col-gap); border-top: 1.5px solid var(--ink); }
@@ -4592,4 +4598,26 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) {
   .hr-page .hr-route__link::before, .hr-page .hr-route__title, .hr-page .hr-route__arrow, .hr-page .hr-photos__tile img, .hr-page .hr-eco__list a, .hr-page .hr-steps__fill { transition: none; }
   .hr-page .hr-node { translate: -50% -50%; }
+}
+
+/* 20. Phones: hero type and mockups --------------------------------------------- */
+/* Hero headlines, leads and product mockups step down one size on phones, so the first
+   screen shows the headline, lead and actions together and mockups stay a glance, not a page.
+   Headlines stay larger than section h2s; mockups keep their em-based proportions. */
+@media (max-width: 640px) {
+  :root { --fs-page-h1: clamp(32px, 9.4vw, 40px); --fs-lead: 16.5px; }
+  .hero h1 { font-size: clamp(30px, 8.8vw, 36px); margin-block: 16px 14px; }
+  .hero__intro { font-size: 16px; }
+  .phero h1, .phero--program h1, .pro-hero h1, .kit-hero h1, .article__head h1, .legal__head h1 { font-size: var(--fs-page-h1); }
+  .phero h1.lhero__title, .phero h1.hero__title--xl { font-size: clamp(34px, 10vw, 42px); }
+  .ahero h1 { font-size: clamp(40px, 12vw, 50px); }
+  .phero__lead, .ahero__lead { font-size: var(--fs-lead); }
+  .hr-page .hr-hero__title > .hr-hero__line { font-size: clamp(44px, 13vw, 56px); }
+
+  /* mockups: a narrower stage inside the same frame, so height shrinks with width */
+  .pmock--inline .pnet, .pmock--inline .proto { width: min(100%, 270px); margin-inline: auto; }
+  .bw-case__art { padding: 12px; font-size: 10.5px; }
+  .preview__chat, .preview__table { max-width: 280px; margin-inline: auto; }
+  .kit-preview { gap: 12px; }
+  .kit-preview__cover { min-height: 140px; padding: 14px; }
 }
