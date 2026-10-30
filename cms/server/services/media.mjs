@@ -8,7 +8,7 @@
 //                            supabase/migrations/20261022000000_event_galleries.sql)
 //            json store (local development): the website's assets/images/uploads/ folder, so the
 //                            local site build and the dashboard preview show it at once
-// library  The photos already on the website (src/data/gallery.json and its web versions), so an
+// library  The photos already on the website (data/gallery.json and its web versions), so an
 //          editor can pick one without uploading it again.
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -81,7 +81,7 @@ export function createMedia({ cfg, store, log, fetchImpl = globalThis.fetch }) {
     },
 
     library() {
-      const reg = join(repo, "src", "data", "gallery.json"), lockFile = join(repo, "src", "data", "gallery.lock.json");
+      const reg = join(repo, "data", "gallery.json"), lockFile = join(repo, "data", "gallery.lock.json");
       if (!existsSync(reg) || !existsSync(lockFile)) return { photos: [] };
       const { images = {} } = JSON.parse(readFileSync(reg, "utf8"));
       const lock = JSON.parse(readFileSync(lockFile, "utf8"));

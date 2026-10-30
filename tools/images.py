@@ -1,4 +1,4 @@
-"""Faith Works web images, made from the originals listed in src/data/gallery.json.
+"""Faith Works web images, made from the originals listed in data/gallery.json.
 
     python tools/images.py            make anything missing or older than its original
     python tools/images.py --force    remake everything
@@ -8,7 +8,7 @@ Each photo gets three WebP files in assets/images/web/: <id>-640.webp (phones, s
 (cropped) original. They are encoded at a high quality setting so photos stay sharp; the browser
 picks the smallest file that fills its slot (srcset), so phones never download the large one. Photos marked
 "social" also get <id>-1200.jpg, a 1200x630 link-preview image. The originals stay untouched in
-assets/images/; the site only ever loads the web versions. src/data/gallery.lock.json records each
+assets/images/; the site only ever loads the web versions. data/gallery.lock.json records each
 photo's final size and the real width of each file (listed in the order 640, 1280, 1920), so the build can reserve its space (width/height) without opening the file.
 Needs Pillow (pip install pillow). The web versions are committed, so builds (Vercel) need nothing.
 """
@@ -19,8 +19,8 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
-REGISTRY = ROOT / "src" / "data" / "gallery.json"
-LOCK = ROOT / "src" / "data" / "gallery.lock.json"
+REGISTRY = ROOT / "data" / "gallery.json"
+LOCK = ROOT / "data" / "gallery.lock.json"
 OUT = ROOT / "assets" / "images" / "web"
 WIDTHS = (640, 1280, 1920)
 WEBP_QUALITY = 92

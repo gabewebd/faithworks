@@ -43,7 +43,7 @@ cms-keep{display:inline-flex!important;align-items:center;gap:6px;font:500 12px/
 body.cms-canvas{min-height:100vh}`;
 
 // Same as VERSION in tools/layout.mjs: a new value makes the canvas load the current site styles.
-const SITE_CSS_VERSION = "17";
+const SITE_CSS_VERSION = "18";
 const isLocal = () => ["localhost", "127.0.0.1"].includes(location.hostname);
 const trimDoc = (s) => String(s || "").replace(/^\s*\n/, "").replace(/\s+$/, "");
 

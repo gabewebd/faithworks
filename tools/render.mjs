@@ -3,7 +3,7 @@
 // are page documents (cms/shared/page-doc.mjs): this file fills in the values Details controls
 // and the parts only the website can generate (forms, lists of other pages).
 import { readFileSync } from "node:fs";
-import { esc } from "./layout.mjs";
+import { esc, cleanPath } from "./layout.mjs";
 import {
   badge, tbc, extLink as ext, img, preview, eventCta, eventStatus, isPastEvent, eventEndsAt, programCtaLabel,
   applyBindings, bindingValues, fillComponents, recordComponent, tzAbbrev, findMarked, textOf,
@@ -533,7 +533,7 @@ function programAudience(p, html) {
 }
 
 // "What you'll learn" and "What you leave with" as a two-step scroll story, the Build with AI use
-// cases' pattern (css/build.css §2 and §6, js/motion.js §5d): the learning steps, then the outputs,
+// cases' pattern (css/style.css §2 and §6, js/main.js §5d): the learning steps, then the outputs,
 // pass on the left while the output frame on the right shows the learning path, then the example
 // output (the program's own preview, restyled). Only programs listed here; the rest keep the plain
 // band. Each path row is drawn from the program's own "How it runs" step: its title, then chips,
@@ -588,8 +588,7 @@ function programOutcomes(p, html) {
       const agenda = [...(html.match(/<section[^>]*aria-labelledby="agenda-title"[^>]*>([\s\S]*?)<\/section>/)?.[1] || "").matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/g)].map((m) => m[1]);
       if (agenda.length !== path.rows.length) return all; // the agenda changed shape in the CMS: keep the plain band
       const label = agenda;
-      return `<link rel="stylesheet" href="/css/build.css?v=24">
-<section class="section band band--stone bw-learn" aria-labelledby="outcomes-title">
+      return `<section class="section band band--stone bw-learn" aria-labelledby="outcomes-title">
   <div class="wrap">
     <div class="bw-story" data-story>
       <div class="bw-story__steps">
@@ -905,7 +904,7 @@ const SHARE_ICONS = {
   link: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.2 4.2 0 0 0-6-6l-1 1"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.2 4.2 0 0 0 6 6l1-1"/></svg>`,
 };
 function shareBar(path, title) {
-  const url = `${String(D.site.origin || "").replace(/\/$/, "")}${path}`, u = encodeURIComponent(url);
+  const url = `${String(D.site.origin || "").replace(/\/$/, "")}${cleanPath(path)}`, u = encodeURIComponent(url);
   const out = (net, href, label) => `<a class="share__btn" href="${esc(href)}" target="_blank" rel="noopener" data-share="${net}" aria-label="${label} (opens in a new tab)">${SHARE_ICONS[net]}</a>`;
   return `<div class="share" data-share-bar data-url="${esc(url)}" data-title="${esc(title)}">
       <p class="share__label">Share this</p>
@@ -1104,7 +1103,7 @@ export const starterKitNotice = () => D.site.starterKitReady === false
   ? `<div class="notice notice--draft" role="note"><strong>Kit in production.</strong> This page shows the planned kit. It must not receive public traffic until the final kit, Privacy Notice and delivery email are ready.</div>` : "";
 
 /* ---- Forms ------------------------------------------------------------- */
-// Shared markup for every lead form; js/forms.js adds validation, hidden context
+// Shared markup for every lead form; js/main.js adds validation, hidden context
 // (source page, UTMs, timestamp, request ID, consent) and the submit states.
 const CONSENT = "Send me practical AI tips and updates about Faith Works programs. I can unsubscribe anytime.";
 

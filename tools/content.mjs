@@ -22,6 +22,7 @@ import { eventHasPage } from "../cms/shared/schema.mjs";
 import { resolveImage } from "./gallery.mjs";
 import { eventGalleryEntries } from "./event-gallery.mjs";
 import { STATIC_PROGRAMS } from "../cms/shared/static-programs.mjs";
+import { STATIC_TESTIMONIALS } from "../cms/shared/static-testimonials.mjs";
 
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
 
@@ -95,6 +96,9 @@ export async function loadSnapshot({ root, source = "fixtures", view = "auto", a
   // The CMS Programs dashboard and its page preview are unaffected. Remove this block to render
   // programs from the CMS again.
   if (snap) snap = { ...snap, programs: buildSnapshot({ records: { programs: STATIC_PROGRAMS }, view: "preview" }).programs };
+  // TEMPORARY: the same for testimonials (cms/shared/static-testimonials.mjs, already in the
+  // published snapshot's shape). Remove this line to render testimonials from the CMS again.
+  if (snap) snap = { ...snap, testimonials: STATIC_TESTIMONIALS };
 
   const problems = checkSnapshot(snap);
   if (problems.length) throw new Error(`Content snapshot is not usable: ${problems.join(" ")}`);
@@ -132,8 +136,6 @@ export const typeOf = (r) => (TYPE_LABELS[r.resource_type] ? r.resource_type : r
 // (tools/build.mjs and vercel.mjs redirect the old one too).
 export const SITE_REDIRECTS = [
   { from: "/individuals/", to: "/professionals/" },
-  { from: "/free-ai-starter-kit/", to: "/start-your-ai-journey/" },
-  { from: "/free-ai-starter-kit/thank-you/", to: "/start-your-ai-journey/thank-you/" },
 ];
 export function currentUrl(u) {
   if (!u) return u;
@@ -177,7 +179,7 @@ export function toRenderData(snap) {
 
   // A cover that points at a retired image (or at a registered photo) is pointed at that photo's
   // web files on the record itself, so cards, the article's own cover block and its link preview
-  // all show the same picture (tools/gallery.mjs, src/data/gallery.json "replaces").
+  // all show the same picture (tools/gallery.mjs, data/gallery.json "replaces").
   const covered = (r) => {
     const im = featuredImage("resources", r), photo = resolveImage(im);
     if (!im || photo === im) return r;

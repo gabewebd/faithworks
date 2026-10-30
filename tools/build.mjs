@@ -1,14 +1,14 @@
 // Faith Works static site generator. No dependencies: `node tools/build.mjs`.
-// Reads page bodies from src/pages/*.html and content through tools/content.mjs (CMS fixtures
+// Reads page bodies from templates/*.html and content through tools/content.mjs (CMS fixtures
 // by default, or the CMS itself with --content=cms),
-// wraps them in the shared layout (tools/layout.mjs) and writes plain static HTML
-// to clean routes at the repo root (/learn/index.html, /programs/{slug}/index.html…),
+// wraps them in the shared layout (tools/layout.mjs) and writes one plain static HTML file per
+// page at the repo root (/learn/ -> learn.html, /programs/{slug}/ -> programs/{slug}.html…),
 // plus 404.html, sitemap.xml and robots.txt. Generated files carry a banner; edit
 // the sources, then rebuild.
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync, cpSync } from "node:fs";
 import { dirname, join, resolve, relative, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
-import { layout } from "./layout.mjs";
+import { layout, cleanPath } from "./layout.mjs";
 import * as R from "./render.mjs";
 import { loadSnapshot, toRenderData, SITE_REDIRECTS, currentUrl } from "./content.mjs";
 
@@ -33,8 +33,8 @@ if (process.env.VERCEL && opts.source !== "cms") {
   process.exit(1);
 }
 // --out=<dir> writes the site to its own folder (the Vercel build, see vercel.json) holding only
-// what visitors need: the generated pages plus css/, js/ and assets/ (without assets/data, the
-// migration source, and with only the images the pages use: see "Images" below, so the full-size
+// what visitors need: the generated pages plus css/, js/ and assets/ (with only the images the
+// pages use: see "Images" below, so the full-size
 // originals in assets/images/ never ship). Without it the pages are written into the repository
 // root, as before.
 const outArg = arg("out");
@@ -56,24 +56,25 @@ R.init(data);
 // Content loaded: only now is a separate output folder replaced (a failed fetch leaves it alone).
 if (OUT !== ROOT) {
   rmSync(OUT, { recursive: true, force: true });
-  const skip = [join(ROOT, "assets", "data"), join(ROOT, "assets", "images")];
+  const skip = [join(ROOT, "assets", "images")];
   for (const dir of ["css", "js", "assets"]) cpSync(join(ROOT, dir), join(OUT, dir), { recursive: true, filter: (src) => !skip.includes(src) });
 }
 
-// Default build is portable: every local URL is rewritten relative to the page, and page links
-// point at index.html, so the site works opened from disk (file://), under Live Server, or from
-// any sub-folder. `node tools/build.mjs --deploy` keeps root-relative clean URLs (/learn/) for a
-// real host serving this folder at the domain root.
+// Routes stay as the CMS and the page sources write them ("/learn/"); each page is one file:
+// "/" -> index.html, "/learn/" -> learn.html, "/programs/x/" -> programs/x.html.
+// Default build is portable: every local URL is rewritten relative to the page and page links
+// point at the .html file, so the site works opened from disk (file://), under Live Server, or
+// from any sub-folder. `node tools/build.mjs --deploy` writes root-relative clean URLs (/learn)
+// for a host that serves page.html at /page (Vercel cleanUrls, see vercel.mjs).
 const DEPLOY = process.argv.includes("--deploy");
+const fileOf = (route) => route === "/" ? "index.html" : route.endsWith("/") ? route.slice(1, -1) + ".html" : route.slice(1);
 
 function relativize(html, route) {
-  const depth = route.endsWith("/") ? route.split("/").filter(Boolean).length : 0;
-  const prefix = "../".repeat(depth);
+  const prefix = "../".repeat(fileOf(route).split("/").length - 1);
   const fix = (url) => {
     if (!url.startsWith("/") || url.startsWith("//")) return url;
-    const m = url.slice(1).match(/^([^?#]*)(.*)$/);
-    let path = m[1];
-    if (path === "" || path.endsWith("/")) path += "index.html"; // a page, not a file
+    const m = url.match(/^([^?#]*)(.*)$/);
+    const path = m[1].endsWith("/") ? fileOf(m[1]) : m[1].slice(1); // a page, not a file
     return prefix + path + m[2];
   };
   return html
@@ -84,22 +85,30 @@ function relativize(html, route) {
 const written = [];
 const imagesUsed = new Set(); // every /assets/images/… file a page points at (see "Images" below)
 
+// Deploy mode: page links lose their trailing slash (/learn/ -> /learn), the address Vercel serves.
+function cleanLinks(html) {
+  return html.replace(/(\s(?:href|data-redirect))="(\/[^"?#]*)([^"]*)"/g, (all, attr, path, rest) => `${attr}="${cleanPath(path)}${rest}"`);
+}
+
 function emit(path, html) {
-  // path is the public route: "/" → index.html, "/learn/" → learn/index.html, "/404.html" → 404.html
+  // path is the public route: "/" → index.html, "/learn/" → learn.html, "/404.html" → 404.html
   // A renderer with nothing to show leaves R.EMPTY_SECTION; the <section> around it is removed.
   html = R.dropEmptySections(html);
   // Links to a renamed page (also inside CMS content) point at its new address
   html = html.replace(/(\shref)="(\/[^"]*)"/g, (all, attr, url) => `${attr}="${currentUrl(url)}"`);
+  // Published pages carry no notes: HTML comments (dev notes, the build banner) and the CMS
+  // field markers (data-cms-*, read from the sources at build time, never by the site) are removed.
+  html = html.replace(/<!--[\s\S]*?-->\n?/g, "").replace(/\sdata-cms-[\w-]+(?:="[^"]*")?/g, "");
   for (const m of html.matchAll(/\/assets\/images\/[^"'\s),?#]+/g)) imagesUsed.add(decodeURI(m[0].slice(1)));
-  const file = path.endsWith("/") ? join(OUT, path, "index.html") : join(OUT, path);
+  const file = join(OUT, fileOf(path));
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, DEPLOY ? html : relativize(html, path));
+  writeFileSync(file, DEPLOY ? cleanLinks(html) : relativize(html, path));
   written.push(path);
 }
 
 // Page sources: <!--meta {json}--> then the <main> body. {{name}} or {{name:arg}} calls a renderer.
 function renderPage(file) {
-  const src = read(join("src/pages", file));
+  const src = read(join("templates", file));
   const m = src.match(/^<!--meta\s*([\s\S]*?)-->\s*/);
   if (!m) throw new Error(`${file}: missing <!--meta {...}--> header`);
   const meta = JSON.parse(m[1]);
@@ -110,7 +119,7 @@ function renderPage(file) {
   return { meta, body };
 }
 
-for (const file of readdirSync(join(ROOT, "src/pages")).filter((f) => f.endsWith(".html"))) {
+for (const file of readdirSync(join(ROOT, "templates")).filter((f) => f.endsWith(".html"))) {
   const { meta, body } = renderPage(file);
   emit(meta.path, layout({ ...meta, body, site: data.site }));
 }
@@ -149,7 +158,7 @@ writeFileSync(join(OUT, "events", "calendar.json"), JSON.stringify({ generated_a
 const redirects = [...SITE_REDIRECTS, ...data.redirects].filter((r) => r.from && r.to && r.from !== r.to && !written.includes(r.from));
 for (const r of redirects) {
   // The refresh URL is not an href, so relativize() leaves it alone: point it at the page here.
-  const target = DEPLOY ? r.to : relativize(`<a href="${r.to}">`, r.from).slice(9, -2);
+  const target = DEPLOY ? cleanPath(r.to) : relativize(`<a href="${r.to}">`, r.from).slice(9, -2);
   emit(r.from, `<!doctype html>
 <!-- Generated by tools/build.mjs: ${r.from} moved to ${r.to} -->
 <html lang="en"><head><meta charset="utf-8"><title>Moved</title><meta name="robots" content="noindex">
@@ -157,25 +166,25 @@ for (const r of redirects) {
 <body><p>This page has moved to <a href="${r.to}">${r.to}</a>.</p></body></html>
 `);
 }
-if (DEPLOY && redirects.length) writeFileSync(join(OUT, "_redirects"), redirects.map((r) => `${r.from} ${r.to} 301`).join("\n") + "\n");
+if (DEPLOY && redirects.length) writeFileSync(join(OUT, "_redirects"), redirects.map((r) => `${cleanPath(r.from)} ${cleanPath(r.to)} 301`).join("\n") + "\n");
 
 // Remove generated pages this build did not produce (an unpublished program, a renamed event…),
 // so content taken off the CMS never lingers in the output. Only files carrying the generator
-// banner inside the content routes are touched.
+// tag (or the older banner) inside the content routes are touched.
 for (const dir of ["programs", "resources", "events"]) {
   if (!existsSync(join(OUT, dir))) continue;
-  for (const slug of readdirSync(join(OUT, dir), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name)) {
-    const route = `/${dir}/${slug}/`, file = join(OUT, dir, slug, "index.html");
-    if (written.includes(route) || !existsSync(file) || !readFileSync(file, "utf8").includes("Generated by tools/build.mjs")) continue;
+  for (const name of readdirSync(join(OUT, dir)).filter((f) => f.endsWith(".html"))) {
+    const route = `/${dir}/${name.slice(0, -5)}/`, file = join(OUT, dir, name);
+    const src = readFileSync(file, "utf8");
+    if (written.includes(route) || !(src.includes('content="fw-build"') || src.includes("Generated by tools/build.mjs"))) continue;
     rmSync(file);
-    if (!readdirSync(join(OUT, dir, slug)).length) rmSync(join(OUT, dir, slug), { recursive: true });
     console.log(`Removed ${route} (no longer in the content)`);
   }
 }
 
 // Images. Every image a page points at must exist (a CMS record with a mistyped path is reported,
 // not shipped silently). A separate output folder gets those files only, plus the web versions
-// of the photo registry (src/data/gallery.json, made by tools/images.py).
+// of the photo registry (data/gallery.json, made by tools/images.py).
 const imagesMissing = [...imagesUsed].filter((p) => !existsSync(join(ROOT, p)));
 for (const p of imagesMissing) console.warn(`Warning: missing image /${p}`);
 if (OUT !== ROOT) {
@@ -189,7 +198,7 @@ const redirected = new Set(redirects.map((r) => r.from));
 const indexable = written.filter((p) => p.endsWith("/") && !p.includes("thank-you") && !redirected.has(p));
 writeFileSync(join(OUT, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  indexable.map((p) => `  <url><loc>${origin}${p}</loc></url>`).join("\n") + `\n</urlset>\n`);
+  indexable.map((p) => `  <url><loc>${origin}${cleanPath(p)}</loc></url>`).join("\n") + `\n</urlset>\n`);
 // Link-preview crawlers may still read staging pages (LinkedIn honours robots.txt, so without this a
 // shared link shows no preview); the pages themselves stay noindex.
 writeFileSync(join(OUT, "robots.txt"), data.site.staging

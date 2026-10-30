@@ -442,7 +442,7 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 Most website forms (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
 event notify) are **GoHighLevel embeds** (`ghlFormEmbed` in `tools/render.mjs`): GoHighLevel stores
 those submissions and handles alerts and follow-up. The general contact form still uses the site's
-own form (`js/forms.js`), which can post to the CMS; Super Admins see those under
+own form (`js/main.js`), which can post to the CMS; Super Admins see those under
 **Inbox → Form submissions**. The CMS sends **no email** and writes **no Google Sheet** (the Resend
 alerts, the Sheets copy, their retry job and *Retry now* were removed on 25 Oct 2026; existing rows
 keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
@@ -450,7 +450,7 @@ keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
 ### 13.1 Architecture
 
 ```
- Website form (js/forms.js) ── POST JSON + request id ──► CMS /api/forms/submit
+ Website form (js/main.js) ── POST JSON + request id ──► CMS /api/forms/submit
                                      │ validate (shared/forms.mjs), classify, rate-limit
                                      ▼
                      Supabase cms_form_submissions  (the record; never deleted)
@@ -482,7 +482,7 @@ retry or double click never creates a second row.
 
 1. Run `supabase/migrations/20261021000000_form_submissions.sql` (additive).
 2. `FORMS_ALLOWED_ORIGINS=https://<website origin>` on the CMS host (Functions scope), redeploy.
-3. In `js/config.js` set `forms.mode = "endpoint"` and `forms.endpoint = "https://<cms-domain>/api/forms/submit"`.
+3. In the settings at the top of `js/main.js` set `forms.mode = "endpoint"` and `forms.endpoint = "https://<cms-domain>/api/forms/submit"`.
 
 ### 13.4 Tested
 

@@ -7,9 +7,9 @@
 [functions]
   node_bundler = "esbuild"
   # The page preview renders with the website's own templates (../tools), which read the photo
-  # registry (../src/data) and draw the brand marks in program covers (../assets/icons). The
+  # registry (../data) and draw the brand marks in program covers (../assets/icons). The
   # photos themselves are not bundled: the preview loads them from the public website.
-  included_files = ["../tools/**", "shared/**", "fixtures/seed.json", "../src/data/*.json", "../assets/icons/**"]
+  included_files = ["../tools/**", "shared/**", "fixtures/seed.json", "../data/*.json", "../assets/icons/**"]
 
 [[headers]]
   for = "/*"

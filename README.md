@@ -6,7 +6,7 @@ Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 
 **Current phase:** staging. Every page in the brief's sitemap exists. Most forms are GoHighLevel
 embeds (GoHighLevel stores them and alerts the team). The contact form is the site's own form, in
 **preview mode** (nothing is sent); its destination is the CMS, which stores each submission in
-Supabase under *Form submissions* (`cms/README.md` §13), switched on with `js/config.js`
+Supabase under *Form submissions* (`cms/README.md` §13), switched on with the settings at the top of `js/main.js`
 (`mode: "endpoint"`). The pages are `noindex` until launch.
 
 Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
@@ -28,7 +28,7 @@ Content view: drafts are shown only while Site settings say **staging** (noindex
 Otherwise only published, approved content is built (`--view=published|preview` overrides).
 
 Then open `index.html` directly, or use any local server (VS Code Live Server, `python -m http.server`).
-The default build writes **relative** links (`css/style.css`, `../learn/index.html`), so styles, images
+The default build writes **relative** links (`css/style.css`, `../learn.html`), so styles, images
 and navigation work from disk, from a sub-folder, or from a server root.
 
 For production on a host that serves this folder at the domain root, build with clean URLs instead:
@@ -53,7 +53,7 @@ there is no equivalent check there.
 
 **Vercel (production):** `vercel.mjs` runs `node tools/build.mjs --deploy --content=cms --view=published
 --out=dist` and serves `dist/`, which holds only the generated pages, `css/`, `js/` and `assets/`
-(never `cms/`, `src/`, `tools/` or `docs/`). Set `CMS_CONTENT_URL=https://faithworks-cms.netlify.app` in
+(never `cms/`, `templates/`, `data/`, `tools/` or `docs/`). Set `CMS_CONTENT_URL=https://faithworks-cms.netlify.app` in
 the Vercel project. If the CMS cannot be reached the build fails and Vercel keeps the previous deployment;
 it never falls back to the fixtures. See `cms/README.md` §5.5.
 
@@ -61,24 +61,26 @@ it never falls back to the fixtures. See `cms/README.md` §5.5.
 
 | Path | What |
 | --- | --- |
-| `src/pages/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
+| `templates/*.html` | Page bodies. Each starts with a `<!--meta {...}-->` header (route, title, description, nav). `{{renderer}}` tokens insert generated content. |
 | `cms/` | The CMS (dashboard, API, Supabase store). Programs, events, resources/articles, testimonials, tags and site settings are edited there. |
 | `cms/fixtures/seed.json` | Development content fixture (all current content, with its approval state). Regenerate with `node cms/scripts/seed-from-site.mjs`. |
-| `src/data/gallery.json` | **Photo registry**: every site photo once (original, alt text, crop, focal point) and, per page, the galleries and photo slots that page sources fill with `{{gallery:page.slot}}` (hero stacks and mosaics, founder photos). Edit this to add, remove, reorder or replace photos. |
-| `src/data/events.json`, `tools/event-gallery.mjs` | **Events gallery** (separate from Resources): the archive of photos from past sessions, by registry id, with order, `featured` (also on the homepage) and optional caption, focal point and CMS `eventId`. The build adds the images editors mark *Show in the events gallery* on published CMS events (the CMS is authoritative for those), never repeats a photo, and lays them out as a masonry grid: `{{eventGallery:home}}` (18 photos, featured first, as three rows that the page scroll slides left, right, left (`js/motion.js` §5c), below Trusted by) and `{{eventGallery:all}}` (Workshops page). |
-| `src/data/trusted-by.json` | The homepage **Trusted by** logo strip. Placeholders until approved client logos are supplied; set `name` and `logo` per entry to use a real one (`show: false` keeps an entry without showing it). |
+| `data/gallery.json` | **Photo registry**: every site photo once (original, alt text, crop, focal point) and, per page, the galleries and photo slots that page sources fill with `{{gallery:page.slot}}` (hero stacks and mosaics, founder photos). Edit this to add, remove, reorder or replace photos. |
+| `data/events.json`, `tools/event-gallery.mjs` | **Events gallery** (separate from Resources): the archive of photos from past sessions, by registry id, with order, `featured` (also on the homepage) and optional caption, focal point and CMS `eventId`. The build adds the images editors mark *Show in the events gallery* on published CMS events (the CMS is authoritative for those), never repeats a photo, and lays them out as a masonry grid: `{{eventGallery:home}}` (18 photos, featured first, as three rows that the page scroll slides left, right, left (`js/motion.js` §5c), below Trusted by) and `{{eventGallery:all}}` (Workshops page). |
+| `data/trusted-by.json` | The homepage **Trusted by** logo strip. Placeholders until approved client logos are supplied; set `name` and `logo` per entry to use a real one (`show: false` keeps an entry without showing it). |
 | `tools/images.py`, `assets/images/web/` | Makes each registered photo's web versions from its original: WebP at 640 and 1280px (plus a 1200×630 JPEG link preview where `social` is set). Run `python tools/images.py` (needs Pillow) after changing the registry, then build; the web files are committed, so deploys need nothing extra. Originals in `assets/images/` are never edited and never deployed. |
-| `assets/data/programs.json`, `events.json`, `resources.json`, `insights.json`, `success-stories.json`, `site.json` | **Migration source only** (used to create the seed). The build no longer reads them; edit content in the CMS. |
+| `data/migration/programs.json`, `events.json`, `resources.json`, `insights.json`, `success-stories.json`, `site.json` | **Migration source only** (used to create the seed). The build no longer reads them; edit content in the CMS. |
 | `tools/content.mjs` | The website's content interface: fixtures, local CMS or live CMS → the shapes the templates render. |
 | `tools/build.mjs`, `layout.mjs`, `render.mjs` | The generator, shared page chrome, and content/form renderers (CMS page documents with their Details values, forms and lists filled in). |
-| `css/style.css` | The design system: tokens, components, states, responsive and reduced-motion rules; section 21 holds the CMS page templates (program, event, resource pages, testimonial cards, `fw-*` editor blocks). |
+| `css/style.css` | The only stylesheet. The design system: tokens, components, states, responsive and reduced-motion rules; section 21 holds the CMS page templates (program, event, resource pages, testimonial cards, `fw-*` editor blocks). |
 | `js/main.js` | Navigation, tabs, program selector, thank-you state, analytics events (`dataLayer`, no personal data). |
-| `js/forms.js`, `js/config.js` | Form validation, states and submission; `config.js` sets the form mode (`preview` / `endpoint`) and the kit download URL. Never put secrets here. |
+| `js/main.js` (forms and settings sections) | The only site script (plus the vendored GSAP in `js/vendor/`). Its first section, `FW_CONFIG`, sets the form mode (`preview` / `endpoint`) and the kit download URL (never put secrets there); the forms section handles validation, states and submission. |
 | `docs/01–07_*.docx` | Project documents: scope, audit, gap list, architecture, copy, forms spec, acceptance checklist. |
 
-Generated output (do not edit by hand): `index.html`, `404.html`, `sitemap.xml`, `robots.txt` and the
-route folders `about/ build/ business/ community/ contact/ start-your-ai-journey/ learn/ privacy/ professionals/ programs/
-resources/ speaking/ terms/ workshops/` (and `events/` when an event has its own page content). Pages for
+Generated output (do not edit by hand): one file per page at the root (`index.html`, `about.html`,
+`learn.html`, `thank-you.html`, `404.html`…), `sitemap.xml`, `robots.txt`, and the content pages in
+`programs/`, `resources/` and `events/` (`programs/{slug}.html`). On Vercel (`cleanUrls`) `/about` serves
+`about.html`, and the old folder addresses (`/about/`) redirect there. `thank-you.html` is the shared
+thank-you page for every form: point GHL form redirects at `/thank-you`. Pages for
 content that is no longer in the build's content view are removed automatically.
 
 ## Before launch

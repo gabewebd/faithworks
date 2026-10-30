@@ -17,7 +17,7 @@ import { isSuperAdmin } from "../../shared/schema.mjs";
 
 export const TAB = "form_submissions";
 const RATE_WINDOW_MS = 10 * 60_000;
-const MIN_FILL_MS = 2500;          // the browser form's own time trap (js/forms.js)
+const MIN_FILL_MS = 2500;          // the browser form's own time trap (js/main.js)
 const TEST_DOMAINS = /@(example\.(com|org|net)|[a-z0-9-]+\.test|test\.invalid)$/i;
 
 export const submissionId = (provider, providerId) => `sub_${createHash("sha256").update(`${provider}:${providerId}`).digest("hex").slice(0, 32)}`;

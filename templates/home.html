@@ -1,0 +1,535 @@
+<!--meta {
+  "path": "/",
+  "title": "Faith Works · Work Better with AI, without becoming a tech expert",
+  "description": "Practical workshops, guided programs and business support that help founders, professionals and teams turn AI learning into work they can use.",
+  "nav": "home"
+}-->
+    <!-- HERO: centred copy on the feather gradient (brand guidelines p.18, G1), with the node web below
+         the CTAs (p.21) and the motto under it. The web runs the full width of the hero: lines come in
+         from the edge through the AI tools, merge at a junction and enter the Faith Works hub; on the
+         right they fan out again through the everyday work apps to the far edge. -->
+    <section class="hero" id="home" aria-labelledby="hero-title" data-reveal>
+      <div class="hero__stage wrap">
+        <div class="hero__copy">
+          <p class="eyebrow hero__eyebrow"><span class="dot" aria-hidden="true"></span>Human first. AI empowered.</p>
+          <h1 id="hero-title">
+            <span class="line"><span>Work better with <em>AI.</em></span></span>
+            <span class="line"><span>Without becoming a tech expert.</span></span>
+          </h1>
+          <p class="intro hero__intro">Practical workshops, guided programs, and business support that help founders, professionals, and teams turn AI learning into work they can use.</p>
+          <div class="actions hero__actions">
+            <a class="btn btn--sheen" href="/start-your-ai-journey/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <a class="btn btn--light" href="/business/">Train My Team</a>
+          </div>
+        </div>
+        <div class="hweb" role="img" aria-label="Illustration: AI tools such as ChatGPT, Claude, Gemini, OpenAI Codex, NotebookLM and Perplexity, connected through Faith Works to everyday work in Gmail, Google Docs, Google Sheets and Google Drive.">
+          <span class="hweb__node" data-k="a" style="--x:17%;--y:14%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/chatgpt.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="b" style="--x:33%;--y:30%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/claude-color.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="c" style="--x:10%;--y:50%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/gemini.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="d" style="--x:23%;--y:50%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/codex-color.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="e" style="--x:33%;--y:70%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/notebooklm.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="f" style="--x:17%;--y:86%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/perplexity.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <!-- the hub: a small chat with the Faith Works mark (illustrative content) -->
+          <span class="hweb__hub hchat" aria-hidden="true">
+            <span class="hchat__you">Turn my meeting notes into a client update</span>
+            <span class="hchat__ai"><span class="hchat__avatar"><img src="/assets/icons/favicon.svg" alt="" width="44" height="44" decoding="async"></span><span class="hchat__bubble">Here&rsquo;s a draft for the team. Want it shorter, or more formal?</span></span>
+            <span class="hchat__input"><span>Ask a follow-up&hellip;</span><span class="hchat__send"></span></span>
+          </span>
+          <span class="hweb__node" data-k="g" style="--x:82%;--y:12%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/gmail.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="h" style="--x:82%;--y:37%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/google-docs.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="i" style="--x:82%;--y:63%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/google-sheets.svg" alt="" width="24" height="24" decoding="async"></span></span>
+          <span class="hweb__node" data-k="j" style="--x:82%;--y:88%" aria-hidden="true"><span class="hweb__dot"><img src="/assets/icons/tools/google-drive.svg" alt="" width="24" height="24" decoding="async"></span></span>
+        </div>
+        <!-- the motto fills in letter by letter, light to Charcoal, as the page scrolls (js/main.js §5i) -->
+        <p class="hero__small" data-ink-scroll>Learn. Implement. Scale.</p>
+      </div>
+    </section>
+
+    <!-- TRUSTED BY: a quiet logo strip (src/data/trusted-by.json). Placeholders until approved
+         client logos are supplied. The loop is CSS only (css/style.css §10b); js/main.js §11
+         adds the pause button. -->
+    <section class="trusted" aria-labelledby="trusted-title">
+      <div class="wrap trusted__head">
+        <h2 id="trusted-title" class="trusted__title">Trusted by</h2>
+        <button type="button" class="trusted__toggle" data-logo-toggle aria-pressed="false" hidden><span class="trusted__toggle-pause">Pause</span><span class="trusted__toggle-play">Play</span><span class="sr-only"> the logo strip</span></button>
+      </div>
+      <div class="trusted__marquee" data-logo-marquee>
+        {{trustedBy}}
+      </div>
+    </section>
+
+    <!-- EVENTS GALLERY: real Faith Works sessions only (no stock), as three full-bleed rows of
+         photos that the page scroll slides left, right, left (js/main.js §5c).
+         Photos: CMS event images marked for the gallery, then src/data/events.json (tools/event-gallery.mjs).
+         Full bleed: the section is not a .wrap, so the rows run edge to edge; only the heading
+         sits on the page grid. -->
+    <section class="section egallery egallery--bleed" id="gallery" aria-labelledby="gallery-title">
+      <div class="wrap section-head" data-reveal>
+        <div>
+          <p class="eyebrow">Events</p>
+          <h2 id="gallery-title" data-split>Made for<br>real-world work.</h2>
+        </div>
+        <div class="egallery__intro">
+          <p>Masterclasses, hands-on workshops, keynotes and community gatherings, with real people working on real tasks.</p>
+          <a class="text-link" href="/workshops/#gallery">View all events</a>
+        </div>
+      </div>
+      {{eventGallery:home}}
+    </section>
+
+    <div class="strip">
+      <p class="strip__label">Built around your work</p>
+      <ul class="strip__list" aria-label="Who Faith Works is for">
+        <li>Business owners</li>
+        <li>Professionals</li>
+        <li>Teams &amp; organizations</li>
+        <li>Non-technical leaders</li>
+      </ul>
+    </div>
+
+    <!-- PATHWAYS (brief §3 audience section) -->
+    <section class="section wrap" id="pathways" aria-labelledby="pathways-title">
+      <div class="section-head" data-reveal>
+        <div>
+          <p class="eyebrow">Start where you are</p>
+          <h2 id="pathways-title" data-split>Find your next step<br>with AI.</h2>
+        </div>
+        <p>You don’t need to learn every tool. Start with the outcome that matters to you.</p>
+      </div>
+      <ol class="routes" data-reveal>
+        <li class="route route--stone" style="--n:0">
+          <a class="route__link" href="/professionals/">
+
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__ring" cx="24" cy="24" r="17"/>
+                <path class="route__line" d="M24 5.5v3.5M24 39v3.5M5.5 24h3.5M39 24h3.5"/>
+                <path class="route__needle route__needle--lead" d="M30.4 17.6 26.1 26.1 21.9 21.9Z"/>
+                <path class="route__needle" d="M17.6 30.4 21.9 21.9 26.1 26.1Z"/>
+              </svg>
+            </span>
+            <span class="route__num">For professionals</span>
+            <h3 class="route__title">I want to learn AI.</h3>
+            <span class="route__desc"><span>Build practical skills you can apply in your work.</span></span>
+            <span class="route__cta">Explore programs and workshops <span class="route__arrow" aria-hidden="true">↗</span></span>
+          </a>
+        </li>
+        <li class="route route--pink" style="--n:1">
+          <a class="route__link" href="/build/">
+
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <rect class="route__node" x="6" y="8" width="13" height="13" rx="3.5"/>
+                <rect class="route__node" x="6" y="27" width="13" height="13" rx="3.5"/>
+                <path class="route__line" d="M19 14.5h3.5a3.5 3.5 0 0 1 3.5 3.5v12a3.5 3.5 0 0 1-3.5 3.5H19M26 24h3"/>
+                <rect class="route__node route__node--lead" x="29" y="17.5" width="13" height="13" rx="3.5"/>
+              </svg>
+            </span>
+            <span class="route__num">For founders</span>
+            <h3 class="route__title">I want to build with AI.</h3>
+            <span class="route__desc"><span>Turn everyday business tasks into clearer, repeatable workflows.</span></span>
+            <span class="route__cta">See what’s possible <span class="route__arrow" aria-hidden="true">↗</span></span>
+          </a>
+        </li>
+        <li class="route route--yellow" style="--n:2">
+          <a class="route__link" href="/business/">
+
+            <span class="route__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" focusable="false" data-draw>
+                <circle class="route__head route__head--lead" cx="24" cy="9.5" r="4.5"/>
+                <path class="route__line" d="M16.5 22a7.5 7.5 0 0 1 15 0M24 25v4M11 29h26M11 29v3.5M24 29v3.5M37 29v3.5"/>
+                <circle class="route__head" cx="11" cy="37" r="3"/>
+                <circle class="route__head" cx="24" cy="37" r="3"/>
+                <circle class="route__head" cx="37" cy="37" r="3"/>
+                <path class="route__line" d="M6 45.5a5 5 0 0 1 10 0M19 45.5a5 5 0 0 1 10 0M32 45.5a5 5 0 0 1 10 0"/>
+              </svg>
+            </span>
+            <span class="route__num">For organizations</span>
+            <h3 class="route__title">I want my team ready.</h3>
+            <span class="route__desc"><span>Help your people use AI with purpose, confidence, and accountability.</span></span>
+            <span class="route__cta">Explore corporate training <span class="route__arrow" aria-hidden="true">↗</span></span>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <!-- MAKE IT CONCRETE: three cards, task → AI assists → you review -->
+    <section class="section band band--paper" id="examples" aria-labelledby="examples-title">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <div>
+            <p class="eyebrow">Make it concrete</p>
+            <h2 id="examples-title" data-split>One real task.<br>A better way to work.</h2>
+          </div>
+          <p>AI drafts. You check. The work gets done. Illustrative examples, not customer results.</p>
+        </div>
+
+        <div class="flow" data-reveal>
+          <div class="flow__tabs" role="tablist" aria-label="Choose an example task">
+            <button type="button" role="tab" id="ex-tab-0" aria-controls="ex-panel" aria-selected="true" data-example="0"><span class="flow__tab-icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="6" y="9" width="36" height="32" rx="3.5"/><path class="route__line" d="M6 18h36M15 5v8M33 5v8"/><rect class="route__node route__node--lead" x="13" y="25" width="8" height="8" rx="1.5"/></svg></span><span class="flow__tab-name">Content planning</span></button>
+            <button type="button" role="tab" id="ex-tab-1" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="1"><span class="flow__tab-icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="route__node" d="M43 5 5 20l15 7 7 15Z"/><path class="route__node route__node--lead" d="M43 5 20 27l7 15Z"/></svg></span><span class="flow__tab-name">Lead follow‑up</span></button>
+            <button type="button" role="tab" id="ex-tab-2" aria-controls="ex-panel" aria-selected="false" tabindex="-1" data-example="2"><span class="flow__tab-icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="route__node" d="M24 12c-5-4-12-4.5-19-3v28c7-1.5 14-1 19 3 5-4 12-4.5 19-3V9c-7-1.5-14-1-19 3Z"/><path class="route__line" d="M24 12v28M10 17h8M10 23h8M10 29h5"/><circle class="route__head route__head--lead" cx="34" cy="21" r="3"/></svg></span><span class="flow__tab-name">Team knowledge</span></button>
+          </div>
+
+          <!-- Three cards, one per step: the task → AI assists → you review. js/main.js swaps the copy per task -->
+          <div class="flow__cards is-playing" id="ex-panel" role="tabpanel" aria-labelledby="ex-tab-0" aria-live="polite">
+            <article class="fcard fcard--task">
+              <div class="fcard__art" aria-hidden="true">
+                <ul class="fpills" id="ex-inputs"><li>Your audience</li><li>One business objective</li><li>Approved source notes</li></ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span class="fcard__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="9" y="8" width="30" height="35" rx="3.5"/><rect class="route__node route__node--lead" x="17" y="4" width="14" height="8" rx="2"/><path class="route__line" d="M16 22h16M16 30h10"/></svg></span>The task</p>
+                <h3 id="ex-task-title">Start with the right context</h3>
+                <p id="ex-task-copy">Turn a topic into a content plan. Begin with your audience, one business objective and approved source notes.</p>
+              </div>
+            </article>
+            <article class="fcard fcard--ai">
+              <div class="fcard__art">
+                <div class="fdraft" aria-hidden="true">
+                  <p class="fdraft__top"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.5Q13 10.9 21.5 12 13 13.1 12 21.5 11 13.1 2.5 12 11 10.9 12 2.5Z"/></svg>Drafting</p>
+                  <p class="fdraft__label" id="ex-draft">Three content angles</p>
+                  <span class="fdraft__bar"><span></span></span>
+                  <span class="fdraft__line"></span>
+                  <span class="fdraft__line fdraft__line--short"></span>
+                </div>
+                <ul class="ftools" aria-label="Example AI tools">
+                  <li><img src="/assets/icons/tools/notebooklm.svg" alt="NotebookLM" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/chatgpt.svg" alt="ChatGPT" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/grok.svg" alt="Grok" width="24" height="24"></li>
+                  <li><img src="/assets/icons/tools/claude-color.svg" alt="Claude" width="24" height="24"></li>
+                </ul>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span class="fcard__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="route__node route__node--lead" d="M24 5Q26 21.8 43 24 26 26.2 24 43 22 26.2 5 24 22 21.8 24 5Z"/></svg></span>AI assists</p>
+                <h3 id="ex-ai-title">Turn notes into a first draft</h3>
+                <p id="ex-ai-copy">AI drafts three content angles from your approved source notes, ready for you to choose from.</p>
+              </div>
+            </article>
+            <article class="fcard fcard--review">
+              <div class="fcard__art" aria-hidden="true">
+                <div class="fout">
+                  <p class="fout__head" id="ex-out">Content plan</p>
+                  <ul class="fout__rows" id="ex-output"><li>Answer one audience question</li><li>Share a practical how-to</li><li>Tell a real example</li></ul>
+                  <span class="fout__seal"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 12.5 10 16.5 18 8"/></svg></span>
+                </div>
+              </div>
+              <div class="fcard__body">
+                <p class="fcard__step"><span class="fcard__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><circle class="route__node" cx="24" cy="24" r="17"/><path class="route__line" d="M16.5 24.5l5 5 10-10.5"/></svg></span>You review</p>
+                <h3 id="ex-review-title">Review before it goes live</h3>
+                <p id="ex-review-copy">Check accuracy, voice and whether every claim is supported, then publish one angle.</p>
+              </div>
+            </article>
+          </div>
+          <p class="flow__foot"><a class="text-link" href="/learn/">Find a learning pathway</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNEY: LEARN → APPLY → BUILD → IMPLEMENT → IMPROVE (brief §1, §3) -->
+    <section class="section section--field" id="journey" aria-labelledby="journey-title">
+      <div class="wrap journey">
+        <div class="journey__intro" data-reveal>
+          <p class="eyebrow">Learning becomes execution</p>
+          <h2 id="journey-title" data-split>Don’t stop<br>at knowing.</h2>
+          <div class="steps" role="tablist" aria-label="Explore the learning journey" aria-orientation="vertical">
+            <button type="button" class="step" role="tab" id="step-tab-0" aria-controls="step-panel-0" aria-selected="true" data-step="0"><span class="step__name"><span class="step__num" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="route__node" d="M24 12c-5-4-12-4.5-19-3v28c7-1.5 14-1 19 3 5-4 12-4.5 19-3V9c-7-1.5-14-1-19 3Z"/><path class="route__line" d="M24 12v28M10 17h8M10 23h8M10 29h5"/><circle class="route__head route__head--lead" cx="34" cy="21" r="3"/></svg></span>Learn</span><span class="step__arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="step" role="tab" id="step-tab-1" aria-controls="step-panel-1" aria-selected="false" tabindex="-1" data-step="1"><span class="step__name"><span class="step__num" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="7" y="5" width="26" height="34" rx="3.5"/><path class="route__line" d="M13 14h14M13 20h14M13 26h8"/><path class="route__node route__node--lead" d="M36 26l2.2 5.8L44 34l-5.8 2.2L36 42l-2.2-5.8L28 34l5.8-2.2Z"/></svg></span>Apply</span><span class="step__arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="step" role="tab" id="step-tab-2" aria-controls="step-panel-2" aria-selected="false" tabindex="-1" data-step="2"><span class="step__name"><span class="step__num" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="5" y="28" width="17" height="13" rx="2.5"/><rect class="route__node" x="26" y="28" width="17" height="13" rx="2.5"/><rect class="route__node route__node--lead" x="15.5" y="13" width="17" height="13" rx="2.5"/><path class="route__line" d="M24 4v5"/></svg></span>Build</span><span class="step__arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="step" role="tab" id="step-tab-3" aria-controls="step-panel-3" aria-selected="false" tabindex="-1" data-step="3"><span class="step__name"><span class="step__num" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="7" y="8" width="34" height="23" rx="3"/><path class="route__line" d="M3 37.5h42M13 16h12M13 22h8"/><circle class="route__head route__head--lead" cx="35" cy="33" r="8"/><path class="journey-strip__tick" d="M31.5 33l2.5 2.5 5-5"/></svg></span>Implement</span><span class="step__arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="step" role="tab" id="step-tab-4" aria-controls="step-panel-4" aria-selected="false" tabindex="-1" data-step="4"><span class="step__name"><span class="step__num" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><path class="route__ring" d="M39 19A16 16 0 0 0 9 20M9 29a16 16 0 0 0 30 0"/><path class="route__line" d="M39 10v9h-9M9 38v-9h9M17 29l5-5 4 3 5-6"/><circle class="route__head route__head--lead" cx="31" cy="21" r="3"/></svg></span>Improve</span><span class="step__arrow" aria-hidden="true">↗</span></button>
+          </div>
+        </div>
+
+        <div class="scenes" data-reveal>
+          <div class="scene scene--learn is-active" id="step-panel-0" role="tabpanel" aria-labelledby="step-tab-0">
+            <div class="scene__art" data-ui aria-hidden="true">
+              <div class="learn">
+                <div class="learn__topics"><span>Prompting</span><span>Use cases</span><span class="is-on">Human judgment</span><span>Tool choice</span></div>
+                <div class="learn__notes">
+                  <p class="learn__panel-title">Knowledge</p>
+                  <p class="learn__note" style="--n:0"><b>Insight</b>What AI can do</p>
+                  <p class="learn__note" style="--n:1"><b>Insight</b>Where human judgment matters</p>
+                  <p class="learn__note learn__note--pick" style="--n:2"><b>Insight</b><mark>A practical starting point</mark></p>
+                </div>
+                <div class="learn__assistant">
+                  <p class="learn__head"><span class="learn__tools"><img class="tool" src="/assets/icons/tools/claude.svg" alt="" width="22" height="22"><img class="tool" src="/assets/icons/tools/chatgpt.svg" alt="" width="22" height="22"><img class="tool" src="/assets/icons/tools/gemini.svg" alt="" width="22" height="22"></span><span>Learning assistant</span></p>
+                  <p class="learn__bubble">Which task repeats every week?</p>
+                  <p class="learn__prompt"><span class="learn__typed">Map where AI could help my week</span><span class="learn__caret"></span></p>
+                  <p class="learn__suggest"><span>Explain it simply</span><span>Show an example</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="scene__copy">
+              <h3>Make AI feel less overwhelming.</h3>
+              <p>Understand what AI can do, where human judgment matters, and how to choose a practical starting point.</p>
+              <span class="tag">Example: an AI readiness map</span>
+            </div>
+          </div>
+
+          <div class="scene scene--apply" id="step-panel-1" role="tabpanel" aria-labelledby="step-tab-1" hidden>
+            <div class="scene__art" data-ui aria-hidden="true">
+              <div class="apply">
+                <div class="apply__doc apply__doc--in">
+                  <p class="apply__tag">Your task</p>
+                  <p class="apply__title">Plan next week’s content</p>
+                  <p class="apply__label">Inputs</p>
+                  <ul class="apply__inputs"><li style="--n:0">Audience</li><li style="--n:1">Objective</li><li style="--n:2">Source notes</li></ul>
+                </div>
+                <div class="apply__core">
+                  <svg viewBox="236 136 108 108" focusable="false">
+                    <circle class="apply__ring" cx="290" cy="190" r="50"/>
+                    <circle class="apply__sun" cx="290" cy="190" r="40"/>
+                    <path class="apply__spark" d="M290 166 Q294 186 314 190 Q294 194 290 214 Q286 194 266 190 Q286 186 290 166 Z"/>
+                  </svg>
+                  <p class="apply__status">Drafting</p>
+                </div>
+                <div class="apply__doc apply__doc--out">
+                  <p class="apply__tag">AI draft</p>
+                  <p class="apply__title">Three content angles</p>
+                  <ol class="apply__lines"><li style="--n:0">Answer one audience question</li><li style="--n:1">Share a practical how-to</li><li style="--n:2">Tell a real example</li></ol>
+                  <p class="apply__review"><span class="apply__review-dot"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span><span>Reviewed by you</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="scene__copy">
+              <h3>Start with one real task.</h3>
+              <p>Use AI to support an everyday task in your work. Build confidence through useful practice and review the result.</p>
+              <span class="tag">Example: a repeatable content workflow</span>
+            </div>
+          </div>
+
+          <div class="scene scene--build" id="step-panel-2" role="tabpanel" aria-labelledby="step-tab-2" hidden>
+            <div class="scene__art" data-ui aria-hidden="true">
+              <div class="proto">
+                <div class="proto__bar"><i></i><i></i><i></i><span>your-first-version</span></div>
+                <div class="proto__body">
+                  <div class="proto__page"><span class="proto__nav"></span><span class="proto__h"></span><span class="proto__h proto__h--short"></span><span class="proto__btn"></span></div>
+                  <div class="proto__tracker">
+                    <p class="proto__title">Lead tracker</p>
+                    <p class="proto__row" style="--n:0"><span>New inquiry</span><b class="is-new">New</b></p>
+                    <p class="proto__row" style="--n:1"><span>Workshop question</span><b class="is-follow">Follow up</b></p>
+                    <p class="proto__row" style="--n:2"><span>Team proposal</span><b class="is-done">Done</b></p>
+                  </div>
+                </div>
+                <div class="proto__progress"><span>Prototype v1</span><i><b></b></i></div>
+              </div>
+            </div>
+            <div class="scene__copy">
+              <h3>Make your first version real.</h3>
+              <p>Turn an idea into a simple prototype that you can explore, test and refine with guidance.</p>
+              <span class="tag">Example: a landing page or lead tracker</span>
+            </div>
+          </div>
+
+          <div class="scene scene--implement" id="step-panel-3" role="tabpanel" aria-labelledby="step-tab-3" hidden>
+            <div class="scene__art" data-ui aria-hidden="true">
+              <ol class="pipe">
+                <li class="pipe__step"><span class="pipe__icon pipe__icon--trigger"><svg viewBox="0 0 24 24" focusable="false"><path d="M13 3 5 13.5h6l-1 7.5 8-10.5h-6z"/></svg></span><span class="pipe__text"><b>Inquiry arrives</b><small>Trigger</small></span><span class="pipe__chip pipe__chip--auto">Automated</span></li>
+                <li class="pipe__step"><span class="pipe__icon pipe__icon--ai"><img class="tool" src="/assets/icons/tools/claude.svg" alt="" width="22" height="22"></span><span class="pipe__text"><b>Summarize and draft a reply</b><small>AI-assisted</small></span><span class="pipe__chip pipe__chip--auto">Automated</span></li>
+                <li class="pipe__step"><span class="pipe__icon pipe__icon--owner">You</span><span class="pipe__text"><b>Check pricing and context</b><small>Owner: you</small></span><span class="pipe__chip">Assigned</span></li>
+                <li class="pipe__step pipe__step--approve"><span class="pipe__icon pipe__icon--approve"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span><span class="pipe__text"><b>Approve and send</b><small>Human approval checkpoint</small></span><span class="pipe__chip pipe__chip--approve">Needs approval</span></li>
+              </ol>
+            </div>
+            <div class="scene__copy">
+              <h3>Bring it into your workflow.</h3>
+              <p>Define how the process fits into real work, who is responsible, and what needs a human check.</p>
+              <span class="tag">Example: a documented handoff</span>
+            </div>
+          </div>
+
+          <div class="scene scene--improve" id="step-panel-4" role="tabpanel" aria-labelledby="step-tab-4" hidden>
+            <div class="scene__art" data-ui aria-hidden="true">
+              <div class="improve">
+                <svg class="motif motif--build" viewBox="28 60 572 274" data-draw>
+                  <g class="motif-build__module"><rect x="40" y="70" width="110" height="72" rx="10"/><path d="M58 92 H112"/><path d="M58 106 H132"/><path d="M58 120 H96"/></g>
+                  <g class="motif-build__module"><rect x="40" y="250" width="110" height="72" rx="10"/><rect class="motif-build__box" x="58" y="266" width="12" height="12" rx="3"/><path d="M60.5 272 L63.5 275 L68 269.5"/><path d="M80 272 H130"/><rect class="motif-build__box" x="58" y="290" width="12" height="12" rx="3"/><path d="M80 296 H116"/></g>
+                  <path class="motif__wire" d="M150 106 H184 Q200 106 200 122 V175 Q200 191 216 191 H245"/>
+                  <path class="motif__wire" d="M150 286 H184 Q200 286 200 270 V207 Q200 191 216 191 H245"/>
+                  <g class="motif-build__module"><rect x="245" y="151" width="110" height="80" rx="12"/><path d="M272 191 H328"/><circle class="motif-build__dot" cx="272" cy="191" r="5"/><circle class="motif-build__dot" cx="300" cy="191" r="5"/><circle class="motif-build__dot" cx="328" cy="191" r="5"/></g>
+                  <path class="motif__wire" d="M355 191 H404"/>
+                  <path class="motif__wire" d="M384 183 L392 191 L384 199"/>
+                  <path class="motif-build__frame" d="M418 100 H572 Q586 100 586 114 V268 Q586 282 572 282 H418 Q404 282 404 268 V114 Q404 100 418 100 Z"/>
+                  <rect class="motif-build__tile" x="418" y="114" width="70" height="70" rx="8"/>
+                  <rect class="motif-build__tile" x="502" y="114" width="70" height="70" rx="8"/>
+                  <rect class="motif-build__tile" x="418" y="198" width="70" height="70" rx="8"/>
+                  <rect class="motif-build__tile motif-build__tile--accent" x="502" y="198" width="70" height="70" rx="8"/>
+                  <path class="motif-build__check" d="M522 234 L531 243 L551 221"/>
+                  <circle class="motif-build__node" cx="150" cy="106" r="5"/><circle class="motif-build__node" cx="150" cy="286" r="5"/><circle class="motif-build__node" cx="245" cy="191" r="5"/><circle class="motif-build__node" cx="355" cy="191" r="5"/><circle class="motif-build__node" cx="404" cy="191" r="5"/>
+                </svg>
+                <div class="compare">
+                  <div class="compare__item"><p><b>Version 1</b><span>3 of 5 review checks</span></p><span class="compare__bar"><i style="--w:0.6"></i></span></div>
+                  <span class="compare__loop"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 12a8 8 0 0 1 13.7-5.6M20 4v4h-4M20 12a8 8 0 0 1-13.7 5.6M4 20v-4h4"/></svg>Feedback</span>
+                  <div class="compare__item compare__item--after"><p><b>Version 2</b><span>5 of 5 review checks</span></p><span class="compare__bar"><i style="--w:1"></i></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="scene__copy">
+              <h3>Learn from what happens next.</h3>
+              <p>Review results, gather feedback, and refine your process as your needs and skills grow.</p>
+              <span class="tag">Example: a workflow improvement log</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRAMS: scroll-driven split, a sticky mockup beside each program and what a learner leaves with (brief §3 programs introduction) -->
+    <section class="section wrap" id="programs" aria-labelledby="programs-title">
+      <div class="section-head" data-reveal>
+        <div>
+          <p class="eyebrow">Learn by doing</p>
+          <h2 id="programs-title" data-split>Practical skills.<br>Useful outputs.</h2>
+        </div>
+        <p>Every session ends with something you can use: a content plan, a landing page, a workflow prototype.</p>
+      </div>
+      {{programRowsHome}}
+      <div class="programs__foot">
+        <a class="btn btn--light" href="/learn/">See all programs</a>
+        <a class="text-link" href="/workshops/">Upcoming workshops <span class="link-arrow" aria-hidden="true">↗</span></a>
+        <p class="small">New schedules, fees and enrollment details are announced on each program page once confirmed.</p>
+      </div>
+    </section>
+
+    <!-- BUSINESS: the photo carries the "with your people" idea; four verbs say how it works (brief §3 corporate introduction) -->
+    <section id="business" aria-labelledby="business-title">
+      <div class="business" data-reveal>
+        <div class="business__copy">
+          <p class="eyebrow">For your organization</p>
+          <h2 id="business-title" data-split>Future-ready starts<br>with your people.</h2>
+          <p>Move your team from AI awareness to practical adoption, with training built around your people, priorities and workflows.</p>
+          <ol class="business__ways" aria-label="How corporate training runs">
+            <li><b>Align</b> on your team’s priorities</li>
+            <li><b>Learn</b> through relevant use cases</li>
+            <li><b>Apply</b> AI in guided exercises</li>
+            <li><b>Define</b> the next implementation steps</li>
+          </ol>
+          <p class="business__for">For CEOs, HR and learning leaders, and teams navigating the future of work.</p>
+          <div class="actions">
+            <a class="btn" href="/business/#proposal" data-track="corporate_inquiry_start">Request a proposal <span class="btn__arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="/business/">How corporate training works <span class="link-arrow" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <figure class="business__photo">
+          {{gallery:home.business}}
+        </figure>
+      </div>
+    </section>
+
+    <!-- PROOF: participants' own words (exactly as written): the heading beside a stack of cards -->
+    <section class="section proof" id="proof" aria-labelledby="proof-title">
+      <div class="wrap proof__grid">
+        <div class="proof__head" data-reveal>
+          <p class="eyebrow">In their words</p>
+          <h2 id="proof-title" data-split>Hands-on, even if<br>you’re not techy.</h2>
+          <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
+        </div>
+        {{voices}}
+      </div>
+    </section>
+
+    <!-- VIDEO: a real Faith Works video from Site settings; removed when none is set -->
+    <section class="section section--flush-top wrap" id="video" aria-labelledby="video-title">
+      <div class="section-head section-head--compact">
+        <h2 id="video-title" class="h3">See a session in action.</h2>
+      </div>
+      {{featuredVideo}}
+    </section>
+
+    <!-- ABOUT: founder and ecosystem (brief §3; only active destinations at launch) -->
+    <section class="section wrap" id="about" aria-labelledby="about-title">
+      <div class="about">
+        <div class="about__lead" data-reveal>
+          <p class="eyebrow">The bigger picture</p>
+          <h2 id="about-title" data-split>One mission.<br>More ways forward.</h2>
+          <p class="ecosystem__mission">A First-World Philippines, powered by AI-empowered Filipinos.</p>
+          <p class="ecosystem__lede">Faith Works brings together learning, leadership, systems, and community to help people turn new possibilities into practical progress.</p>
+        </div>
+        <div class="founder" data-reveal>
+          <div class="founder__text">
+            <p class="founder__label">Founder</p>
+            <strong>Meet Faith Natividad</strong>
+            <p>AI business coach and future-of-work strategist helping non-technical leaders and professionals apply AI with confidence.</p>
+            <div class="founder__links">
+              <a class="text-link" href="/about/">Faith’s story <span class="link-arrow" aria-hidden="true">↗</span></a>
+              <a class="text-link" href="/speaking/">Invite Faith to speak <span class="link-arrow" aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <figure class="founder__photo">
+            {{gallery:home.founder}}
+          </figure>
+        </div>
+      </div>
+      <div class="ecosystem__list" data-reveal>
+        <a href="/learn/"><h3 class="ecosystem__brand"><img class="brandmark" src="/assets/icons/wordmark.svg" alt="Faith Works" width="1906" height="385" loading="lazy" decoding="async"></h3><p>Practical education, workshops, coaching and strategy.</p></a>
+        <a href="/build/#faith-ai"><h3 class="ecosystem__brand"><img class="brandmark brandmark--ai" src="/assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3><p>AI-supported business systems, starting with your use case.</p></a>
+        <a href="/community/"><h3 class="ecosystem__brand"><img class="brandmark brandmark--community" src="/assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3><p>People who keep learning and applying together.</p></a>
+      </div>
+    </section>
+
+    <!-- FAQ (brief §3 suggested FAQ copy) -->
+    <section class="section section--rule wrap" aria-labelledby="faq-title">
+      <div class="faq" data-reveal>
+        <div class="faq__head">
+          <p class="eyebrow">A little clarity before you begin</p>
+          <h2 id="faq-title" data-split>Good questions.<br>Clear next steps.</h2>
+        </div>
+        <div class="faq__items">
+          <details><summary>Do I need a technical background?</summary><p>Many introductory programs are designed for non-technical learners. Check each program’s prerequisites before registering.</p></details>
+          <details><summary>What do I need to bring?</summary><p>Hands-on sessions may require a laptop, internet access and tool accounts. The event page will list the exact requirements and any paid subscriptions.</p></details>
+          <details><summary>Can you train our company?</summary><p>Yes. Submit your team size, goals and preferred schedule through the <a class="inline" href="/business/#proposal">corporate inquiry form</a>.</p></details>
+          <details><summary>Will I leave with a finished system?</summary><p>Outcomes vary by program. Each program page specifies whether you are building a prototype, learning a workflow, or receiving implementation support.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- STARTER KIT: the primary launch conversion (brief §9, §11) -->
+    <section class="section section--flush-top wrap" id="starter-kit" aria-labelledby="kit-title">
+      <div class="resource" data-reveal>
+        <div>
+          <p class="eyebrow">A useful place to begin</p>
+          <h2 id="kit-title" data-split>Start with one<br>useful workflow.</h2>
+          <p>The free AI Workflow Starter Kit helps you choose one recurring task, organize your inputs, and plan a first version you can test, with a person reviewing the result.</p>
+          <a class="btn" href="/start-your-ai-journey/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <p class="small">Free. No card required. Designed for non-technical learners.</p>
+        </div>
+        <div class="kitart" data-ui aria-label="What is inside the kit">
+          <div class="kitart__stack">
+            <span class="kitart__back" aria-hidden="true"></span>
+            <div class="kitart__doc">
+              <div class="kitart__head">
+                <span class="kitart__icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h4"/></svg></span>
+                <div>
+                  <p class="kitart__tag">Free PDF · Inside the kit</p>
+                  <p class="kitart__title">AI Workflow Starter Kit</p>
+                </div>
+              </div>
+              <ul class="kitart__list"><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Task selector</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Workflow map</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Prompt starter</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Three examples</li><li><span class="kitart__tick" aria-hidden="true"><svg viewBox="0 0 12 12" focusable="false"><path d="M2 6.4 4.9 9.2 10 3.2"/></svg></span>Small test plan</li></ul>
+            </div>
+            <!-- The workflow around the kit: your task, AI drafts, you review -->
+            <span class="kitart__wire" aria-hidden="true"></span>
+            <span class="kitart__node kitart__node--task" aria-hidden="true"><svg viewBox="0 0 48 40" focusable="false"><rect x="10" y="13" width="28" height="4" rx="2"/><rect x="10" y="23" width="18" height="4" rx="2"/></svg></span>
+            <span class="kitart__node kitart__node--ai" aria-hidden="true"><img src="/assets/icons/tools/claude.svg" alt="" width="26" height="26"></span>
+            <span class="kitart__node kitart__node--ok" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5 10 17.5 19 7"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" aria-labelledby="cta-title" data-reveal>
+      <div class="cta__side cta__side--left" aria-hidden="true">
+        <svg class="cta__pattern" viewBox="0 0 320 340" data-draw><path d="M0 12 H72 Q84 12 84 24 V100 Q84 112 96 112 H250"/> <path d="M308 0 V128 Q308 140 296 140 H176 Q164 140 164 152 V310"/> <path d="M0 270 H96 Q108 270 108 258 V236 Q108 224 120 224 H232"/> <path d="M36 0 V190"/> <circle cx="250" cy="112" r="4"/> <circle cx="164" cy="310" r="4"/> <circle cx="232" cy="224" r="4"/> <circle cx="36" cy="190" r="4"/></svg>
+      </div>
+      <div class="cta__side cta__side--right" aria-hidden="true">
+        <svg class="cta__pattern" viewBox="0 0 320 340" data-draw><path d="M0 12 H72 Q84 12 84 24 V100 Q84 112 96 112 H250"/> <path d="M308 0 V128 Q308 140 296 140 H176 Q164 140 164 152 V310"/> <path d="M0 270 H96 Q108 270 108 258 V236 Q108 224 120 224 H232"/> <path d="M36 0 V190"/> <circle cx="250" cy="112" r="4"/> <circle cx="164" cy="310" r="4"/> <circle cx="232" cy="224" r="4"/> <circle cx="36" cy="190" r="4"/></svg>
+      </div>
+      <div class="cta__inner">
+        <p class="eyebrow">Your next chapter starts with one step</p>
+        <h2 id="cta-title" data-split>You don’t have to figure<br>out AI on your own.</h2>
+        <p>Bring your curiosity. Let’s turn it into something useful.</p>
+        <div class="actions actions--center">
+          <a class="btn" href="/start-your-ai-journey/" data-track="starter_kit_click">Start Your AI Journey <span class="btn__arrow" aria-hidden="true">↗</span></a>
+          <a class="btn btn--light" href="/contact/">Talk to us</a>
+        </div>
+      </div>
+    </section>

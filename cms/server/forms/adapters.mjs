@@ -1,7 +1,7 @@
 // Submission providers. Each adapter turns one provider's request into the same neutral shape;
 // everything after that (validation, storage, the CMS screens) is provider-independent.
 //
-//   cms_endpoint   The website's own forms (js/forms.js) POST JSON to /api/forms/submit. Works on
+//   cms_endpoint   The website's own forms (js/main.js) POST JSON to /api/forms/submit. Works on
 //                  any host: the CMS API receives it directly.
 //
 // Every other website form is a GoHighLevel embed; GHL stores and follows up on those. Rows
@@ -17,7 +17,7 @@ const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_c
 const str = (v, max) => (typeof v === "string" ? v.replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, max) : "");
 const isoOrNull = (v) => (typeof v === "string" && v.length <= 40 && !Number.isNaN(Date.parse(v)) ? new Date(v).toISOString() : null);
 
-/* ---- Website forms (js/forms.js) ---- */
+/* ---- Website forms (js/main.js) ---- */
 export function fromWebsite(body) {
   if (!body || typeof body !== "object") throw new HttpError(400, "Send the form as JSON.", "bad_request");
   const formId = body.form_id;

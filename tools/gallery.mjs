@@ -1,4 +1,4 @@
-// Photos and galleries from src/data/gallery.json (the registry) and src/data/gallery.lock.json
+// Photos and galleries from data/gallery.json (the registry) and data/gallery.lock.json
 // (sizes written by tools/images.py). A page source calls {{gallery:page.slot}}; the layout of
 // that slot decides the markup: single (one <img>), figures (captioned figures), stack (a main
 // photo with floating cards), showcase (a large photo over thumbnails) or mosaic (an asymmetric grid). The Events gallery (masonry) is
@@ -15,8 +15,8 @@ const WIDTHS = [640, 1280, 1920];
 // page preview runs without them (they are not bundled into its function); its pages load the
 // photos from the public website instead.
 const CHECK_FILES = existsSync(join(ROOT, WEB));
-const registry = JSON.parse(readFileSync(join(ROOT, "src/data/gallery.json"), "utf8"));
-const lockFile = join(ROOT, "src/data/gallery.lock.json");
+const registry = JSON.parse(readFileSync(join(ROOT, "data/gallery.json"), "utf8"));
+const lockFile = join(ROOT, "data/gallery.lock.json");
 const lock = existsSync(lockFile) ? JSON.parse(readFileSync(lockFile, "utf8")) : {};
 
 // A registered photo, with its web files checked: a missing one stops the build rather than

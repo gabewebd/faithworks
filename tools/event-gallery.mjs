@@ -3,7 +3,7 @@
 //   1. CMS events (authoritative for event images): the published, visible events in the build's
 //      content view, newest first, each with the images its editor marked "Show in the events
 //      gallery" (cover first, then in the event's own order);
-//   2. src/data/events.json: the archive of earlier sessions that have no CMS event record.
+//   2. data/events.json: the archive of earlier sessions that have no CMS event record.
 // The same photo never appears twice (a CMS image that points at a registered photo, or at one
 // of its retired paths, counts as that photo). Drafts and hidden events never reach this list:
 // the content view already leaves them out (cms/shared/public.mjs).
@@ -18,15 +18,15 @@ import { esc } from "./layout.mjs";
 import { imgTag, resolveImage, imageIds } from "./gallery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const archive = JSON.parse(readFileSync(join(ROOT, "src/data/events.json"), "utf8"));
+const archive = JSON.parse(readFileSync(join(ROOT, "data/events.json"), "utf8"));
 
 // Checked once at load: a typo in events.json stops the build instead of shipping a hole.
 {
   const known = new Set(imageIds()), seen = new Set();
   for (const e of archive.gallery || []) {
-    if (!e.id || seen.has(e.id)) throw new Error(`src/data/events.json: missing or duplicate id "${e.id}"`);
+    if (!e.id || seen.has(e.id)) throw new Error(`data/events.json: missing or duplicate id "${e.id}"`);
     seen.add(e.id);
-    if (!known.has(e.image)) throw new Error(`src/data/events.json: "${e.id}" names unknown image "${e.image}" (register it in src/data/gallery.json)`);
+    if (!known.has(e.image)) throw new Error(`data/events.json: "${e.id}" names unknown image "${e.image}" (register it in data/gallery.json)`);
   }
 }
 
@@ -142,7 +142,7 @@ export function photoMarquee(items, { label } = {}) {
 /* ---- Homepage rows -------------------------------------------------------------------------
    Three full-bleed rows of photos, one height per row and varied widths (each tile's --ar is its
    width as a multiple of the row height). Photos are dealt across the rows in turn, so the
-   featured ones lead every row. js/motion.js §5c slides the rows left, right, left as the
+   featured ones lead every row. js/main.js §5c slides the rows left, right, left as the
    section crosses the viewport; without it (reduced motion, phones, no script) each row is a
    plain horizontal scroller. Every photo appears once: nothing is duplicated to fake a loop. */
 const ROWS = 3;
@@ -190,7 +190,7 @@ export function eventGalleryEntries(gallery = []) {
 
 /* ---- Editorial bands (homepage redesign) ---------------------------------------------------
    The homepage's 18 photos as composed spreads of nine: one large photo, then tall, wide and small
-   ones fitted around it on a 12-column grid (css/home-redesign.css places each tile by position).
+   ones fitted around it on a 12-column grid (css/style.css places each tile by position).
    Every second band is mirrored, so the large photo alternates sides. Photos keep their captions. */
 const EDITORIAL_BAND = 9;
 const EDITORIAL_SIZES = ["(min-width: 900px) 58vw, 100vw", "(min-width: 900px) 42vw, 100vw", "(min-width: 900px) 25vw, 50vw"];

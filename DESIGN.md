@@ -269,7 +269,7 @@ The homepage rhythm follows the tinting in the concept's homepage flow [C‑12]:
 - **Pink plate.** Portraits may sit on, or be revealed from, a Faith Pink plate [C‑13 hero panel, C‑15 backdrop]. The plate is the only "frame" allowed.
 - **Text never sits on a photo.** Put captions below in `label` style. *Why:* it avoids scrims and keeps contrast guaranteed.
 - **Placeholders.** Until real photos exist, use a Pink Tint block with a `label` caption describing the intended shot. Never fill a gap with stock.
-- **Performance.** WebP from one original per photo (`src/data/gallery.json` → `tools/images.py`), `srcset` at 640/1280 widths, lazy‑loaded below the fold, and explicit `width`/`height` to prevent layout shift.
+- **Performance.** WebP from one original per photo (`data/gallery.json` → `tools/images.py`), `srcset` at 640/1280 widths, lazy‑loaded below the fold, and explicit `width`/`height` to prevent layout shift.
 
 ---
 

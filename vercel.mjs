@@ -10,6 +10,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadSnapshot, SITE_REDIRECTS } from "./tools/content.mjs";
 import { publicPath } from "./cms/shared/schema.mjs";
+import { cleanPath } from "./tools/layout.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 
@@ -32,8 +33,11 @@ export const config = {
   installCommand: "",
   buildCommand: "node tools/build.mjs --deploy --content=cms --view=published --out=dist",
   outputDirectory: "dist",
-  trailingSlash: true,
-  redirects: redirects.map((r) => ({ source: r.from, destination: r.to, permanent: true })),
+  // Every page is one .html file (tools/build.mjs): /about serves about.html, and the old folder
+  // addresses (/about/) redirect to it because trailing slashes are dropped.
+  cleanUrls: true,
+  trailingSlash: false,
+  redirects: redirects.map((r) => ({ source: cleanPath(r.from), destination: cleanPath(r.to), permanent: true })),
   headers: [
     {
       source: "/(.*)",
