@@ -424,7 +424,7 @@ window.FW_CONFIG = {
   }
 
   /* ---- 7. Analytics events ------------------------------------------------ */
-  if (/\/start-your-ai-journey(\.html|\/?$)/.test(location.pathname)) track("landing_view", { offer_id: "ai-workflow-starter-kit" });
+  if (/\/start-your-ai-journey\/?$/.test(location.pathname)) track("landing_view", { offer_id: "ai-workflow-starter-kit" });
   doc.addEventListener("click", function (e) {
     var el = e.target.closest && e.target.closest("[data-track]");
     if (el) track(el.getAttribute("data-track"), { link_url: el.getAttribute("href") || "" });

@@ -64,9 +64,10 @@ if (OUT !== ROOT) {
 // "/" -> index.html, "/learn/" -> learn.html, "/programs/x/" -> programs/x.html.
 // Default build is portable: every local URL is rewritten relative to the page and page links
 // point at the .html file, so the site works opened from disk (file://), under Live Server, or
-// from any sub-folder. `node tools/build.mjs --deploy` writes root-relative clean URLs (/learn)
+// from any sub-folder. the default build writes root-relative clean URLs (/learn); `--portable` writes the relative .html links
 // for a host that serves page.html at /page (Vercel cleanUrls, see vercel.mjs).
-const DEPLOY = process.argv.includes("--deploy");
+// Clean root URLs (/learn) are the default; --portable keeps the relative .html links for opening from disk.
+const DEPLOY = !process.argv.includes("--portable");
 const fileOf = (route) => route === "/" ? "index.html" : route.endsWith("/") ? route.slice(1, -1) + ".html" : route.slice(1);
 
 function relativize(html, route) {
