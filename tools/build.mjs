@@ -193,6 +193,9 @@ if (OUT !== ROOT) {
   cpSync(join(ROOT, "assets/images/web"), join(OUT, "assets/images/web"), { recursive: true });
   // Event graphics are linked from pasted GHL pages, not only from built pages, so they always ship.
   cpSync(join(ROOT, "assets/images/events"), join(OUT, "assets/images/events"), { recursive: true });
+  // So do resource featured images and article screenshots: the GHL Resources page and CMS previews
+  // of draft articles load them from here before any built page uses them.
+  cpSync(join(ROOT, "assets/images/resources"), join(OUT, "assets/images/resources"), { recursive: true });
 }
 
 // Search files. Staging is excluded from indexing (brief §6); flip site.staging at launch.
