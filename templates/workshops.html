@@ -55,6 +55,18 @@
       {{eventGallery:all}}
     </section>
 
+    <!-- PROOF: participants' own words (CMS testimonials); removed when there are none. Same layout as the homepage: the heading beside a stack of cards -->
+    <section class="section proof" aria-labelledby="ws-proof-title">
+      <div class="wrap proof__grid">
+        <div class="proof__head" data-reveal>
+          <p class="eyebrow">In their words</p>
+          <h2 id="ws-proof-title" data-split>Hands-on, even if<br>you’re not techy.</h2>
+          <p>What participants wrote after Faith Works sessions, quoted exactly.</p>
+        </div>
+        {{voices}}
+      </div>
+    </section>
+
     <!-- Past events hidden for now: remove "hidden" to show again -->
     <section class="section wrap" id="past" aria-labelledby="past-title" hidden>
       <div class="section-head">

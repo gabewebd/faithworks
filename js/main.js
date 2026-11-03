@@ -6,14 +6,11 @@
    forms.mode
      "preview"  : staging. Forms validate and show what would be recorded,
                   but nothing is sent or stored, and no false success is shown.
-     "endpoint" : forms POST JSON to forms.endpoint: the CMS submission API,
-                  https://<cms-domain>/api/forms/submit (cms/README.md §13). It
-                  stores the submission in Supabase, then alerts the team. Its
-                  credentials stay on the CMS server. Success is shown only when
-                  it answers 2xx with { ok: true }. The website's origin must be
-                  listed in the CMS setting FORMS_ALLOWED_ORIGINS.
-     If native GHL forms are embedded instead (the recommended launch path),
-     the designed forms are replaced and this setting is unused.
+     "endpoint" : forms POST JSON to forms.endpoint. Success is shown only when
+                  it answers 2xx with { ok: true }. The CMS no longer takes
+                  submissions (cms/README.md §13), so there is no endpoint to set.
+     Every live form is a GoHighLevel embed, which replaces the designed forms,
+     so this setting is unused.
    starterKit.downloadUrl : the approved kit file. null until the PDF is final.
    ========================================================================== */
 window.FW_CONFIG = {
@@ -435,8 +432,11 @@ window.FW_CONFIG = {
   // Dates are the event's own calendar dates (as entered in its time zone), so they never shift.
   // Every day is a button (one tab stop: the arrow keys move between days, Page Up/Down change
   // the month). Choosing a day lists its events in the panel; "Next up" jumps to the next event.
-  var cal = $("[data-fw-calendar]");
-  if (cal) {
+  // A calendar put in later (GHL pages, §21) is drawn by FW_SITE.mount.
+  $$("[data-fw-calendar]").forEach(calendar);
+  function calendar(cal) {
+    if (cal.__fwOn) return;
+    cal.__fwOn = true;
     var calEvents = [];
     try { calEvents = JSON.parse($("[data-cal-data]", cal).textContent) || []; } catch (err) { calEvents = []; }
     // An event that has ended since this page was built is shown as past: its title only
@@ -659,10 +659,13 @@ window.FW_CONFIG = {
 
   /* ---- 9. Testimonial photos ---------------------------------------------- */
   // A photo that cannot load is removed, so a card never shows a broken image.
-  $$(".quote__photo").forEach(function (img) {
-    var drop = function () { img.remove(); };
-    if (img.complete && img.naturalWidth === 0) drop(); else img.addEventListener("error", drop);
-  });
+  function quotePhotos(root) {
+    $$(".quote__photo", root).forEach(function (img) {
+      var drop = function () { img.remove(); };
+      if (img.complete && img.naturalWidth === 0) drop(); else img.addEventListener("error", drop);
+    });
+  }
+  quotePhotos();
 
   /* ---- 10. Hero: node web wires ------------------------------------------ */
   // The home hero's node web (css/style.css, 5. Home: hero) runs the full width of the hero. One set
@@ -794,7 +797,10 @@ window.FW_CONFIG = {
   // hovered, focused, dragged, off screen or in a background tab; the buttons, dragging the top card
   // off and the arrow keys flip through it, and any of them starts the wait again. Reduced motion: no autoplay,
   // and cards change place without the swing. Without JS: the scroll-snap row.
-  $$("[data-carousel]").forEach(function (box) {
+  $$("[data-carousel]").forEach(carousel);
+  function carousel(box) {
+    if (box.__fwOn) return;
+    box.__fwOn = true;
     var track = $(".voices__track", box);
     var slides = $$("[data-slide]", box);
     var n = slides.length;
@@ -817,6 +823,7 @@ window.FW_CONFIG = {
     };
     var schedule = function () {
       clearTimeout(timer);
+      if (!box.isConnected) return; // replaced by newer cards (§21): this stack stops for good
       if (!reduceMotion && !held()) timer = setTimeout(function () { go(1); }, DWELL);
     };
     var pause = function (key, on) {
@@ -953,7 +960,7 @@ window.FW_CONFIG = {
 
     box.classList.add("is-ready", "is-stack");
     paint();
-  });
+  }
 
   /* ---- 13. Video (click to load) and booking ------------------------------- */
   // Nothing from YouTube, Vimeo or Calendly loads until the visitor asks for it.
@@ -1167,12 +1174,15 @@ window.FW_CONFIG = {
   // Registration buttons carry the event's end (data-event-end, from the build). A page built
   // before the event ended drops them once it is over (on a card, with its "Event details" link,
   // as past cards have none); the next daily rebuild does the same on the server.
-  $$("[data-event-end]").forEach(function (btn) {
-    if (!(Date.parse(btn.getAttribute("data-event-end")) <= Date.now())) return;
-    var box = btn.parentNode;
-    btn.remove();
-    if (box && box.classList.contains("event__cta")) box.remove();
-  });
+  function endedButtons(root) {
+    $$("[data-event-end]", root).forEach(function (btn) {
+      if (!(Date.parse(btn.getAttribute("data-event-end")) <= Date.now())) return;
+      var box = btn.parentNode;
+      btn.remove();
+      if (box && box.classList.contains("event__cta")) box.remove();
+    });
+  }
+  endedButtons();
 
   /* ---- 20. Event photo slideshows ------------------------------------------- */
   // Event cards with several photos: Previous/Next buttons (and the arrow keys while focus is in
@@ -1181,7 +1191,8 @@ window.FW_CONFIG = {
   $$("[data-slides]").forEach(slideshow);
   function slideshow(box) {
     var slides = $$("[data-slide]", box), nav = $("[data-slides-nav]", box), count = $("[data-slide-count]", box);
-    if (slides.length < 2 || !nav) return;
+    if (slides.length < 2 || !nav || box.__fwOn) return;
+    box.__fwOn = true;
     var at = 0;
     var show = function (i) {
       at = (i + slides.length) % slides.length;
@@ -1199,6 +1210,25 @@ window.FW_CONFIG = {
       show(at + (e.key === "ArrowLeft" ? -1 : 1));
     });
   }
+
+  /* ---- 21. CMS sections put in after load (GHL pages) ----------------------- */
+  // GHL pages load the CMS's published content in the browser (js/fw-live.js) and swap in a
+  // section whose events or testimonials changed since the page was built. FW_SITE.mount(el)
+  // gives the new markup inside el what this file gives the page's own at load: the calendar,
+  // the testimonial stack, photo slideshows, ended events' buttons and reveals. The scroll-motion
+  // file below adds its own part (gallery rows) with FW_SITE.add.
+  var mounts = [
+    function (root) { $$("[data-fw-calendar]", root).forEach(calendar); },
+    quotePhotos,
+    function (root) { $$("[data-carousel]", root).forEach(carousel); },
+    endedButtons,
+    function (root) { $$("[data-slides]", root).forEach(slideshow); },
+    function (root) { $$("[data-reveal]", root).forEach(function (el) { if (io) io.observe(el); else el.classList.add("is-in"); }); }
+  ];
+  window.FW_SITE = {
+    add: function (fn) { mounts.push(fn); },
+    mount: function (root) { mounts.forEach(function (fn) { try { fn(root); } catch (err) { console.error(err); } }); }
+  };
 
   window.__fwReady = true;
 })();
@@ -1345,7 +1375,12 @@ window.FW_CONFIG = {
   // settle instead of jumping. Rows only move while the gallery is on screen.
   var SPEEDS = [22, 18, 20];       // px per second at rest, per row
   var BOOST = 0.003, MAX_BOOST = 3; // scroll velocity (px/s) → speed multiplier, and its cap
-  $$("[data-srows]").forEach(function (box) {
+  $$("[data-srows]").forEach(scrollRows);
+  // Rows put in after load (GHL pages, §21 of the file above) start the same way.
+  if (window.FW_SITE) window.FW_SITE.add(function (root) { $$("[data-srows]", root).forEach(scrollRows); });
+  function scrollRows(box) {
+    if (box.__fwRows) return;
+    box.__fwRows = true;
     var rows = $$("[data-srow]", box).map(function (row, i) {
       var tiles = Array.prototype.slice.call(row.children);
       if (!tiles.length) return null;
@@ -1374,16 +1409,23 @@ window.FW_CONFIG = {
       });
     };
     measure();
-    window.addEventListener("resize", function () { clearTimeout(box._fwT); box._fwT = setTimeout(measure, 150); });
+    var onResize = function () { clearTimeout(box._fwT); box._fwT = setTimeout(measure, 150); };
+    window.addEventListener("resize", onResize);
 
     var visible = false, boost = 0;
-    ScrollTrigger.create({
+    var trigger = ScrollTrigger.create({
       trigger: box, start: "top bottom", end: "bottom top",
       onToggle: function (self) { visible = self.isActive; },
       onUpdate: function (self) { boost = Math.max(boost, Math.min(Math.abs(self.getVelocity()) * BOOST, MAX_BOOST)); }
     });
     var mult = 1;
-    gsap.ticker.add(function (time, delta) {
+    gsap.ticker.add(function tick(time, delta) {
+      if (!box.isConnected) { // replaced by newer photos (GHL pages): stop for good
+        gsap.ticker.remove(tick);
+        trigger.kill();
+        window.removeEventListener("resize", onResize);
+        return;
+      }
       var dt = Math.min(delta, 64) / 1000;
       boost *= Math.pow(0.04, dt);               // the surge fades over about a second
       mult += (1 + boost - mult) * Math.min(1, dt * 6); // ease toward it so speed never jumps
@@ -1394,7 +1436,7 @@ window.FW_CONFIG = {
         r.set(r.dir < 0 ? -r.pos : r.pos - r.loop);
       });
     });
-  });
+  }
 
 
   // An illustration arriving (5d, 5e): its blocks a beat apart, then its small parts after them

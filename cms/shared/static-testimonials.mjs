@@ -35,7 +35,7 @@ export const STATIC_TESTIMONIALS = [
   },
   {
     "id": "tst_1775b1b50f",
-    "quote": "Such a great experience at the AI Employees Workshop! 🤖 Learned a lot, met amazing people, and got so many ideas I'm excited to apply. Definitely worth it! 🙌GDDDG",
+    "quote": "Such a great experience at the AI Employees Workshop! 🤖 Learned a lot, met amazing people, and got so many ideas I'm excited to apply. Definitely worth it! 🙌",
     "version": 5,
     "visible": true,
     "sort_order": 40,
