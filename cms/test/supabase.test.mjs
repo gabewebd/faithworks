@@ -5,7 +5,6 @@
 // This verifies the adapter's logic. The full API suite can also run against a real database:
 // see test/helpers.mjs (CMS_TEST_SUPABASE_URL) and cms/README.md.
 import { test } from "node:test";
-import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { loadConfig, supabaseKeyKind } from "../server/config.mjs";
 import { createSupabaseStore, encodeRecord, decodeRow } from "../server/store/supabase-store.mjs";
@@ -155,47 +154,4 @@ test("store: a secret key (sb_secret_…) goes only in the apikey header, never 
   await createSupabaseStore({ url: "https://abc.supabase.co", serviceKey: "sb_secret_abc", fetchImpl, log: { error() {} } }).list("tags");
   assert.equal(seen[0].apikey, "sb_secret_abc");
   assert.equal("authorization" in seen[0], false);
-});
-
-test("form submissions on Supabase: filtered queries, a dropped insert reply, duplicates and status updates", async () => {
-  const fake = fakeSupabase();
-  const sent = [];
-  const fetchImpl = async (url, init) => {
-    if (String(url).startsWith("https://api.resend.com")) { sent.push(JSON.parse(init.body)); return new Response("{}", { status: 200 }); }
-    return fake.fetchImpl(url, init);
-  };
-  const store = createSupabaseStore({ url: "https://abc.supabase.co", serviceKey: KEY, fetchImpl, baseDelayMs: 1, log: { error() {} } });
-  const seed = JSON.parse(readFileSync(new URL("../fixtures/seed.json", import.meta.url), "utf8"));
-  await store.importMissing("users", seed.users);
-  const { app, cleanup } = testApp({ store, fetchImpl, env: { FORMS_ALLOWED_ORIGINS: "https://example.test", FORMS_RATE_LIMIT: "2", RESEND_API_KEY: "re_test", FORMS_EMAIL_FROM: "forms@example.test", FORMS_NOTIFY_TO: "team@example.test" } });
-  const submit = (b) => app.handle(new Request("http://localhost/api/forms/submit", { method: "POST", headers: { "content-type": "application/json", origin: "https://example.test", "x-real-ip": "203.0.113.5" }, body: JSON.stringify(b) }));
-  const b = { form_id: "event_notify", request_id: "req-1", source_page: "/workshops/", elapsed_ms: 8000, fields: { first_name: "[TEST] Kai", email: "kai@example.test" } };
-
-  fake.faults.push({ method: "POST", table: "cms_form_submissions", drop: true }); // stored, reply lost
-  assert.equal((await submit(b)).status, 201);
-  assert.equal((await submit(b)).status, 200, "the browser's retry finds it");
-  const rows = fake.tables.cms_form_submissions;
-  assert.equal(rows.length, 1);
-  assert.equal(sent.length, 0, "no email is sent (GoHighLevel handles alerts)");
-  assert.equal(rows[0].notify_state, "off");
-  assert.equal(typeof rows[0].answers, "object", "answers stored as jsonb");
-  assert.equal(rows[0].notify_attempts, 0, "integer column");
-
-  const q = fake.calls.find((c) => c.method === "GET" && c.url.searchParams.has("ip_hash"));
-  assert.match(q.url.searchParams.get("received_at"), /^gte\.\d{4}-/, "rate limit asks the database for the last 10 minutes only");
-  assert.equal((await submit({ ...b, request_id: "req-2" })).status, 201);
-  assert.equal((await submit({ ...b, request_id: "req-3" })).status, 429);
-
-  const u = await signedIn(app);
-  const list = await u.super.get("/api/submissions?kind=not_spam&form=event_notify");
-  assert.equal(list.status, 200);
-  assert.equal(list.data.items.length, 2);
-  const listCall = fake.calls.findLast((c) => c.method === "GET" && c.url.searchParams.has("form_id"));
-  assert.equal(listCall.url.searchParams.get("kind"), 'in.("genuine","test")');
-  assert.equal(listCall.url.searchParams.get("order"), "received_at.desc");
-  const up = await u.super.put(`/api/submissions/${rows[0].id}`, { status: "completed" });
-  assert.equal(up.status, 200);
-  assert.equal(fake.tables.cms_form_submissions.find((r) => r.id === rows[0].id).status, "completed");
-  assert.ok(!fake.calls.some((c) => c.method === "DELETE"), "nothing is ever deleted");
-  cleanup();
 });

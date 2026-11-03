@@ -3,11 +3,9 @@
 The faithph.ai website for Faith Works PH: practical AI learning for founders, professionals and teams.
 Built to the *Faith Works Brand and Website Development Brief v2.0* (15 October 2026).
 
-**Current phase:** staging. Every page in the brief's sitemap exists. Most forms are GoHighLevel
-embeds (GoHighLevel stores them and alerts the team). The contact form is the site's own form, in
-**preview mode** (nothing is sent); its destination is the CMS, which stores each submission in
-Supabase under *Form submissions* (`cms/README.md` §13), switched on with the settings at the top of `js/main.js`
-(`mode: "endpoint"`). The pages are `noindex` until launch.
+**Current phase:** staging. Every page in the brief's sitemap exists. Every form, contact included,
+is a GoHighLevel embed: GoHighLevel stores submissions and alerts the team (`cms/README.md` §13).
+The pages are `noindex` until launch.
 
 Plain HTML, CSS and JavaScript. No framework, no npm packages. A small Node script generates the pages so
 that the header, footer and repeated content (programs, events, articles) come from one place.

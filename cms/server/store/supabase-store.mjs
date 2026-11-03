@@ -18,10 +18,10 @@ const TRANSIENT = new Set([408, 429, 500, 502, 503, 504]);
 const PAGE = 1000; // Supabase's default max rows per request
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const TS = ["created_at", "updated_at", "published_at", "deleted_at", "at", "submitted_at", "received_at", "notified_at", "sheets_at"];
-const INT = ["version", "published_version", "notify_attempts", "sheets_attempts"];
+const TS = ["created_at", "updated_at", "published_at", "deleted_at", "at"];
+const INT = ["version", "published_version"];
 const BOOL = ["active", "archived"];
-const JSON_COLS = ["payload", "data", "answers", "context"];
+const JSON_COLS = ["payload", "data"];
 
 // Typed columns of every table (cms/supabase/migrations). Content tables also have `fields`.
 const COLUMNS = {
@@ -34,11 +34,9 @@ const COLUMNS = {
 for (const c of Object.keys(COLLECTIONS)) COLUMNS[c] = [...SYSTEM_FIELDS, ...(hasSlug(c) ? ["slug"] : [])];
 // CMS content and system tables (check, seed, import and backup work on these).
 export const SUPABASE_TABS = Object.keys(COLUMNS);
-// Website form submissions (supabase/migrations/20261021000000_form_submissions.sql). Not content:
-// kept out of SUPABASE_TABS, so seeding, imports and content backups never touch it.
-COLUMNS.form_submissions = ["id", "provider", "provider_id", "form_id", "name", "email", "answers", "context", "status", "kind", "spam_reason", "ip_hash",
-  "submitted_at", "received_at", "notify_state", "notify_attempts", "notify_error", "notified_at", "sheets_state", "sheets_attempts", "sheets_error", "sheets_at",
-  "version", "write_id", "updated_at", "updated_by"];
+// cms_form_submissions (supabase/migrations/20261021000000_form_submissions.sql) still holds the
+// submissions the CMS took before website forms moved to GoHighLevel. The CMS no longer reads or
+// writes it; keeping or deleting those rows is a separate decision.
 export const tableOf = (tab) => {
   if (!COLUMNS[tab]) throw new HttpError(500, `Unknown CMS table: ${tab}`, "unknown_table");
   return `cms_${tab}`;

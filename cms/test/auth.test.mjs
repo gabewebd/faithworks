@@ -180,7 +180,7 @@ test("auth: forged, expired or wrong-type session cookies are rejected by protec
 test("auth: protected endpoints refuse anonymous requests; logout needs the CSRF header and clears the cookie", async () => {
   const s = setup();
   try {
-    for (const [method, path] of [["GET", "/api/dashboard"], ["GET", "/api/users"], ["GET", "/api/backup"], ["GET", "/api/submissions"], ["GET", "/api/audit"], ["GET", "/api/records/programs"]]) {
+    for (const [method, path] of [["GET", "/api/dashboard"], ["GET", "/api/users"], ["GET", "/api/backup"], ["GET", "/api/audit"], ["GET", "/api/records/programs"]]) {
       assert.equal((await s.req(path, { method })).status, 401, path);
     }
     for (const [method, path] of [["POST", "/api/users"], ["POST", "/api/deploy"], ["PUT", "/api/records/programs/x"]]) {

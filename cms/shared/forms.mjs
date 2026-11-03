@@ -1,7 +1,6 @@
-// Website lead forms: one definition for the form markup (tools/render.mjs builds the fields
-// from it) and for the server that accepts submissions (cms/server/forms/). Labels, options and
-// limits are therefore the same in the browser and on the server, and a field the website does
-// not have is never stored.
+// Website lead forms: the fields of the site's own designed form markup (tools/render.mjs). The
+// live forms are GoHighLevel embeds, and GoHighLevel stores what visitors send; the CMS does not
+// accept submissions.
 //
 // Field shape: name, label, type (text | email | tel | number | date | select | textarea),
 // required (default true), maxlength, options (strings, { value, label }, or "events" for the
@@ -98,60 +97,4 @@ export const FORMS = {
   },
 };
 
-export const FORM_IDS = Object.keys(FORMS);
-export const formLabel = (id) => FORMS[id]?.label || id;
-
-// Team workflow on a submission, and what kind of record it is.
-export const SUBMISSION_STATUSES = { new: "New", in_progress: "In Progress", completed: "Completed" };
-export const SUBMISSION_KINDS = { genuine: "Genuine", spam: "Spam", test: "Test" };
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const TOKEN = /^[a-z0-9][a-z0-9_-]{0,119}$/i;
-// Control characters except tab and line breaks.
-const CONTROL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
-
-const clean = (v, multiline) => {
-  let s = String(v ?? "").replace(CONTROL, "").normalize("NFC");
-  if (!multiline) s = s.replace(/\s+/g, " ");
-  return s.trim();
-};
 export const optionValue = (o) => (typeof o === "string" ? o : o.value);
-const limitOf = (f) => f.maxlength || (f.type === "textarea" ? 3000 : 160);
-
-// Validates and normalises the answers of one form. Unknown keys are dropped; nothing is
-// coerced silently into a different value. Returns { answers, errors: [{ field, message }] }.
-export function validateAnswers(formId, input) {
-  const form = FORMS[formId];
-  if (!form) return { answers: {}, errors: [{ field: "form_id", message: "Unknown form." }] };
-  const src = input && typeof input === "object" && !Array.isArray(input) ? input : {};
-  const answers = {};
-  const errors = [];
-  for (const f of form.fields) {
-    const v = clean(src[f.name], f.type === "textarea");
-    const required = f.required !== false;
-    if (!v) { if (required) errors.push({ field: f.name, message: `${f.label} is required.` }); continue; }
-    if (v.length > limitOf(f)) { errors.push({ field: f.name, message: `${f.label} is too long.` }); continue; }
-    if (f.type === "email" && !EMAIL.test(v)) { errors.push({ field: f.name, message: "Enter a valid email address." }); continue; }
-    if (f.type === "number" && (!/^\d+$/.test(v) || Number(v) < Number(f.min || 0))) { errors.push({ field: f.name, message: `${f.label} must be a number.` }); continue; }
-    if (f.type === "date" && (!DATE.test(v) || Number.isNaN(Date.parse(v)))) { errors.push({ field: f.name, message: `${f.label} must be a date.` }); continue; }
-    if (f.type === "select") {
-      const ok = f.options === "events" ? TOKEN.test(v) : f.options.some((o) => optionValue(o) === v);
-      if (!ok) { errors.push({ field: f.name, message: `Choose one of the options for ${f.label}.` }); continue; }
-    }
-    answers[f.name] = f.type === "email" ? v.toLowerCase() : v;
-  }
-  for (const k of form.hidden || []) {
-    const v = clean(src[k]);
-    if (v) answers[k] = v.slice(0, 80);
-  }
-  return { answers, errors };
-}
-
-// Plain-text view of a value for lists.
-export function answerLabel(formId, name, value) {
-  const f = FORMS[formId]?.fields.find((x) => x.name === name);
-  if (!f || f.type !== "select" || !Array.isArray(f.options)) return value;
-  const o = f.options.find((x) => optionValue(x) === value);
-  return o ? (typeof o === "string" ? o : o.label) : value;
-}

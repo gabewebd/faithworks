@@ -42,7 +42,6 @@ export function loadConfig(env = process.env) {
     publicSiteUrl: (env.PUBLIC_SITE_URL || "https://faithph.ai").replace(/\/$/, ""),
     deployHookUrl: env.PUBLIC_SITE_DEPLOY_HOOK_URL || "",
     iframeHosts: env.CMS_IFRAME_HOSTS ? list(env.CMS_IFRAME_HOSTS) : DEFAULT_IFRAME_HOSTS,
-    forms: formsConfig(env),
   };
 
   if (!["supabase", "json"].includes(store)) errors.push(`CMS_STORE must be "supabase" or "json" (got "${store}"). The Google Sheets store was removed.`);
@@ -67,22 +66,7 @@ export function loadConfig(env = process.env) {
   return Object.freeze(cfg);
 }
 
-// Website form submissions (server/forms/). Problems here never stop the CMS: they are listed in
-// cfg.forms.problems, shown on /api/health (as a count) and on the Submissions page, and the part
-// they concern stays off. The submission endpoint is off until FORMS_ALLOWED_ORIGINS is set.
 const EMAIL_ADDRESS = /^[^\s@<>,]+@[^\s@<>,]+\.[^\s@<>,]{2,}$/;
-export function formsConfig(env = process.env) {
-  const problems = [];
-  const allowedOrigins = list(env.FORMS_ALLOWED_ORIGINS).map((o) => o.replace(/\/$/, ""));
-  const badOrigins = allowedOrigins.filter((o) => !/^https:\/\/[^/]+$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o));
-  if (badOrigins.length) problems.push("FORMS_ALLOWED_ORIGINS must list origins like https://faithph.ai (https, no path).");
-  const f = {
-    allowedOrigins: allowedOrigins.filter((o) => !badOrigins.includes(o)),
-    rateLimit: Math.min(Math.max(Number(env.FORMS_RATE_LIMIT) || 5, 1), 100),
-    problems,
-  };
-  return f;
-}
 
 // The kind of Supabase key, never the key itself: "secret" (sb_secret_…), "service_role" (legacy
 // JWT), "publishable", another JWT role, or null when unset/unrecognised.

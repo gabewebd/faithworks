@@ -353,10 +353,10 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 
 Optional website settings: `PUBLIC_SITE_URL` (the public site's address, no path: dashboard
 previews load images from it), `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild),
-`CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`. Website form submissions (all optional; the endpoint stays
-off without `FORMS_ALLOWED_ORIGINS`): `FORMS_ALLOWED_ORIGINS`, `FORMS_RATE_LIMIT` (§13).
+`CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
 
-**No longer used** (removed 25 Oct 2026; delete them from the host): `NETLIFY_FORMS_WEBHOOK_SECRET`, `GOOGLE_SHEETS_SPREADSHEET_ID`,
+**No longer used** (delete them from the host): `FORMS_ALLOWED_ORIGINS` and `FORMS_RATE_LIMIT`
+(the CMS submission endpoint, removed 3 Nov 2026, §13); removed 25 Oct 2026: `NETLIFY_FORMS_WEBHOOK_SECRET`, `GOOGLE_SHEETS_SPREADSHEET_ID`,
 `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SERVICE_ACCOUNT_JSON_BASE64`,
 `RESEND_API_KEY`, `FORMS_EMAIL_FROM`, `FORMS_NOTIFY_TO`, `FORMS_NOTIFY_TO_<FORM_ID>`,
 `FORMS_SHEETS_MIRROR`, `FORMS_SHEETS_TAB`.
@@ -401,7 +401,11 @@ not a replacement.
 
 ## 10. What is tested, and what is not
 
-**25 Oct 2026 (current: `npm test`, 108 tests, all passing).** Cross-owner editing and publishing
+**3 Nov 2026 (current: `npm test`, 94 tests).** The CMS submission endpoint, the Submissions screen
+and their tests were removed (§13); the forms tests now check that every website form is a
+GoHighLevel embed and that the old endpoints answer 404.
+
+**25 Oct 2026 (`npm test`, 108 tests, all passing).** Cross-owner editing and publishing
 with the user, action and time recorded in history and the audit log, while unpublish, archive,
 delete and Site settings stay restricted; the Google Sheets store and its tests, and the email/Sheets
 delivery of form submissions, were removed (see §4a, §13); past/ongoing/future events by end time.
@@ -435,59 +439,22 @@ The CMS does not need GHL; GHL keeps CRM, forms, workflows and email. Options fo
 5. Website project builds with `CONTENT_SOURCE=cms`; a test publish triggers the rebuild and appears within minutes; unpublish removes it.
 6. Secret scanning and push protection enabled; first backup taken and stored privately.
 7. Content team walked through: drafts, Publish, Show on the website, preview, HTML/visual editing, event registration choices. Testimonials are published only with the person's agreement to be quoted (the CMS no longer records consent; keep that record wherever the team keeps it).
-8. Form submissions (§13): migration run; one labelled test per form appears under *Form submissions*; the alert arrives at the right recipients; an Author cannot open the page.
+8. Website forms (§13): one labelled test per GoHighLevel form arrives in GoHighLevel.
 
-## 13. Website form submissions
+## 13. Website forms
 
-Most website forms (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
-event notify) are **GoHighLevel embeds** (`ghlFormEmbed` in `tools/render.mjs`): GoHighLevel stores
-those submissions and handles alerts and follow-up. The general contact form still uses the site's
-own form (`js/main.js`), which can post to the CMS; Super Admins see those under
-**Inbox → Form submissions**. The CMS sends **no email** and writes **no Google Sheet** (the Resend
-alerts, the Sheets copy, their retry job and *Retry now* were removed on 25 Oct 2026; existing rows
-keep their old `notify_*`/`sheets_*` columns, which new rows set to `off`).
+Every website form (Starter Kit, program interest, corporate inquiry, speaking, Faith AI demo,
+event notify, general contact) is a **GoHighLevel embed** (`ghlFormEmbed` in `tools/render.mjs`):
+GoHighLevel stores the submissions and runs alerts, contacts and follow-up. The CMS takes no
+submissions: its endpoint (`POST /api/forms/submit`), the Super Admin *Form submissions* screen and
+its API (`/api/submissions`) were removed on 3 Nov 2026, with the `FORMS_ALLOWED_ORIGINS` and
+`FORMS_RATE_LIMIT` settings. `shared/forms.mjs` still defines the fields of the site's own designed
+form markup (`tools/render.mjs`); the live pages use the GoHighLevel embeds instead.
 
-### 13.1 Architecture
+**Kept on purpose:** the Supabase table `cms_form_submissions` and its migration
+(`supabase/migrations/20261021000000_form_submissions.sql`). It still holds the submissions the CMS
+received before the move to GoHighLevel, and nothing deletes them (RLS on, no policies, no DELETE
+grant). Whether to export, keep or drop those rows is a separate decision about personal data
+retention (see the Privacy Notice); the CMS no longer reads or writes the table.
 
-```
- Website form (js/main.js) ── POST JSON + request id ──► CMS /api/forms/submit
-                                     │ validate (shared/forms.mjs), classify, rate-limit
-                                     ▼
-                     Supabase cms_form_submissions  (the record; never deleted)
-```
-
-| Piece | Where |
-| --- | --- |
-| Form definitions, one source for the website markup and the server | `shared/forms.mjs` (used by `tools/render.mjs`) |
-| Provider adapters | `server/forms/adapters.mjs`: `cms_endpoint` (website forms). The Netlify Forms webhook was removed on 25 Oct 2026 (GoHighLevel handles those forms); older `netlify_forms` rows are kept and shown |
-| Capture and CMS operations | `server/forms/submissions.mjs` |
-| Dashboard screens | `public/ui/submissions.mjs` |
-| Database | `supabase/migrations/20261021000000_form_submissions.sql` |
-
-Each row is keyed by provider + provider id (the browser's request id, reused on retries), so a
-retry or double click never creates a second row.
-
-### 13.2 Security
-
-- **Public endpoint** `POST /api/forms/submit`: off until `FORMS_ALLOWED_ORIGINS` is set; accepts
-  only requests whose `Origin` is listed; JSON up to 64 KB; every field is validated on the server.
-- **Spam:** honeypot and 2.5-second time trap re-checked on the server; spam is stored as *Spam* and
-  answered like a success. **Test records** (`example.*`/`*.test` addresses, "[TEST]" names) are labelled *Test*.
-- **Rate limit:** `FORMS_RATE_LIMIT` (default 5) per connection per 10 minutes, counted with a keyed
-  hash of the visitor's address; the address itself is never stored.
-- **Access:** Super Admins only (API-enforced). RLS on, no policies, no DELETE for anyone. Status and
-  type changes go to the audit log (no personal data in the entry).
-
-### 13.3 Setup
-
-1. Run `supabase/migrations/20261021000000_form_submissions.sql` (additive).
-2. `FORMS_ALLOWED_ORIGINS=https://<website origin>` on the CMS host (Functions scope), redeploy.
-3. In the settings at the top of `js/main.js` set `forms.mode = "endpoint"` and `forms.endpoint = "https://<cms-domain>/api/forms/submit"`.
-
-### 13.4 Tested
-
-`npm test` covers the rendered fields matching the server, the GoHighLevel embeds, validation,
-endpoint off by default, CORS, storage, duplicates, spam and test labelling, rate limits, the
-database unavailable (no false success), the retired Netlify route answering 404, Super-Admin-only access,
-filters and audited status changes, and that no request goes to an email service or Google even when
-the old settings are still present.
+`npm test` checks that every website form is a GoHighLevel embed and that the removed endpoints answer 404.

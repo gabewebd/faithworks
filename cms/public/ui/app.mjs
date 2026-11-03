@@ -4,7 +4,6 @@ import { h, clear, api, toast, errorText, roleLabel, icon, skeleton, setUnauthor
 import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin } from "/shared/schema.mjs";
 import { editorView } from "./editor.mjs";
 import { dashboardView, listView, tagsView, usersView, activityView, recoveryView } from "./views.mjs";
-import { submissionsView, submissionView } from "./submissions.mjs";
 
 const appEl = document.getElementById("app");
 const app = { user: null, config: {}, current: null, lastHash: location.hash, reload: () => route(true), refreshCounts: () => {} };
@@ -74,7 +73,6 @@ function shell(content, active, loading = false) {
     navLink("#/", "home", "Dashboard", "dashboard"),
     h("p", { class: "nav-label" }, "Content"),
     CONTENT_COLLECTIONS.map((c) => navLink(`#/c/${c}`, icons[c], COLLECTIONS[c].label, c)),
-    admin ? [h("p", { class: "nav-label" }, "Inbox"), navLink("#/submissions", "inbox", "Form submissions", "submissions")] : null,
     admin ? [h("p", { class: "nav-label" }, "Site"), navLink("#/c/settings/site", "settings", "Site settings", "settings"), navLink("#/tags", "tag", "Tags", "tags"), navLink("#/activity", "log", "Activity log", "activity")] : null,
     admin ? [h("p", { class: "nav-label" }, "Administration"), navLink("#/users", "users", "Users and roles", "users"), navLink("#/recovery", "shield", "Recovery and backup", "recovery")] : null);
   const logout = h("button", { type: "button", onclick: async () => { if (app.current?.isDirty?.() && !(await dialog({ title: "Sign out?", body: "You have unsaved changes that will be lost.", confirm: "Sign out", danger: true })).ok) return; await api("POST", "/api/auth/logout", {}).catch(() => {}); location.hash = ""; location.reload(); } }, "Sign out");
@@ -92,7 +90,7 @@ const pendingActive = (p) => (!p.length ? "dashboard" : p[0] === "c" ? (p[1] ===
 const skeletonKind = (p) => (!p.length ? "dashboard" : p[0] === "c" ? (p[1] === "settings" || p[2] ? "editor" : "list") : "page");
 // Super Admin screens. A direct link from an Author gets "No access" here, and the API refuses
 // the same requests on its own (this check only avoids showing controls that would fail).
-const ADMIN_ROUTES = new Set(["tags", "users", "activity", "recovery", "submissions"]);
+const ADMIN_ROUTES = new Set(["tags", "users", "activity", "recovery"]);
 const noAccess = () => ({ el: h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "No access. "), "Only Super Admins can open this page. ", h("a", { href: "#/" }, "Back to the dashboard")))) });
 
 async function route(force = false) {
@@ -119,7 +117,6 @@ async function route(force = false) {
     else if (path[0] === "users") { active = "users"; view = { el: await usersView(app) }; }
     else if (path[0] === "activity") { active = "activity"; view = { el: await activityView(app) }; }
     else if (path[0] === "recovery") { active = "recovery"; view = { el: await recoveryView(app) }; }
-    else if (path[0] === "submissions") { active = "submissions"; view = { el: path[1] ? await submissionView(app, { id: path[1] }) : await submissionsView(app) }; }
     else view = { el: h("div", { class: "card empty" }, h("h3", {}, "Page not found"), h("p", {}, h("a", { href: "#/" }, "Back to the dashboard"))) };
   } catch (e) {
     if (e.status === 401) return;

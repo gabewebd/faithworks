@@ -17,7 +17,7 @@ export function createJsonStore({ path, seedPath }) {
   let queue = Promise.resolve();
   const load = () => {
     const data = JSON.parse(readFileSync(path, "utf8"));
-    for (const t of [...ALL_TABS, "form_submissions"]) data[t] ||= [];
+    for (const t of ALL_TABS) data[t] ||= [];
     return data;
   };
   const save = (data) => {

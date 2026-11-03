@@ -10,7 +10,7 @@ test("anonymous requests reach only the public endpoints", async () => {
   const { app, cleanup } = testApp();
   const anon = client(app, "");
   for (const p of ["/api/dashboard", "/api/records/programs", "/api/records/resources", "/api/records/settings", "/api/records/testimonials/x",
-    "/api/records/events/x/history", "/api/authors", "/api/tags", "/api/users", "/api/audit", "/api/recovery", "/api/backup", "/api/submissions", "/api/submissions/sub_x"]) {
+    "/api/records/events/x/history", "/api/authors", "/api/tags", "/api/users", "/api/audit", "/api/recovery", "/api/backup"]) {
     assert.equal((await anon.get(p)).status, 401, `GET ${p} needs a session`);
   }
   for (const p of ["/api/records/resources", "/api/records/resources/x/actions/publish", "/api/preview", "/api/tags", "/api/users", "/api/deploy"]) {
@@ -20,9 +20,7 @@ test("anonymous requests reach only the public endpoints", async () => {
 
   const health = await anon.get("/api/health");
   assert.equal(health.status, 200);
-  assert.deepEqual(Object.keys(health.data).sort(), ["configured", "forms", "ok", "store"]);
-  assert.deepEqual(Object.keys(health.data.forms).sort(), ["endpoint", "problems"], "forms setup as booleans and a count only");
-  assert.equal((await anon.put("/api/submissions/sub_x", { status: "completed" })).status, 401, "PUT /api/submissions/:id needs a session");
+  assert.deepEqual(Object.keys(health.data).sort(), ["configured", "ok", "store"]);
 
   const pub = await anon.get("/api/public/content");
   assert.equal(pub.status, 200);
