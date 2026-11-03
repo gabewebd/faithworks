@@ -143,7 +143,11 @@ const inline = (js) => js.replace(/<\/script/gi, "<\\/script").replace(/<!--/g, 
   }
 }
 const asJson = (v) => JSON.stringify(v).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
-const runtime = read("poc/ghl-resources-cms/runtime.js");
+// The site's image preview (js/main.js, between the fw-lightbox markers) runs first; runtime.js
+// attaches it to the shadow root, so images in the embed open the same preview as on the site.
+const lightbox = (read("js/main.js").match(/\/\* fw-lightbox:start \*\/[\s\S]*?\/\* fw-lightbox:end \*\//) || [])[0];
+if (!lightbox) throw new Error("js/main.js has lost its fw-lightbox:start/end block.");
+const runtime = lightbox + "\n" + read("poc/ghl-resources-cms/runtime.js");
 if (!runtime.includes("/*DATA*/") || !runtime.includes("/*RENDER*/")) throw new Error("runtime.js has lost its /*DATA*/ or /*RENDER*/ placeholder.");
 const base = { fontsUrl: FONTS, css, hostCss: HOST_CSS, extraCss: EXTRA_CSS };
 const { siteCards, generatedAt, headHtml, ...shown } = content;

@@ -414,6 +414,8 @@
 
   base = findBase();
   mount();
+  // Image preview (js/main.js fw-lightbox block, put in front of this file by build.mjs)
+  if (window.FWLightbox) window.FWLightbox.attach(root);
   if (!DATA.live) start();
   else {
     // An article address (?slug, #/resources/slug) waits on an article wireframe, the rest on cards

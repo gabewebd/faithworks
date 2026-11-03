@@ -2109,3 +2109,147 @@ window.FW_CONFIG = {
 })();
 
 
+
+/* ---- js/main.js ---- */
+/* ==========================================================================
+   Image preview (lightbox). Click or tap any content image to see it large, with its caption and
+   an × button (Esc and a click outside the image also close it). Images inside links or buttons
+   keep their link; logos, icons (.svg) and small images are left alone; [data-no-zoom] opts out.
+   Self-contained on purpose (own styles, no site helpers): the GHL Resources embed
+   (poc/ghl-resources-cms/build.mjs) copies the block between the fw-lightbox markers into its
+   bundle and calls FWLightbox.attach(shadowRoot). Brand palette only.
+   ========================================================================== */
+/* fw-lightbox:start */
+(function () {
+  "use strict";
+  if (window.FWLightbox) return;
+  var CSS = ".fw-zoom{cursor:zoom-in}" +
+    ".fw-zoom:focus-visible{outline:3px solid #FBC522;outline-offset:3px}" +
+    ".fw-lb{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;padding:72px 16px 24px;border:0;background:transparent;color:#FAF8F4;overflow:auto}" +
+    ".fw-lb[open]{display:grid;place-items:center}" +
+    ".fw-lb::backdrop{background:rgb(26 26 26 / 0.9);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}" +
+    ".fw-lb:not([open]){display:none}" +
+    ".fw-lb__fig{display:grid;justify-items:center;gap:14px;margin:0;max-width:min(1400px,100%)}" +
+    ".fw-lb__img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 160px);max-height:calc(100dvh - 160px);border-radius:12px;background:#FAF8F4;box-shadow:0 30px 60px -20px rgb(0 0 0 / 0.6);cursor:zoom-out}" +
+    ".fw-lb__cap{max-width:70ch;margin:0;font:400 14px/1.5 Inter,Arial,sans-serif;color:#FAF8F4;text-align:center}" +
+    ".fw-lb__cap:empty{display:none}" +
+    ".fw-lb__close{position:fixed;top:16px;right:16px;z-index:1;display:grid;place-items:center;width:48px;height:48px;margin:0;padding:0;border:0;border-radius:50%;background:#FAF8F4;color:#1A1A1A;cursor:pointer;box-shadow:0 8px 20px -8px rgb(0 0 0 / 0.5);transition:background-color 160ms ease}" +
+    ".fw-lb__close:hover{background:#EFACBA}" +
+    ".fw-lb__close:focus-visible{outline:3px solid #FBC522;outline-offset:3px}" +
+    ".fw-lb__close svg{display:block;width:20px;height:20px}" +
+    "@media (prefers-reduced-motion:no-preference){.fw-lb[open] .fw-lb__fig{animation:fw-lb-in 220ms cubic-bezier(.215,.61,.355,1)}.fw-lb[open]::backdrop{animation:fw-lb-fade 220ms ease}}" +
+    "@keyframes fw-lb-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}" +
+    "@keyframes fw-lb-fade{from{opacity:0}to{opacity:1}}";
+  // Never a preview inside these (the link or control wins), nor for the site frame and logos
+  var SKIP = "a,button,label,summary,select,[data-no-zoom],.site-header,.site-footer,.menu,.fw-lb,.logo,.tools,.share";
+  var MIN_W = 96, MIN_H = 64;
+
+  function isSvg(img) { var s = img.getAttribute("src") || ""; return /\.svg(\?|#|$)/i.test(s) || /^data:image\/svg/i.test(s); }
+  function eligible(img) { return !!img && img.tagName === "IMG" && !isSvg(img) && !img.closest(SKIP); }
+  function bigEnough(img) { var r = img.getBoundingClientRect(); return r.width >= MIN_W && r.height >= MIN_H; }
+  // The largest file the image offers (its srcset's widest candidate), else what it shows now
+  function largest(img) {
+    var best = img.currentSrc || img.src, bestW = 0;
+    (img.getAttribute("srcset") || "").split(",").forEach(function (c) {
+      var p = c.trim().split(/\s+/), w = parseInt(p[1], 10);
+      if (p[0] && /w$/.test(p[1] || "") && w > bestW) { bestW = w; best = p[0]; }
+    });
+    return best;
+  }
+  function captionOf(img) {
+    var fig = img.closest("figure"), cap = fig && fig.querySelector("figcaption");
+    return (cap && cap.textContent.trim()) || "";
+  }
+
+  function attach(root) {
+    var doc = root.ownerDocument || root, isDoc = root === doc, lb, shown, opener, lockWas;
+    function hasStyle() { return isDoc ? doc.getElementById("fw-lb-style") : root.querySelector("style[data-fw-lb]"); }
+    // Built on first use, and again if the page replaced it (the embed re-renders its root)
+    function ensure() {
+      if (!hasStyle()) {
+        var st = doc.createElement("style");
+        st.setAttribute("data-fw-lb", "");
+        if (isDoc) st.id = "fw-lb-style";
+        st.textContent = CSS;
+        (isDoc ? doc.head : root).appendChild(st);
+      }
+      if (lb && lb.isConnected) return lb;
+      lb = doc.createElement("dialog");
+      lb.className = "fw-lb";
+      lb.setAttribute("aria-label", "Image preview");
+      lb.innerHTML = "<button class=\"fw-lb__close\" type=\"button\" aria-label=\"Close image preview\">" +
+        "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button>" +
+        "<figure class=\"fw-lb__fig\"><img class=\"fw-lb__img\" alt=\"\"><figcaption class=\"fw-lb__cap\"></figcaption></figure>";
+      shown = lb.querySelector(".fw-lb__img");
+      lb.querySelector(".fw-lb__close").addEventListener("click", close);
+      // A click anywhere except the caption closes it (the dialog's own area is the backdrop)
+      lb.addEventListener("click", function (e) { if (!e.target.closest(".fw-lb__cap")) close(); });
+      lb.addEventListener("close", function () {
+        doc.documentElement.style.overflow = lockWas || "";
+        shown.removeAttribute("src");
+        if (opener && opener.isConnected && opener.focus) opener.focus({ preventScroll: true });
+      });
+      (isDoc ? doc.body : root).appendChild(lb);
+      return lb;
+    }
+    function close() {
+      if (!lb || !lb.hasAttribute("open")) return;
+      if (typeof lb.close === "function") lb.close();
+      else { lb.removeAttribute("open"); lb.dispatchEvent(new Event("close")); }
+    }
+    function open(img) {
+      ensure();
+      opener = img;
+      shown.src = largest(img);
+      shown.alt = img.alt || "";
+      lb.querySelector(".fw-lb__cap").textContent = captionOf(img);
+      if (!lb.hasAttribute("open")) lockWas = doc.documentElement.style.overflow;
+      doc.documentElement.style.overflow = "hidden";
+      if (typeof lb.showModal === "function") lb.showModal(); else lb.setAttribute("open", "");
+      lb.querySelector(".fw-lb__close").focus({ preventScroll: true });
+    }
+
+    root.addEventListener("click", function (e) {
+      var img = e.target.closest && e.target.closest("img");
+      if (!eligible(img) || !bigEnough(img)) return;
+      e.preventDefault();
+      open(img);
+    });
+    // The zoom cursor appears on the images that open a preview
+    root.addEventListener("pointerover", function (e) {
+      var img = e.target.closest && e.target.closest("img");
+      if (img && !img.classList.contains("fw-zoom") && eligible(img) && bigEnough(img)) img.classList.add("fw-zoom");
+    });
+    // Keyboard: figure and cover images can be focused, and Enter or Space opens them
+    root.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && e.target.tagName === "IMG" && e.target.classList.contains("fw-zoom") && eligible(e.target)) { e.preventDefault(); open(e.target); }
+    });
+    function mark(scope) {
+      [].forEach.call(scope.querySelectorAll("figure img, .article__cover img"), function (img) {
+        if (img.hasAttribute("tabindex") || !eligible(img) || img.classList.contains("fw-lb__img")) return;
+        img.classList.add("fw-zoom");
+        img.setAttribute("tabindex", "0");
+        img.setAttribute("role", "button");
+        img.setAttribute("aria-label", "View larger: " + (img.alt || captionOf(img) || "image"));
+      });
+    }
+    if (!hasStyle()) ensure();
+    mark(root);
+    // Content put in later (GHL live sections, search results, the embed's routes) is marked too
+    if (window.MutationObserver) {
+      var queued = false;
+      new MutationObserver(function () {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(function () { queued = false; if (!hasStyle()) ensure(); mark(root); });
+      }).observe(isDoc ? doc.body : root, { childList: true, subtree: true });
+    }
+  }
+
+  window.FWLightbox = { attach: attach };
+  // The GHL Resources embed attaches to its own shadow root instead
+  if (window.FW_LIGHTBOX_MANUAL) return;
+  if (document.body) attach(document);
+  else document.addEventListener("DOMContentLoaded", function () { attach(document); });
+})();
+/* fw-lightbox:end */
