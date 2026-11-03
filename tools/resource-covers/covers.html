@@ -1,27 +1,27 @@
 <!doctype html>
 <!-- Composer for the Resources featured images. Each scene is written as plain SVG markup:
-     window.compose(name) returns the finished SVG document and render.mjs --compose saves it as
-     svg/<slug>.svg. Those SVG files are the sources: render.mjs exports the PNGs from them, so an
-     SVG edited by hand exports the same way.
-     Brand visuals, not interfaces: recognizable logos on large white tiles are the focus, joined
-     to a few concept icons (the site's line icons, as in .promise__icon: a Faith Pink or AI Yellow
-     tile, Charcoal strokes, Works White fills, one solid Charcoal accent). A few short labels, only
-     where an icon needs a word, in the program pages' hero style: a frosted white pill, or a Charcoal
-     tooltip under a cursor. No cards, no paragraphs.
+     window.compose(name) returns the finished SVG document (text measured with the real font) and
+     render.mjs --compose saves it as svg/<slug>.svg. Those SVG files are the sources: render.mjs
+     exports the PNGs from them, so an SVG edited by hand exports the same way.
+     Brand visuals, not interfaces: recognizable logos on large white tiles are the focus. Concepts
+     are chips in the program pages' hero style ("Website form / New enquiry"): a compact white card
+     holding the site's line icon on a Faith Pink or AI Yellow tile (as .promise__icon), a short
+     title and a muted line under it. Nothing else carries text.
      Rules: brand palette only; smooth backgrounds, no texture; connectors are straight segments
      only; each image has its own gradient direction. Logos are the site's own files in
      assets/icons/tools/, embedded as symbols in their real colours. Key content stays inside the
      area both crops keep: 16:10 on cards (x 96–1824) and 21:9 at the top of articles (y 128–952). -->
 <html lang="en">
-<head><meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=block">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=block">
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter" font-weight="600" font-size="26"></text></svg>
+<svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
 const LOGOS = ["chatgpt", "claude-color", "gemini", "gmail", "google-calendar", "google-sheets", "github"];
-const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@600&amp;display=block";
+const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /* ---- Concept icons: the site's line-icon language on a 48-unit grid ---- */
@@ -46,38 +46,32 @@ const ICONS = {
 };
 
 /* ---- Pieces ---- */
-// A tile: Faith Pink, AI Yellow or white, lifted by a soft Charcoal shadow, a white halo and a
-// faint top light (the only dimensional touches)
-function tile(x, y, s, fill) {
-  const rx = Math.round(s * 0.22), f = fill === "white" ? "#FFFFFF" : C[fill];
-  return `<rect x="${x - 12}" y="${y - 12}" width="${s + 24}" height="${s + 24}" rx="${rx + 12}" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/>` +
-    `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="${f}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="url(#light)"/>`;
+const width = (str, weight, size) => { const m = document.getElementById("m"); m.setAttribute("font-weight", weight); m.setAttribute("font-size", size); m.textContent = str; return m.getComputedTextLength(); };
+// The lift every element shares: a white halo and a soft Charcoal shadow
+const halo = (x, y, w, h, rx) => `<rect x="${x - 10}" y="${y - 10}" width="${w + 20}" height="${h + 20}" rx="${rx + 10}" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/>`;
+// The site's icon: line icon on a pink or yellow tile with a faint top light
+function iconTile(x, y, s, name, fill) {
+  const rx = Math.round(s * 0.22), i = Math.round(s * 0.62), o = (s - i) / 2;
+  return `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="${C[fill]}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="url(#light)"/>` +
+    `<svg x="${x + o}" y="${y + o}" width="${i}" height="${i}" viewBox="0 0 48 48" overflow="visible">${ICONS[name]}</svg>`;
 }
-// A concept icon on a pink or yellow tile (the icon fills 62% of it, as on the site)
-function icon(x, y, s, name, fill) {
-  const i = Math.round(s * 0.62), o = (s - i) / 2;
-  return `<g>${tile(x, y, s, fill)}<svg x="${x + o}" y="${y + o}" width="${i}" height="${i}" viewBox="0 0 48 48" overflow="visible">${ICONS[name]}</svg></g>`;
-}
-// A logo on a white tile
+// A logo on a large white tile (s square, top-left x, y)
 function logo(x, y, s, name) {
-  const i = Math.round(s * 0.54), o = (s - i) / 2;
-  return `<g>${tile(x, y, s, "white")}<use href="#logo-${name}" x="${x + o}" y="${y + o}" width="${i}" height="${i}" color="${C.ink}"/></g>`;
+  const rx = Math.round(s * 0.22), i = Math.round(s * 0.54), o = (s - i) / 2;
+  return `<g>${halo(x, y, s, s, rx)}<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="#FFFFFF"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="url(#light)"/><use href="#logo-${name}" x="${x + o}" y="${y + o}" width="${i}" height="${i}" color="${C.ink}"/></g>`;
+}
+// A concept chip centred on (cx, cy): icon tile, title, a muted line. Returns its svg and edges.
+function chip(cx, cy, iconName, fill, title, sub) {
+  const h = 120, t = 80, pad = 20, gap = 22, w = Math.round(pad + t + gap + Math.max(width(title, 600, 29), width(sub, 500, 23)) + 34);
+  const x = Math.round(cx - w / 2), y = Math.round(cy - h / 2), tx = x + pad + t + gap;
+  const svg = `<g>${halo(x, y, w, h, 24)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="24" fill="#FFFFFF" fill-opacity="0.94"/>${iconTile(x + pad, y + (h - t) / 2, t, iconName, fill)}` +
+    `<text x="${tx}" y="${y + 52}" font-family="Inter" font-weight="600" font-size="29" fill="${C.ink}">${esc(title)}</text>` +
+    `<text x="${tx}" y="${y + 88}" font-family="Inter" font-weight="500" font-size="23" fill="${C.ink}" fill-opacity="0.55">${esc(sub)}</text></g>`;
+  return { svg, w, left: x, right: x + w, top: y, bottom: y + h };
 }
 // Connectors: straight segments only
 const wire = (pts) => `<polyline points="${pts.map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ink}" stroke-opacity="0.22" stroke-width="3" stroke-linejoin="miter"/>`;
 const node = (x, y, fill = C.pink, r = 10) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#FFFFFF" stroke-width="5"/>`;
-// A label, as in the program pages' hero mockups: a frosted white pill with a dot, or (dark) a
-// Charcoal tooltip. anchor: (x, y) is the pill's start, middle or end; y is its centre.
-function label(x, y, str, { anchor = "middle", dot = C.pink, dark = false } = {}) {
-  const m = document.getElementById("m"); m.textContent = str;
-  const h = 54, pad = 22, gap = dark ? 0 : 26, w = Math.round(m.getComputedTextLength() + pad * 2 + gap);
-  const left = Math.round(anchor === "start" ? x : anchor === "end" ? x - w : x - w / 2), top = Math.round(y - h / 2);
-  const box = dark ? `<rect x="${left}" y="${top}" width="${w}" height="${h}" rx="12" fill="${C.ink}" filter="url(#lift)"/>`
-    : `<rect x="${left}" y="${top}" width="${w}" height="${h}" rx="${h / 2}" fill="#FFFFFF" fill-opacity="0.94" filter="url(#lift)"/><circle cx="${left + pad + 7}" cy="${y}" r="7" fill="${dot}"/>`;
-  return box + `<text x="${left + pad + gap}" y="${y}" dominant-baseline="central" font-family="Inter" font-weight="600" font-size="26" fill="${dark ? "#FFFFFF" : C.ink}">${esc(str)}</text>`;
-}
-// The cursor of the hero mockups (straight edges only), its tip at (x, y)
-const cursor = (x, y) => `<polygon points="${x},${y} ${x},${y + 34} ${x + 9},${y + 26} ${x + 15},${y + 39} ${x + 21},${y + 36} ${x + 15},${y + 23} ${x + 26},${y + 23}" fill="${C.ink}" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="miter"/>`;
 const ends = (wires, fill) => wires.flatMap((p) => [node(...p[0], fill), node(...p[p.length - 1], fill)]).join("");
 
 /* ---- Shared definitions; each scene adds its own background gradient ---- */
@@ -93,7 +87,6 @@ async function defs(bg, extra = "") {
 ${bg}
 <linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
 <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="${C.ink}" flood-opacity="0.13"/></filter>
-<filter id="lift" x="-20%" y="-50%" width="140%" height="240%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="${C.ink}" flood-opacity="0.12"/></filter>
 ${extra}
 ${symbols.join("\n")}
 </defs>`;
@@ -111,75 +104,78 @@ const layer = (id, content) => `<g id="${id}">${content}</g>\n`;
 /* ---- 1. AI Is Not Another Niche Skill — radial gradient: three AI tools at the centre, wired to six kinds of work ---- */
 async function niche() {
   const bg = `<radialGradient id="bg" cx="960" cy="540" r="1100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F6D0D8"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE6A6"/></radialGradient>`;
+  const top = [[430, "megaphone", "pink", "Marketing", "Campaign drafts"], [960, "people", "yellow", "People", "Policy summaries"], [1490, "chart", "pink", "Finance", "Report checks"]].map(([x, ...a]) => chip(x, 218, ...a));
+  const bottom = [[430, "process", "yellow", "Operations", "Process maps"], [960, "book", "pink", "Learning", "Lesson plans"], [1490, "growth", "yellow", "Growth", "Sales prep"]].map(([x, ...a]) => chip(x, 862, ...a));
   const wires = [
     [[745, 540], [825, 540]], [[1095, 540], [1175, 540]],
-    [[960, 300], [960, 405]], [[460, 300], [460, 365], [635, 365], [635, 430]], [[1460, 300], [1460, 365], [1285, 365], [1285, 430]],
-    [[960, 780], [960, 675]], [[460, 780], [460, 715], [635, 715], [635, 650]], [[1460, 780], [1460, 715], [1285, 715], [1285, 650]],
+    [[960, top[1].bottom], [960, 405]], [[430, top[0].bottom], [430, 365], [635, 365], [635, 430]], [[1490, top[2].bottom], [1490, 365], [1285, 365], [1285, 430]],
+    [[960, bottom[1].top], [960, 675]], [[430, bottom[0].top], [430, 715], [635, 715], [635, 650]], [[1490, bottom[2].top], [1490, 715], [1285, 715], [1285, 650]],
   ];
-  const work = layer("work", icon(385, 150, 150, "megaphone", "pink") + icon(885, 150, 150, "people", "yellow") + icon(1385, 150, 150, "chart", "pink") +
-    icon(385, 780, 150, "process", "yellow") + icon(885, 780, 150, "book", "pink") + icon(1385, 780, 150, "growth", "yellow"));
-  const tools = layer("ai-tools", logo(525, 430, 220, "chatgpt") + logo(825, 405, 270, "claude-color") + logo(1175, 430, 220, "gemini"));
-  return doc("AI Is Not Another Niche Skill", "ChatGPT, Claude and Gemini at the centre, joined by straight lines to six kinds of work: marketing, people, finance, operations, learning and growth.",
-    await defs(bg), layer("connectors", wires.map(wire).join("")) + work + tools + layer("nodes", ends(wires)) +
-    layer("labels", [["Marketing", 385, 150, C.pink], ["People", 885, 150, C.yellow], ["Finance", 1385, 150, C.pink], ["Operations", 385, 780, C.yellow], ["Learning", 885, 780, C.pink], ["Growth", 1385, 780, C.yellow]].map(([t, x, y, d]) => label(x + 132, y + 118, t, { anchor: "start", dot: d })).join("")));
+  const body = layer("connectors", wires.map(wire).join("")) + layer("work", [...top, ...bottom].map((c) => c.svg).join("")) +
+    layer("ai-tools", logo(525, 430, 220, "chatgpt") + logo(825, 405, 270, "claude-color") + logo(1175, 430, 220, "gemini")) + layer("nodes", ends(wires));
+  return doc("AI Is Not Another Niche Skill", "ChatGPT, Claude and Gemini at the centre, joined by straight lines to six kinds of work: marketing, people, finance, operations, learning and growth.", await defs(bg), body);
 }
 
 /* ---- 2. AI agents — horizontal gradient: an instruction, the agent, its tools, a result ---- */
 async function agents() {
   const bg = `<linearGradient id="bg" x1="0" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3C2CC"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE3A0"/></linearGradient>`;
+  const ask = ["chat", "pink", "Your instruction", "Plan our team offsite"], res = ["done", "yellow", "Ready for review", "Shortlist and email"];
+  const aw = chip(0, 0, ...ask).w, rw = chip(0, 0, ...res).w;
+  const as = 240, ts = 150, gap = 80; // agent and tool tile sizes, the space a connector spans
+  const total = aw + gap + as + gap * 1.6 + ts + gap * 1.6 + rw, x0 = Math.round(960 - total / 2);
+  const a = chip(x0 + aw / 2, 540, ...ask), agX = a.right + gap, tX = Math.round(agX + as + gap * 1.6), r = chip(Math.round(tX + ts + gap * 1.6 + rw / 2), 540, ...res);
+  const sx = Math.round(agX + as + gap * 0.8), mx = Math.round(tX + ts + gap * 0.8), ys = [320, 540, 760];
   const wires = [
-    [[360, 540], [520, 540]],
-    [[800, 540], [900, 540], [900, 300], [1000, 300]], [[900, 540], [1000, 540]], [[900, 540], [900, 780], [1000, 780]],
-    [[1170, 300], [1310, 300], [1310, 540], [1450, 540]], [[1170, 540], [1450, 540]], [[1170, 780], [1310, 780], [1310, 540]],
+    [[a.right, 540], [agX, 540]],
+    [[agX + as, 540], [sx, 540], [sx, ys[0]], [tX, ys[0]]], [[sx, 540], [tX, 540]], [[sx, 540], [sx, ys[2]], [tX, ys[2]]],
+    [[tX + ts, ys[0]], [mx, ys[0]], [mx, 540], [r.left, 540]], [[tX + ts, 540], [r.left, 540]], [[tX + ts, ys[2]], [mx, ys[2]], [mx, 540]],
   ];
-  const nodes = [[360, 540], [520, 540], [800, 540], [1000, 300], [1000, 540], [1000, 780], [1170, 300], [1170, 540], [1170, 780]].map((p) => node(...p)).join("") + node(1450, 540, C.yellow);
-  const body = layer("connectors", wires.map(wire).join("")) +
-    layer("instruction", icon(170, 445, 190, "chat", "pink")) + layer("agent", logo(520, 400, 280, "claude-color")) +
-    layer("tools", logo(1000, 215, 170, "google-calendar") + logo(1000, 455, 170, "google-sheets") + logo(1000, 695, 170, "gmail")) +
-    layer("result", icon(1450, 435, 210, "done", "yellow")) + layer("nodes", nodes) +
-    layer("labels", label(265, 690, "Your instruction") + label(1085, 172, "Your tools", { dot: C.yellow }) + label(1555, 700, "Ready for review", { dot: C.yellow }) + cursor(696, 640) + label(722, 712, "AI agent", { anchor: "start", dark: true }));
-  return doc("AI Agents Explained", "An instruction goes to an AI agent (Claude), which uses tools (Google Calendar, Google Sheets, Gmail) and returns a finished result, all joined by straight lines.", await defs(bg), body);
+  const nodes = [[a.right, 540], [agX, 540], [agX + as, 540], ...ys.flatMap((y) => [[tX, y], [tX + ts, y]])].map((p) => node(...p)).join("") + node(r.left, 540, C.yellow);
+  const body = layer("connectors", wires.map(wire).join("")) + layer("instruction", a.svg) + layer("agent", logo(agX, 540 - as / 2, as, "claude-color")) +
+    layer("tools", ["google-calendar", "google-sheets", "gmail"].map((n, i) => logo(tX, ys[i] - ts / 2, ts, n)).join("")) + layer("result", r.svg) + layer("nodes", nodes);
+  return doc("AI Agents Explained", "Your instruction goes to an AI agent (Claude), which uses your tools (Google Calendar, Google Sheets, Gmail) and returns a result ready for your review, all joined by straight lines.", await defs(bg), body);
 }
 
-/* ---- 3. AI for beginners — vertical gradient: everyday tasks and the tools that help, along one straight line ---- */
+/* ---- 3. AI for beginners — vertical gradient: three everyday tasks, each joined to a tool that helps ---- */
 async function beginners() {
   const bg = `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F5CCD4"/><stop offset="0.55" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE5A8"/></linearGradient>`;
-  const tasks = [[150, "mail", "pink"], [710, "doc", "yellow"], [1270, "idea", "pink"]], tools = [[430, "chatgpt"], [990, "claude-color"], [1550, "gemini"]];
-  const spine = [[245, 540], [1650, 540]];
-  const stubs = [...tasks.map(([x]) => [[x + 95, 430], [x + 95, 540]]), ...tools.map(([x]) => [[x + 100, 540], [x + 100, 650]])];
-  const body = layer("connectors", wire(spine) + stubs.map(wire).join("")) +
-    layer("tasks", tasks.map(([x, n, f]) => icon(x, 240, 190, n, f)).join("")) + layer("tools", tools.map(([x, n]) => logo(x, 650, 200, n)).join("")) +
-    layer("nodes", tasks.map(([x]) => node(x + 95, 430)).join("") + tools.map(([x]) => node(x + 100, 650)).join("") + stubs.map((s) => node(s[0][0], 540, C.yellow, 8)).join("")) +
-    layer("labels", label(245, 196, "Write an email") + label(805, 196, "Summarize a report", { dot: C.yellow }) + label(1365, 196, "Brainstorm ideas"));
-  return doc("AI for Beginners: What It Can Do at Work, and What It Can't", "Everyday tasks (an email, a document, new ideas) alternating with the AI tools that help with them (ChatGPT, Claude, Gemini) along one straight line.", await defs(bg), body);
+  const xs = [400, 960, 1520];
+  const tasks = [["mail", "pink", "Write an email", "Thank-you note"], ["doc", "yellow", "Summarize a report", "Key points first"], ["idea", "pink", "Brainstorm ideas", "Workshop themes"]].map((a, i) => chip(xs[i], 300, ...a));
+  const tools = ["chatgpt", "claude-color", "gemini"], ts = 200, ty = 640;
+  const wires = [[[xs[0], 500], [xs[2], 500]], ...xs.map((x) => [[x, tasks[0].bottom], [x, ty]])];
+  const body = layer("connectors", wires.map(wire).join("")) + layer("tasks", tasks.map((c) => c.svg).join("")) + layer("tools", tools.map((n, i) => logo(xs[i] - ts / 2, ty, ts, n)).join("")) +
+    layer("nodes", xs.map((x) => node(x, tasks[0].bottom) + node(x, 500, C.yellow, 8) + node(x, ty)).join(""));
+  return doc("AI for Beginners: What It Can Do at Work, and What It Can't", "Three everyday tasks (write an email, summarize a report, brainstorm ideas), each joined by a straight line to an AI tool that helps (ChatGPT, Claude, Gemini).", await defs(bg), body);
 }
 
 /* ---- 4. Purpose before productivity — diagonal gradient (top right to bottom left): people, then purpose, then the work, then the tool ---- */
 async function purpose() {
   const bg = `<linearGradient id="bg" x1="1920" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE3A0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F2BDC8"/></linearGradient>`;
-  const extra = `<clipPath id="photoClip"><rect x="150" y="170" width="900" height="740" rx="40"/></clipPath>
-<linearGradient id="photoTint" x1="1050" y1="170" x2="600" y2="910" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${C.pink}" stop-opacity="0.3"/><stop offset="0.5" stop-color="${C.pink}" stop-opacity="0"/></linearGradient>`;
-  const wires = [[[1050, 285], [1240, 285]], [[1345, 390], [1345, 540], [1490, 540]], [[1585, 635], [1585, 805], [1430, 805]]];
-  const body = layer("people", `<rect x="138" y="158" width="924" height="764" rx="52" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/><image href="../../../assets/images/web/roundtable-1920.webp" x="150" y="170" width="900" height="740" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/><rect x="150" y="170" width="900" height="740" rx="40" fill="url(#photoTint)"/>`) +
-    layer("connectors", wires.map(wire).join("")) +
-    layer("purpose", icon(1240, 180, 210, "target", "pink")) + layer("work", icon(1490, 445, 190, "week", "yellow")) + layer("tool", logo(1260, 720, 170, "claude-color")) +
-    layer("nodes", ends(wires.slice(0, 2)) + node(1585, 635) + node(1430, 805, C.yellow)) +
-    layer("labels", label(1432, 352, "Start with purpose", { anchor: "start" }) + label(1585, 690, "Work worth doing", { dot: C.yellow }) + label(1345, 918, "Then the tools"));
-  return doc("Purpose Before Productivity", "A Faith Works roundtable photo joined by straight lines to purpose (a target), the work worth doing (a planned week), and only then the tool (Claude).", await defs(bg, extra), body);
+  const extra = `<clipPath id="photoClip"><rect x="150" y="170" width="860" height="740" rx="40"/></clipPath>
+<linearGradient id="photoTint" x1="1010" y1="170" x2="580" y2="910" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${C.pink}" stop-opacity="0.3"/><stop offset="0.5" stop-color="${C.pink}" stop-opacity="0"/></linearGradient>`;
+  const p = chip(1400, 262, "target", "pink", "Start with purpose", "Why this work matters");
+  const w = chip(1500, 540, "week", "yellow", "Work worth doing", "Three priorities");
+  const cs = 180, cx = 1180, cy = 730; // Claude, last
+  const wires = [[[1010, 262], [p.left, 262]], [[1400, p.bottom], [1400, w.top]], [[1500, w.bottom], [1500, cy + cs / 2], [cx + cs, cy + cs / 2]]];
+  const body = layer("people", `<rect x="138" y="158" width="884" height="764" rx="52" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/><image href="../../../assets/images/web/roundtable-1920.webp" x="150" y="170" width="860" height="740" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/><rect x="150" y="170" width="860" height="740" rx="40" fill="url(#photoTint)"/>`) +
+    layer("connectors", wires.map(wire).join("")) + layer("purpose", p.svg) + layer("work", w.svg) + layer("tool", logo(cx, cy, cs, "claude-color")) +
+    layer("nodes", ends(wires.slice(0, 2)) + node(1500, w.bottom) + node(cx + cs, cy + cs / 2, C.yellow));
+  return doc("Purpose Before Productivity", "A Faith Works roundtable photo joined by straight lines to purpose (why this work matters), the work worth doing (three priorities), and only then the tool (Claude).", await defs(bg, extra), body);
 }
 
-/* ---- 5. GitHub for non-developers — diagonal gradient (bottom left to top right): GitHub and Claude, joined by a branch ---- */
+/* ---- 5. GitHub for non-developers — diagonal gradient (bottom left to top right): GitHub and Claude, joined by version history ---- */
 async function github() {
   const bg = `<linearGradient id="bg" x1="0" y1="1080" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4C6D0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE8AE"/></linearGradient>`;
-  const wires = [[[670, 540], [885, 540]], [[1035, 540], [1290, 540]]];
-  const body = layer("connectors", wires.map(wire).join("")) + layer("github", logo(330, 370, 340, "github")) + layer("branch", icon(885, 465, 150, "branch", "yellow")) +
-    layer("claude", logo(1290, 390, 300, "claude-color")) + layer("nodes", ends(wires)) +
-    layer("labels", label(500, 772, "GitHub") + label(1440, 752, "Claude") + cursor(990, 598) + label(1016, 670, "Every change saved", { anchor: "start", dark: true }));
-  return doc("GitHub for Non-Developers", "The GitHub mark and the Claude mark, joined by one straight line through a branch icon.", await defs(bg), body);
+  const v = chip(960, 540, "branch", "yellow", "Every change saved", "Version history");
+  const gs = 320, gx = 230, cs = 290, cx = 1690 - cs;
+  const wires = [[[gx + gs, 540], [v.left, 540]], [[v.right, 540], [cx, 540]]];
+  const body = layer("connectors", wires.map(wire).join("")) + layer("github", logo(gx, 540 - gs / 2, gs, "github")) + layer("history", v.svg) +
+    layer("claude", logo(cx, 540 - cs / 2, cs, "claude-color")) + layer("nodes", ends(wires));
+  return doc("GitHub for Non-Developers", "The GitHub mark and the Claude mark, joined by one straight line through version history: every change saved.", await defs(bg), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github };
-window.compose = async (name) => { await document.fonts.load("600 26px Inter"); await document.fonts.ready; return SCENES[name](); };
+window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>
 </html>
