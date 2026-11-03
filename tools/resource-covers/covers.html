@@ -5,17 +5,23 @@
      SVG edited by hand exports the same way.
      Brand visuals, not interfaces: recognizable logos on large white tiles are the focus, joined
      to a few concept icons (the site's line icons, as in .promise__icon: a Faith Pink or AI Yellow
-     tile, Charcoal strokes, Works White fills, one solid Charcoal accent). No text, no cards.
+     tile, Charcoal strokes, Works White fills, one solid Charcoal accent). A few short labels, only
+     where an icon needs a word, in the program pages' hero style: a frosted white pill, or a Charcoal
+     tooltip under a cursor. No cards, no paragraphs.
      Rules: brand palette only; smooth backgrounds, no texture; connectors are straight segments
      only; each image has its own gradient direction. Logos are the site's own files in
      assets/icons/tools/, embedded as symbols in their real colours. Key content stays inside the
      area both crops keep: 16:10 on cards (x 96–1824) and 21:9 at the top of articles (y 128–952). -->
 <html lang="en">
-<head><meta charset="utf-8"></head>
+<head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=block">
+</head>
 <body>
+<svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter" font-weight="600" font-size="26"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
 const LOGOS = ["chatgpt", "claude-color", "gemini", "gmail", "google-calendar", "google-sheets", "github"];
+const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /* ---- Concept icons: the site's line-icon language on a 48-unit grid ---- */
@@ -60,6 +66,18 @@ function logo(x, y, s, name) {
 // Connectors: straight segments only
 const wire = (pts) => `<polyline points="${pts.map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ink}" stroke-opacity="0.22" stroke-width="3" stroke-linejoin="miter"/>`;
 const node = (x, y, fill = C.pink, r = 10) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#FFFFFF" stroke-width="5"/>`;
+// A label, as in the program pages' hero mockups: a frosted white pill with a dot, or (dark) a
+// Charcoal tooltip. anchor: (x, y) is the pill's start, middle or end; y is its centre.
+function label(x, y, str, { anchor = "middle", dot = C.pink, dark = false } = {}) {
+  const m = document.getElementById("m"); m.textContent = str;
+  const h = 54, pad = 22, gap = dark ? 0 : 26, w = Math.round(m.getComputedTextLength() + pad * 2 + gap);
+  const left = Math.round(anchor === "start" ? x : anchor === "end" ? x - w : x - w / 2), top = Math.round(y - h / 2);
+  const box = dark ? `<rect x="${left}" y="${top}" width="${w}" height="${h}" rx="12" fill="${C.ink}" filter="url(#lift)"/>`
+    : `<rect x="${left}" y="${top}" width="${w}" height="${h}" rx="${h / 2}" fill="#FFFFFF" fill-opacity="0.94" filter="url(#lift)"/><circle cx="${left + pad + 7}" cy="${y}" r="7" fill="${dot}"/>`;
+  return box + `<text x="${left + pad + gap}" y="${y}" dominant-baseline="central" font-family="Inter" font-weight="600" font-size="26" fill="${dark ? "#FFFFFF" : C.ink}">${esc(str)}</text>`;
+}
+// The cursor of the hero mockups (straight edges only), its tip at (x, y)
+const cursor = (x, y) => `<polygon points="${x},${y} ${x},${y + 34} ${x + 9},${y + 26} ${x + 15},${y + 39} ${x + 21},${y + 36} ${x + 15},${y + 23} ${x + 26},${y + 23}" fill="${C.ink}" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="miter"/>`;
 const ends = (wires, fill) => wires.flatMap((p) => [node(...p[0], fill), node(...p[p.length - 1], fill)]).join("");
 
 /* ---- Shared definitions; each scene adds its own background gradient ---- */
@@ -71,9 +89,11 @@ async function defs(bg, extra = "") {
     return `<symbol id="logo-${n}" viewBox="${vb}"${fill ? ` fill="${fill}"` : ""}>${inner}</symbol>`;
   }));
   return `<defs>
+<style>@import url("${FONTS}");</style>
 ${bg}
 <linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
 <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="${C.ink}" flood-opacity="0.13"/></filter>
+<filter id="lift" x="-20%" y="-50%" width="140%" height="240%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="${C.ink}" flood-opacity="0.12"/></filter>
 ${extra}
 ${symbols.join("\n")}
 </defs>`;
@@ -100,7 +120,8 @@ async function niche() {
     icon(385, 780, 150, "process", "yellow") + icon(885, 780, 150, "book", "pink") + icon(1385, 780, 150, "growth", "yellow"));
   const tools = layer("ai-tools", logo(525, 430, 220, "chatgpt") + logo(825, 405, 270, "claude-color") + logo(1175, 430, 220, "gemini"));
   return doc("AI Is Not Another Niche Skill", "ChatGPT, Claude and Gemini at the centre, joined by straight lines to six kinds of work: marketing, people, finance, operations, learning and growth.",
-    await defs(bg), layer("connectors", wires.map(wire).join("")) + work + tools + layer("nodes", ends(wires)));
+    await defs(bg), layer("connectors", wires.map(wire).join("")) + work + tools + layer("nodes", ends(wires)) +
+    layer("labels", [["Marketing", 385, 150, C.pink], ["People", 885, 150, C.yellow], ["Finance", 1385, 150, C.pink], ["Operations", 385, 780, C.yellow], ["Learning", 885, 780, C.pink], ["Growth", 1385, 780, C.yellow]].map(([t, x, y, d]) => label(x + 132, y + 118, t, { anchor: "start", dot: d })).join("")));
 }
 
 /* ---- 2. AI agents — horizontal gradient: an instruction, the agent, its tools, a result ---- */
@@ -115,7 +136,8 @@ async function agents() {
   const body = layer("connectors", wires.map(wire).join("")) +
     layer("instruction", icon(170, 445, 190, "chat", "pink")) + layer("agent", logo(520, 400, 280, "claude-color")) +
     layer("tools", logo(1000, 215, 170, "google-calendar") + logo(1000, 455, 170, "google-sheets") + logo(1000, 695, 170, "gmail")) +
-    layer("result", icon(1450, 435, 210, "done", "yellow")) + layer("nodes", nodes);
+    layer("result", icon(1450, 435, 210, "done", "yellow")) + layer("nodes", nodes) +
+    layer("labels", label(265, 690, "Your instruction") + label(1085, 172, "Your tools", { dot: C.yellow }) + label(1555, 700, "Ready for review", { dot: C.yellow }) + cursor(696, 640) + label(722, 712, "AI agent", { anchor: "start", dark: true }));
   return doc("AI Agents Explained", "An instruction goes to an AI agent (Claude), which uses tools (Google Calendar, Google Sheets, Gmail) and returns a finished result, all joined by straight lines.", await defs(bg), body);
 }
 
@@ -127,7 +149,8 @@ async function beginners() {
   const stubs = [...tasks.map(([x]) => [[x + 95, 430], [x + 95, 540]]), ...tools.map(([x]) => [[x + 100, 540], [x + 100, 650]])];
   const body = layer("connectors", wire(spine) + stubs.map(wire).join("")) +
     layer("tasks", tasks.map(([x, n, f]) => icon(x, 240, 190, n, f)).join("")) + layer("tools", tools.map(([x, n]) => logo(x, 650, 200, n)).join("")) +
-    layer("nodes", tasks.map(([x]) => node(x + 95, 430)).join("") + tools.map(([x]) => node(x + 100, 650)).join("") + stubs.map((s) => node(s[0][0], 540, C.yellow, 8)).join(""));
+    layer("nodes", tasks.map(([x]) => node(x + 95, 430)).join("") + tools.map(([x]) => node(x + 100, 650)).join("") + stubs.map((s) => node(s[0][0], 540, C.yellow, 8)).join("")) +
+    layer("labels", label(245, 196, "Write an email") + label(805, 196, "Summarize a report", { dot: C.yellow }) + label(1365, 196, "Brainstorm ideas"));
   return doc("AI for Beginners: What It Can Do at Work, and What It Can't", "Everyday tasks (an email, a document, new ideas) alternating with the AI tools that help with them (ChatGPT, Claude, Gemini) along one straight line.", await defs(bg), body);
 }
 
@@ -140,7 +163,8 @@ async function purpose() {
   const body = layer("people", `<rect x="138" y="158" width="924" height="764" rx="52" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/><image href="../../../assets/images/web/roundtable-1920.webp" x="150" y="170" width="900" height="740" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/><rect x="150" y="170" width="900" height="740" rx="40" fill="url(#photoTint)"/>`) +
     layer("connectors", wires.map(wire).join("")) +
     layer("purpose", icon(1240, 180, 210, "target", "pink")) + layer("work", icon(1490, 445, 190, "week", "yellow")) + layer("tool", logo(1260, 720, 170, "claude-color")) +
-    layer("nodes", ends(wires.slice(0, 2)) + node(1585, 635) + node(1430, 805, C.yellow));
+    layer("nodes", ends(wires.slice(0, 2)) + node(1585, 635) + node(1430, 805, C.yellow)) +
+    layer("labels", label(1432, 352, "Start with purpose", { anchor: "start" }) + label(1585, 690, "Work worth doing", { dot: C.yellow }) + label(1345, 918, "Then the tools"));
   return doc("Purpose Before Productivity", "A Faith Works roundtable photo joined by straight lines to purpose (a target), the work worth doing (a planned week), and only then the tool (Claude).", await defs(bg, extra), body);
 }
 
@@ -149,12 +173,13 @@ async function github() {
   const bg = `<linearGradient id="bg" x1="0" y1="1080" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4C6D0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE8AE"/></linearGradient>`;
   const wires = [[[670, 540], [885, 540]], [[1035, 540], [1290, 540]]];
   const body = layer("connectors", wires.map(wire).join("")) + layer("github", logo(330, 370, 340, "github")) + layer("branch", icon(885, 465, 150, "branch", "yellow")) +
-    layer("claude", logo(1290, 390, 300, "claude-color")) + layer("nodes", ends(wires));
+    layer("claude", logo(1290, 390, 300, "claude-color")) + layer("nodes", ends(wires)) +
+    layer("labels", label(500, 772, "GitHub") + label(1440, 752, "Claude") + cursor(990, 598) + label(1016, 670, "Every change saved", { anchor: "start", dark: true }));
   return doc("GitHub for Non-Developers", "The GitHub mark and the Claude mark, joined by one straight line through a branch icon.", await defs(bg), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github };
-window.compose = (name) => SCENES[name]();
+window.compose = async (name) => { await document.fonts.load("600 26px Inter"); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>
 </html>
