@@ -13,6 +13,8 @@
     "supabase:check": "node scripts/supabase.mjs check",
     "supabase:seed": "node scripts/supabase.mjs seed",
     "supabase:import": "node scripts/supabase.mjs import",
-    "supabase:backup": "node scripts/supabase.mjs backup"
+    "supabase:backup": "node scripts/supabase.mjs backup",
+    "schedule:check": "node scripts/publish-scheduled.mjs",
+    "schedule:run": "node scripts/publish-scheduled.mjs --run"
   }
 }

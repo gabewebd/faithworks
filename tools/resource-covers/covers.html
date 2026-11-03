@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "gmail", "google-calendar", "google-sheets", "github"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -42,6 +42,8 @@ const ICONS = {
   idea: `<path ${K} d="M22 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4Z"/><path ${N} d="M37 29l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
   target: `<circle ${N} cx="24" cy="24" r="18"/><circle ${N} cx="24" cy="24" r="11"/><circle ${K} cx="24" cy="24" r="4"/><path ${L} d="M24 24l15-15M33 9h6v6"/>`,
   week: `<rect ${N} x="6" y="9" width="36" height="33" rx="3"/><path ${L} d="M6 18h36M16 5v8M32 5v8M17 30l5 5 9-10"/>`,
+  shield: `<path ${N} d="M24 4l16 6v12c0 10-7 17-16 22C15 39 8 32 8 22V10Z"/><path ${L} d="M17 24l5 5 9-10"/>`,
+  assist: `<path ${N} d="M8 5h21l8 8v30H8Z"/><path ${L} d="M29 5v8h8M14 21h15M14 28h10"/><path ${K} d="M37 27l2.6 6.4L46 36l-6.4 2.6L37 45l-2.6-6.4L28 36l6.4-2.6Z"/>`,
   branch: `<circle ${N} cx="14" cy="10" r="4"/><circle ${N} cx="14" cy="38" r="4"/><circle ${K} cx="34" cy="14" r="4"/><path ${L} d="M14 14v20M34 18v6L14 34"/>`,
 };
 
@@ -174,7 +176,44 @@ async function github() {
   return doc("GitHub for Non-Developers", "The GitHub mark and the Claude mark, joined by one straight line through version history: every change saved.", await defs(bg), body);
 }
 
-const SCENES = { niche, agents, beginners, purpose, github };
+/* ---- 6. How to set up your AI agent — diagonal gradient (top left to bottom right): three setup
+   steps wired into the agent, which reaches the connected tools ---- */
+async function setup() {
+  const bg = `<linearGradient id="bg" x1="0" y1="0" x2="1920" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4C4CE"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE2A0"/></linearGradient>`;
+  const ys = [300, 540, 780];
+  const steps = [["doc", "yellow", "Instructions", "The job, in writing"], ["shield", "pink", "Tools and access", "Read-only first"], ["done", "yellow", "Your approval", "Nothing goes out unchecked"]];
+  const ws = steps.map((a) => chip(0, 0, ...a).w), cw = Math.max(...ws);
+  const as = 300, ax = 960 - as / 2, ts = 150, tx = 1500; // the agent tile and the tool tiles
+  const cx = Math.round(ax - 150 - cw / 2); // chips share a right edge 150 px left of the agent
+  const chips = steps.map((a, i) => chip(cx + (cw - ws[i]) / 2, ys[i], ...a));
+  const lb = Math.round(ax - 75), rb = Math.round(ax + as + (tx - ax - as) / 2);
+  const wires = [
+    ...chips.map((c, i) => (i === 1 ? [[c.right, 540], [ax, 540]] : [[c.right, ys[i]], [lb, ys[i]], [lb, 540]])),
+    [[ax + as, 540], [tx, 540]], [[rb, 540], [rb, ys[0]], [tx, ys[0]]], [[rb, 540], [rb, ys[2]], [tx, ys[2]]],
+  ];
+  const agent = `<g>${halo(ax, 540 - as / 2, as, as, 66)}<rect x="${ax}" y="${540 - as / 2}" width="${as}" height="${as}" rx="66" fill="#FFFFFF"/><rect x="${ax}" y="${540 - as / 2}" width="${as}" height="${as}" rx="66" fill="url(#light)"/>${iconTile(ax + 60, 540 - as / 2 + 60, as - 120, "idea", "pink")}</g>`;
+  const nodes = chips.map((c, i) => node(c.right, ys[i])).join("") + node(ax, 540) + node(ax + as, 540, C.yellow) + ys.map((y) => node(tx, y)).join("");
+  const body = layer("connectors", wires.map(wire).join("")) + layer("setup-steps", chips.map((c) => c.svg).join("")) + layer("agent", agent) +
+    layer("tools", ["google-drive", "google-docs", "gmail"].map((n, i) => logo(tx, ys[i] - ts / 2, ts, n)).join("")) + layer("nodes", nodes);
+  return doc("How to Set Up Your AI Agent", "Three setup steps (instructions, tools and access with read-only first, and your approval) joined by straight lines to an AI agent, which connects to Google Drive, Google Docs and Gmail.", await defs(bg), body);
+}
+
+/* ---- 7. Chatbot, copilot or AI agent — radial gradient from the bottom: three ways to use AI,
+   all reached from the same four assistants (ChatGPT, Claude, Grok, Gemini) ---- */
+async function modes() {
+  const bg = `<radialGradient id="bg" cx="960" cy="1080" r="1350" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.48" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></radialGradient>`;
+  const xs = [420, 960, 1500], cy = 290, bus = 520, ls = 196, ly = 640;
+  const chips = [["chat", "pink", "Chatbot", "Answers your questions"], ["assist", "yellow", "Copilot", "Helps while you work"], ["process", "pink", "AI agent", "Carries out the steps"]].map((a, i) => chip(xs[i], cy, ...a));
+  const lx = [480, 800, 1120, 1440];
+  const tools = ["chatgpt", "claude-color", "grok", "gemini"];
+  const wires = [[[xs[0], bus], [xs[2], bus]], ...xs.map((x) => [[x, chips[0].bottom], [x, bus]]), [[lx[0], bus], [lx[0], ly]], [[lx[3], bus], [lx[3], ly]], [[lx[1], bus], [lx[1], ly]], [[lx[2], bus], [lx[2], ly]]];
+  const nodes = xs.map((x) => node(x, chips[0].bottom)).join("") + lx.map((x) => node(x, ly) + node(x, bus, C.yellow, 8)).join("");
+  const body = layer("connectors", wires.map(wire).join("")) + layer("ways-to-use-ai", chips.map((c) => c.svg).join("")) +
+    layer("assistants", tools.map((n, i) => logo(lx[i] - ls / 2, ly, ls, n)).join("")) + layer("nodes", nodes);
+  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps), joined by straight lines to four assistants that offer them: ChatGPT, Claude, Grok and Gemini.", await defs(bg), body);
+}
+
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>

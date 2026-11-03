@@ -8,7 +8,8 @@
 // Protocol, no dependencies), then recompressed losslessly with Pillow when Python has it. Full
 // colour on purpose: a 256-colour palette greys out small brand colours (the Google and GitHub
 // marks, pink and yellow accents) next to the wide gradients.
-// Options: BASE=http://localhost:8775  CHROME=<path to chrome>
+// Options: BASE=http://localhost:8775  CHROME=<path to chrome>  --only=setup,modes (scene names; the
+// other images are left exactly as they are)
 import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -25,7 +26,11 @@ const SCENES = {
   beginners: "ai-for-beginners-what-ai-can-do",
   purpose: "purpose-before-productivity",
   github: "github-for-beginners",
+  setup: "how-to-set-up-an-ai-agent",
+  modes: "chatbot-vs-copilot-vs-ai-agent",
 };
+const only = (process.argv.find((a) => a.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
+for (const k of Object.keys(SCENES)) if (only.length && !only.includes(k)) delete SCENES[k];
 const SVG_DIR = join(HERE, "svg"), OUT = join(ROOT, "assets/images/resources");
 mkdirSync(SVG_DIR, { recursive: true });
 mkdirSync(OUT, { recursive: true });

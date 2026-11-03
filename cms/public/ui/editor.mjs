@@ -11,10 +11,11 @@ import { COLLECTIONS, STATUSES, blankRecord, eventHasPage, statusOf } from "/sha
 import { ACTIONS } from "/shared/workflow.mjs";
 import { BINDINGS, bindingValues, upgradeRecord, readingTime, eventDuration, bylineOf, DOC_VERSION } from "/shared/page-doc.mjs";
 import { starterTemplate } from "/shared/starters.mjs";
+import { scheduleInstant, fmtSchedule, SCHEDULE_TZ_LABEL } from "/shared/schedule.mjs";
 
 // History rows name the step that saved each version. Steps of the retired workflow (older
 // versions) are shown generically.
-const KINDS = { create: "Created", save: "Saved", publish: "Published", unpublish: "Unpublished", archive: "Archived", restore: "Restored to draft", delete: "Deleted", undelete: "Restored", reconcile: "Finished publishing", restore_version: "Earlier version restored" };
+const KINDS = { create: "Created", save: "Saved", publish: "Published", schedule: "Scheduled", unschedule: "Schedule cancelled", schedule_failed: "Scheduled publish failed", unpublish: "Unpublished", archive: "Archived", restore: "Restored to draft", delete: "Deleted", undelete: "Restored", reconcile: "Finished publishing", restore_version: "Earlier version restored" };
 export const historyKind = (k) => KINDS[k] || "Earlier workflow step";
 
 // The confirmation for a publishing action, shared by the editor and the content lists' item
@@ -22,6 +23,7 @@ export const historyKind = (k) => KINDS[k] || "Earlier workflow step";
 export function actionConfirm(action, { live = null, version } = {}) {
   return {
     publish: { title: "Publish to the website?", body: live ? `Version ${version} will replace the published version ${live.version}. The website rebuilds within a few minutes.` : "This item will appear on the website after the next rebuild (usually a few minutes).", confirm: "Publish" },
+    unschedule: { title: "Cancel the schedule?", body: "It becomes a Draft and will not go live by itself. Its date and time are kept, so you can schedule it again.", confirm: "Cancel schedule" },
     unpublish: { title: "Take this off the website?", body: "It is removed at the next website rebuild. The content stays here as a Draft.", confirm: "Unpublish", danger: true },
     archive: { title: "Archive this item?", body: "Archived items are kept for the record and removed from the website.", confirm: "Archive", danger: true },
     delete: { title: "Delete this item?", body: "It disappears from the dashboard and the website. A Super Admin can restore it from Recovery.", confirm: "Delete", danger: true },
@@ -234,9 +236,12 @@ export async function editorView(app, { collection, id }) {
     // Every CMS user publishes content in one step (save, then publish), whoever created the item.
     // Also on published items: editing one and pressing Publish saves and publishes the change.
     const canPublish = !isNew && (view.actions.includes("publish") || (view.can_edit && rec.status === "published"));
-    if (canPublish) buttons.push(h("button", { class: "btn btn--yellow", type: "button", onclick: (e) => busy(e.currentTarget, () => publishNow()) }, "Publish"));
+    // Resources: Schedule (or Reschedule) publishes automatically at a chosen Manila time.
+    const canSchedule = !isNew && C.schedulable && view.can_edit && (view.actions.includes("schedule") || rec.status === "published");
+    if (canSchedule) buttons.push(h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, () => scheduleNow()) }, icon("calendar"), rec.status === "scheduled" ? "Reschedule" : "Schedule"));
+    if (canPublish) buttons.push(h("button", { class: "btn btn--yellow", type: "button", onclick: (e) => busy(e.currentTarget, () => publishNow()) }, rec.status === "scheduled" ? "Publish now" : "Publish"));
     if (view.actions.includes("reconcile")) buttons.push(h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, () => act("reconcile")) }, "Finish publishing"));
-    const more = view.actions.filter((a) => !["publish", "reconcile"].includes(a));
+    const more = view.actions.filter((a) => !["publish", "reconcile", "schedule"].includes(a));
     if (more.length) {
       const pop = h("div", { class: "menu-pop", hidden: true, role: "menu" }, more.map((a) => h("button", { type: "button", role: "menuitem", class: ["delete", "archive", "unpublish"].includes(a) ? "danger" : "", onclick: () => { pop.hidden = true; act(a); } }, a === "undelete" ? "Restore deleted item" : ACTIONS[a].label)));
       const toggle = h("button", { class: "btn btn--light", type: "button", "aria-haspopup": "menu", onclick: () => { pop.hidden = !pop.hidden; } }, "More…");
@@ -258,6 +263,10 @@ export async function editorView(app, { collection, id }) {
     if (rec.deleted_at) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Deleted "), `${when(rec.deleted_at)} by ${who(rec.deleted_by)}. It is not on the website.`))));
     if (rec.upgraded && !isNew) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Converted to the page editor. "), "Same content; nothing changes until you save and publish."))));
     if (view.live && view.draft_differs) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, "Unpublished changes. "), `The website shows published version ${view.live.version}. Changes here are a new draft; publish them to replace it.`))));
+    if (rec.status === "scheduled") out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, h("strong", {}, `Scheduled for ${fmtSchedule(rec.scheduled_at)}, ${SCHEDULE_TZ_LABEL}. `),
+      view.live ? `It replaces published version ${view.live.version} automatically then; until that moment the website keeps showing version ${view.live.version}. ` : "It goes live automatically then and is not on the website before that. ",
+      "To change the time, edit Scheduled publishing in Details and save (or press Reschedule). To stop it, use More… → Cancel schedule."))));
+    if (rec.status === "draft" && rec.schedule_error) out.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "The scheduled publish did not happen. "), rec.schedule_error, " Fix it, then press Schedule again or Publish."))));
     if (view.live?.hidden) out.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "Hidden. "), "The published version has “Show on the website” turned off, so it is not on the website. Turn it on and press Publish to show it again."))));
     if (!view.can_edit && !rec.deleted_at) out.push(h("div", { class: "alert alert--info" }, h("div", {}, h("p", {}, rec.status === "archived" ? (view.actions.includes("restore") ? "Archived items cannot be edited. Use More… → Restore to draft to edit it again." : "Archived items cannot be edited. Its authors or a Super Admin can restore it to draft.") : "You can view this item but not edit it. Only Super Admins can change Site settings."))));
     return out;
@@ -276,12 +285,14 @@ export async function editorView(app, { collection, id }) {
         isNew ? null : h("dl", { class: "kv" },
           h("dt", {}, "Created"), h("dd", {}, `${when(rec.created_at)} · ${who(rec.created_by)}`),
           h("dt", {}, "Last saved"), h("dd", {}, `${when(rec.updated_at)} · ${who(rec.updated_by)}`),
+          rec.status === "scheduled" ? [h("dt", {}, "Goes live"), h("dd", {}, `${fmtSchedule(rec.scheduled_at)} (Manila) · scheduled by ${who(rec.scheduled_by)}`)] : null,
           live ? [h("dt", {}, "Published"), h("dd", {}, `${when(live.published_at)} · ${who(live.published_by)}`)] : null)),
       h("div", { class: "card" },
         h("h3", {}, "How publishing works"),
         h("ol", { class: "small muted", style: "padding-left:18px;margin:0" },
           h("li", {}, "Save your draft as often as you like. Every save is kept in History."),
           h("li", {}, "Press Publish to put it on the website. The website rebuilds within a few minutes."),
+          C.schedulable ? h("li", {}, `Or choose a date and time under Scheduled publishing (${SCHEDULE_TZ_LABEL}) and press Schedule. It goes live by itself then (within about 5 minutes), even if nobody has the CMS open.`) : null,
           ["events", "testimonials"].includes(collection) ? h("li", {}, "To take it off the website but keep it here, turn off “Show on the website” and press Publish.") : null)));
   }
 
@@ -365,9 +376,31 @@ export async function editorView(app, { collection, id }) {
     if (view.deploy) toast(view.deploy.triggered ? "Website rebuild started. Changes appear in a few minutes." : view.deploy.error || view.deploy.reason, view.deploy.error ? "error" : "info", 8000);
     app.refreshCounts();
   }
+  // Save, then schedule (or reschedule) at the Manila date and time in Details. The server checks
+  // the item as strictly as Publish, and that the time is in the future.
+  async function scheduleNow() {
+    const d = details();
+    const at = scheduleInstant(d.schedule_date, d.schedule_time);
+    if (!at) {
+      showErrors({ ...(d.schedule_date ? {} : { schedule_date: "Choose the day it should go live." }), ...(d.schedule_time ? {} : { schedule_time: "Choose the time it should go live (Manila time)." }), ...(d.schedule_date && d.schedule_time ? { schedule_date: "This date or time could not be read." } : {}) });
+      toast("Choose a date and a time under Scheduled publishing first.", "error");
+      return;
+    }
+    const r = await dialog({ title: view.record.status === "scheduled" ? "Reschedule?" : "Schedule this resource?", confirm: "Schedule",
+      body: `It goes live automatically on ${fmtSchedule(at)}, ${SCHEDULE_TZ_LABEL} (${new Date(at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })} on this computer). ${view.live ? `The website keeps showing published version ${view.live.version} until then.` : "Until then it is not on the website."}` });
+    if (!r.ok) return;
+    if (dirty || htmlEd?.hasVisualChanges()) { const saved = await save_({ quiet: true }); if (!saved) return; }
+    if (view.record.status === "published") { toast("This version is already on the website. Change something first, then schedule the change.", "info"); return; }
+    try {
+      view = upgrade(await api("POST", `/api/records/${collection}/${encodeURIComponent(view.record.id)}/actions/schedule`, { version: view.record.version }));
+      render();
+      toast(`Scheduled for ${fmtSchedule(view.record.scheduled_at)} (Manila time).`, "ok", 6000);
+      app.refreshCounts();
+    } catch (e) { handleError(e, () => {}); }
+  }
   async function act(action) {
     const rec = view.record;
-    if (dirty && !["unpublish", "archive", "delete", "reconcile", "undelete"].includes(action)) {
+    if (dirty && !["unpublish", "unschedule", "archive", "delete", "reconcile", "undelete"].includes(action)) {
       const saved = await save_({ quiet: true });
       if (!saved) return;
     } else if (dirty) {

@@ -17,10 +17,14 @@ export const normalizeRole = (role) => (ROLES[role] ? role : null);
 export const isSuperAdmin = (role) => normalizeRole(role) === "super_admin";
 
 // Publishing statuses. There is no approval step: whoever may edit an item publishes it.
-//   Draft: saved, not on the website.  Published: on the website (events and testimonials
+//   Draft: saved, not on the website.  Scheduled (resources): not on the website until the
+//   scheduled job publishes it.  Published: on the website (events and testimonials
 //   also need "Show on the website" on).  Archived: kept for the record, off the website.
 export const STATUSES = {
   draft: { label: "Draft", tone: "stone", help: "Saved, but not on the website. Press Publish when it is ready." },
+  // Resources only (COLLECTIONS.resources.schedulable): saved, not on the website yet; the
+  // scheduled job publishes it at the chosen time (shared/schedule.mjs).
+  scheduled: { label: "Scheduled", tone: "yellow", help: "Not on the website yet. It is published automatically at the scheduled time (Manila time)." },
   published: { label: "Published", tone: "green", help: "On the website exactly as shown." },
   archived: { label: "Archived", tone: "stone", help: "Kept for the record. Not on the website." },
 };
@@ -166,7 +170,8 @@ export const COLLECTIONS = {
   resources: {
     label: "Resources", singular: "Resource", prefix: "res", labelField: "title", route: "/resources/{slug}/", page: "Resource page",
     description: "Articles, guides, templates, checklists and other resources.",
-    groups: { main: "Resource", dest: "Link instead of a page", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
+    schedulable: true, // Schedule / Cancel schedule (shared/workflow.mjs, shared/schedule.mjs)
+    groups: { main: "Resource", schedule: "Scheduled publishing", dest: "Link instead of a page", media: "Featured image", seo: "Search (SEO)", publishing: "Authors and tags" },
     fields: [
       f("title", "Title", "text", { group: "main", required: true, max: 160, help: "The page’s main heading. Editing the heading in the page editor changes it here too." }),
       f("slug", "URL slug", "slug", { group: "main", required: true }),
@@ -176,6 +181,13 @@ export const COLLECTIONS = {
       f("publish_date", "Publish date", "date", { group: "main", required: true }),
       f("read_time", "Reading time", "text", { group: "main", computed: true, help: "Calculated from the article text whenever it changes." }),
       f("featured", "Feature this resource", "boolean", { group: "main" }),
+      // Scheduled publishing. The date and time are a wall-clock time in Manila (Asia/Manila,
+      // UTC+8); the server stores the matching UTC instant in scheduled_at. None of this is public.
+      f("schedule_date", "Publish on (date)", "date", { group: "schedule", public: false, help: "Optional. Pick a date and time, then press Schedule. It goes live automatically then; until that moment it is not on the website." }),
+      f("schedule_time", "Publish at (Manila time)", "time", { group: "schedule", public: false, help: "Asia/Manila (UTC+8), whatever time zone your computer uses." }),
+      f("scheduled_at", "Scheduled instant (UTC)", "text", { hidden: true, computed: true, public: false }),
+      f("scheduled_by", "Scheduled by", "text", { hidden: true, computed: true, public: false }),
+      f("schedule_error", "Why the scheduled publish did not happen", "text", { hidden: true, computed: true, public: false }),
       // Older guides and worksheets linked their card to a file or page instead of having a page.
       // Shown only for those (or while the page is empty); a page always wins over the link.
       f("file_url", "Card link (only without page content)", "url", { group: "dest", showIf: (r) => !!r.file_url || !String(r.body_html || "").trim(), help: "Optional. Used only while the page has no content: the card then opens this file or page (for example /start-your-ai-journey/). Leave empty and write the page instead." }),

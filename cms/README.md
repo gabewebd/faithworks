@@ -87,7 +87,7 @@ and `cms/server/services/`). Hiding a button is never the protection.
 
 ## 3. Publishing, drafts and the live version
 
-Statuses: **Draft → Published**, plus **Archived**. There is no review or approval step and no
+Statuses: **Draft → Published**, plus **Archived** (resources can also be **Scheduled**, see below). There is no review or approval step and no
 publisher role: any CMS user (Author or Super Admin) publishes it with one click. Tags are separate.
 
 - **Draft:** saved, not on the website. **Published:** on the website. **Archived:** kept for the record, off the website (*More → Restore to draft* brings it back).
@@ -97,6 +97,36 @@ publisher role: any CMS user (Author or Super Admin) publishes it with one click
 - **Concurrent edits:** every save sends the version it was based on. If someone saved in between, the save is refused with who and when, and nothing is overwritten. The storage layer double-checks with a per-row `write_id`.
 - **Slugs:** format-checked, unique per route type (including old slugs that now redirect). A slug made from the title gets `-2`, `-3`… when it is taken (e.g. a monthly event with the same title). Changing a live page's slug needs a confirmation. The old URL then gets a redirect page (plus a Netlify `_redirects` 301 in deploy mode).
 - Every save and publishing step is copied to `history`, and every action is recorded in `audit_log`.
+
+### Scheduled publishing (resources)
+
+A resource can go live by itself at a chosen time. Statuses for resources are **Draft → Scheduled → Published** (plus Archived);
+Publish still works exactly as before, at any time.
+
+- **Schedule:** in Details, *Scheduled publishing*, pick **Publish on (date)** and **Publish at (Manila time)**, then press
+  **Schedule** (next to Publish). Times are always **Asia/Manila (UTC+8)**, whatever time zone the editor's computer or the
+  server uses; the server stores the matching UTC instant in `scheduled_at` (`shared/schedule.mjs`). Schedule checks the
+  item exactly as Publish would (every required field, a free slug) and needs a time at least 2 minutes and at most two
+  years ahead. The article's *Publish date* becomes the scheduled Manila date.
+- **Until then** the item is not on the website: only the `published` tab is public, and Schedule writes nothing there.
+  Lists, the editor and the dashboard (*Scheduled* card) show when it goes live.
+- **Reschedule:** change the date or time and **Save** (a scheduled item stays scheduled, so a save must keep it
+  publishable), or press **Reschedule**. **Cancel:** *More… → Cancel schedule* (also in the list's ⋯ menu); it becomes a
+  Draft and keeps its date and time. **Publish now** publishes at once and clears the schedule. A published item with a
+  new draft can be scheduled too: the live version stays until the scheduled time.
+- **The job:** `netlify/functions/publish-scheduled.mjs`, a Netlify Scheduled Function, runs **every 5 minutes** on
+  Netlify's servers (no browser needed). It reads only rows with status `scheduled`, publishes each one that is due through
+  the same `publish()` as the button (as `system:scheduler`, recorded in History and the activity log), then starts one
+  website rebuild. So an item goes live within about 5 minutes of its time, plus the website build (1–2 minutes).
+  It never publishes twice: an item is published only while it is still Scheduled and due, a save made meanwhile is
+  refused by the version check (retried on the next run), and the live-copy write is conditional. If an item can no
+  longer be published (e.g. its slug was taken), it goes back to Draft with the reason, shown on the dashboard.
+  A missed run (e.g. during a deploy) is caught up by the next one.
+- **Requirements:** the CMS must be deployed on **Netlify**, from a **published production deploy** (Netlify runs scheduled
+  functions only there), with `PUBLIC_SITE_DEPLOY_HOOK_URL` set so the website rebuilds. On Vercel there is no equivalent
+  configured. The dashboard shows *Scheduled publishing is late* when an item is still waiting 20 minutes after its time.
+- **By hand:** `npm run schedule:check` lists what is scheduled (changes nothing); `npm run schedule:run` publishes what is
+  due now with the same code (uses `cms/.env`).
 
 ### Testimonials
 
@@ -338,6 +368,7 @@ In the CMS, set `PUBLIC_SITE_DEPLOY_HOOK_URL` to the website's build hook (Verce
 Deploy Hooks*, branch `main`). Every publish, unpublish, archive or delete then starts a rebuild, admins
 also get a *Rebuild website* button, and `netlify/functions/daily-rebuild.mjs` rebuilds the site every
 day at 00:05 Manila time so that finished events move from *Upcoming* to *Past* without an edit.
+`netlify/functions/publish-scheduled.mjs` publishes scheduled resources every 5 minutes (§3, *Scheduled publishing*).
 **Timing:** the public endpoint is not cached by the CDN (at most 10 seconds in memory), and a static
 build takes about 1–2 minutes, so new content is usually live **within about 2 minutes** of *Publish*.
 
@@ -401,7 +432,16 @@ not a replacement.
 
 ## 10. What is tested, and what is not
 
-**3 Nov 2026 (current: `npm test`, 94 tests).** The CMS submission endpoint, the Submissions screen
+**3 Nov 2026, scheduled publishing (`npm test`, 101 tests; 100 pass).** `test/schedule.test.mjs`: Manila → UTC
+conversion (and refusal of impossible dates and times), Schedule validated like Publish (and filling in the publish
+date), scheduled items absent from the public output, the job publishing a due item exactly once (also two runs at once)
+with one rebuild, reschedule by save or action, cancel, Publish now, a scheduled update to a live item, retry after a
+concurrent save, giving up (back to Draft with the reason) when an item can no longer be published, resources only, and
+the dashboard's scheduled/late lists. The one failure is older and unrelated (the home testimonial deck's carousel button
+markup in `test/pages.test.mjs`). Checked by hand in Chrome on the local JSON store: Schedule with no date (errors shown),
+Schedule at a Manila time, the dashboard card, the list filter and *Cancel schedule* from the ⋯ menu.
+
+**3 Nov 2026 (`npm test`, 94 tests).** The CMS submission endpoint, the Submissions screen
 and their tests were removed (§13); the forms tests now check that every website form is a
 GoHighLevel embed and that the old endpoints answer 404.
 

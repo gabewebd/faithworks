@@ -14,14 +14,29 @@
 //   4. write history + audit, refresh the public cache, start a website rebuild.
 // If step 2 fails, nothing changed. If step 3 fails, the item is live but still marked
 // Draft; the dashboard flags it and "Finish publishing" (reconcile) completes it.
+//
+// Scheduled publishing (resources): "Schedule" checks the item exactly as Publish would, then
+// marks it Scheduled with the UTC instant of the chosen Manila date and time. Nothing goes live.
+// publishDue() (run every few minutes by netlify/functions/publish-scheduled.mjs) publishes
+// each item whose instant has passed through the same publish() as the Publish button, as
+// the user "system:scheduler". It never publishes twice: publish() refuses an item that is not
+// Scheduled any more, the version check refuses an item someone saved meanwhile (it is retried
+// on the next run), and the live-copy insert/update is conditional. An item that can no longer
+// be published (e.g. its slug was taken) goes back to Draft with the reason, so it is not retried.
 import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin, hasSlug, publicPath, migrateRecord, eventHasPage } from "../../shared/schema.mjs";
 import { normalize, validate, slugify, syncEventCover } from "../../shared/validate.mjs";
 import { ACTIONS, canEdit, canEditContent, canView, canManage, allowedActions, statusAfterSave } from "../../shared/workflow.mjs";
 import { toPublic } from "../../shared/public.mjs";
 import { readingTime, bylineOf } from "../../shared/page-doc.mjs";
 import { HttpError, randomId, now } from "../http.mjs";
+import { scheduleProblems, scheduleInstant, scheduleLocalDate, fmtSchedule, SCHEDULE_TZ_LABEL, OVERDUE_MS } from "../../shared/schedule.mjs";
 
-const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "registration_type", "event_page", "visible", "role", "featured_image_url", "display_name"];
+// The user that scheduled publishes run as (audit log, history, "Published by").
+export const SCHEDULER = { email: "system:scheduler", name: "Scheduled publishing", role: "author" };
+// Set only by the server (Schedule, Cancel schedule, the scheduled job), never by a save.
+const SCHEDULE_SERVER_FIELDS = ["scheduled_at", "scheduled_by", "schedule_error"];
+
+const SUMMARY_FIELDS = ["id", "status", "version", "slug", "updated_at", "updated_by", "created_by", "review_date", "content_owner", "authors", "byline", "tags", "deleted_at", "resource_type", "event_date", "registration_type", "event_page", "visible", "role", "featured_image_url", "display_name", "scheduled_at", "schedule_error"];
 
 export function createRecords({ store, cfg, log, onPublicChange = async () => ({}) }) {
   const assertCollection = (c) => { if (!COLLECTIONS[c]) throw new HttpError(404, "Unknown content type.", "not_found"); };
@@ -86,6 +101,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       data._authorSet = new Set([...dir.keys(), ...(current?.authors || [])]);
     }
     if (collection === "resources") data.read_time = readingTime(data.body_html);
+    if (COLLECTIONS[collection].schedulable) for (const k of SCHEDULE_SERVER_FIELDS) data[k] = current ? current[k] ?? "" : "";
     // Events: a registration link only for "External link"; the address follows the title.
     if (collection === "events" && data.registration_type !== "external") data.registration_url = "";
     return data;
@@ -132,13 +148,26 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     }
   }
 
-  async function write(user, collection, rec, patch, kind, { requestId } = {}) {
+  async function write(user, collection, rec, patch, kind, { requestId, detail = "" } = {}) {
     const next = { ...rec, ...patch, version: Number(rec.version) + 1, write_id: randomId("w", 6), updated_at: now(), updated_by: user.email };
     const saved = await store.update(collection, rec.id, next, { expectWriteId: rec.write_id });
     await log.snapshot(user, collection, saved, kind);
-    await log.log(user, kind, collection, rec.id, saved.version, "", requestId);
+    await log.log(user, kind, collection, rec.id, saved.version, detail, requestId);
     return saved;
   }
+
+  // Everything that would stop this record being published now (strict validation, and a slug
+  // that another item has live). Publish and Schedule both use it.
+  async function publishProblems(collection, rec) {
+    const errors = await validateAll(collection, rec, { strict: true });
+    if (hasSlug(collection)) {
+      const pub = await store.list("published");
+      const taken = pub.filter((p) => p.collection === collection && p.state === "live" && p.record_id !== rec.id).map((p) => p.slug);
+      if (taken.includes(rec.slug)) errors.slug = `The address ${publicPath(collection, rec.slug)} is already live for another item.`;
+    }
+    return errors;
+  }
+  const scheduleNote = (at) => `${fmtSchedule(at)}, ${SCHEDULE_TZ_LABEL} (${at})`;
 
   return {
     async authors() {
@@ -217,13 +246,22 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       if (live && hasSlug(collection) && incoming.slug !== liveSlug && (collection !== "events" || eventHasPage(live.payload))) {
         if (!confirmSlugChange) throw new HttpError(409, `This page is live at ${publicPath(collection, liveSlug)}. Changing the slug moves it to ${publicPath(collection, incoming.slug)}; the old address will redirect after the next publish. Confirm to continue.`, "slug_change_confirm");
       }
-      const errors = await validateAll(collection, { ...incoming, id }, { strict: false });
+      let errors = await validateAll(collection, { ...incoming, id }, { strict: false });
+      // A scheduled item stays scheduled when it is saved, so it must stay publishable: checked
+      // as strictly as Publish, with a valid future time. (Cancel schedule first to save freely.)
+      if (!Object.keys(errors).length && rec.status === "scheduled") {
+        const at = scheduleInstant(incoming.schedule_date, incoming.schedule_time);
+        if (at) { incoming.scheduled_at = at; incoming.publish_date = scheduleLocalDate(at); }
+        errors = { ...(await publishProblems(collection, { ...incoming, id })), ...scheduleProblems(incoming) };
+        if (Object.keys(errors).length) fail422(errors, "This resource is scheduled, so it must stay ready to publish. Fix the highlighted fields, or use More… → Cancel schedule first.");
+      }
       if (Object.keys(errors).length) fail422(errors);
       delete incoming._authorSet;
       const changed = COLLECTIONS[collection].fields.some((fd) => JSON.stringify(incoming[fd.key] ?? null) !== JSON.stringify(rec[fd.key] ?? null));
       if (!changed) return { ...view(user, collection, rec, live), unchanged: true };
       const patch = { ...incoming, status: statusAfterSave(rec.status) };
-      const saved = await write(user, collection, rec, patch, "save", { requestId });
+      const moved = rec.status === "scheduled" && incoming.scheduled_at !== rec.scheduled_at;
+      const saved = await write(user, collection, rec, patch, "save", { requestId, detail: moved ? `Rescheduled for ${scheduleNote(incoming.scheduled_at)}` : "" });
       return view(user, collection, saved, live);
     },
 
@@ -239,7 +277,19 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
 
       let patch;
       let unpublished = false;
+      let detail = "";
       switch (action) {
+        case "schedule": {
+          // The article's date becomes the scheduled Manila date, so check the record with it.
+          const at = scheduleInstant(rec.schedule_date, rec.schedule_time);
+          const dated = at ? { ...rec, publish_date: scheduleLocalDate(at) } : rec;
+          const errors = { ...(await publishProblems(collection, dated)), ...scheduleProblems(rec) };
+          if (Object.keys(errors).length) fail422(errors, "This resource cannot be scheduled until the highlighted fields are fixed.");
+          patch = { status: "scheduled", scheduled_at: at, scheduled_by: user.email, schedule_error: "", publish_date: dated.publish_date };
+          detail = `${rec.status === "scheduled" ? "Rescheduled" : "Scheduled"} for ${scheduleNote(at)}`;
+          break;
+        }
+        case "unschedule": patch = { status: "draft", scheduled_at: "", scheduled_by: "" }; detail = `Was scheduled for ${scheduleNote(rec.scheduled_at)}`; break;
         case "unpublish": patch = { status: "draft" }; unpublished = true; break;
         case "archive": patch = { status: "archived" }; unpublished = !!live; break;
         case "restore": patch = { status: "draft" }; break;
@@ -251,26 +301,24 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       if (unpublished && liveRow) {
         await store.update("published", liveRow.id, { ...liveRow, state: "unpublished", write_id: randomId("w", 6) }, { expectWriteId: liveRow.write_id });
       }
-      const saved = await write(user, collection, rec, patch, action, { requestId });
+      const saved = await write(user, collection, rec, patch, action, { requestId, detail });
       const result = view(user, collection, saved, unpublished ? null : live);
       if (unpublished) result.deploy = await onPublicChange(`${action} ${collection}/${id}`);
       return result;
     },
 
-    async publish(user, collection, id, { version } = {}, { requestId } = {}) {
+    // dueBy (the scheduled job only): publish only if the item is still Scheduled for no later
+    // than this instant; deploy: false lets the job start one website rebuild for all items.
+    async publish(user, collection, id, { version } = {}, { requestId, dueBy = null, deploy = true, detail = "" } = {}) {
       if (collection === "settings" && !isSuperAdmin(user.role)) throw new HttpError(403, "Only Super Admins can publish Site settings.", "forbidden");
       const { rec, liveRow } = await load(collection, id);
       if (!canEditContent(user, collection)) throw new HttpError(403, "You do not have permission to publish this item.", "forbidden");
       checkVersion(rec, version);
+      if (dueBy && (rec.status !== "scheduled" || !(Date.parse(rec.scheduled_at) <= dueBy.getTime()))) throw new HttpError(409, "This item is no longer scheduled for now.", "not_due");
       if (rec.deleted_at) throw new HttpError(409, "Deleted items cannot be published.", "deleted");
       if (rec.status === "archived") throw new HttpError(409, "Archived items cannot be published. Restore it to draft first.", "archived");
       if (rec.status === "published") throw new HttpError(409, "This version is already on the website.", "already_published");
-      const errors = await validateAll(collection, rec, { strict: true });
-      if (hasSlug(collection)) {
-        const pub = await store.list("published");
-        const taken = pub.filter((p) => p.collection === collection && p.state === "live" && p.record_id !== id).map((p) => p.slug);
-        if (taken.includes(rec.slug)) errors.slug = `The address ${publicPath(collection, rec.slug)} is already live for another item.`;
-      }
+      const errors = await publishProblems(collection, rec);
       if (Object.keys(errors).length) fail422(errors, "This item cannot be published until the highlighted fields are fixed.");
 
       const newVersion = Number(rec.version) + 1;
@@ -293,15 +341,17 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
         saved = await store.update(collection, id, {
           ...rec, status: "published", version: newVersion, write_id: randomId("w", 6), updated_at: stamp, updated_by: user.email,
           published_at: stamp, published_by: user.email, published_version: newVersion, published_slug: rec.slug || "", previous_slugs: previousSlugs,
+          // Published now, so any schedule is done with (a later Schedule needs a new time).
+          ...(COLLECTIONS[collection].schedulable ? { scheduled_at: "", scheduled_by: "", schedule_error: "", schedule_date: "", schedule_time: "" } : {}),
         }, { expectWriteId: rec.write_id });
       } catch (e) {
         warning = `The item is live on the website, but its status could not be updated (${e.message}). Use “Finish publishing” to complete it.`;
         saved = rec;
       }
       await log.snapshot(user, collection, saved, "publish");
-      await log.log(user, "publish", collection, id, newVersion, previousSlugs ? `Redirects from: ${previousSlugs}` : "", requestId);
+      await log.log(user, "publish", collection, id, newVersion, [detail, previousSlugs ? `Redirects from: ${previousSlugs}` : ""].filter(Boolean).join(". "), requestId);
       const result = view(user, collection, saved, row);
-      result.deploy = await onPublicChange(`publish ${collection}/${id}`);
+      if (deploy) result.deploy = await onPublicChange(`publish ${collection}/${id}`);
       if (warning) result.warning = warning;
       return result;
     },
@@ -319,6 +369,48 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       await log.snapshot(user, collection, saved, "reconcile");
       await log.log(user, "reconcile", collection, id, saved.version, contentUnchanged ? "Marked as published" : "Recorded live version; draft changes kept", requestId);
       return view(user, collection, saved, live);
+    },
+
+    // The scheduled job: publishes every Scheduled item whose time has passed (oldest first),
+    // then starts one website rebuild. Safe to run as often as wanted, and to run twice at once.
+    //   published  went live now
+    //   failed     can no longer be published as it stands: back to Draft, reason in
+    //              schedule_error (dashboard + audit log), not retried
+    //   retry      someone saved it meanwhile, or the database could not be reached: next run
+    async publishDue({ now: at = new Date(), dryRun = false } = {}) {
+      const out = { checked: 0, due: [], published: [], failed: [], retry: [], deploy: null };
+      for (const c of CONTENT_COLLECTIONS.filter((x) => COLLECTIONS[x].schedulable)) {
+        // Only Scheduled rows (one indexed column), so a run with nothing due reads almost nothing.
+        const rows = (store.query ? await store.query(c, { eq: { status: "scheduled" } }) : (await store.list(c)).filter((r) => r.status === "scheduled")).map((r) => migrateRecord(c, r));
+        out.checked += rows.length;
+        const due = rows.filter((r) => !r.deleted_at && r.status === "scheduled")
+          .filter((r) => { const ms = Date.parse(r.scheduled_at); return Number.isNaN(ms) || ms <= at.getTime(); })
+          .sort((a, b) => String(a.scheduled_at).localeCompare(String(b.scheduled_at)));
+        for (const r of due) {
+          const item = { collection: c, id: r.id, label: labelOf(c, r), scheduled_at: r.scheduled_at };
+          out.due.push(item);
+          if (dryRun) continue;
+          const fail = async (reason) => {
+            try {
+              const { rec } = await load(c, r.id);
+              if (rec.status !== "scheduled") return out.retry.push({ ...item, reason: "changed meanwhile" });
+              await write(SCHEDULER, c, rec, { status: "draft", scheduled_at: "", schedule_error: reason }, "schedule_failed", { detail: `Not published: ${reason}` });
+              out.failed.push({ ...item, reason });
+            } catch (e) { out.retry.push({ ...item, reason: e.message }); }
+          };
+          if (Number.isNaN(Date.parse(r.scheduled_at))) { await fail("It had no valid scheduled time."); continue; }
+          try {
+            await this.publish(SCHEDULER, c, r.id, { version: r.version }, { dueBy: at, deploy: false, detail: `Scheduled by ${r.scheduled_by || "an editor"} for ${scheduleNote(r.scheduled_at)}` });
+            out.published.push(item);
+          } catch (e) {
+            const permanent = e instanceof HttpError && (e.status === 422 || (e.status === 409 && ["deleted", "archived", "already_published"].includes(e.code)));
+            if (permanent) await fail([e.message, ...Object.values(e.details?.errors || {})].join(" "));
+            else out.retry.push({ ...item, reason: e.message }); // conflict, not_due, duplicate_id, database errors
+          }
+        }
+      }
+      if (out.published.length) out.deploy = await onPublicChange(`scheduled publish: ${out.published.map((p) => `${p.collection}/${p.id}`).join(", ")}`);
+      return out;
     },
 
     async history(user, collection, id) {
@@ -346,7 +438,7 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
     async dashboard(user) {
       const t = await store.listMany([...CONTENT_COLLECTIONS, "published"], { fresh: false });
       const today = now().slice(0, 10);
-      const counts = {}, mine = [], overdue = [], repair = [];
+      const counts = {}, mine = [], overdue = [], repair = [], scheduled = [], scheduleFailed = [];
       const liveIds = new Map(t.published.filter((p) => p.state === "live").map((p) => [`${p.collection}:${p.record_id}`, p]));
       for (const c of CONTENT_COLLECTIONS) {
         counts[c] = {};
@@ -361,6 +453,8 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
           if (manage && r.review_date && r.review_date < today && r.status !== "archived") overdue.push({ ...item, review_date: r.review_date });
           const l = liveIds.get(`${c}:${r.id}`);
           if (canEditContent(user, c) && l && Number(r.published_version || 0) < Number(l.version)) repair.push(item);
+          if (r.status === "scheduled") scheduled.push({ ...item, scheduled_at: r.scheduled_at, scheduled_by: r.scheduled_by, late: Date.now() - Date.parse(r.scheduled_at) > OVERDUE_MS });
+          else if (r.schedule_error && r.status === "draft") scheduleFailed.push({ ...item, schedule_error: r.schedule_error });
           if (l && l.payload?.visible === false) counts[c].hidden = (counts[c].hidden || 0) + 1;
         }
         counts[c].live = [...liveIds.keys()].filter((k) => k.startsWith(`${c}:`)).length - (counts[c].hidden || 0);
@@ -369,7 +463,8 @@ export function createRecords({ store, cfg, log, onPublicChange = async () => ({
       const recent = (await store.list("audit_log"))
         .filter((a) => isSuperAdmin(user.role) || (a.actor === user.email && a.collection))
         .sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 12);
-      return { counts, mine: mine.sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at))).slice(0, 20), overdue: overdue.slice(0, 20), repair, recent };
+      return { counts, mine: mine.sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at))).slice(0, 20), overdue: overdue.slice(0, 20), repair, recent,
+        scheduled: scheduled.sort((a, b) => String(a.scheduled_at).localeCompare(String(b.scheduled_at))), scheduleFailed };
     },
   };
 }

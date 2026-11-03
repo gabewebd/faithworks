@@ -92,7 +92,7 @@ test("any author edits and publishes content someone else created; each change r
   const other = u.author2;
   const view = (await other.get(`/api/records/resources/${r.id}`)).data;
   assert.equal(view.can_edit, true, "another author may edit it");
-  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish"], "and publish, archive or delete it");
+  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish", "schedule"], "and publish, schedule, archive or delete it");
   r = rec(await other.put(`/api/records/resources/${r.id}`, { version: r.version, data: article({ authors: [USERS.author], summary: "Edited by a colleague" }) }));
   assert.equal(r.summary, "Edited by a colleague");
   assert.equal(r.updated_by, USERS.author2, "the editor is recorded");
@@ -179,7 +179,7 @@ test("publishing is one step with no approval; the live copy is separate from dr
     assert.equal((await u.super.post(`/api/records/resources/${r.id}/actions/${old}`, { version: r.version })).status, 404, `no ${old} action`);
   }
   const view = (await u.author.get(`/api/records/resources/${r.id}`)).data;
-  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish"], "a draft can be published, archived or deleted by its author");
+  assert.deepEqual(view.actions.sort(), ["archive", "delete", "publish", "schedule"], "a draft can be published, scheduled, archived or deleted by its author");
   const pub = await u.author.post(`/api/records/resources/${r.id}/actions/publish`, { version: r.version });
   assert.equal(pub.status, 200);
   assert.equal(rec(pub).status, "published");

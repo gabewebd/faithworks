@@ -4,10 +4,11 @@ import { COLLECTIONS, CONTENT_COLLECTIONS, STATUSES, ROLES, isSuperAdmin } from 
 import { assetUrl } from "./fields.mjs";
 import { historyKind, actionConfirm } from "./editor.mjs";
 import { ACTIONS } from "/shared/workflow.mjs";
+import { fmtSchedule } from "/shared/schedule.mjs";
 
 // Activity rows: content steps in plain words (steps of the retired workflow shown generically);
 // account and settings actions (sign_in, user_save…) as recorded.
-const CONTENT_ACTIONS = new Set(["create", "save", "publish", "unpublish", "archive", "restore", "delete", "undelete", "reconcile", "restore_version", "submit", "withdraw", "approve", "request_changes", "reject"]);
+const CONTENT_ACTIONS = new Set(["create", "save", "publish", "schedule", "unschedule", "schedule_failed", "unpublish", "archive", "restore", "delete", "undelete", "reconcile", "restore_version", "submit", "withdraw", "approve", "request_changes", "reject"]);
 const actionLabel = (a) => (CONTENT_ACTIONS.has(a) ? historyKind(a) : a);
 import { selectBox, toggle } from "./controls.mjs";
 
@@ -19,13 +20,16 @@ export async function dashboardView(app) {
   const d = await api("GET", "/api/dashboard");
   const admin = isSuperAdmin(app.user.role);
   const alerts = [];
+  const late = (d.scheduled || []).filter((r) => r.late);
+  if (late.length) alerts.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Scheduled publishing is late. "), `${late.length} item(s) are still waiting after their scheduled time, so the scheduled job (Netlify function “publish-scheduled”) may not be running. They are not on the website yet. Publish them by hand, or ask a developer to check the job: `), late.map((r) => [link(r.collection, r.id, r.label), " "]))));
+  if ((d.scheduleFailed || []).length) alerts.push(h("div", { class: "alert alert--warn" }, h("div", {}, h("p", {}, h("strong", {}, "A scheduled publish did not happen. "), "These are Drafts again; open one to see why: "), d.scheduleFailed.map((r) => [link(r.collection, r.id, r.label), " "]))));
   if (d.repair.length) alerts.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing needs attention. "), `${d.repair.length} item(s) are live but their status was not updated: `), d.repair.map((r) => [link(r.collection, r.id, r.label), " "]))));
   const icons = { programs: "book", events: "calendar", resources: "file", testimonials: "quote" };
   const stats = CONTENT_COLLECTIONS.map((c) => {
     const n = d.counts[c] || {};
     const total = Object.entries(n).filter(([k]) => k !== "live").reduce((a, [, v]) => a + v, 0);
     return h("a", { class: "card stat", href: `#/c/${c}` }, h("h3", { class: "row" }, icon(icons[c]), COLLECTIONS[c].label), h("p", { class: "num" }, String(total)),
-      h("div", { class: "row" }, n.published ? h("span", { class: "badge badge--green" }, `${n.published} published`) : null, n.hidden ? h("span", { class: "badge badge--yellow" }, `${n.hidden} hidden`) : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
+      h("div", { class: "row" }, n.published ? h("span", { class: "badge badge--green" }, `${n.published} published`) : null, n.scheduled ? h("span", { class: "badge badge--yellow" }, `${n.scheduled} scheduled`) : null, n.hidden ? h("span", { class: "badge badge--yellow" }, `${n.hidden} hidden`) : null, n.draft ? h("span", { class: "badge badge--stone" }, `${n.draft} draft`) : null));
   });
   const itemList = (items, empty) => items.length
     ? h("ul", { class: "list" }, items.map((r) => h("li", {}, statusBadge(r.status), h("div", {}, link(r.collection, r.id, r.label), h("div", { class: "small muted" }, `${COLLECTIONS[r.collection].singular} · ${when(r.updated_at)} by ${who(r.updated_by)}`)))))
@@ -36,6 +40,8 @@ export async function dashboardView(app) {
       admin && app.config.deployHook ? h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, async () => { try { const r = await api("POST", "/api/deploy", {}); toast(r.triggered ? "Website rebuild started." : r.error || r.reason, r.triggered ? "ok" : "error"); } catch (err) { toast(errorText(err), "error"); } }) }, icon("rocket"), "Rebuild website") : null),
     alerts,
     h("div", { class: "grid grid--4", style: "margin-bottom:16px" }, stats),
+    (d.scheduled || []).length ? h("div", { class: "card", style: "margin-bottom:16px" }, h("h2", {}, "Scheduled"), h("p", { class: "small muted" }, "These go live automatically at the time shown (Manila time). Until then they are not on the website."),
+      h("ul", { class: "list" }, d.scheduled.map((r) => h("li", {}, statusBadge(r.status), h("div", {}, link(r.collection, r.id, r.label), h("div", { class: "small muted" }, `${COLLECTIONS[r.collection].singular} · scheduled by ${who(r.scheduled_by)}`)), h("span", { class: "spacer" }), h("b", { class: "small" }, `${fmtSchedule(r.scheduled_at)} Manila time`))))) : null,
     h("div", { class: "card" }, h("h2", {}, admin ? "Drafts" : "Your drafts"), h("p", { class: "small muted" }, "Saved but not on the website yet. Open one and press Publish when it is ready."),
       itemList(d.mine, "No drafts. Use “New” on any content type to start.")),
     d.recent.length ? h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, admin ? "Recent activity" : "Your recent activity"),
@@ -49,7 +55,7 @@ export async function listView(app, { collection }) {
   const tags = await api("GET", "/api/tags").catch(() => []);
   const q = h("input", { class: "input", type: "search", placeholder: `Search ${C.label.toLowerCase()}…`, "aria-label": "Search" });
   const params = new URLSearchParams(location.hash.split("?")[1] || "");
-  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).map(([k, s]) => ({ value: k, label: s.label }))] });
+  const status = selectBox({ label: "Filter by status", value: params.get("status") || "", onChange: () => load(), options: [{ value: "", label: "All statuses" }, ...(C.fields.some((fd) => fd.key === "visible") ? [{ value: "hidden", label: "Hidden from the website" }] : []), ...Object.entries(STATUSES).filter(([k]) => k !== "scheduled" || C.schedulable).map(([k, s]) => ({ value: k, label: s.label }))] });
   const tagged = C.fields.some((fd) => fd.type === "tags");
   const tag = selectBox({ label: "Filter by tag", value: params.get("tag") || "", searchable: true, onChange: () => load(), options: [{ value: "", label: "All tags" }, ...tags.filter((t) => !t.archived).map((t) => ({ value: t.id, label: t.label }))] });
   const body = h("div", { class: "list-body" }, skeleton("table"));
@@ -66,7 +72,9 @@ export async function listView(app, { collection }) {
         h("tbody", {}, rows.map((r) => {
           const tr = h("tr", { onclick: (e) => { if (!e.target.closest("a, .menu-wrap")) location.hash = `#/c/${collection}/${encodeURIComponent(r.id)}`; } },
             h("td", { class: "title" }, h("div", { class: "row", style: "gap:10px;flex-wrap:nowrap" }, thumb(r), h("div", {}, link(collection, r.id, r.label || "(untitled)"), r.can_edit || r.status === "archived" ? null : h("span", { class: "badge badge--stone", title: "Only its authors and Super Admins can change this item" }, "View only"), subline(r), tagged && (r.tags || []).length ? h("div", {}, r.tags.map((t) => h("span", { class: "tag" }, tags.find((x) => x.id === t)?.label || t))) : null))),
-            h("td", {}, h("div", { class: "row", style: "gap:6px" }, statusBadge(r.status), r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : hiddenBadge(r.live))),
+            h("td", {}, h("div", { class: "row", style: "gap:6px" }, statusBadge(r.status), r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : hiddenBadge(r.live)),
+              r.status === "scheduled" && r.scheduled_at ? h("div", { class: "small", title: r.scheduled_at }, `Goes live ${fmtSchedule(r.scheduled_at)} (Manila)`) : null,
+              r.status === "draft" && r.schedule_error ? h("div", { class: "small error" }, "Scheduled publish failed") : null),
             h("td", { class: "small" }, r.byline || r.content_owner || h("span", { class: "muted" }, "—")),
             h("td", { class: "small muted" }, `${when(r.updated_at)} · ${who(r.updated_by)}`),
             h("td", { class: "row-actions" }, itemMenu(r)));
@@ -79,7 +87,8 @@ export async function listView(app, { collection }) {
   // The three-dot menu on each row: the actions the server allows for this item now (r.actions),
   // plus Edit and Preview. Publish, Unpublish, Archive and Delete ask first, as in the editor.
   const previewable = C.route !== null || collection === "testimonials";
-  const ROW_ACTIONS = ["publish", "unpublish", "archive", "restore", "delete"];
+  // Schedule needs a date and time, so it is in the editor only; Cancel schedule is here too.
+  const ROW_ACTIONS = ["publish", "unschedule", "unpublish", "archive", "restore", "delete"];
   function itemMenu(r) {
     const href = `#/c/${collection}/${encodeURIComponent(r.id)}`;
     const items = [
