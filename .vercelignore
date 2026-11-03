@@ -1,17 +1,11 @@
-# Allowlist: Vercel receives only what the website build (vercel.mjs) needs. Everything else
-# (cms/ server, fixtures and Supabase files, docs/, .env files, the committed root HTML, briefs,
-# screenshots) never leaves this machine or the repository. The build reads templates/, data/ and tools/,
-# imports cms/shared/ (content helpers, no secrets) and copies css/, js/ and assets/ into dist/,
-# the only folder Vercel serves. Add a path here only if tools/build.mjs starts to need it.
+# Allowlist: main deploys only the asset CDN (vercel.mjs → tools/build-cdn.mjs → dist/), so Vercel
+# receives just the files it serves (css/, js/, assets/) and the two files that build them.
+# Everything else (pages, templates, cms/, docs, briefs, screenshots) stays in the repository.
 /*
 !/vercel.mjs
-!/templates
-!/data
-/data/migration
 !/tools
+/tools/*
+!/tools/build-cdn.mjs
 !/css
 !/js
 !/assets
-!/cms
-/cms/*
-!/cms/shared

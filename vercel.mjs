@@ -1,52 +1,22 @@
-// Vercel project configuration for the website (formerly vercel.json). A module rather than JSON so
-// the CMS slug history becomes real redirects: when an event, program or resource changes slug, its
-// old address answers 308 → the new address at the CDN, instead of a "This page has moved" page
-// with a meta refresh. Vercel evaluates this file at deploy time, before the build command, with
-// the project's environment variables; it reads the same published snapshot the build does
-// (tools/content.mjs), so a CMS outage stops the deploy here just as it would stop the build.
-// The build still writes its fallback redirect pages (tools/build.mjs) for other hosts and local
-// previews; on Vercel these redirects run first, so those pages are never shown.
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { loadSnapshot, SITE_REDIRECTS } from "./tools/content.mjs";
-import { publicPath } from "./cms/shared/schema.mjs";
-import { cleanPath } from "./tools/layout.mjs";
-
-const root = dirname(fileURLToPath(import.meta.url));
-
-// Site renames come from tools/content.mjs SITE_REDIRECTS (the build writes fallback pages for the same list).
-
-async function cmsRedirects() {
-  const snap = await loadSnapshot({ root, source: "cms", view: "published" });
-  // Redirects run before the site's own files, so never redirect away from an address that a
-  // current item owns (the CMS already refuses such slugs; this keeps a stale entry harmless).
-  // Plain paths only: Vercel reads a source as a route pattern, and slugs never need more.
-  const live = new Set(["programs", "events", "resources"].flatMap((c) => (snap[c] || []).map((p) => publicPath(c, p.slug))));
-  const plain = (p) => /^\/[a-z0-9/-]+\/$/.test(p || "");
-  return (snap.redirects || []).filter((r) => plain(r.from) && plain(r.to) && r.from !== r.to && !live.has(r.from));
-}
-
-const redirects = [...SITE_REDIRECTS, ...(await cmsRedirects())];
-
+// Vercel project configuration for main: the asset CDN for the live site on GoHighLevel.
+// It serves only css/, js/ and assets/ (tools/build-cdn.mjs). No pages, so no CMS snapshot or
+// redirects are needed here. Other paths, including the root address, answer 404.
+// The full website build lives on the testing-before-live branch (its vercel.mjs builds every page
+// with tools/build.mjs). When merging that branch into main, keep this file and .vercelignore.
 export const config = {
   framework: null,
   installCommand: "",
-  buildCommand: "node tools/build.mjs --deploy --content=cms --view=published --out=dist",
+  buildCommand: "node tools/build-cdn.mjs",
   outputDirectory: "dist",
-  // Every page is one .html file (tools/build.mjs): /about serves about.html, and the old folder
-  // addresses (/about/) redirect to it because trailing slashes are dropped.
-  cleanUrls: true,
-  trailingSlash: false,
-  redirects: redirects.map((r) => ({ source: cleanPath(r.from), destination: cleanPath(r.to), permanent: true })),
   headers: [
     {
       source: "/(.*)",
       headers: [
+        // The GHL pages (another origin) load these files, and the resources embed fetches css/style.css
+        { key: "Access-Control-Allow-Origin", value: "*" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        { key: "X-Frame-Options", value: "SAMEORIGIN" },
         { key: "Strict-Transport-Security", value: "max-age=31536000" },
-        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
       ],
     },
   ],
