@@ -198,10 +198,9 @@ async function setup() {
   return doc("How to Set Up Your AI Agent", "Three setup steps (instructions, tools and access with read-only first, and your approval) joined by straight lines to an AI agent, which connects to Google Drive, Google Docs and Gmail.", await defs(bg), body);
 }
 
-/* ---- 7. Chatbot, copilot or AI agent — radial gradient from the bottom: three ways to use AI,
-   all reached from the same row of eight tools (ChatGPT, Codex, Claude, Grok, Gemini, Claude Code,
-   Hermes Agent, Obsidian). More AI logos drift around the edges, tilted and feathered (blurred and
-   faded), outside the area the crops keep, so they frame the scene without competing with it ---- */
+/* ---- 7. Chatbot, copilot or AI agent — radial gradient from the bottom: three ways to use AI in a
+   row, joined by one straight line, with the tools scattered around them as tilted logo tiles:
+   the nearer ones sharp, the ones at the edges feathered (blurred and faded) for depth ---- */
 // A logo tile tilted by a degrees about its centre (cx, cy), softened by the feather blur
 function drift(cx, cy, s, name, a, blur, opacity) {
   const x = cx - s / 2, y = cy - s / 2, rx = Math.round(s * 0.22), i = Math.round(s * 0.54), o = (s - i) / 2;
@@ -211,22 +210,24 @@ async function modes() {
   const bg = `<radialGradient id="bg" cx="960" cy="1080" r="1350" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.48" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></radialGradient>`;
   const blurs = [2, 4, 5, 6];
   const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
-  const xs = [420, 960, 1500], cy = 290, bus = 520, ls = 160, ly = 650;
+  const xs = [420, 960, 1500], cy = 540;
   const chips = [["chat", "pink", "Chatbot", "Answers your questions"], ["assist", "yellow", "Copilot", "Helps while you work"], ["process", "pink", "AI agent", "Carries out the steps"]].map((a, i) => chip(xs[i], cy, ...a));
-  const tools = ["chatgpt", "codex-color", "claude-color", "grok", "gemini", "claude-code-color", "hermes-agent", "obsidian"];
-  const step = 204, lx = tools.map((_, i) => Math.round(960 + (i - (tools.length - 1) / 2) * step));
-  const wires = [[[lx[0], bus], [lx[lx.length - 1], bus]], ...xs.map((x) => [[x, chips[0].bottom], [x, bus]]), ...lx.map((x) => [[x, bus], [x, ly]])];
-  const nodes = xs.map((x) => node(x, chips[0].bottom)).join("") + lx.map((x) => node(x, ly) + node(x, bus, C.yellow, 8)).join("");
-  // [centre x, centre y, size, logo, tilt, blur, opacity]: bigger tiles sit nearer the edge and are softer
-  const edge = [
-    [70, 80, 190, "perplexity", -16, 5, 0.85], [36, 420, 130, "chatgpt", 12, 4, 0.8], [120, 1000, 200, "gemini", 18, 6, 0.8],
-    [690, 46, 110, "notebooklm", -10, 2, 0.75], [640, 1040, 120, "claude-code-color", 9, 2, 0.75],
-    [1250, 40, 100, "grok", 8, 2, 0.7], [1240, 1046, 110, "codex-color", -12, 2, 0.75],
-    [1856, 96, 180, "claude-color", 14, 5, 0.85], [1890, 450, 130, "hermes-agent", -10, 4, 0.8], [1800, 1000, 210, "chatgpt", -18, 6, 0.8],
+  const wires = [[[chips[0].right, cy], [chips[1].left, cy]], [[chips[1].right, cy], [chips[2].left, cy]]];
+  // [centre x, centre y, size, logo, tilt, blur (0 = sharp), opacity]
+  const sharp = [
+    [300, 260, 150, "chatgpt", -9], [760, 230, 140, "claude-color", 7], [1170, 270, 150, "gemini", -6], [1620, 250, 140, "grok", 10],
+    [330, 830, 140, "codex-color", 8], [790, 850, 150, "claude-code-color", -7], [1180, 820, 140, "hermes-agent", 6], [1630, 840, 150, "obsidian", -10],
   ];
-  const body = layer("drifting-logos", edge.map((e) => drift(...e)).join("")) + layer("connectors", wires.map(wire).join("")) + layer("ways-to-use-ai", chips.map((c) => c.svg).join("")) +
-    layer("assistants", tools.map((n, i) => logo(lx[i] - ls / 2, ly, ls, n)).join("")) + layer("nodes", nodes);
-  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps), joined by straight lines to eight tools: ChatGPT, Codex, Claude, Grok, Gemini, Claude Code, Hermes Agent and Obsidian. More AI logos float, tilted and softly blurred, around the edges.", await defs(bg, extra), body);
+  const soft = [
+    [70, 80, 190, "perplexity", -16, 5, 0.85], [36, 540, 130, "notebooklm", 12, 4, 0.8], [120, 1000, 200, "gemini", 18, 6, 0.8],
+    [540, 60, 110, "notebooklm", -10, 2, 0.75], [990, 50, 100, "codex-color", 8, 2, 0.7], [1380, 70, 110, "perplexity", -12, 2, 0.75],
+    [560, 1030, 120, "grok", 9, 2, 0.75], [1000, 1040, 110, "chatgpt", -12, 2, 0.75], [1400, 1030, 110, "claude-color", 10, 2, 0.7],
+    [1856, 96, 180, "claude-code-color", 14, 5, 0.85], [1890, 540, 130, "chatgpt", -10, 4, 0.8], [1800, 1000, 210, "hermes-agent", -18, 6, 0.8],
+  ];
+  const sharpTile = ([x, y, sz, n, a]) => `<g transform="rotate(${a} ${x} ${y})">${logo(x - sz / 2, y - sz / 2, sz, n)}</g>`;
+  const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) + layer("tools", sharp.map(sharpTile).join("")) +
+    layer("connectors", wires.map(wire).join("")) + layer("ways-to-use-ai", chips.map((c) => c.svg).join("")) + layer("nodes", ends(wires));
+  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps) joined by one straight line, with AI tool logos scattered around them, tilted: ChatGPT, Claude, Gemini, Grok, Codex, Claude Code, Hermes Agent and Obsidian, plus softer ones at the edges.", await defs(bg, extra), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github, setup, modes };

@@ -149,7 +149,11 @@
   #selfhost .host .lbl { margin-bottom: 26px; }
   #selfhost .pair { display: flex; justify-content: center; gap: 40px; }
   #selfhost .pair figure { margin: 0; display: grid; justify-items: center; gap: 14px; font-size: 28px; font-weight: 700; }
-  #selfhost .notes { position: relative; display: flex; align-items: center; gap: 26px; width: 620px; margin: 90px auto 0; padding: 26px 30px; }
+  #selfhost .chip--logo { gap: 12px; padding: 8px 20px 8px 10px; }
+  #selfhost .chip--logo::before { display: none; }
+  #selfhost .chip--logo img { width: 34px; height: 34px; }
+  #selfhost .named { margin: 0; display: grid; justify-items: center; gap: 10px; font-size: 24px; font-weight: 700; }
+  #selfhost .notes { position: relative; display: flex; align-items: center; gap: 30px; width: 700px; margin: 90px auto 0; padding: 26px 30px; }
   #selfhost .safe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 50px; padding: 26px 30px; border-radius: 24px; background: var(--pink-tint); }
   #selfhost .safe div { display: flex; align-items: center; gap: 18px; font-size: 25px; font-weight: 600; line-height: 1.3; }
   #selfhost .safe .tile { width: 64px; height: 64px; border-radius: 16px; }
@@ -316,11 +320,11 @@
   <p class="kicker">Open-source agents</p>
   <h2>An agent you install and run yourself</h2>
   <div class="grid">
-    <div class="card side" data-n="chat"><p class="lbl">You message it from</p><div class="list"><span class="chip">WhatsApp</span><span class="chip chip--y">Telegram</span><span class="chip">Slack</span><span class="chip chip--y">Discord</span></div></div>
+    <div class="card side" data-n="chat"><p class="lbl">You message it from</p><div class="list"><span class="chip chip--logo"><img src="/assets/icons/tools/whatsapp.svg" alt="">WhatsApp</span><span class="chip chip--logo"><img src="/assets/icons/tools/telegram.svg" alt="">Telegram</span><span class="chip chip--logo"><img src="/assets/icons/tools/slack.svg" alt="">Slack</span><span class="chip chip--logo"><img src="/assets/icons/tools/discord.svg" alt="">Discord</span></div></div>
     <div class="card host" data-n="host"><p class="lbl">Your computer or a small cloud server</p><div class="pair"><figure><span class="logo logo--lg"><img src="/assets/icons/tools/openclaw.svg" alt=""></span>OpenClaw</figure><figure><span class="logo logo--lg"><img src="/assets/icons/tools/hermes-agent.svg" alt=""></span>Hermes Agent</figure></div></div>
-    <div class="card side" data-n="model"><p class="lbl">With the model you choose</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span></div><div class="list"><span class="chip chip--y">or a local model</span></div></div>
+    <div class="card side" data-n="model"><p class="lbl">With the model you choose</p><div class="list"><span class="chip chip--logo"><img src="/assets/icons/tools/claude-color.svg" alt="">Claude</span><span class="chip chip--logo"><img src="/assets/icons/tools/chatgpt.svg" alt="">ChatGPT</span><span class="chip chip--logo"><img src="/assets/icons/tools/gemini.svg" alt="">Gemini</span><span class="chip chip--y">or a local model</span></div></div>
   </div>
-  <div class="card notes" data-n="notes"><span class="logo logo--lg"><img src="/assets/icons/tools/obsidian.svg" alt=""></span><div><p class="t">One notes folder</p><p class="s">Brief, style guide, research: plain Markdown files it can read.</p></div></div>
+  <div class="card notes" data-n="notes"><figure class="named"><span class="logo logo--lg"><img src="/assets/icons/tools/obsidian.svg" alt=""></span>Obsidian</figure><div><p class="t">One notes folder in Obsidian</p><p class="s">Brief, style guide, research: plain Markdown files it can read.</p></div></div>
   <div class="safe"><div><span class="tile" data-i="shield"></span>A separate machine or sandbox</div><div><span class="tile tile--y" data-i="tools"></span>Only the folders and apps it needs</div><div><span class="tile" data-i="person"></span>Your yes before it sends or pays</div></div>
   <svg class="wires" data-wires="selfhost"></svg>
 </section>

@@ -2456,7 +2456,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .article__lead { margin: 18px 0 0; font-size: var(--fs-lead); }
 .article__meta { margin: 14px 0 0; font-size: var(--fs-small); color: var(--muted); }
 .article__cover picture { display: block; overflow: hidden; border-radius: var(--r-lg); }
-.article__cover img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
+/* Featured image at its own proportions (covers are 1920×1080): never cropped to a banner */
+.article__cover img { display: block; width: 100%; height: auto; }
 .article__body { max-width: 720px; margin-inline: auto; padding: clamp(32px, 4vw, 56px) var(--gutter) 0; font-size: 17px; }
 .article__body > h2 { margin: 52px 0 14px; font-size: clamp(28px, 3vw, 42px); line-height: 1.08; letter-spacing: -0.045em; }
 .article__body > h3 { margin: 32px 0 10px; font-size: clamp(21px, 1.9vw, 26px); }
