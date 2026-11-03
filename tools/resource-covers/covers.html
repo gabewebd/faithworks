@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -80,9 +80,11 @@ const ends = (wires, fill) => wires.flatMap((p) => [node(...p[0], fill), node(..
 async function defs(bg, extra = "") {
   const symbols = await Promise.all(LOGOS.map(async (n) => {
     const src = await (await fetch(`/assets/icons/tools/${n}.svg`)).text();
-    const vb = src.match(/viewBox="([^"]+)"/)[1], fill = (src.match(/<svg[^>]*\sfill="([^"]+)"/) || [])[1];
+    const vb = src.match(/viewBox="([^"]+)"/)[1], root = src.match(/<svg[^>]*>/)[0];
+    // paint set on the logo's own <svg> (fill, or stroke for line logos such as Gamma) moves to the symbol
+    const paint = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"].map((a) => { const m = root.match(new RegExp(`[ \\t\\n]${a}="([^"]+)"`)); return m ? ` ${a}="${m[1]}"` : ""; }).join("");
     const inner = src.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").replace(/\sid="([^"]*)"/g, ` id="logo-${n}-$1"`).replace(/url\(#([^)]+)\)/g, `url(#logo-${n}-$1)`).replace(/\s+/g, " ").trim(); // ids kept (gradients), made unique per logo
-    return `<symbol id="logo-${n}" viewBox="${vb}"${fill ? ` fill="${fill}"` : ""}>${inner}</symbol>`;
+    return `<symbol id="logo-${n}" viewBox="${vb}"${paint}>${inner}</symbol>`;
   }));
   return `<defs>
 <style>@import url("${FONTS}");</style>
@@ -208,21 +210,21 @@ function drift(cx, cy, s, name, a, blur, opacity) {
 }
 async function modes() {
   const bg = `<radialGradient id="bg" cx="960" cy="1080" r="1350" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.48" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></radialGradient>`;
-  const blurs = [2, 4, 5, 6];
+  const blurs = [3, 4, 5, 6];
   const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
   const xs = [420, 960, 1500], cy = 540;
   const chips = [["chat", "pink", "Chatbot", "Answers your questions"], ["assist", "yellow", "Copilot", "Helps while you work"], ["process", "pink", "AI agent", "Carries out the steps"]].map((a, i) => chip(xs[i], cy, ...a));
   const wires = [[[chips[0].right, cy], [chips[1].left, cy]], [[chips[1].right, cy], [chips[2].left, cy]]];
   // [centre x, centre y, size, logo, tilt, blur, opacity]
-  const soft = [
-    [70, 80, 190, "perplexity", -16, 5, 0.85], [36, 540, 130, "notebooklm", 12, 4, 0.8], [120, 1000, 200, "gemini", 18, 6, 0.8],
-    [540, 60, 110, "notebooklm", -10, 2, 0.75], [990, 50, 100, "codex-color", 8, 2, 0.7], [1380, 70, 110, "perplexity", -12, 2, 0.75],
-    [560, 1030, 120, "grok", 9, 2, 0.75], [1000, 1040, 110, "chatgpt", -12, 2, 0.75], [1400, 1030, 110, "claude-color", 10, 2, 0.7],
-    [1856, 96, 180, "claude-code-color", 14, 5, 0.85], [1890, 540, 130, "chatgpt", -10, 4, 0.8], [1800, 1000, 210, "hermes-agent", -18, 6, 0.8],
+  const soft = [ // each logo once, placed unevenly: corners, edges and a few nearer the row
+    [80, 110, 190, "perplexity", -16, 5, 0.85], [520, 210, 130, "notebooklm", 10, 3, 0.75], [1010, 90, 170, "codex-color", 8, 3, 0.8],
+    [1420, 250, 120, "grok", -12, 3, 0.75], [1840, 130, 180, "claude-color", 14, 5, 0.85], [60, 640, 170, "gemini", 12, 4, 0.8],
+    [960, 790, 150, "chatgpt", -10, 3, 0.8], [1860, 450, 160, "hermes-agent", -10, 4, 0.8], [300, 960, 190, "obsidian", 18, 6, 0.8],
+    [1450, 900, 140, "claude-code-color", -14, 4, 0.8], [1790, 1010, 200, "gamma", -18, 6, 0.75],
   ];
   const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) +
     layer("connectors", wires.map(wire).join("")) + layer("ways-to-use-ai", chips.map((c) => c.svg).join("")) + layer("nodes", ends(wires));
-  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps) joined by one straight line, framed by tilted, softly blurred AI tool logos around the edges (ChatGPT, Claude, Gemini, Grok, Codex, Claude Code, Hermes Agent, Perplexity and NotebookLM).", await defs(bg, extra), body);
+  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps) joined by one straight line, framed by tilted, softly blurred AI tool logos, each shown once (Perplexity, NotebookLM, Codex, Grok, Claude, Gemini, ChatGPT, Hermes Agent, Obsidian, Claude Code and Gamma).", await defs(bg, extra), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github, setup, modes };
