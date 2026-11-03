@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- In-article diagrams for the Resources articles (agents, niche skill, purpose, learning rhythm,
-     AI for beginners). Each .fig is one image, 1600px wide; render.mjs saves each one as
+     AI for beginners, chatbot vs copilot vs agent). Each .fig is one image, 1600px wide; render.mjs saves each one as
      assets/images/resources/<article>/<id>.png at 1600px (shown at 720px in the article).
      House rules: brand palette only (Faith Pink, AI Yellow, Works White, Soft Charcoal and their
      tints), Poppins 600 headings, Inter text, white cards lifted by a soft Charcoal shadow, hairline
@@ -37,6 +37,8 @@
   .wires circle.y { fill: var(--yellow); }
   .logo { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.08), 0 10px 20px -12px rgb(26 26 26 / 0.3); }
   .logo img { width: 38px; height: 38px; }
+  .logo--lg { flex: none; width: 120px; height: 120px; border-radius: 28px; }
+  .logo--lg img { width: 68px; height: 68px; }
   .chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 999px; background: #fff; font-size: 24px; font-weight: 600; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.08); }
   .chip::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--pink); }
   .chip--y::before { background: var(--yellow); }
@@ -121,6 +123,69 @@
   #prompt .legend .num { justify-self: start; margin-bottom: 8px; width: 42px; height: 42px; font-size: 22px; line-height: 1; color: #fff; }
   #prompt .legend b { font-size: 30px; font-family: Poppins, Arial, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
   #prompt .legend span:not(.num) { font-size: 24px; line-height: 1.35; color: rgb(26 26 26 / 0.72); }
+  /* ---- chatbot vs copilot vs agent: three levels ---- */
+  #levels .cols { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  #levels .card { display: flex; flex-direction: column; padding: 36px 34px 38px; }
+  #levels .head { display: flex; align-items: center; gap: 24px; margin-bottom: 22px; }
+  #levels .head .t { font-size: 44px; }
+  #levels .say { margin: 0; font-size: 30px; font-weight: 600; line-height: 1.3; }
+  #levels .meter { display: flex; gap: 8px; margin: 30px 0 12px; }
+  #levels .meter span { flex: 1; height: 16px; border-radius: 8px; background: var(--stone); }
+  #levels .meter span.on { background: var(--pink); }
+  #levels .card:nth-child(2) .meter span.on { background: var(--yellow); }
+  #levels .ml { display: flex; justify-content: space-between; font-size: 22px; font-weight: 600; color: rgb(26 26 26 / 0.55); }
+  #levels .you { margin: 26px 0 0; padding-top: 22px; border-top: 1px solid rgb(26 26 26 / 0.12); font-size: 26px; line-height: 1.35; }
+  #levels .you b { font-weight: 700; }
+  #levels .logos { display: flex; gap: 12px; margin-top: auto; padding-top: 30px; }
+  #levels .axis { display: flex; justify-content: space-between; margin-top: 34px; font-size: 26px; font-weight: 600; }
+
+  /* ---- self-hosted agent ---- */
+  #selfhost .grid { position: relative; display: grid; grid-template-columns: 340px 1fr 340px; column-gap: 110px; align-items: center; }
+  #selfhost .side { padding: 30px 30px 34px; }
+  #selfhost .lbl { margin: 0 0 20px; font-size: 22px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(26 26 26 / 0.6); }
+  #selfhost .side .list { display: grid; gap: 12px; justify-items: start; }
+  #selfhost .side .logos { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  #selfhost .host { padding: 34px 36px 38px; text-align: center; background: var(--yellow-pastel); }
+  #selfhost .host .lbl { margin-bottom: 26px; }
+  #selfhost .pair { display: flex; justify-content: center; gap: 40px; }
+  #selfhost .pair figure { margin: 0; display: grid; justify-items: center; gap: 14px; font-size: 28px; font-weight: 700; }
+  #selfhost .notes { position: relative; display: flex; align-items: center; gap: 26px; width: 620px; margin: 90px auto 0; padding: 26px 30px; }
+  #selfhost .safe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 50px; padding: 26px 30px; border-radius: 24px; background: var(--pink-tint); }
+  #selfhost .safe div { display: flex; align-items: center; gap: 18px; font-size: 25px; font-weight: 600; line-height: 1.3; }
+  #selfhost .safe .tile { width: 64px; height: 64px; border-radius: 16px; }
+  #selfhost .safe .tile svg { width: 40px; height: 40px; }
+
+  /* ---- decision path ---- */
+  #choose .tree { position: relative; display: grid; grid-template-columns: 700px 1fr; column-gap: 150px; row-gap: 60px; }
+  #choose .q { display: flex; align-items: center; gap: 26px; padding: 28px 32px; min-height: 150px; }
+  #choose .q .t { font-size: 32px; }
+  #choose .out { display: flex; align-items: center; gap: 24px; padding: 24px 28px; min-height: 150px; }
+  #choose .out .t { font-size: 34px; }
+  #choose .out .s { margin-top: 6px; font-size: 24px; }
+  #choose .out .logos { display: flex; gap: 8px; margin-top: 12px; }
+  #choose .out .logo { width: 52px; height: 52px; border-radius: 13px; }
+  #choose .out .logo img { width: 30px; height: 30px; }
+  #choose .lab { position: absolute; z-index: 2; padding: 4px 14px; border-radius: 999px; background: var(--paper); font-size: 24px; font-weight: 700; }
+  #choose .o-chat { background: var(--pink-tint); } #choose .o-co { background: var(--yellow-pastel); } #choose .o-auto { background: var(--stone-2); } #choose .o-agent { background: var(--pink-tint); }
+
+  /* ---- combining them ---- */
+  #combo .in { display: flex; align-items: center; gap: 16px; width: max-content; margin: 0 0 70px; padding: 16px 26px 16px 16px; border-radius: 20px; font-size: 27px; font-weight: 600; }
+  #combo .in .tile { width: 60px; height: 60px; border-radius: 15px; }
+  #combo .in .tile svg { width: 38px; height: 38px; }
+  #combo .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 70px; }
+  #combo .row .card { display: flex; flex-direction: column; padding: 30px 28px 32px; min-height: 380px; }
+  #combo .row .card:last-child { background: var(--yellow-pastel); }
+  #combo .row .card .tile { margin-bottom: 22px; }
+  #combo .card .t { font-size: 33px; }
+  #combo .card .s { font-size: 25px; }
+  #combo .logos { display: flex; gap: 10px; margin-top: auto; padding-top: 22px; }
+  #combo .under { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 70px; margin-top: 90px; }
+  #combo .under .logo { flex: none; }
+  #combo .under .card { display: flex; align-items: center; gap: 20px; padding: 22px 24px; }
+  #combo .under .card .t { font-size: 28px; }
+  #combo .under .card .s { margin-top: 4px; font-size: 22px; }
+  #combo .under .notes { grid-column: 2; }
+  #combo .under .bot { grid-column: 3; }
 </style>
 </head>
 <body>
@@ -235,6 +300,66 @@
   </div>
 </section>
 
+<!-- ================= Chatbot, copilot or AI agent ================= -->
+<section class="fig fig--both" id="levels" data-out="chatbot-vs-copilot-vs-ai-agent/three-levels">
+  <p class="kicker">Three levels of help</p>
+  <h2>One answers you, one works beside you, one does the steps</h2>
+  <div class="cols">
+    <div class="card"><div class="head"><div class="tile" data-i="chat"></div><p class="t">Chatbot</p></div><p class="say">You ask. It answers.</p><div class="meter"><span class="on"></span><span></span><span></span><span></span><span></span></div><div class="ml"><span>Autonomy</span><span>None</span></div><p class="you"><b>You:</b> read every answer, then use it yourself.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/grok.svg" alt=""></span></div></div>
+    <div class="card"><div class="head"><div class="tile tile--y" data-i="assist"></div><p class="t">Copilot</p></div><p class="say">It suggests in your app. You accept.</p><div class="meter"><span class="on"></span><span class="on"></span><span></span><span></span><span></span></div><div class="ml"><span>Autonomy</span><span>Low</span></div><p class="you"><b>You:</b> approve every change before it stays.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/google-docs.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/github.svg" alt=""></span></div></div>
+    <div class="card"><div class="head"><div class="tile" data-i="process"></div><p class="t">AI agent</p></div><p class="say">You set a goal. It works the steps.</p><div class="meter"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div><div class="ml"><span>Autonomy</span><span>Medium to high</span></div><p class="you"><b>You:</b> approve key steps and review the result.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/codex-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-code-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/openclaw.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/hermes-agent.svg" alt=""></span></div></div>
+  </div>
+  <div class="axis"><span>You do more of the work</span><span>The AI does more, so you check more →</span></div>
+</section>
+
+<section class="fig fig--yellow" id="selfhost" data-out="chatbot-vs-copilot-vs-ai-agent/self-hosted-agent">
+  <p class="kicker">Open-source agents</p>
+  <h2>An agent you install and run yourself</h2>
+  <div class="grid">
+    <div class="card side" data-n="chat"><p class="lbl">You message it from</p><div class="list"><span class="chip">WhatsApp</span><span class="chip chip--y">Telegram</span><span class="chip">Slack</span><span class="chip chip--y">Discord</span></div></div>
+    <div class="card host" data-n="host"><p class="lbl">Your computer or a small cloud server</p><div class="pair"><figure><span class="logo logo--lg"><img src="/assets/icons/tools/openclaw.svg" alt=""></span>OpenClaw</figure><figure><span class="logo logo--lg"><img src="/assets/icons/tools/hermes-agent.svg" alt=""></span>Hermes Agent</figure></div></div>
+    <div class="card side" data-n="model"><p class="lbl">With the model you choose</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span></div><div class="list"><span class="chip chip--y">or a local model</span></div></div>
+  </div>
+  <div class="card notes" data-n="notes"><span class="logo logo--lg"><img src="/assets/icons/tools/obsidian.svg" alt=""></span><div><p class="t">One notes folder</p><p class="s">Brief, style guide, research: plain Markdown files it can read.</p></div></div>
+  <div class="safe"><div><span class="tile" data-i="shield"></span>A separate machine or sandbox</div><div><span class="tile tile--y" data-i="tools"></span>Only the folders and apps it needs</div><div><span class="tile" data-i="person"></span>Your yes before it sends or pays</div></div>
+  <svg class="wires" data-wires="selfhost"></svg>
+</section>
+
+<section class="fig fig--both" id="choose" data-out="chatbot-vs-copilot-vs-ai-agent/decision-path">
+  <p class="kicker">Which one do you need?</p>
+  <h2>Four questions, asked in order</h2>
+  <div class="tree">
+    <div class="card q" data-n="q1"><div class="tile tile--w" data-i="chat"></div><p class="t">Is it a single request?</p></div>
+    <div class="card out o-chat" data-n="o1"><div><p class="t">Chatbot</p><p class="s">Ask, read, use what helps.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/grok.svg" alt=""></span></div></div></div>
+    <div class="card q" data-n="q2"><div class="tile tile--w" data-i="doc"></div><p class="t">Do you need help inside an app while you work?</p></div>
+    <div class="card out o-co" data-n="o2"><div><p class="t">Copilot</p><p class="s">Help in place. You accept each change.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/google-docs.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/github.svg" alt=""></span></div></div></div>
+    <div class="card q" data-n="q3"><div class="tile tile--w" data-i="week"></div><p class="t">Do the same steps apply every time?</p></div>
+    <div class="card out o-auto" data-n="o3"><div><p class="t">Fixed automation</p><p class="s">Rules, not AI. Add AI to one step if needed.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/google-sheets.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span></div></div></div>
+    <div class="card q" data-n="q4"><div class="tile tile--w" data-i="process"></div><p class="t">Several steps, tools and choices that depend on what it finds?</p></div>
+    <div class="card out o-agent" data-n="o4"><div><p class="t">AI agent</p><p class="s">Least access, approval checkpoints.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/codex-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-code-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/hermes-agent.svg" alt=""></span></div></div></div>
+    <div></div>
+    <div class="card out" data-n="o5"><div class="tile tile--y" data-i="target"></div><div><p class="t">Pick the simplest option</p><p class="s">Move up a level once that works.</p></div></div>
+  </div>
+  <svg class="wires" data-wires="choose"></svg>
+</section>
+
+<section class="fig fig--pink" id="combo" data-out="chatbot-vs-copilot-vs-ai-agent/combined-workflow">
+  <p class="kicker">Combining them</p>
+  <h2>One website enquiry, four kinds of help, one person who sends</h2>
+  <div class="card in" data-n="in"><span class="tile tile--y" data-i="mail"></span>A new enquiry arrives</div>
+  <div class="row">
+    <div class="card"><div class="tile tile--w" data-i="week"></div><p class="t">1. Fixed automation</p><p class="s">Logs it in a sheet and sends the standard confirmation.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/google-sheets.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile" data-i="process"></div><p class="t">2. AI agent</p><p class="s">Reads it, checks your services and drafts a reply.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile tile--y" data-i="assist"></div><p class="t">3. Copilot</p><p class="s">Helps you polish the draft in your email.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile" data-i="person"></div><p class="t">4. You send it</p><p class="s">A person reads it and presses send.</p></div>
+  </div>
+  <div class="under">
+    <div class="card notes"><span class="logo"><img src="/assets/icons/tools/obsidian.svg" alt=""></span><div><p class="t">Your notes</p><p class="s">Services, prices, tone</p></div></div>
+    <div class="card bot"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><div><p class="t">Chatbot</p><p class="s">Improves the agent’s instructions</p></div></div>
+  </div>
+  <svg class="wires" data-wires="combo"></svg>
+</section>
+
 <script>
 const I = (() => {
   const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
@@ -257,6 +382,7 @@ const I = (() => {
     tools: `<rect ${N} x="5" y="5" width="16" height="16" rx="3"/><rect ${K} x="27" y="5" width="16" height="16" rx="3"/><rect ${N} x="5" y="27" width="16" height="16" rx="3"/><rect ${N} x="27" y="27" width="16" height="16" rx="3"/>`,
     stop: `<circle ${N} cx="24" cy="24" r="18"/><path ${L} d="M12 36L36 12"/>`,
     heart: `<path ${N} d="M24 41C11 32 5 25 5 17a9.5 9.5 0 0 1 19-3 9.5 9.5 0 0 1 19 3c0 8-6 15-19 24Z"/><path ${K} d="M24 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
+    assist: `<path ${N} d="M8 5h21l8 8v30H8Z"/><path ${L} d="M29 5v8h8M14 21h15M14 28h10"/><path ${K} d="M37 27l2.6 6.4L46 36l-6.4 2.6L37 45l-2.6-6.4L28 36l6.4-2.6Z"/>`,
     scissors: `<circle ${N} cx="12" cy="36" r="6"/><circle ${N} cx="36" cy="36" r="6"/><path ${L} d="M16 32L36 6M32 32L12 6"/><circle ${K} cx="24" cy="21" r="2.6"/>`,
   };
 })();
@@ -310,6 +436,29 @@ const WIRES = {
     lines.push([[q[2].cx, q[2].b], [q[2].cx, o[3].cy], [o[3].l, o[3].cy]]); dots.push([q[2].cx, q[2].b], [o[3].l, o[3].cy]); labs.push([q[2].cx + 50, o[3].cy - 46, "No"]);
     draw(fig.querySelector(".wires"), lines, dots);
     for (const [x, y, t] of labs) { const s = document.createElement("span"); s.className = "lab"; s.textContent = t; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = "translate(-50%,-50%)"; fig.appendChild(s); }
+  },
+  selfhost(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), c = g("chat"), h = g("host"), m = g("model"), n = g("notes");
+    const lines = [[[c.r, h.cy], [h.l, h.cy]], [[h.r, h.cy], [m.l, h.cy]], [[h.cx, h.b], [h.cx, n.t]]];
+    draw(fig.querySelector(".wires"), lines, [[c.r, h.cy], [h.l, h.cy], [h.r, h.cy], [m.l, h.cy, "y"], [h.cx, h.b], [h.cx, n.t]]);
+  },
+  choose(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), q = [1, 2, 3, 4].map((i) => g("q" + i)), o = [1, 2, 3, 4, 5].map((i) => g("o" + i));
+    const lines = [], dots = [], labs = [];
+    for (let i = 0; i < 4; i++) { lines.push([[q[i].r, q[i].cy], [o[i].l, q[i].cy]]); dots.push([q[i].r, q[i].cy], [o[i].l, q[i].cy, "y"]); labs.push([(q[i].r + o[i].l) / 2, q[i].cy - 40, "Yes"]); }
+    for (let i = 0; i < 3; i++) { lines.push([[q[i].cx, q[i].b], [q[i].cx, q[i + 1].t]]); dots.push([q[i].cx, q[i].b], [q[i].cx, q[i + 1].t]); labs.push([q[i].cx + 48, (q[i].b + q[i + 1].t) / 2, "No"]); }
+    lines.push([[q[3].cx, q[3].b], [q[3].cx, o[4].cy], [o[4].l, o[4].cy]]); dots.push([q[3].cx, q[3].b], [o[4].l, o[4].cy]); labs.push([(q[3].cx + o[4].l) / 2, o[4].cy - 40, "Not sure"]);
+    draw(fig.querySelector(".wires"), lines, dots);
+    for (const [x, y, t] of labs) { const s = document.createElement("span"); s.className = "lab"; s.textContent = t; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = "translate(-50%,-50%)"; fig.appendChild(s); }
+  },
+  combo(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), i = rel(fig.querySelector("[data-n=in]"), fig), nt = rel(fig.querySelector(".under .notes"), fig), bt = rel(fig.querySelector(".under .bot"), fig), y = c[0].t + 70;
+    const ix = c[0].cx, lines = [[[ix, i.b], [ix, c[0].t]]], dots = [[ix, i.b], [ix, c[0].t]];
+    for (let k = 0; k < 3; k++) { lines.push([[c[k].r, y], [c[k + 1].l, y]]); dots.push([c[k].r, y], k === 2 ? [c[k + 1].l, y, "y"] : [c[k + 1].l, y]); }
+    lines.push([[nt.cx, nt.t], [nt.cx, c[1].b]]); dots.push([nt.cx, nt.t], [nt.cx, c[1].b]);
+    const my = (c[1].b + bt.t) / 2, ax = c[1].r - 50;
+    lines.push([[bt.cx, bt.t], [bt.cx, my], [ax, my], [ax, c[1].b]]); dots.push([bt.cx, bt.t], [ax, c[1].b]);
+    draw(fig.querySelector(".wires"), lines, dots);
   },
 };
 window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))))).then(() => {
