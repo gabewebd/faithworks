@@ -138,7 +138,7 @@ code { font-size: 0.9em; }
 /* Secondary text on Faith Pink and AI Yellow uses a deeper charcoal so it keeps AA contrast */
 .band--pink, .phero--pink, .phero--yellow, .route--pink, .route--yellow, .route--stone, .agents, .voice, .proof, .founder, .quote--pink, .quote--yellow,
 .scope--pink, .scope--yellow, .kit-hero, .thanks, .contact__form, .cta, .resource, .band-cta, .business,
-.cm-grid__rules, .takeaway, .article__cta, .formats__item, .notice, .form__status--preview, .band--yellow { --muted: var(--ink); }
+.takeaway, .article__cta, .formats__item, .notice, .form__status--preview, .band--yellow { --muted: var(--ink); }
 
 /* 3. Layout + shared ------------------------------------------------------- */
 .wrap { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
@@ -876,6 +876,11 @@ body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper
 .pstep__body { padding: clamp(22px, 2.6vw, 34px); }
 .pstep__cat { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; font-size: 11px; font-weight: 700; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
 .pstep__num { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--white); font-family: var(--font-display); font-size: 11px; letter-spacing: 0.04em; transition: background var(--dur-fast), border-color var(--dur-fast); }
+/* Stacked (below the wide split, where only the active number fills): every number filled, Faith Pink and AI Yellow in turn */
+@media (max-width: 1023px) {
+  .pscene__steps > .pstep .pstep__num { background: var(--pink); border-color: var(--pink); }
+  .pscene__steps > .pstep:nth-child(even) .pstep__num { background: var(--yellow); border-color: var(--yellow); }
+}
 .pstep__title { max-width: 14ch; margin: 0 0 16px; font-size: clamp(36px, 4vw, 60px); line-height: 0.98; letter-spacing: -0.045em; text-wrap: balance; }
 .pstep__title a { text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 6px; transition: text-decoration-color var(--dur-fast); }
 .pstep__title a:hover { text-decoration-color: currentColor; }
@@ -1160,7 +1165,8 @@ body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper
   .mgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: clamp(34px, 11vw, 54px); gap: 8px; }
   .egallery--bleed .mgrid { --cols: 2; --k: 0.3; --g: 6px; }
   .mgrid__tile { grid-column: span var(--cm); grid-row: span var(--rm); }
-  .mgrid__tile figure { border-radius: var(--r); }
+  /* 10px is --r: each tile's inline --r (its row span, tools/event-gallery.mjs) shadows the token here */
+  .mgrid__tile figure { border-radius: 10px; }
   .mgrid__tile figcaption { left: 8px; bottom: 8px; padding: 4px 10px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1456,7 +1462,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .scopes__note { margin: 18px 0 0; }
 .mini-steps { list-style: none; counter-reset: m; display: grid; gap: 8px; margin: 18px 0; }
 .mini-steps li { counter-increment: m; display: flex; align-items: center; gap: 12px; font-weight: 500; }
-.mini-steps li::before { content: counter(m); display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--yellow); font-size: 13px; font-weight: 700; }
+.mini-steps li::before { content: counter(m); display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--pink); color: var(--ink); font-size: 13px; font-weight: 700; }
+/* filled, alternating Faith Pink and AI Yellow with Charcoal numbers (as .bw-learn .numbered) */
+.mini-steps li:nth-child(even)::before { background: var(--yellow); }
 .formats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .formats__item { padding: clamp(24px, 2.6vw, 34px); border-radius: var(--r-lg); background: var(--f-bg); }
 .formats__item--pink { --f-bg: var(--pink); }
@@ -1634,11 +1642,6 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .motion .creds__photo--a { animation-delay: 120ms !important; }
 .motion .creds__photo--b { animation-delay: 240ms !important; }
 /* Two ruled editorial columns, then the house rules as the one solid block */
-.cm-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--col-gap); align-items: start; }
-.cm-grid article { padding: 26px 0 0; border-top: 1.5px solid var(--ink); }
-.cm-grid h2 { margin-bottom: 18px; }
-.cm-grid article.cm-grid__rules { padding: 26px; border-top: 0; border-radius: var(--r-lg); }
-.cm-grid__rules { background: var(--yellow-tint) !important; }
 .contact { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
 .contact__h { margin-top: 32px; }
 .contact__form { padding: clamp(22px, 3vw, 36px); border-radius: var(--r-lg); background: var(--pink-tint); }
@@ -1927,6 +1930,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .site-nav.is-open { display: flex; }
   .site-nav > a:not(.btn) { padding: 14px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-body); }
   .site-nav > a:not(.btn)::after { display: none; }
+  /* The current page, now the underline is hidden: semibold, led by a Faith Pink node */
+  .site-nav > a[aria-current="page"] { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+  .site-nav > a[aria-current="page"]::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
   .site-nav .btn { margin-top: 16px; }
   .motion .site-nav.is-open > * { animation: fw-rise 360ms var(--ease-out) both; }
 
@@ -1946,7 +1952,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .about, .business, .formblock, .partner, .contact { grid-template-columns: minmax(0, 1fr); }
   .formblock__intro, .contact__side { position: static; }
   .about { align-items: start; }
-  .routes, .scopes, .formats, .cm-grid { grid-template-columns: minmax(0, 1fr); }
+  .routes, .scopes, .formats { grid-template-columns: minmax(0, 1fr); }
   .routes { grid-template-rows: none; gap: 12px; }
   .route, .route__link { grid-row: auto; grid-template-rows: none; }
   .route__link { padding: 24px 22px 26px; }
@@ -2230,7 +2236,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .pinfo__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 16px); margin: 0; }
 .pinfo__grid > div { display: flex; flex-direction: column; padding: clamp(22px, 2.4vw, 32px); border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-fast) var(--ease-out); }
 .pinfo__grid > div:hover { box-shadow: inset 0 0 0 1.5px var(--pink); }
-.pinfo__grid dt { display: flex; flex-direction: column; align-items: flex-start; margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(22px, 2vw, 28px); font-weight: 600; line-height: 1.15; letter-spacing: -0.035em; }
+.pinfo__grid dt { display: flex; flex-direction: column; align-items: flex-start; margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(22px, 2vw, 28px); font-weight: 700; line-height: 1.15; letter-spacing: -0.035em; }
 .pinfo__grid dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
 /* line icons as on Learn's .promise__icon, on tiles alternating Faith Pink and AI Yellow */
 .pinfo__icon { display: grid; place-items: center; flex: none; width: 58px; height: 58px; margin-bottom: clamp(22px, 2.2vw, 30px); border-radius: 12px; background: var(--pink); }
@@ -3095,6 +3101,11 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .journey-strip__desc { grid-template-rows: 1fr; opacity: 1; transform: none; }
   .pgrid .art__mono { font-size: 13px; }
   .pgrid .art__label { font-size: 17px; }
+  /* The programs sit on the section ground rather than White cards; each view keeps its own corners */
+  .pgrid { gap: clamp(48px, 12vw, 64px); }
+  .pgrid > .pstep { border: 0; border-radius: 0; background: none; overflow: visible; }
+  .pgrid > .pstep .pstep__visual { overflow: hidden; border-radius: var(--r-lg); }
+  .pgrid .prog__body { padding: 24px 0 0; }
 }
 @media (max-width: 640px) {
   .lhero__actions .btn { width: 100%; }
@@ -3452,6 +3463,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   background: var(--pink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.6 12.4 10.6 15.4 16.6 9'/%3E%3C/svg%3E") center / 22px no-repeat; }
 .bw-learn .numbered li:nth-child(even)::before, .bw-learn .ticks li:nth-child(even)::before { background-color: var(--yellow); }
 .bw-learn .small { margin: 20px 0 0; }
+/* the Community page's group (templates/community.html): the kit's Next step rows, a label column wide enough for "Encouragement" */
+@media (min-width: 681px) { .bw-learn .bw-kitpage__next li { grid-template-columns: 0.72em 9.5em minmax(0, 1fr); } }
 
 /* 6a. The learning path: three frosted steps on a hairline, a Faith Pink node where each meets it */
 .bw-path { position: relative; display: grid; gap: 0.9em; padding-left: 2.6em; }
@@ -3946,7 +3959,12 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .pp-hub__trace { stroke: rgb(26 26 26 / 0.28); stroke-width: 1.5; stroke-linecap: round; }
 .pp-hub__doc { left: var(--x); top: var(--y); translate: -50% -50%; display: grid; place-items: center; width: 10cqi; aspect-ratio: 1; border-radius: 50%; background: var(--white); box-shadow: inset 0 0 0 0.6cqi var(--yellow), 0 10px 20px -12px rgb(26 26 26 / 0.4); }
 .pp-hub__doc::before { content: ""; width: 4.4cqi; height: 3cqi; background: linear-gradient(var(--ink), var(--ink)) 0 0 / 100% 0.6cqi no-repeat, linear-gradient(rgb(26 26 26 / 0.4), rgb(26 26 26 / 0.4)) 0 50% / 100% 0.6cqi no-repeat, linear-gradient(rgb(26 26 26 / 0.4), rgb(26 26 26 / 0.4)) 0 100% / 64% 0.6cqi no-repeat; }
-.pp-hub__member { --f: 12cqi; }
+/* the members as the starter kit's Next step draws them (.bw-kitfaces): Faith Pink and AI Yellow
+   discs in turn, a White figure, a White ring */
+.pp-hub__member { --f: 12cqi;
+  background: radial-gradient(circle at 50% 38%, rgb(255 255 255 / 0.85) 0 22%, transparent 23%), radial-gradient(ellipse 46% 34% at 50% 100%, rgb(255 255 255 / 0.85) 0 98%, transparent 100%), var(--pink);
+  box-shadow: 0 0 0 1cqi var(--white), 0 10px 20px -12px rgb(26 26 26 / 0.4); }
+.pp-hub__member:nth-of-type(even) { background-color: var(--yellow); }
 .pp-hub__core { left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 17cqi; aspect-ratio: 1; border-radius: 50%; background: var(--ink); color: var(--white);
   box-shadow: 0 0 0 2.4cqi rgb(255 255 255 / 0.7), 0 20px 40px -18px rgb(26 26 26 / 0.5); font: 700 4.4cqi/1 var(--font-display); letter-spacing: 0.02em; }
 
@@ -3987,6 +4005,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .pp-step:nth-of-type(3) { grid-row: 5; } .pp-art:nth-child(3) { grid-row: 6; }
   .pp-step:nth-of-type(4) { grid-row: 7; } .pp-art:nth-child(4) { grid-row: 8; }
   .pp-step:not(:nth-of-type(1)) { margin-top: clamp(32px, 7vw, 56px); }
+  /* every number filled, Faith Pink and AI Yellow in turn, Charcoal inside (the live rail fills only the active one) */
+  .pp-step__num { background: var(--pink); color: var(--ink); box-shadow: none; }
+  .pp-step:nth-of-type(even) .pp-step__num { background: var(--yellow); }
 }
 
 @media (max-width: 640px) {

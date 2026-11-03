@@ -17,32 +17,95 @@
       </div>
     </section>
 
-    <section class="section wrap cm-grid" aria-label="About the community">
-      <article>
-        <h2 class="h3">Who it’s for</h2>
-        <ul class="ticks">
-          <li>Past and future workshop participants</li>
-          <li>Founders and professionals applying AI in their work</li>
-          <li>Anyone who wants practical, human-first conversations about AI</li>
-        </ul>
-      </article>
-      <article>
-        <h2 class="h3">What you get</h2>
-        <ul class="ticks">
-          <li>A place to share what you built and ask what to try next</li>
-          <li>First word on new workshops, events and resources</li>
-          <li>Encouragement from people learning the same things</li>
-        </ul>
-      </article>
-      <article class="cm-grid__rules">
-        <h2 class="h3">What we ask of members</h2>
-        <ul class="ticks">
-          <li>Be kind and assume good intent</li>
-          <li>Share learning, not sales pitches</li>
-          <li>Never post client data or anything confidential</li>
-          <li>Credit other people’s work and ideas</li>
-        </ul>
-      </article>
+    <!-- Who it's for, What you get and What we ask of members use the program page sections
+         (tools/render.mjs): the "Who it's for" photo column and checks (css/style.css .pfor), the
+         "What you'll learn" story with its gradient stage (.bw-learn, .bw-story) and the
+         "How it runs" stage cards (.journey-strip--agenda, longer titles as on Speaking) -->
+    <section class="section pfor" aria-labelledby="cm-for-title">
+      <div class="wrap pfor__grid">
+        {{gallery:community.for}}
+        <div class="pfor__copy" data-reveal>
+          <h2 id="cm-for-title">Who it’s for</h2>
+          <ul class="pfor__checks">
+            <li>Past and future workshop participants</li>
+            <li>Founders and professionals applying AI in their work</li>
+            <li>Anyone who wants practical, human-first conversations about AI</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band band--stone bw-learn" aria-labelledby="cm-get-title">
+      <div class="wrap">
+        <div class="bw-story" data-story>
+          <div class="bw-story__steps">
+            <span class="bw-story__rail" aria-hidden="true"><i data-story-rail></i></span>
+            <div class="bw-story__step" data-story-step>
+              <span class="bw-story__num" aria-hidden="true">01</span>
+              <h2 id="cm-get-title" class="bw-case__title" data-reveal>What you get</h2>
+              <ol class="numbered">
+                <li>A place to share what you built and ask what to try next</li>
+                <li>First word on new workshops, events and resources</li>
+                <li>Encouragement from people learning the same things</li>
+              </ol>
+            </div>
+          </div>
+          <div class="bw-story__stage">
+            <div class="bw-story__frame fcard" data-story-frame>
+              <span class="bw-story__bg" data-bg="0" aria-hidden="true"></span>
+              <div class="bw-story__arts fcard__art">
+                <!-- the group as the starter kit's Next step page draws it (bw-kitpage, bw-kitfaces) -->
+                <div class="bw-case__art bw-story__art" role="img" aria-label="Illustration: the Faith Works Community group, where members share what they built, get first word on new workshops and encourage each other, with a row of members and room for you." data-story-art>
+                  <div class="bw-kitscene">
+                    <div class="bw-kitpage">
+                      <p class="bw-kitpage__bar"><span>Faith Works Community</span></p>
+                      <ul class="bw-kitpage__next">
+                        <li><b>Share and ask</b><span class="bw-lines"><i></i></span></li>
+                        <li><b>First word</b><span class="bw-lines"><i></i></span></li>
+                        <li><b>Encouragement</b><span class="bw-lines"><i></i></span></li>
+                      </ul>
+                    </div>
+                    <div class="bw-kitscene__side bw-kitscene__side--end">
+                      <div class="bw-kitcard bw-kitcard--glass">
+                        <span class="bw-kitcard__head">Members</span>
+                        <span class="bw-kitfaces"><i></i><i></i><i></i><i></i><b>+ you</b></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" aria-labelledby="cm-ask-title">
+      <div class="section-head"><h2 id="cm-ask-title">What we ask of members</h2></div>
+      <div class="journey-strip">
+        <ol class="journey-strip__steps journey-strip__steps--agenda journey-strip__steps--topics" data-reveal>
+          <li class="journey-strip__step">
+            <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><path class="route__node" d="M24 41 8.6 25.6a9.6 9.6 0 0 1 13.6-13.6L24 13.8l1.8-1.8a9.6 9.6 0 0 1 13.6 13.6Z"/><circle class="route__head route__head--lead" cx="24" cy="24" r="3"/></svg></span>
+            <span class="journey-strip__num" aria-hidden="true">01</span>
+            <h3 class="journey-strip__title">Be kind and assume good intent</h3>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><path class="route__node" d="M24 12c-5-4-12-4.5-19-3v28c7-1.5 14-1 19 3 5-4 12-4.5 19-3V9c-7-1.5-14-1-19 3Z"/><path class="route__line" d="M24 12v28M10 17h8M10 23h8M10 29h5"/><circle class="route__head route__head--lead" cx="34" cy="21" r="3"/></svg></span>
+            <span class="journey-strip__num" aria-hidden="true">02</span>
+            <h3 class="journey-strip__title">Share learning, not sales pitches</h3>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><path class="route__line" d="M15 21v-6a9 9 0 0 1 18 0v6"/><rect class="route__node" x="8" y="21" width="32" height="22" rx="3.5"/><circle class="route__head route__head--lead" cx="24" cy="31" r="3"/><path class="route__line" d="M24 34v3.5"/></svg></span>
+            <span class="journey-strip__num" aria-hidden="true">03</span>
+            <h3 class="journey-strip__title">Never post client data or anything confidential</h3>
+          </li>
+          <li class="journey-strip__step">
+            <span class="journey-strip__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false" data-draw><circle class="route__node" cx="18" cy="15" r="7"/><path class="route__node" d="M4 41c0-8 6.3-13 14-13s14 5 14 13Z"/><path class="route__node route__node--lead" d="M37 8l2.2 5.8L45 16l-5.8 2.2L37 24l-2.2-5.8L29 16l5.8-2.2Z"/></svg></span>
+            <span class="journey-strip__num" aria-hidden="true">04</span>
+            <h3 class="journey-strip__title">Credit other people’s work and ideas</h3>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section class="section section--flush-top wrap">

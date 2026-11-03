@@ -314,6 +314,18 @@
             "image": "group-orchestrator"
           }
         ]
+      },
+      "for": {
+        "layout": "pfor",
+        "sizes": "(min-width: 1024px) 1280px, (min-width: 640px) 50vw, 100vw",
+        "items": [
+          {
+            "image": "group-selfie"
+          },
+          {
+            "image": "open-qa"
+          }
+        ]
       }
     },
     "learn": {
