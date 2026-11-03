@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -81,7 +81,7 @@ async function defs(bg, extra = "") {
   const symbols = await Promise.all(LOGOS.map(async (n) => {
     const src = await (await fetch(`/assets/icons/tools/${n}.svg`)).text();
     const vb = src.match(/viewBox="([^"]+)"/)[1], fill = (src.match(/<svg[^>]*\sfill="([^"]+)"/) || [])[1];
-    const inner = src.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").replace(/\sid="[^"]*"/g, "").replace(/\s+/g, " ").trim();
+    const inner = src.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").replace(/\sid="([^"]*)"/g, ` id="logo-${n}-$1"`).replace(/url\(#([^)]+)\)/g, `url(#logo-${n}-$1)`).replace(/\s+/g, " ").trim(); // ids kept (gradients), made unique per logo
     return `<symbol id="logo-${n}" viewBox="${vb}"${fill ? ` fill="${fill}"` : ""}>${inner}</symbol>`;
   }));
   return `<defs>
@@ -199,18 +199,19 @@ async function setup() {
 }
 
 /* ---- 7. Chatbot, copilot or AI agent — radial gradient from the bottom: three ways to use AI,
-   all reached from the same four assistants (ChatGPT, Claude, Grok, Gemini) ---- */
+   all reached from the same row of eight tools (ChatGPT, Codex, Claude, Grok, Gemini, OpenClaw,
+   Hermes Agent, Obsidian) ---- */
 async function modes() {
   const bg = `<radialGradient id="bg" cx="960" cy="1080" r="1350" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.48" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></radialGradient>`;
-  const xs = [420, 960, 1500], cy = 290, bus = 520, ls = 196, ly = 640;
+  const xs = [420, 960, 1500], cy = 290, bus = 520, ls = 160, ly = 650;
   const chips = [["chat", "pink", "Chatbot", "Answers your questions"], ["assist", "yellow", "Copilot", "Helps while you work"], ["process", "pink", "AI agent", "Carries out the steps"]].map((a, i) => chip(xs[i], cy, ...a));
-  const lx = [480, 800, 1120, 1440];
-  const tools = ["chatgpt", "claude-color", "grok", "gemini"];
-  const wires = [[[xs[0], bus], [xs[2], bus]], ...xs.map((x) => [[x, chips[0].bottom], [x, bus]]), [[lx[0], bus], [lx[0], ly]], [[lx[3], bus], [lx[3], ly]], [[lx[1], bus], [lx[1], ly]], [[lx[2], bus], [lx[2], ly]]];
+  const tools = ["chatgpt", "codex-color", "claude-color", "grok", "gemini", "openclaw", "hermes-agent", "obsidian"];
+  const step = 204, lx = tools.map((_, i) => Math.round(960 + (i - (tools.length - 1) / 2) * step));
+  const wires = [[[lx[0], bus], [lx[lx.length - 1], bus]], ...xs.map((x) => [[x, chips[0].bottom], [x, bus]]), ...lx.map((x) => [[x, bus], [x, ly]])];
   const nodes = xs.map((x) => node(x, chips[0].bottom)).join("") + lx.map((x) => node(x, ly) + node(x, bus, C.yellow, 8)).join("");
   const body = layer("connectors", wires.map(wire).join("")) + layer("ways-to-use-ai", chips.map((c) => c.svg).join("")) +
     layer("assistants", tools.map((n, i) => logo(lx[i] - ls / 2, ly, ls, n)).join("")) + layer("nodes", nodes);
-  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps), joined by straight lines to four assistants that offer them: ChatGPT, Claude, Grok and Gemini.", await defs(bg), body);
+  return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps), joined by straight lines to eight tools: ChatGPT, Codex, Claude, Grok, Gemini, OpenClaw, Hermes Agent and Obsidian.", await defs(bg), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github, setup, modes };
