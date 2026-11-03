@@ -1,88 +1,66 @@
 <!doctype html>
-<!-- Composer for the Resources featured images. Each scene below is written as plain SVG markup:
-     window.compose(name) returns the finished SVG document (text measured with the real fonts, so
-     chips fit their labels and paragraphs wrap), and render.mjs --compose saves it as
+<!-- Composer for the Resources featured images. Each scene is written as plain SVG markup:
+     window.compose(name) returns the finished SVG document and render.mjs --compose saves it as
      svg/<slug>.svg. Those SVG files are the sources: render.mjs exports the PNGs from them, so an
      SVG edited by hand exports the same way.
-     Rules: brand palette only (Faith Pink, AI Yellow, Works White, Soft Charcoal and their tints);
-     smooth backgrounds, no texture; connectors and dividers are straight segments only; each image
-     has its own gradient direction. Third-party logos are the site's own files in
+     Brand visuals, not interfaces: recognizable logos on large white tiles are the focus, joined
+     to a few concept icons (the site's line icons, as in .promise__icon: a Faith Pink or AI Yellow
+     tile, Charcoal strokes, Works White fills, one solid Charcoal accent). No text, no cards.
+     Rules: brand palette only; smooth backgrounds, no texture; connectors are straight segments
+     only; each image has its own gradient direction. Logos are the site's own files in
      assets/icons/tools/, embedded as symbols in their real colours. Key content stays inside the
      area both crops keep: 16:10 on cards (x 96–1824) and 21:9 at the top of articles (y 128–952). -->
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=block">
-</head>
+<head><meta charset="utf-8"></head>
 <body>
-<svg id="measure" width="0" height="0" style="position:absolute"><text id="m"></text></svg>
 <script>
-const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Poppins:wght@500;600;700&amp;display=block";
-const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A", pinkTint: "#F7E5E6" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "notebooklm", "perplexity", "gmail", "google-calendar", "google-sheets", "github"];
+const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
+const LOGOS = ["chatgpt", "claude-color", "gemini", "gmail", "google-calendar", "google-sheets", "github"];
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const r1 = (n) => Math.round(n * 10) / 10;
 
-/* ---- Text: measured with the loaded fonts ---- */
-const FONT = { eyebrow: ["Inter", 600, 17, 2.4], body: ["Inter", 500, 22, 0], strong: ["Inter", 600, 22, 0], chip: ["Inter", 600, 19, 0], title: ["Poppins", 600, 32, -1.1] };
-const style = (k, o = {}) => { const [family, weight, size, ls] = FONT[k]; return { family, weight, size, ls, ...o }; };
-function width(str, s) {
-  const t = document.getElementById("m");
-  t.setAttribute("font-family", s.family); t.setAttribute("font-weight", s.weight); t.setAttribute("font-size", s.size); t.setAttribute("letter-spacing", s.ls || 0);
-  t.textContent = str;
-  return t.getComputedTextLength();
-}
-function text(x, y, str, s, extra = "") {
-  const a = [`x="${r1(x)}"`, `y="${r1(y)}"`, `font-family="${s.family}"`, `font-weight="${s.weight}"`, `font-size="${s.size}"`];
-  if (s.ls) a.push(`letter-spacing="${s.ls}"`);
-  if (s.fill && s.fill !== C.ink) a.push(`fill="${s.fill}"`);
-  if (s.opacity) a.push(`fill-opacity="${s.opacity}"`);
-  if (s.anchor) a.push(`text-anchor="${s.anchor}"`);
-  return `<text ${a.join(" ")}${extra}>${esc(s.upper ? str.toUpperCase() : str)}</text>`;
-}
-const eyebrow = (x, y, str, o = {}) => text(x, y, str, style("eyebrow", { opacity: 0.62, upper: true, ...o }));
-// Words wrapped to maxW; returns { svg, lines }
-function para(x, y, str, maxW, s, lh) {
-  const lines = []; let line = "";
-  for (const w of str.split(" ")) { const t = line ? `${line} ${w}` : w; if (line && width(t, s) > maxW) { lines.push(line); line = w; } else line = t; }
-  if (line) lines.push(line);
-  const a = [`font-family="${s.family}"`, `font-weight="${s.weight}"`, `font-size="${s.size}"`]; if (s.ls) a.push(`letter-spacing="${s.ls}"`); if (s.opacity) a.push(`fill-opacity="${s.opacity}"`);
-  return { lines: lines.length, svg: `<text ${a.join(" ")}>${lines.map((l, i) => `<tspan x="${r1(x)}" y="${r1(y + i * lh)}">${esc(l)}</tspan>`).join("")}</text>` };
-}
+/* ---- Concept icons: the site's line-icon language on a 48-unit grid ---- */
+const N = `fill="${C.white}" stroke="${C.ink}" stroke-width="2.2" stroke-linejoin="round"`;   // a shape
+const L = `fill="none" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`; // a line
+const K = `fill="${C.ink}"`;                                                                     // the accent
+const ICONS = {
+  chat: `<path ${N} d="M6 8h36v24H20l-9 8v-8H6Z"/><path ${L} d="M13 17h22M13 24h13"/><circle ${K} cx="34" cy="24" r="3"/>`,
+  done: `<rect ${N} x="6" y="6" width="36" height="36" rx="4"/><path ${L} d="M15 25l6 6 12-14"/>`,
+  megaphone: `<path ${N} d="M7 18h9l18-10v32L16 30H7Z"/><path ${L} d="M16 30l3 10h6l-3-10M40 20v8"/><rect ${K} x="7" y="18" width="5" height="12"/>`,
+  people: `<circle ${N} cx="17" cy="15" r="6"/><circle ${N} cx="33" cy="17" r="5"/><path ${N} d="M6 40l3-14h16l3 14Z"/><path ${K} d="M27 40l2-11h10l3 11Z"/>`,
+  chart: `<path ${L} d="M5 42h38"/><rect ${N} x="9" y="25" width="7" height="17"/><rect ${K} x="20.5" y="14" width="7" height="28"/><rect ${N} x="32" y="6" width="7" height="36"/>`,
+  process: `<rect ${N} x="5" y="18" width="12" height="12" rx="2"/><rect ${K} x="31" y="5" width="12" height="12" rx="2"/><rect ${N} x="31" y="31" width="12" height="12" rx="2"/><path ${L} d="M17 24h7V11h7M24 24v13h7"/>`,
+  book: `<path ${N} d="M5 10h15l4 4 4-4h15v28H28l-4 4-4-4H5Z"/><path ${L} d="M24 14v28M10 18h8M10 24h8M30 18h8"/>`,
+  growth: `<path ${L} d="M5 42h38M8 34l10-10 7 7 14-14"/><path ${K} d="M31 13h10v10Z"/>`,
+  mail: `<rect ${N} x="5" y="10" width="38" height="28" rx="3"/><path ${L} d="M6 12l18 14 18-14"/>`,
+  doc: `<path ${N} d="M10 4h20l8 8v32H10Z"/><path ${L} d="M30 4v8h8M16 21h16M16 28h16M16 35h9"/><rect ${K} x="16" y="13" width="8" height="3"/>`,
+  idea: `<path ${K} d="M22 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4Z"/><path ${N} d="M37 29l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
+  target: `<circle ${N} cx="24" cy="24" r="18"/><circle ${N} cx="24" cy="24" r="11"/><circle ${K} cx="24" cy="24" r="4"/><path ${L} d="M24 24l15-15M33 9h6v6"/>`,
+  week: `<rect ${N} x="6" y="9" width="36" height="33" rx="3"/><path ${L} d="M6 18h36M16 5v8M32 5v8M17 30l5 5 9-10"/>`,
+  branch: `<circle ${N} cx="14" cy="10" r="4"/><circle ${N} cx="14" cy="38" r="4"/><circle ${K} cx="34" cy="14" r="4"/><path ${L} d="M14 14v20M34 18v6L14 34"/>`,
+};
 
 /* ---- Pieces ---- */
-// A card: the white halo of the site's mockups, then the panel with a soft charcoal shadow
-function card(x, y, w, h, fill = "url(#solid)", rx = 22) {
-  return `<g><rect x="${x - 10}" y="${y - 10}" width="${w + 20}" height="${h + 20}" rx="${rx + 10}" fill="#FFFFFF" fill-opacity="0.5" filter="url(#shadow)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}"/></g>`;
+// A tile: Faith Pink, AI Yellow or white, lifted by a soft Charcoal shadow, a white halo and a
+// faint top light (the only dimensional touches)
+function tile(x, y, s, fill) {
+  const rx = Math.round(s * 0.22), f = fill === "white" ? "#FFFFFF" : C[fill];
+  return `<rect x="${x - 12}" y="${y - 12}" width="${s + 24}" height="${s + 24}" rx="${rx + 12}" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/>` +
+    `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="${f}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="url(#light)"/>`;
 }
-const glass = (x, y, w, h) => card(x, y, w, h, "url(#glass)");
-// A pill label; returns { svg, w }. o.at = "end" right-aligns it at x.
-function chip(x, y, label, o = {}) {
-  const s = style("chip", o.size ? { size: o.size } : {}), h = o.h || Math.round(s.size * 2.1), pad = o.pad || 16, w = width(label, s) + pad * 2;
-  const left = o.at === "end" ? x - w : x, fill = o.fill || C.pinkTint, ink = fill === C.ink ? "#FFFFFF" : C.ink;
-  const box = o.line ? `<rect x="${r1(left + 0.75)}" y="${y + 0.75}" width="${r1(w - 1.5)}" height="${h - 1.5}" rx="${(h - 1.5) / 2}" fill="none" stroke="${C.ink}" stroke-opacity="0.25" stroke-width="1.5"/>`
-    : `<rect x="${r1(left)}" y="${y}" width="${r1(w)}" height="${h}" rx="${h / 2}" fill="${fill}"/>`;
-  return { w, svg: box + text(left + pad, y + h / 2, label, { ...s, fill: ink }, ` dominant-baseline="central"`) };
+// A concept icon on a pink or yellow tile (the icon fills 62% of it, as on the site)
+function icon(x, y, s, name, fill) {
+  const i = Math.round(s * 0.62), o = (s - i) / 2;
+  return `<g>${tile(x, y, s, fill)}<svg x="${x + o}" y="${y + o}" width="${i}" height="${i}" viewBox="0 0 48 48" overflow="visible">${ICONS[name]}</svg></g>`;
 }
 // A logo on a white tile
-function logo(x, y, name, size = 64) {
-  const pad = Math.round(size * 0.235);
-  return `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="${Math.round(size * 0.28)}" fill="#FFFFFF" stroke="${C.ink}" stroke-opacity="0.06" filter="url(#lift)"/><use href="#logo-${name}" x="${x + pad}" y="${y + pad}" width="${size - pad * 2}" height="${size - pad * 2}" color="${C.ink}"/>`;
+function logo(x, y, s, name) {
+  const i = Math.round(s * 0.54), o = (s - i) / 2;
+  return `<g>${tile(x, y, s, "white")}<use href="#logo-${name}" x="${x + o}" y="${y + o}" width="${i}" height="${i}" color="${C.ink}"/></g>`;
 }
-const ai = (x, y, s = 56) => `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${Math.round(s / 4)}" fill="${C.ink}"/>` + text(x + s / 2, y + s / 2, "AI", { family: "Poppins", weight: 700, size: Math.round(s * 0.39), ls: -0.4, fill: "#FFFFFF", anchor: "middle" }, ` dominant-baseline="central"`);
-function check(cx, cy, state = "done", r = 15) {
-  if (state === "open") return `<circle cx="${cx}" cy="${cy}" r="${r - 1}" fill="none" stroke="${C.ink}" stroke-opacity="0.3" stroke-width="2"/>`;
-  if (state === "busy") return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.yellow}"/><circle cx="${cx}" cy="${cy}" r="4" fill="${C.ink}"/>`;
-  const k = r / 15;
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.ink}"/><polyline points="${r1(cx - 6 * k)},${r1(cy + 0.5 * k)} ${r1(cx - 1.5 * k)},${r1(cy + 5 * k)} ${r1(cx + 6.5 * k)},${r1(cy - 4.5 * k)}" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-}
-const bar = (x, y, w, o = 0.09) => `<rect x="${x}" y="${y}" width="${w}" height="14" rx="7" fill="${C.ink}" fill-opacity="${o}"/>`;
-// Connectors and dividers: straight segments only
-const wire = (pts, o = {}) => `<polyline points="${pts.map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ink}" stroke-opacity="${o.opacity || 0.2}" stroke-width="${o.width || 2}"${o.dash ? ` stroke-dasharray="${o.dash}"` : ""} stroke-linejoin="miter"/>`;
-const rule = (x1, y1, x2, y2, o = 0.08) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${C.ink}" stroke-opacity="${o}" stroke-width="1.5"/>`;
-const node = (x, y, fill = C.pink, r = 8) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#FFFFFF" stroke-width="4"/>`;
-// A highlighter mark behind a run of text (drawn before it)
-const mark = (x, y, w, fill = "url(#markYellow)") => `<rect x="${r1(x - 4)}" y="${r1(y)}" width="${r1(w + 8)}" height="22" fill="${fill}"/>`;
+// Connectors: straight segments only
+const wire = (pts) => `<polyline points="${pts.map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ink}" stroke-opacity="0.22" stroke-width="3" stroke-linejoin="miter"/>`;
+const node = (x, y, fill = C.pink, r = 10) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#FFFFFF" stroke-width="5"/>`;
+const ends = (wires, fill) => wires.flatMap((p) => [node(...p[0], fill), node(...p[p.length - 1], fill)]).join("");
 
 /* ---- Shared definitions; each scene adds its own background gradient ---- */
 async function defs(bg, extra = "") {
@@ -93,14 +71,9 @@ async function defs(bg, extra = "") {
     return `<symbol id="logo-${n}" viewBox="${vb}"${fill ? ` fill="${fill}"` : ""}>${inner}</symbol>`;
   }));
   return `<defs>
-<style>@import url("${FONTS}");</style>
 ${bg}
-<linearGradient id="solid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.88"/></linearGradient>
-<linearGradient id="glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.8"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.6"/></linearGradient>
-<linearGradient id="markYellow" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${C.yellow}"/><stop offset="1" stop-color="${C.yellow}" stop-opacity="0.75"/></linearGradient>
-<linearGradient id="markPink" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${C.pink}"/><stop offset="1" stop-color="${C.pink}" stop-opacity="0.7"/></linearGradient>
-<filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="30" stdDeviation="34" flood-color="${C.ink}" flood-opacity="0.12"/></filter>
-<filter id="lift" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="${C.ink}" flood-opacity="0.1"/></filter>
+<linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="190%"><feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="${C.ink}" flood-opacity="0.13"/></filter>
 ${extra}
 ${symbols.join("\n")}
 </defs>`;
@@ -109,137 +82,79 @@ const doc = (title, desc, d, body) => `<svg xmlns="http://www.w3.org/2000/svg" w
 <title>${esc(title)}</title>
 <desc>${esc(desc)}</desc>
 ${d}
+<rect width="1920" height="1080" fill="url(#bg)"/>
 ${body}
 </svg>
 `;
+const layer = (id, content) => `<g id="${id}">${content}</g>\n`;
 
-/* ---- 1. AI Is Not Another Niche Skill — subtle radial gradient around the hub ---- */
+/* ---- 1. AI Is Not Another Niche Skill — radial gradient: three AI tools at the centre, wired to six kinds of work ---- */
 async function niche() {
-  const bg = `<radialGradient id="bg" cx="960" cy="510" r="1150" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F5CDD5"/><stop offset="0.45" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE6A6"/></radialGradient>`;
-  const roles = [
-    ["Marketing", "Campaign brief", "First draft in minutes", 240, 206], ["HR & People", "Policy update", "Plain-English summary", 170, 532], ["Finance", "Monthly report", "Questions to check", 290, 770],
-    ["Operations", "Team process", "Steps mapped", 1330, 206, C.yellow], ["Sales", "Client call", "Prep notes ready", 1400, 532], ["Education", "Lesson plan", "Outline to refine", 1280, 770],
-  ];
-  const W = 350, H = 176;
+  const bg = `<radialGradient id="bg" cx="960" cy="540" r="1100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F6D0D8"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE6A6"/></radialGradient>`;
   const wires = [
-    [[590, 294], [680, 294], [680, 430], [770, 430]], [[520, 620], [710, 620], [710, 540], [770, 540]], [[640, 858], [800, 858], [800, 670]],
-    [[1330, 294], [1240, 294], [1240, 430], [1150, 430]], [[1400, 620], [1210, 620], [1210, 540], [1150, 540]], [[1280, 858], [1120, 858], [1120, 670]],
+    [[745, 540], [825, 540]], [[1095, 540], [1175, 540]],
+    [[960, 300], [960, 405]], [[460, 300], [460, 365], [635, 365], [635, 430]], [[1460, 300], [1460, 365], [1285, 365], [1285, 430]],
+    [[960, 780], [960, 675]], [[460, 780], [460, 715], [635, 715], [635, 650]], [[1460, 780], [1460, 715], [1285, 715], [1285, 650]],
   ];
-  let body = `<rect width="1920" height="1080" fill="url(#bg)"/>\n<g id="connectors">${wires.map((p) => wire(p)).join("")}</g>\n<g id="roles">`;
-  for (const [role, title, task, x, y, fill] of roles) body += glass(x, y, W, H) + eyebrow(x + 32, y + 52, role) + text(x + 32, y + 100, title, style("title")) + chip(x + 32, y + 118, task, { fill }).svg;
-  const tw = width("AI fluency", style("title", { size: 46, ls: -1.6 }));
-  body += `</g>\n<g id="hub">${card(770, 350, 380, 320, "url(#hubFill)")}${ai(804, 384)}${eyebrow(878, 419, "Core skill")}${mark(808, 488, tw)}${text(808, 505, "AI fluency", style("title", { size: 46, ls: -1.6 }))}${text(808, 550, "One capability, every role", style("body", { opacity: 0.6 }))}`;
-  ["chatgpt", "claude-color", "gemini", "notebooklm"].forEach((n, i) => (body += logo(804 + i * 60, 578, n, 48)));
-  body += `</g>\n<g id="nodes">${wires.flatMap((p) => [node(...p[0]), node(...p[p.length - 1])]).join("")}</g>`;
-  const extra = `<linearGradient id="hubFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FFF6F7"/></linearGradient>`;
-  return doc("AI Is Not Another Niche Skill", "An AI fluency card at the centre, connected by straight lines to six roles, each with an everyday task AI helps with.", await defs(bg, extra), body);
+  const work = layer("work", icon(385, 150, 150, "megaphone", "pink") + icon(885, 150, 150, "people", "yellow") + icon(1385, 150, 150, "chart", "pink") +
+    icon(385, 780, 150, "process", "yellow") + icon(885, 780, 150, "book", "pink") + icon(1385, 780, 150, "growth", "yellow"));
+  const tools = layer("ai-tools", logo(525, 430, 220, "chatgpt") + logo(825, 405, 270, "claude-color") + logo(1175, 430, 220, "gemini"));
+  return doc("AI Is Not Another Niche Skill", "ChatGPT, Claude and Gemini at the centre, joined by straight lines to six kinds of work: marketing, people, finance, operations, learning and growth.",
+    await defs(bg), layer("connectors", wires.map(wire).join("")) + work + tools + layer("nodes", ends(wires)));
 }
 
-/* ---- 2. AI agents — horizontal gradient, following the flow from left to right ---- */
+/* ---- 2. AI agents — horizontal gradient: an instruction, the agent, its tools, a result ---- */
 async function agents() {
   const bg = `<linearGradient id="bg" x1="0" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3C2CC"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE3A0"/></linearGradient>`;
   const wires = [
-    [[490, 585], [555, 585], [555, 535], [620, 535]],
-    [[1030, 470], [1098, 470], [1098, 338], [1166, 338]], [[1030, 546], [1166, 546]], [[1030, 622], [1098, 622], [1098, 754], [1166, 754]],
-    [[1458, 338], [1494, 338], [1494, 450], [1530, 450]], [[1458, 546], [1530, 546]], [[1458, 754], [1494, 754], [1494, 600], [1530, 600]],
+    [[360, 540], [520, 540]],
+    [[800, 540], [900, 540], [900, 300], [1000, 300]], [[900, 540], [1000, 540]], [[900, 540], [900, 780], [1000, 780]],
+    [[1170, 300], [1310, 300], [1310, 540], [1450, 540]], [[1170, 540], [1450, 540]], [[1170, 780], [1310, 780], [1310, 540]],
   ];
-  let body = `<rect width="1920" height="1080" fill="url(#bg)"/>\n<g id="connectors">${wires.map((p) => wire(p)).join("")}</g>\n`;
-  body += `<g id="labels">${eyebrow(120, 300, "1 · Instructions")}${eyebrow(620, 300, "2 · Agent")}${eyebrow(1166, 250, "3 · Tools & actions")}${eyebrow(1530, 350, "4 · Result")}</g>\n`;
-  const q = para(152, 574, "“Plan our team offsite: compare three venues and draft a summary.”", 306, style("title", { size: 30 }), 34);
-  body += `<g id="instructions">${card(120, 460, 370, 116 + q.lines * 34)}${chip(152, 492, "You ask").svg}${q.svg}</g>\n`;
-  const steps = [["Break the goal into steps", "done"], ["Choose the right tools", "done"], ["Check each result", "busy"], ["Report back to you", "open"]];
-  body += `<g id="agent">${card(620, 370, 410, 330)}${ai(652, 402)}${text(724, 428, "Agent", style("title", { size: 30 }))}${text(724, 456, "Works through the steps", style("body", { size: 19, opacity: 0.6 }))}`;
-  steps.forEach(([s, st], i) => (body += check(667, 506 + i * 48, st) + text(697, 514 + i * 48, s, style("body", st === "open" ? { opacity: 0.6 } : {}))));
-  body += `</g>\n<g id="tools">`;
-  [["google-calendar", "Check dates", 286], ["google-sheets", "Compare costs", 494], ["gmail", "Draft the email", 702]].forEach(([n, l, y]) => (body += glass(1166, y, 292, 104) + logo(1190, y + 20, n) + text(1270, y + 59, l, style("strong", { size: 20 }))));
-  const ok = chip(1556, 576, "Approve", { fill: C.ink, size: 17 });
-  body += `</g>\n<g id="result">${card(1530, 380, 250, 262)}${text(1556, 428, "Venue shortlist", style("title", { size: 26, ls: -0.9 }))}${bar(1556, 452, 180)}${bar(1556, 476, 140)}${bar(1556, 500, 160)}${text(1556, 556, "Ready for your review", style("strong", { size: 18 }))}${ok.svg}${chip(1556 + ok.w + 10, 576, "Edit", { line: true, size: 17 }).svg}</g>\n`;
-  body += `<g id="nodes">${wires.flatMap((p) => [node(...p[0]), node(...p[p.length - 1], p[p.length - 1][0] === 1530 && p[p.length - 1][1] === 546 ? C.yellow : C.pink)]).join("")}</g>`;
-  return doc("AI Agents Explained", "An AI agent workflow drawn with straight connectors: your instruction, the agent's steps, the tools it uses (Google Calendar, Google Sheets, Gmail) and a result waiting for your approval.", await defs(bg), body);
+  const nodes = [[360, 540], [520, 540], [800, 540], [1000, 300], [1000, 540], [1000, 780], [1170, 300], [1170, 540], [1170, 780]].map((p) => node(...p)).join("") + node(1450, 540, C.yellow);
+  const body = layer("connectors", wires.map(wire).join("")) +
+    layer("instruction", icon(170, 445, 190, "chat", "pink")) + layer("agent", logo(520, 400, 280, "claude-color")) +
+    layer("tools", logo(1000, 215, 170, "google-calendar") + logo(1000, 455, 170, "google-sheets") + logo(1000, 695, 170, "gmail")) +
+    layer("result", icon(1450, 435, 210, "done", "yellow")) + layer("nodes", nodes);
+  return doc("AI Agents Explained", "An instruction goes to an AI agent (Claude), which uses tools (Google Calendar, Google Sheets, Gmail) and returns a finished result, all joined by straight lines.", await defs(bg), body);
 }
 
-/* ---- 3. AI for beginners — vertical gradient ---- */
+/* ---- 3. AI for beginners — vertical gradient: everyday tasks and the tools that help, along one straight line ---- */
 async function beginners() {
   const bg = `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F5CCD4"/><stop offset="0.55" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE5A8"/></linearGradient>`;
-  const wires = [[[640, 285], [670, 285], [670, 400], [700, 400]], [[640, 760], [670, 760], [670, 680], [700, 680]], [[1280, 270], [1250, 270], [1250, 400], [1220, 400]], [[1280, 760], [1250, 760], [1250, 680], [1220, 680]]];
-  let body = `<rect width="1920" height="1080" fill="url(#bg)"/>\n<g id="connectors">${wires.map((p) => wire(p, { opacity: 0.18 })).join("")}</g>\n`;
-  // Summarize a long document (centre)
-  body += `<g id="summarize">${card(700, 330, 520, 420)}${eyebrow(734, 390, "Summarize a long document")}${logo(1138, 362, "notebooklm", 48)}`;
-  body += `<rect x="734" y="430" width="220" height="236" rx="16" fill="${C.ink}" fill-opacity="0.04"/>` + [196, 180, 188, 140, 172, 120, 184, 152].map((w, i) => bar(754, 452 + i * 26, w)).join("");
-  body += chip(980, 444, "Key decision", { fill: C.pink }).svg + chip(980, 494, "Two open questions").svg + chip(980, 544, "Next steps", { fill: C.yellow }).svg;
-  body += para(980, 626, "You check it before it goes anywhere.", 214, style("body", { size: 18, opacity: 0.6 }), 24).svg + `</g>\n`;
-  // Draft an email
-  body += `<g id="email">${glass(200, 170, 440, 230)}${eyebrow(232, 226, "Draft an email")}${logo(560, 198, "chatgpt", 48)}${text(232, 288, "Subject", style("body", { size: 19, opacity: 0.6 }))}${text(316, 288, "Thanks for today’s session", style("body", { size: 19 }))}${bar(232, 314, 346)}${bar(232, 338, 300)}${bar(232, 362, 206)}</g>\n`;
-  // Notes into an outline
-  body += `<g id="outline">${glass(200, 640, 440, 240)}${eyebrow(232, 696, "Notes into an outline")}${logo(560, 668, "claude-color", 48)}${text(232, 760, "1  Goals for Q1", style("strong", { size: 20 }))}${bar(262, 780, 262)}${text(232, 826, "2  Team roles", style("strong", { size: 20 }))}${bar(262, 846, 206)}</g>\n`;
-  // Brainstorm ideas
-  body += `<g id="brainstorm">${glass(1280, 170, 440, 200)}${eyebrow(1312, 226, "Brainstorm ideas")}${logo(1640, 198, "gemini", 48)}`;
-  let x = 1312, y = 272;
-  for (const [l, fill] of [["Workshop theme", C.yellow], ["Client FAQ"], ["Newsletter idea", C.pink], ["Event name"]]) { const c = chip(x, y, l, { fill }); if (x + c.w > 1690) { x = 1312; y += 50; body += chip(x, y, l, { fill }).svg; x += c.w + 12; } else { body += c.svg; x += c.w + 12; } }
-  body += `</g>\n`;
-  // Organize your tasks
-  body += `<g id="tasks">${glass(1280, 640, 440, 240)}${eyebrow(1312, 696, "Organize your tasks")}${logo(1640, 668, "perplexity", 48)}`;
-  [["Send the proposal", "done"], ["Review the budget", "open"], ["Book the venue", "open"]].forEach(([l, st], i) => (body += check(1327, 756 + i * 46, st) + text(1356, 763 + i * 46, l, style("body", { size: 20 }))));
-  body += chip(1688, 740, "Today", { fill: C.pink, size: 15, at: "end" }).svg + `</g>\n`;
-  body += `<g id="nodes">${wires.flatMap((p) => [node(...p[0], C.pink, 7), node(...p[p.length - 1], C.pink, 7)]).join("")}</g>`;
-  return doc("AI for Beginners: What It Can Do at Work, and What It Can't", "Five everyday AI tasks as small interface cards joined by straight connectors: drafting an email, summarizing a long document, turning notes into an outline, brainstorming ideas and organizing tasks, each with an AI tool's logo.", await defs(bg), body);
+  const tasks = [[150, "mail", "pink"], [710, "doc", "yellow"], [1270, "idea", "pink"]], tools = [[430, "chatgpt"], [990, "claude-color"], [1550, "gemini"]];
+  const spine = [[245, 540], [1650, 540]];
+  const stubs = [...tasks.map(([x]) => [[x + 95, 430], [x + 95, 540]]), ...tools.map(([x]) => [[x + 100, 540], [x + 100, 650]])];
+  const body = layer("connectors", wire(spine) + stubs.map(wire).join("")) +
+    layer("tasks", tasks.map(([x, n, f]) => icon(x, 240, 190, n, f)).join("")) + layer("tools", tools.map(([x, n]) => logo(x, 650, 200, n)).join("")) +
+    layer("nodes", tasks.map(([x]) => node(x + 95, 430)).join("") + tools.map(([x]) => node(x + 100, 650)).join("") + stubs.map((s) => node(s[0][0], 540, C.yellow, 8)).join(""));
+  return doc("AI for Beginners: What It Can Do at Work, and What It Can't", "Everyday tasks (an email, a document, new ideas) alternating with the AI tools that help with them (ChatGPT, Claude, Gemini) along one straight line.", await defs(bg), body);
 }
 
-/* ---- 4. Purpose before productivity — diagonal gradient, top right to bottom left ---- */
+/* ---- 4. Purpose before productivity — diagonal gradient (top right to bottom left): people, then purpose, then the work, then the tool ---- */
 async function purpose() {
   const bg = `<linearGradient id="bg" x1="1920" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE3A0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F2BDC8"/></linearGradient>`;
-  const extra = `<clipPath id="photoClip"><rect x="150" y="150" width="960" height="780" rx="28"/></clipPath>
-<linearGradient id="photoTint" x1="1110" y1="150" x2="630" y2="930" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${C.pink}" stop-opacity="0.32"/><stop offset="0.55" stop-color="${C.pink}" stop-opacity="0"/></linearGradient>`;
-  let body = `<rect width="1920" height="1080" fill="url(#bg)"/>\n`;
-  body += `<g id="photo"><rect x="138" y="138" width="984" height="804" rx="40" fill="#FFFFFF" fill-opacity="0.5" filter="url(#shadow)"/><image href="../../../assets/images/web/roundtable-1920.webp" x="150" y="150" width="960" height="780" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/><rect x="150" y="150" width="960" height="780" rx="28" fill="url(#photoTint)"/></g>\n`;
-  body += `<g id="connectors">${wire([[1390, 380], [1390, 490]])}${wire([[1300, 770], [1300, 822]])}</g>\n`;
-  const T = style("title", { size: 54, ls: -1.9 }), pre = width("What is this ", T), tail = width("work for?", T);
-  body += `<g id="question">${card(1010, 190, 700, 190)}${eyebrow(1048, 246, "Before you start")}${mark(1048 + pre, 306, tail, "url(#markPink)")}${text(1048, 322, "What is this work for?", T)}</g>\n`;
-  body += `<g id="priorities">${card(1070, 490, 640, 280)}${eyebrow(1104, 540, "This week")}${chip(1676, 518, "3 priorities", { size: 16, at: "end" }).svg}`;
-  [["Coach the new team lead", "done", "Worth doing", C.pink], ["Prepare the client workshop", "open", "Worth doing", C.pink], ["Reformat last year’s reports", "open", "Let AI draft it", C.yellow]].forEach(([l, st, tag, fill], i) => {
-    const y = 600 + i * 50, s = style("strong", i === 2 ? { opacity: 0.6 } : {});
-    body += check(1119, y, st) + text(1150, y + 8, l, s) + chip(1676, y - 16, tag, { fill, size: 15, at: "end" }).svg;
-    if (i === 2) body += rule(1150, y, 1150 + width(l, s), y, 0.35);
-  });
-  body += `</g>\n<g id="ai-note">${glass(1240, 822, 470, 96)}${ai(1266, 846, 48)}${para(1330, 862, "Drafts the routine work, so you can focus on what matters", 360, style("strong", { size: 20 }), 26).svg}</g>\n`;
-  body += `<g id="nodes">${node(1390, 380)}${node(1390, 490)}${node(1300, 770)}${node(1300, 822, C.yellow)}</g>`;
-  return doc("Purpose Before Productivity", "A Faith Works roundtable photo beside cards asking 'What is this work for?' and listing this week's priorities, with routine work left for AI to draft.", await defs(bg, extra), body);
+  const extra = `<clipPath id="photoClip"><rect x="150" y="170" width="900" height="740" rx="40"/></clipPath>
+<linearGradient id="photoTint" x1="1050" y1="170" x2="600" y2="910" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${C.pink}" stop-opacity="0.3"/><stop offset="0.5" stop-color="${C.pink}" stop-opacity="0"/></linearGradient>`;
+  const wires = [[[1050, 285], [1240, 285]], [[1345, 390], [1345, 540], [1490, 540]], [[1585, 635], [1585, 805], [1430, 805]]];
+  const body = layer("people", `<rect x="138" y="158" width="924" height="764" rx="52" fill="#FFFFFF" fill-opacity="0.45" filter="url(#shadow)"/><image href="../../../assets/images/web/roundtable-1920.webp" x="150" y="170" width="900" height="740" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/><rect x="150" y="170" width="900" height="740" rx="40" fill="url(#photoTint)"/>`) +
+    layer("connectors", wires.map(wire).join("")) +
+    layer("purpose", icon(1240, 180, 210, "target", "pink")) + layer("work", icon(1490, 445, 190, "week", "yellow")) + layer("tool", logo(1260, 720, 170, "claude-color")) +
+    layer("nodes", ends(wires.slice(0, 2)) + node(1585, 635) + node(1430, 805, C.yellow));
+  return doc("Purpose Before Productivity", "A Faith Works roundtable photo joined by straight lines to purpose (a target), the work worth doing (a planned week), and only then the tool (Claude).", await defs(bg, extra), body);
 }
 
-/* ---- 5. GitHub for non-developers — diagonal gradient, bottom left to top right ---- */
+/* ---- 5. GitHub for non-developers — diagonal gradient (bottom left to top right): GitHub and Claude, joined by a branch ---- */
 async function github() {
   const bg = `<linearGradient id="bg" x1="0" y1="1080" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4C6D0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE8AE"/></linearGradient>`;
-  const extra = `<linearGradient id="branch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.pink}"/><stop offset="1" stop-color="${C.yellow}"/></linearGradient>`;
-  let body = `<rect width="1920" height="1080" fill="url(#bg)"/>\n`;
-  // Version history: a straight trunk and a branch of straight segments
-  body += `<g id="history">${wire([[1300, 230], [1300, 880]], { width: 3, opacity: 0.2 })}<polyline points="1300,420 1420,490 1420,640 1300,710" fill="none" stroke="url(#branch)" stroke-width="3" stroke-linejoin="miter"/>${wire([[1120, 366], [1210, 366], [1210, 260], [1300, 260]], { dash: "6 8", opacity: 0.14 })}</g>\n`;
-  // The repository
-  const R = { x: 160, y: 230, w: 960 };
-  body += `<g id="repository">${card(R.x, R.y, R.w, 612)}<use href="#logo-github" x="194" y="262" width="44" height="44" color="${C.ink}"/>`;
-  const owner = "faithworks /", ow = width(owner, style("title", { size: 30, weight: 500 })) + 10; // SVG measures no trailing space
-  body += text(254, 296, owner, style("title", { size: 30, weight: 500, opacity: 0.6 })) + text(254 + ow, 296, "website", style("title", { size: 30 }));
-  const nameEnd = 254 + ow + width("website", style("title", { size: 30 }));
-  body += chip(nameEnd + 18, 266, "Private", { line: true, size: 16 }).svg + chip(1086, 264, "main", { size: 17, at: "end" }).svg + rule(160, 330, 1120, 330);
-  body += `<rect x="160" y="330" width="960" height="72" fill="${C.pinkTint}"/><circle cx="211" cy="366" r="17" fill="${C.pink}"/>`;
-  const msg = "Update the homepage headline", mw = width(msg, style("strong", { size: 20 }));
-  body += text(242, 373, msg, style("strong", { size: 20 })) + check(242 + mw + 26, 366, "done", 13) + text(1086, 373, "24 commits", style("body", { size: 18, opacity: 0.6, anchor: "end" }));
-  const folder = (x, y) => `<polygon points="${x},${y + 3} ${x + 11},${y + 3} ${x + 14},${y + 7} ${x + 28},${y + 7} ${x + 28},${y + 25} ${x},${y + 25}" fill="${C.pink}"/>`;
-  const file = (x, y) => `<polygon points="${x + 2},${y} ${x + 17},${y} ${x + 25},${y + 8} ${x + 25},${y + 28} ${x + 2},${y + 28}" fill="none" stroke="${C.ink}" stroke-opacity="0.45" stroke-width="2" stroke-linejoin="miter"/><polyline points="${x + 17},${y} ${x + 17},${y + 8} ${x + 25},${y + 8}" fill="none" stroke="${C.ink}" stroke-opacity="0.45" stroke-width="2"/>`;
-  [["images", "Add photos from the October workshop", "2 days ago", true], ["index.html", "Update the homepage headline", "today"], ["about.html", "Fix a typo on the About page", "last week"], ["events.html", "Add the November workshop dates", "last week"], ["README.md", "Explain how to update the site", "last month"]].forEach(([n, m, t, dir], i) => {
-    const y = 402 + i * 71;
-    body += (dir ? folder(196, y + 22) : file(196, y + 21)) + text(240, y + 44, n, style("strong")) + text(496, y + 43, m, style("body", { size: 19, opacity: 0.6 })) + text(1086, y + 43, t, style("body", { size: 18, opacity: 0.6, anchor: "end" }));
-    if (i < 4) body += rule(194, y + 71, 1086, y + 71, 0.07);
-  });
-  body += `</g>\n`;
-  body += `<g id="history-labels">${eyebrow(1340, 200, "History")}${text(1336, 266, "Update the homepage headline", style("strong", { size: 19 }))}${text(1336, 346, "Fix a typo on the About page", style("body", { size: 19, opacity: 0.6 }))}${text(1336, 426, "Add the November dates", style("body", { size: 19, opacity: 0.6 }))}${text(1336, 716, "Merge pricing changes", style("body", { size: 19, opacity: 0.6 }))}${text(1336, 806, "First version of the site", style("body", { size: 19, opacity: 0.6 }))}</g>\n`;
-  const pr = chip(1484, 586, "Pull request · ready to review", { fill: C.yellow, size: 16 }), bw = Math.max(300, pr.w + 44);
-  body += `<g id="branch-card">${glass(1462, 490, bw, 146)}${eyebrow(1484, 530, "Branch · new-pricing", { size: 14 })}${text(1484, 566, "Draft the pricing section", style("strong", { size: 19 }))}${pr.svg}</g>\n`;
-  body += `<g id="nodes">${[260, 340, 420, 710, 800].map((y) => node(1300, y, C.pink, 11)).join("")}${node(1420, 520, C.yellow, 11)}${node(1420, 610, C.yellow, 11)}</g>`;
-  return doc("GitHub for Non-Developers", "A website's files in a GitHub repository, beside a version history with a branch and a pull request ready to review, all drawn with straight lines.", await defs(bg, extra), body);
+  const wires = [[[670, 540], [885, 540]], [[1035, 540], [1290, 540]]];
+  const body = layer("connectors", wires.map(wire).join("")) + layer("github", logo(330, 370, 340, "github")) + layer("branch", icon(885, 465, 150, "branch", "yellow")) +
+    layer("claude", logo(1290, 390, 300, "claude-color")) + layer("nodes", ends(wires));
+  return doc("GitHub for Non-Developers", "The GitHub mark and the Claude mark, joined by one straight line through a branch icon.", await defs(bg), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github };
-window.compose = async (name) => { await document.fonts.ready; await Promise.all(["Inter", "Poppins"].flatMap((f) => [400, 500, 600, 700].map((w) => document.fonts.load(`${w} 20px ${f}`)))); return SCENES[name](); };
+window.compose = (name) => SCENES[name]();
 </script>
 </body>
 </html>
