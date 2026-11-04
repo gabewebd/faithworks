@@ -2398,6 +2398,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .event__date span { font-size: 15px; font-weight: 700; line-height: 1.2; }
 p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .event__date .event__dow { font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+/* upcoming date stubs alternate AI Yellow, Faith Pink (the calendar uses the same colour per event, js/main.js) */
+.events > .event:not(.event--past):nth-child(even) .event__date { background: var(--pink); }
 .event--past .event__date { background: var(--stone); }
 .event__type { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 10px; font-size: var(--fs-small); font-weight: 600; color: var(--rose); }
 .event h3 { font-size: clamp(20px, 1.8vw, 24px); line-height: 1.2; margin-bottom: 8px; }
@@ -2410,11 +2412,14 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .event__facts dd { margin: 2px 0 0; font-size: 15px; font-weight: 500; }
 .event__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
 .event__img { overflow: hidden; border-radius: var(--r); background: var(--stone); }
+/* event posters and graphics (assets/images/events/) show whole, on white, never cropped */
+.event__img:has(img[src*="/images/events/"]) { background: var(--white); }
 .event__img img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .event__img:not(.event__slides) img { aspect-ratio: auto; }
 @media (min-width: 1241px) {
   .event > .event__img { position: relative; align-self: stretch; min-height: 280px; margin: calc(-1 * var(--event-pad)) calc(-1 * var(--event-pad)) calc(-1 * var(--event-pad)) 0; border-radius: 0; }
   .event > .event__img img, .event > .event__img .event__slides-frame { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }
+  .event > .event__img img[src*="/images/events/"] { object-fit: contain; }
 }
 .event__img figcaption { padding: 6px 10px; font-size: 12px; color: var(--muted); }
 .event--past .event__img img { filter: grayscale(0.4); }
@@ -2546,6 +2551,8 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .cal__day--out { visibility: hidden; }
 .cal__day--has { background: var(--yellow-pastel); }
 .cal__day--has:hover { background: var(--yellow); }
+.cal__day--pink { background: var(--pink-tint); }
+.cal__day--pink:hover { background: var(--pink); }
 .cal__day--pastonly { background: var(--stone-2); }
 .cal__day--pastonly:hover { background: var(--stone); }
 .cal__day[aria-pressed="true"] { background: var(--ink); color: var(--white); }
@@ -2553,6 +2560,7 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .cal__day--today .cal__num { background: var(--ink); color: var(--white); }
 .cal__day--today[aria-pressed="true"] .cal__num { background: var(--white); color: var(--ink); }
 .cal__chip { display: block; padding: 3px 6px; border-radius: 6px; background: var(--yellow); color: var(--ink); font-size: 12px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal__chip--pink { background: var(--pink); }
 .cal__chip--past { background: var(--stone); color: var(--muted); }
 .cal__day[aria-pressed="true"] .cal__chip--past { background: var(--ink-3); color: var(--muted-dark); }
 .cal__more { font-size: 11px; font-weight: 600; color: var(--muted); }
@@ -2564,7 +2572,7 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .cal__legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; padding: 0; }
 .cal__legend li { display: flex; align-items: center; gap: 7px; }
 .cal__key { width: 12px; height: 12px; border-radius: 4px; }
-.cal__key--up { background: var(--yellow); }
+.cal__key--up { background: linear-gradient(135deg, var(--yellow) 50%, var(--pink) 50%); }
 .cal__key--past { background: var(--stone); }
 .cal__key--today { border-radius: 50%; background: var(--ink); }
 .cal__hint { margin: 8px 0 0; }
@@ -2588,6 +2596,7 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 /* the summary stays short: three lines, the full text is on the event page */
 .cal__item > p:not(.cal__meta) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .cal__count { justify-self: start; display: inline-flex; padding: 2px 10px; border-radius: 999px; background: var(--yellow); font-size: 12px; font-weight: 700; }
+.cal__count--pink { background: var(--pink); }
 .cal__count--past { background: var(--stone); color: var(--muted); }
 .cal__item .cal__photo { grid-column: 1 / -1; max-width: none; margin: 0 0 6px; border-radius: var(--r-sm); overflow: hidden; }
 /* A single poster shows whole; slideshows keep their fixed frame */

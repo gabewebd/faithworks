@@ -481,6 +481,15 @@ window.FW_CONFIG = {
       if (ev.past || !ev.endsAt || !(Date.parse(ev.endsAt) <= Date.now())) return;
       ev.past = true;
     });
+    // Each upcoming event keeps its card's colour: the cards alternate AI Yellow, Faith Pink
+    // (css .events > .event:nth-child(even)); without a card on the page, by start order
+    var upOrder = calEvents.filter(function (ev) { return !ev.past; }).sort(function (a, b) { return String(a.start).localeCompare(String(b.start)); });
+    calEvents.forEach(function (ev) {
+      if (ev.past) return;
+      var card = doc.getElementById("event-" + ev.id);
+      var at = card && card.parentNode && !card.classList.contains("event--past") ? Array.prototype.indexOf.call(card.parentNode.children, card) : upOrder.indexOf(ev);
+      ev.pink = at % 2 === 1;
+    });
     var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var pad = function (n) { return (n < 10 ? "0" : "") + n; };
@@ -535,7 +544,7 @@ window.FW_CONFIG = {
         var day = i - lead + 1;
         if (day < 1 || day > days) { grid.appendChild(el("span", "cal__day cal__day--out")); continue; }
         var key = iso(view.y, view.m, day), list = byDay[key] || [];
-        var btn = el("button", "cal__day" + (key === todayIso ? " cal__day--today" : "") + (list.length ? " cal__day--has" : "") + (list.length && list.every(function (ev) { return ev.past; }) ? " cal__day--pastonly" : ""));
+        var btn = el("button", "cal__day" + (key === todayIso ? " cal__day--today" : "") + (list.length ? " cal__day--has" : "") + (list.some(function (ev) { return !ev.past; }) && list.filter(function (ev) { return !ev.past; })[0].pink ? " cal__day--pink" : "") + (list.length && list.every(function (ev) { return ev.past; }) ? " cal__day--pastonly" : ""));
         btn.type = "button";
         btn.setAttribute("data-date", key);
         btn.setAttribute("aria-pressed", key === sel ? "true" : "false");
@@ -552,7 +561,7 @@ window.FW_CONFIG = {
           });
           btn.appendChild(dots);
           list.slice(0, 2).forEach(function (ev) {
-            var chip = el("span", "cal__chip" + (ev.past ? " cal__chip--past" : ""), ev.title);
+            var chip = el("span", "cal__chip" + (ev.past ? " cal__chip--past" : ev.pink ? " cal__chip--pink" : ""), ev.title);
             chip.setAttribute("aria-hidden", "true");
             btn.appendChild(chip);
           });
@@ -578,7 +587,7 @@ window.FW_CONFIG = {
         li.appendChild(el("h4", "", ev.title));
         return li;
       }
-      li.appendChild(el("span", "cal__count" + (ev.past ? " cal__count--past" : ""), countdown(ev)));
+      li.appendChild(el("span", "cal__count" + (ev.past ? " cal__count--past" : ev.pink ? " cal__count--pink" : ""), countdown(ev)));
       li.appendChild(el("h4", "", ev.title));
       if (ev.summary) li.appendChild(el("p", "", ev.summary));
       var meta = el("p", "cal__meta");
@@ -628,7 +637,7 @@ window.FW_CONFIG = {
           if (img) { var media = el("span", "cal__next-media"); img.removeAttribute("loading"); img.alt = ""; media.appendChild(img); jump.appendChild(media); }
         }
         var body = el("span", "cal__next-body");
-        body.appendChild(el("span", "cal__count", countdown(next)));
+        body.appendChild(el("span", "cal__count" + (next.pink ? " cal__count--pink" : ""), countdown(next)));
         body.appendChild(el("span", "cal__next-title", next.title));
         body.appendChild(el("span", "cal__next-date", longDate(next.first)));
         jump.appendChild(body);
