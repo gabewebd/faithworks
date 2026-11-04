@@ -77,11 +77,11 @@ export const EXTRA_CSS = `.fw-main [id]{scroll-margin-top:calc(var(--header-h) +
 .rcards .rcard h3,.rcards .rcard--lead h3{font-size:clamp(19px,1.5vw,22px);line-height:1.22;letter-spacing:-0.025em}
 .rcards .rcard__excerpt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 /* Lighter reading: the type pill and the meta share one line, and the meta and summary sit in
-   softer Charcoal (translucent ink) at a smaller size, so each card reads title first */
+   solid Charcoal (never lightened) at a smaller size, so each card reads title first */
 .rcards .rcard__body{flex-direction:row;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:10px 12px}
 .rcards .rcard__body>:not(.rcard__badges):not(.rcard__meta){flex:0 0 100%;min-width:0}
-.rcards .rcard__meta{font-size:13px;font-weight:500;color:rgb(26 26 26 / 0.66)}
-.rcards .rcard__excerpt{font-size:15px;line-height:1.6;color:rgb(26 26 26 / 0.72)}
+.rcards .rcard__meta{font-size:13px;font-weight:500;color:var(--ink)}
+.rcards .rcard__excerpt{font-size:15px;line-height:1.6;color:var(--ink)}
 .rcards .rcard h3{margin-top:2px}
 .rcards .rcard--lead{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,6fr) minmax(0,6fr);align-items:center;gap:clamp(20px,3.4vw,56px);padding-bottom:calc(var(--fw-rgap) / 2);margin-bottom:calc(var(--fw-rgap) / -2);border-bottom:1px solid var(--line)}
 .rcards .rcard--lead .rcard__body{align-content:center;justify-content:flex-start}

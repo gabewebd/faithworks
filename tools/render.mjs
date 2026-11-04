@@ -973,7 +973,7 @@ export function withToc(html) {
 
 // Keep reading heading gets a way back to the full Resources listing beside it.
 const withBackLink = (html) => html.replace(/<h2 id="related-title"[^>]*>[^]*?<\/h2\s*>/, (h) =>
-  `<div class="related-head">${h}<a class="btn btn--light" href="/resources/"><span aria-hidden="true">←</span> Back to resources</a></div>`);
+  `<div class="related-head">${h}<a class="btn btn--light" href="/resources/"><span class="btn__arrow btn__arrow--left" aria-hidden="true">←</span>Back to resources</a></div>`);
 
 // Share: Facebook and LinkedIn open their share windows with the page address; Instagram has
 // no share link, so js/main.js §16 uses the phone's share sheet or copies the link instead.
