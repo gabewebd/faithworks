@@ -83,8 +83,6 @@
   var DATE = new Intl.DateTimeFormat("en-PH", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
   var dateLabel = function (r) { return /^\d{4}-\d{2}-\d{2}/.test(r.date || "") ? DATE.format(new Date(r.date.slice(0, 10) + "T12:00:00Z")) : ""; };
   var metaParts = function (r) { return String(r.category || "").split("·").map(function (c) { return c.trim(); }).concat([dateLabel(r), r.readTime]).filter(Boolean); };
-  var VERBS = { article: "Read", guide: "Read", playbook: "Read", tool: "Try" };
-  var cardLabel = function (r) { return (r.download ? "Download" : VERBS[r.type] || "Open") + " " + r.typeLabel.toLowerCase(); };
 
   function cardsHtml() {
     var items = DATA.resources.filter(function (r) { return r.href; }).sort(function (a, b) {
@@ -108,35 +106,85 @@
           "<p class=\"rcard__meta\">" + metaParts(r).map(function (p) { return "<span>" + esc(p) + "</span>"; }).join("") + "</p>" +
           "<h3><a href=\"" + esc(r.href) + "\"" + attrs + ">" + esc(r.title) + (r.external ? "<span class=\"sr-only\"> (opens in a new tab)</span>" : "") + "</a></h3>" +
           (r.summary ? "<p class=\"rcard__excerpt\">" + esc(r.summary) + "</p>" : "") +
-          "<span class=\"rcard__more\" aria-hidden=\"true\">" + esc(cardLabel(r)) + " <span class=\"link-arrow\">" + (r.download ? "↓" : "→") + "</span></span>" +
           "</div></li>";
-      }).join("") + "</ul><p class=\"rcards__none small\" data-rcards-none hidden>No resources match your search.</p>";
+      }).join("") + "</ul><p class=\"rcards__none small\" data-rcards-none hidden>No resources match your search.</p>" +
+      "<nav class=\"rcards__pager\" aria-label=\"Resource pages\" data-rcards-pager hidden></nav>";
   }
 
-  // Search and Type filter (js/main.js §15)
+  // Search and Type filter (js/main.js §15), plus pages of PER_PAGE cards (embed only). The wide
+  // featured card is extra on the page it falls on, so the three-column rows below it stay full.
+  // The search, type and page are kept for the visit, so Back from an article returns to the same page.
+  // Pager arrows: line icons in the text colour (currentColor), hidden from screen readers
+  var ARROW = function (d) { return "<svg class=\"rcards__arrow\" viewBox=\"0 0 20 20\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d=\"" + d + "\"/></svg>"; };
+  var ARROW_L = ARROW("M16 10H4M9 5l-5 5 5 5"), ARROW_R = ARROW("M4 10h12M11 5l5 5-5 5");
+  var PER_PAGE = 9, listState = { q: "", type: "", page: 1 };
+  function pageList(n, cur) { // 1 … 4 5 6 … 12 once there are more than seven pages
+    if (n <= 7) return Array.apply(null, Array(n)).map(function (_, i) { return i + 1; });
+    var out = [1], from = Math.max(2, Math.min(cur - 1, n - 4)), to = Math.min(n - 1, Math.max(cur + 1, 5));
+    if (from > 2) out.push(0);
+    for (var p = from; p <= to; p++) out.push(p);
+    if (to < n - 1) out.push(0);
+    out.push(n);
+    return out;
+  }
   function wireFilters() {
-    var tools = root.querySelector("[data-rcards-tools]");
+    var tools = root.querySelector("[data-rcards-tools]"), pager = root.querySelector("[data-rcards-pager]");
     if (!tools) return;
     var cards = [].slice.call(root.querySelectorAll("[data-rcards-list] > li")), none = root.querySelector("[data-rcards-none]");
-    var search = tools.querySelector("[data-rcards-search]"), chips = [].slice.call(tools.querySelectorAll("[data-type]")), type = "";
-    var apply = function () {
-      var words = search.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
-      cards.forEach(function (c) {
+    var search = tools.querySelector("[data-rcards-search]"), chips = [].slice.call(tools.querySelectorAll("[data-type]"));
+    var type = chips.some(function (c) { return c.getAttribute("data-type") === listState.type; }) ? listState.type : "", page = listState.page;
+    search.value = listState.q;
+    chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-type") === type ? "true" : "false"); });
+    var apply = function (scrollUp) {
+      var words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+      var matches = cards.filter(function (c) {
         var text = c.getAttribute("data-search") || "";
-        var ok = (!type || c.getAttribute("data-type") === type) && words.every(function (w) { return text.indexOf(w) >= 0; });
-        c.hidden = !ok;
-        if (ok) shown++;
+        return (!type || c.getAttribute("data-type") === type) && words.every(function (w) { return text.indexOf(w) >= 0; });
       });
-      if (none) none.hidden = shown > 0;
+      var counted = matches.filter(function (c) { return !c.classList.contains("rcard--lead"); }).length;
+      var pages = Math.max(1, Math.ceil(counted / PER_PAGE));
+      page = Math.min(Math.max(1, page), pages);
+      var i = 0, onPage = [];
+      matches.forEach(function (c) {
+        if (c.classList.contains("rcard--lead")) { if (page === 1) onPage.push(c); return; } // always first in the list
+        if (Math.ceil(++i / PER_PAGE) === page) onPage.push(c);
+      });
+      cards.forEach(function (c) { c.hidden = onPage.indexOf(c) < 0; });
+      if (none) none.hidden = matches.length > 0;
+      listState = { q: search.value, type: type, page: page };
+      if (pager) {
+        pager.hidden = pages < 2;
+        pager.innerHTML = pages < 2 ? "" :
+          "<button type=\"button\" class=\"rcards__step\" data-page=\"" + (page - 1) + "\"" + (page === 1 ? " disabled" : "") + ">" + ARROW_L + "<span>Previous</span></button>" +
+          "<ol class=\"rcards__pages\">" + pageList(pages, page).map(function (p) {
+            return p ? "<li><button type=\"button\" class=\"rcards__page\" data-page=\"" + p + "\" aria-label=\"Page " + p + "\"" + (p === page ? " aria-current=\"page\"" : "") + ">" + p + "</button></li>" : "<li class=\"rcards__gap\" aria-hidden=\"true\">…</li>";
+          }).join("") + "</ol>" +
+          "<button type=\"button\" class=\"rcards__step\" data-page=\"" + (page + 1) + "\"" + (page === pages ? " disabled" : "") + "><span>Next</span>" + ARROW_R + "</button>";
+      }
+      if (scrollUp) { // back to the top of the list: the search box and type chips, below the sticky header
+        var head = parseFloat(getComputedStyle(root.querySelector(".fw-main") || tools).getPropertyValue("--header-h")) || 80;
+        var top = tools.getBoundingClientRect().top - head - 24;
+        if (top < 0) window.scrollTo({ top: window.scrollY + top, behavior: "smooth" });
+      }
     };
     chips.forEach(function (chip) {
       chip.addEventListener("click", function () {
         type = chip.getAttribute("data-type");
+        page = 1;
         chips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
         apply();
       });
     });
-    search.addEventListener("input", apply);
+    search.addEventListener("input", function () { page = 1; apply(); });
+    if (pager) pager.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-page]");
+      if (!b || b.disabled || b.getAttribute("aria-current")) return;
+      page = +b.getAttribute("data-page");
+      apply(true);
+      var cur = pager.querySelector("[aria-current]");
+      if (cur) cur.focus({ preventScroll: true });
+    });
+    apply();
   }
 
   /* ---- Article: the production page body, plus its contents and share bar ---- */
@@ -338,6 +386,22 @@
     go(a.getAttribute("href"), a.getAttribute("data-fw-route"));
   });
   var started = false; // content in hand; until then a route change only updates the address
+  // The listing, keeping the hero element that is already on screen when the new markup has the same
+  // hero (the live embed's loading frame → content): re-creating it would restart its rise-in animation.
+  function setListing(html) {
+    var oldHero = main.querySelector(".phero");
+    var tpl = document.createElement("template");
+    tpl.innerHTML = html;
+    var newHero = tpl.content.querySelector(".phero");
+    if (!oldHero || !newHero || oldHero.parentNode !== main || newHero.parentNode !== tpl.content || oldHero.outerHTML !== newHero.outerHTML) {
+      main.innerHTML = html;
+      return;
+    }
+    while (oldHero.previousSibling) main.removeChild(oldHero.previousSibling);
+    while (oldHero.nextSibling) main.removeChild(oldHero.nextSibling);
+    while (tpl.content.firstChild !== newHero) main.insertBefore(tpl.content.firstChild, oldHero);
+    while (newHero.nextSibling) main.appendChild(newHero.nextSibling);
+  }
   function render(scroll) {
     if (!started) return;
     cleanup.forEach(function (fn) { fn(); });
@@ -353,7 +417,7 @@
         document.title = head.title;
         setHead(head);
       } else {
-        main.innerHTML = withRoutes(DATA.listingHtml.replace("%%FW_CARDS%%", cardsHtml()));
+        setListing(withRoutes(DATA.listingHtml.replace("%%FW_CARDS%%", cardsHtml())));
         wireFilters();
         document.title = pageTitle;
         setHead(null);
