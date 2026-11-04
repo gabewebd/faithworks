@@ -22,7 +22,9 @@
 # files becomes public there.
 !/cms/package.json
 !/cms/vercel.json
-!/cms/api
+!/cms/app
+!/cms/next.config.mjs
+!/cms/package-lock.json
 !/cms/server
 !/cms/scripts
 !/cms/public
