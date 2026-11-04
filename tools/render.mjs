@@ -849,6 +849,24 @@ export function resourcesEmpty() {
   });
 }
 
+// One resource card (Resources page and the Home/Learn latest module): picture, Type badge
+// (+ Featured), meta, title, summary, action. lead: the wide card across the row.
+const resLink = (a) => a.download ? ` download data-track="download_click"` : a.external ? ` target="_blank" rel="noopener"` : "";
+function rcard(a, lead, attrs = "") {
+  const link = resLink(a);
+  return `
+        <li class="rcard${lead ? " rcard--lead" : ""}"${attrs}>
+          <a class="rcard__media" href="${esc(a.href)}"${link} tabindex="-1" aria-hidden="true">${a.image ? img(a.image, lead ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, 100vw", "rcard__img") : `<span class="rcard__img rcard__img--blank"></span>`}</a>
+          <div class="rcard__body">
+            <p class="rcard__badges"><span class="rcard__type">${esc(a.typeLabel)}</span>${a.featured ? `<span class="rcard__flag">Featured</span>` : ""}</p>
+            <p class="rcard__meta">${metaLine(articleMeta(a))}</p>
+            <h3><a href="${esc(a.href)}"${link}>${esc(a.title)}${a.external ? `<span class="sr-only"> (opens in a new tab)</span>` : ""}</a></h3>
+            ${a.excerpt ? `<p class="rcard__excerpt">${esc(a.excerpt)}</p>` : ""}
+            <span class="rcard__more" aria-hidden="true">${esc(cardLabel(a))} <span class="link-arrow">${a.download ? "↓" : "→"}</span></span>
+          </div>
+        </li>`;
+}
+
 // Resources: every resource as one card, featured first, then newest. A search box and Type
 // filters (js/main.js §15) appear only with JavaScript; without it every card shows.
 export function resourceCards() {
@@ -863,57 +881,26 @@ export function resourceCards() {
           ${chips}
         </div>
       <ul class="rcards" data-rcards-list>${items.map((a, i) => {
-    const attrs = resLink(a);
-    const lead = i === 0 && a.featured;
     const words = [a.title, a.excerpt, a.category, a.typeLabel, ...a.topics].filter(Boolean).join(" ").toLowerCase();
-    return `
-        <li class="rcard${lead ? " rcard--lead" : ""}" data-type="${esc(a.type)}" data-search="${esc(words)}">
-          <a class="rcard__media" href="${esc(a.href)}"${attrs} tabindex="-1" aria-hidden="true">${a.image ? img(a.image, lead ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, 100vw", "rcard__img") : `<span class="rcard__img rcard__img--blank"></span>`}</a>
-          <div class="rcard__body">
-            <p class="rcard__badges"><span class="rcard__type">${esc(a.typeLabel)}</span>${a.featured ? `<span class="rcard__flag">Featured</span>` : ""}</p>
-            <p class="rcard__meta">${metaLine(articleMeta(a))}</p>
-            <h3><a href="${esc(a.href)}"${attrs}>${esc(a.title)}${a.external ? `<span class="sr-only"> (opens in a new tab)</span>` : ""}</a></h3>
-            ${a.excerpt ? `<p class="rcard__excerpt">${esc(a.excerpt)}</p>` : ""}
-            <span class="rcard__more" aria-hidden="true">${esc(cardLabel(a))} <span class="link-arrow">${a.download ? "↓" : "→"}</span></span>
-          </div>
-        </li>`;
+    return rcard(a, i === 0 && a.featured, ` data-type="${esc(a.type)}" data-search="${esc(words)}"`);
   }).join("")}
       </ul>
       <p class="rcards__none small" data-rcards-none hidden>No resources match your search.</p>`;
 }
 
-// Latest resources ({{latestResources:3}}, Home and Learn): the newest published resources, one
-// lead and the next ones as numbered entries beside it, each with its picture, type, category,
-// date and summary. Only published content: the published view holds nothing else, and a staging
-// (preview) build leaves out anything whose status is not "published" (drafts, scheduled, edits
-// awaiting publishing). Newest by publish date, then by when it went live. Strictly by date (the
-// Resources page puts Featured first). No picture: a quiet Faith Pink panel; no summary: none.
-// Nothing published: the section is removed.
+// Latest resources ({{latestResources:4}}, Home and Learn): the newest published resources in the
+// Resources page's card layout, the newest as the wide lead card and the next ones as cards below
+// it (one row of three). Only published content: the published view holds nothing else, and a
+// staging (preview) build leaves out anything whose status is not "published" (drafts, scheduled,
+// edits awaiting publishing). Newest by publish date, then by when it went live. Strictly by date
+// (the Resources page puts Featured first). Nothing published: the section is removed.
 const byPublished = (a, b) => newest(a, b) || String(b.rec.published_at || "").localeCompare(String(a.rec.published_at || ""));
-const resLink = (a) => a.download ? ` download data-track="download_click"` : a.external ? ` target="_blank" rel="noopener"` : "";
-const LATEST_BLANK = `<span class="latest__blank" aria-hidden="true"><svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" focusable="false"><path d="M0 70 H52 Q62 70 62 60 V38 Q62 28 72 28 H160"/><path d="M104 100 V62 Q104 52 114 52 H160"/><circle cx="62" cy="48" r="3"/><circle cx="114" cy="52" r="3"/></svg></span>`;
 export function latestResources(limit) {
-  const items = D.articles.filter((a) => a.href && (!a.status || a.status === "published")).sort(byPublished).slice(0, Number(limit) || 3);
+  const items = D.articles.filter((a) => a.href && (!a.status || a.status === "published")).sort(byPublished).slice(0, Number(limit) || 4);
   if (!items.length) return EMPTY_SECTION;
-  const entry = (a, i) => {
-    const lead = i === 0, attrs = resLink(a);
-    const cats = String(a.category || "").split("·").map((c) => c.trim()).filter(Boolean);
-    const date = articleDate(a);
-    const media = a.image ? img(a.image, lead ? "(min-width: 900px) 56vw, 100vw" : "(min-width: 900px) 14vw, 30vw", "latest__img") : LATEST_BLANK;
-    return `<li class="latest__entry${lead ? " latest__entry--lead" : ""}">
-          <a class="latest__media" href="${esc(a.href)}"${attrs} tabindex="-1" aria-hidden="true">${media}</a>
-          <div class="latest__body">
-            <p class="latest__meta"><span class="latest__num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><span class="latest__type">${esc(a.typeLabel)}</span>${cats.map((c) => `<span>${esc(c)}</span>`).join("")}${date ? `<time datetime="${esc(a.date.slice(0, 10))}">${esc(date)}</time>` : ""}</p>
-            <h3 class="latest__title"><a href="${esc(a.href)}"${attrs}>${esc(a.title)}${a.external ? `<span class="sr-only"> (opens in a new tab)</span>` : ""}</a></h3>
-            ${a.excerpt ? `<p class="latest__excerpt">${esc(a.excerpt)}</p>` : ""}
-            ${lead ? `<span class="latest__more" aria-hidden="true">${esc(cardLabel(a))} <span class="link-arrow">${a.download ? "↓" : "→"}</span></span>` : ""}
-          </div>
-        </li>`;
-  };
   return `<div class="latest">
-        <ol class="latest__list" aria-label="Newest resources">
-        ${items.map(entry).join("\n        ")}
-        </ol>
+      <ul class="rcards" aria-label="Newest resources">${items.map((a, i) => rcard(a, i === 0)).join("")}
+      </ul>
       </div>`;
 }
 
