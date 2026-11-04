@@ -190,6 +190,97 @@
   #combo .under .card .s { margin-top: 4px; font-size: 22px; }
   #combo .under .notes { grid-column: 2; }
   #combo .under .bot { grid-column: 3; }
+
+  /* ---- no-code automation: anatomy ---- */
+  #auto-flow .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  #auto-flow .row .card { display: flex; flex-direction: column; padding: 32px 30px 34px; min-height: 380px; }
+  #auto-flow .row .card .tile { margin-bottom: 24px; }
+  #auto-flow .lbl { margin: 0 0 8px; font-size: 22px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(26 26 26 / 0.55); }
+  #auto-flow .logos { display: flex; gap: 12px; margin-top: auto; padding-top: 22px; }
+  #auto-flow .under { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 110px; }
+  #auto-flow .under .card { display: flex; align-items: center; gap: 26px; padding: 28px 32px; }
+  #auto-flow .fail { background: var(--stone-2); }
+  #auto-flow .ok { background: var(--pink-tint); }
+  .lab { position: absolute; z-index: 2; padding: 4px 14px; border-radius: 999px; background: var(--paper); font-size: 24px; font-weight: 700; transform: translate(-50%, -50%); white-space: nowrap; }
+
+  /* ---- no-code automation: worth automating? ---- */
+  #auto-worth .list { display: grid; gap: 18px; }
+  #auto-worth .item { display: flex; align-items: center; gap: 28px; padding: 22px 30px; }
+  #auto-worth .item .tile { width: 72px; height: 72px; border-radius: 18px; }
+  #auto-worth .item .tile svg { width: 44px; height: 44px; }
+  #auto-worth .item .t { font-size: 33px; }
+  #auto-worth .item .s { margin-top: 4px; font-size: 25px; }
+  #auto-worth .box { flex: none; width: 54px; height: 54px; margin-left: auto; border-radius: 14px; background: var(--stone-2); box-shadow: inset 0 0 0 2px rgb(26 26 26 / 0.18); }
+  #auto-worth .score { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 44px; }
+  #auto-worth .score div { padding: 24px 28px; border-radius: 24px; font-size: 26px; line-height: 1.35; }
+  #auto-worth .score b { display: block; margin-bottom: 6px; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 34px; letter-spacing: -0.02em; }
+  #auto-worth .s1 { background: var(--yellow-pastel); } #auto-worth .s2 { background: var(--pink-tint); } #auto-worth .s3 { background: var(--stone-2); }
+
+  /* ---- no-code automation: five tests ---- */
+  #auto-tests .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+  #auto-tests .card { display: flex; flex-direction: column; padding: 30px 26px 32px; min-height: 430px; }
+  #auto-tests .card .tile { margin-bottom: 22px; width: 76px; height: 76px; }
+  #auto-tests .card .t { font-size: 31px; }
+  #auto-tests .card .s { font-size: 24px; }
+  #auto-tests .exp { min-height: 112px; margin: auto 0 0; padding-top: 18px; border-top: 1px solid rgb(26 26 26 / 0.12); font-size: 23px; font-weight: 600; line-height: 1.35; }
+  #auto-tests .exp span { display: block; font-weight: 700; color: rgb(26 26 26 / 0.55); }
+
+  /* ---- research assistant: the loop ---- */
+  #research-loop .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  #research-loop .row .card { display: flex; flex-direction: column; padding: 32px 30px 34px; min-height: 400px; }
+  #research-loop .row .card .tile { margin-bottom: 24px; }
+  #research-loop .row .card:last-child { background: var(--yellow-pastel); }
+  #research-loop .ex { margin: auto 0 0; padding-top: 18px; border-top: 1px solid rgb(26 26 26 / 0.12); font-size: 23px; line-height: 1.35; color: rgb(26 26 26 / 0.8); }
+  #research-loop .back { position: relative; height: 150px; }
+  #research-loop .back span { position: absolute; left: 38.6%; top: 92px; transform: translate(-50%, -50%); z-index: 2; padding: 8px 22px; border-radius: 999px; background: var(--paper); font-size: 26px; font-weight: 600; white-space: nowrap; }
+
+  /* ---- research assistant: better questions ---- */
+  #ask-better .head { display: grid; grid-template-columns: 1fr 1.4fr; gap: 90px; margin-bottom: 18px; font-size: 24px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(26 26 26 / 0.55); }
+  #ask-better .pairs { position: relative; display: grid; grid-template-columns: 1fr 1.4fr; column-gap: 90px; row-gap: 26px; }
+  #ask-better .q { display: flex; align-items: center; gap: 24px; padding: 24px 28px; font-size: 28px; line-height: 1.38; }
+  #ask-better .q .tile { width: 64px; height: 64px; border-radius: 16px; }
+  #ask-better .q .tile svg { width: 40px; height: 40px; }
+  #ask-better .vague { background: var(--stone-2); color: rgb(26 26 26 / 0.7); }
+  #ask-better .good b { font-weight: 700; }
+
+  /* ---- privacy: the billboard test ---- */
+  #billboard-test .wrap2 { position: relative; display: grid; grid-template-columns: 760px 1fr; column-gap: 140px; align-items: start; }
+  #billboard-test .board { padding: 50px 52px 54px; }
+  #billboard-test .board .say { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 50px; line-height: 1.12; letter-spacing: -0.03em; }
+  #billboard-test .board .sub { margin: 22px 0 0; font-size: 27px; line-height: 1.4; color: rgb(26 26 26 / 0.7); }
+  #billboard-test .bars { display: flex; gap: 12px; margin-top: 30px; }
+  #billboard-test .bars span { height: 22px; border-radius: 11px; background: var(--stone); }
+  #billboard-test .posts { display: flex; justify-content: space-between; width: 460px; margin: 0 auto; }
+  #billboard-test .posts span { width: 30px; height: 150px; border-radius: 0 0 8px 8px; background: rgb(26 26 26 / 0.12); }
+  #billboard-test .ans { display: grid; gap: 30px; padding-top: 10px; }
+  #billboard-test .ans .card { display: flex; align-items: center; gap: 24px; padding: 24px 28px; }
+  #billboard-test .ans .t { font-size: 32px; }
+  #billboard-test .ans .s { margin-top: 6px; font-size: 24px; }
+  #billboard-test .a-yes { background: var(--yellow-pastel); } #billboard-test .a-no { background: var(--pink-tint); }
+  #billboard-test .if { margin: 0 0 4px; font-size: 21px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(26 26 26 / 0.55); }
+  #billboard-test .note { margin: 34px 0 0; font-size: 25px; color: rgb(26 26 26 / 0.7); }
+
+  /* ---- privacy: three groups ---- */
+  #share-tiers .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  #share-tiers .card { padding: 34px 32px 36px; }
+  #share-tiers .head { display: flex; align-items: center; gap: 22px; margin-bottom: 24px; }
+  #share-tiers .head .t { font-size: 36px; }
+  #share-tiers ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  #share-tiers li { position: relative; padding-left: 30px; font-size: 26px; line-height: 1.35; }
+  #share-tiers li::before { content: ""; position: absolute; left: 0; top: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--pink); }
+  #share-tiers .c2 li::before { background: var(--yellow); } #share-tiers .c3 li::before { background: rgb(26 26 26 / 0.3); }
+  #share-tiers .c1 { background: var(--pink-tint); } #share-tiers .c2 { background: var(--yellow-pastel); }
+
+  /* ---- privacy: redaction ---- */
+  #redact .pair { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 110px; }
+  #redact .lbl { margin: 0 0 18px; font-size: 24px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(26 26 26 / 0.55); }
+  #redact .msg { padding: 34px 36px 38px; font-size: 29px; line-height: 1.6; min-height: 330px; }
+  #redact mark { padding: 2px 6px; border-radius: 8px; background: var(--pink-tint); color: inherit; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #redact .after mark { background: var(--yellow-pastel); font-weight: 600; }
+  #redact .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 40px; }
+  #redact .keys div { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 20px; background: #fff; font-size: 23px; font-weight: 600; line-height: 1.3; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.08); }
+  #redact .keys .tile { width: 56px; height: 56px; border-radius: 14px; }
+  #redact .keys .tile svg { width: 34px; height: 34px; }
 </style>
 </head>
 <body>
@@ -364,6 +455,125 @@
   <svg class="wires" data-wires="combo"></svg>
 </section>
 
+<!-- ================= No-code automation ================= -->
+<section class="fig fig--yellow" id="auto-flow" data-out="no-code-ai-automation-beginners/automation-anatomy">
+  <p class="kicker">Anatomy of a no-code automation</p>
+  <h2>A trigger, a few steps, and a person before anything goes out</h2>
+  <div class="row">
+    <div class="card"><div class="tile tile--y" data-i="form"></div><p class="lbl">Trigger</p><p class="t">A form is sent</p><p class="s">Someone fills in your enquiry form.</p></div>
+    <div class="card"><div class="tile" data-i="eye"></div><p class="lbl">Check</p><p class="t">Data looks right</p><p class="s">Required fields filled? Not a duplicate?</p></div>
+    <div class="card"><div class="tile tile--w" data-i="chart"></div><p class="lbl">Action</p><p class="t">Log it</p><p class="s">Add a row to the enquiries sheet.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/google-sheets.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile tile--y" data-i="idea"></div><p class="lbl">AI step</p><p class="t">Draft a reply</p><p class="s">Summarize the request and write a first draft.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span></div></div>
+  </div>
+  <div class="under">
+    <div class="card fail" data-n="fail"><div class="tile" data-i="alert"></div><div><p class="t">It stops and tells you</p><p class="s">Nothing half-done goes out.</p></div></div>
+    <div class="card ok" data-n="ok"><div class="tile" data-i="person"></div><div><p class="t">You approve, then it sends</p><p class="s">Read it, edit it, send it.</p></div><span class="logo" style="margin-left:auto"><img src="/assets/icons/tools/gmail.svg" alt=""></span></div>
+  </div>
+  <svg class="wires" data-wires="auto-flow"></svg>
+</section>
+
+<section class="fig fig--pink" id="auto-worth" data-out="no-code-ai-automation-beginners/worth-automating">
+  <p class="kicker">Before you build anything</p>
+  <h2>Is this task worth automating? Five quick checks</h2>
+  <div class="list">
+    <div class="card item"><div class="tile" data-i="week"></div><div><p class="t">It happens often</p><p class="s">Every week, or every day.</p></div><span class="box"></span></div>
+    <div class="card item"><div class="tile tile--y" data-i="process"></div><div><p class="t">The steps are the same every time</p><p class="s">You could write them as a checklist.</p></div><span class="box"></span></div>
+    <div class="card item"><div class="tile" data-i="form"></div><div><p class="t">The information arrives in the same shape</p><p class="s">A form, a sheet, an email with the same fields.</p></div><span class="box"></span></div>
+    <div class="card item"><div class="tile tile--y" data-i="eye"></div><div><p class="t">Mistakes are easy to spot and undo</p><p class="s">Nothing goes to a client, or moves money, unchecked.</p></div><span class="box"></span></div>
+    <div class="card item"><div class="tile" data-i="target"></div><div><p class="t">It frees up real time</p><p class="s">Minutes every week you would rather spend elsewhere.</p></div><span class="box"></span></div>
+  </div>
+  <div class="score"><div class="s1"><b>4–5 ticks</b>A good first automation.</div><div class="s2"><b>2–3 ticks</b>Simplify the process first.</div><div class="s3"><b>0–1 ticks</b>Keep doing it by hand.</div></div>
+</section>
+
+<section class="fig fig--both" id="auto-tests" data-out="no-code-ai-automation-beginners/five-tests">
+  <p class="kicker">Test with sample data first</p>
+  <h2>Five tests to run before you switch it on</h2>
+  <div class="grid">
+    <div class="card"><div class="tile tile--y" data-i="done"></div><p class="t">A normal entry</p><p class="s">Fill in the form the way most people do.</p><p class="exp"><span>Expect</span>One row, one draft</p></div>
+    <div class="card"><div class="tile" data-i="form"></div><p class="t">A missing field</p><p class="s">Leave out the email or the message.</p><p class="exp"><span>Expect</span>It stops and tells you</p></div>
+    <div class="card"><div class="tile tile--y" data-i="copy"></div><p class="t">The same entry twice</p><p class="s">Submit identical details again.</p><p class="exp"><span>Expect</span>No duplicate row or reply</p></div>
+    <div class="card"><div class="tile" data-i="chat"></div><p class="t">Odd input</p><p class="s">A very long message, emoji, another language.</p><p class="exp"><span>Expect</span>A sensible draft, or a flag</p></div>
+    <div class="card"><div class="tile tile--w" data-i="alert"></div><p class="t">A tool is down</p><p class="s">Disconnect the sheet for one test run.</p><p class="exp"><span>Expect</span>An error alert, no lost data</p></div>
+  </div>
+</section>
+
+<!-- ================= AI research assistant ================= -->
+<section class="fig fig--pink" id="research-loop" data-out="use-notebooklm-ai-research-assistant/research-loop">
+  <p class="kicker">Your research assistant, step by step</p>
+  <h2>Gather, ask, check, then make something useful</h2>
+  <div class="row">
+    <div class="card"><div class="tile" data-i="book"></div><p class="t">1. Gather</p><p class="s">A few trusted, dated sources.</p><p class="ex">Three public reports on AI skills at work</p></div>
+    <div class="card"><div class="tile tile--y" data-i="chat"></div><p class="t">2. Ask</p><p class="s">Focused questions, one at a time.</p><p class="ex">“Which skills do all three mention? Cite each.”</p></div>
+    <div class="card"><div class="tile" data-i="eye"></div><p class="t">3. Check</p><p class="s">Open every citation that matters.</p><p class="ex">Does the passage say what the answer says?</p></div>
+    <div class="card"><div class="tile tile--w" data-i="doc"></div><p class="t">4. Create</p><p class="s">A briefing, table or FAQ for one reader.</p><p class="ex">A one-page brief for the team meeting</p></div>
+  </div>
+  <div class="back"><span>Found a gap? Add a better source and ask again</span></div>
+  <svg class="wires" data-wires="research-loop"></svg>
+</section>
+
+<section class="fig fig--yellow" id="ask-better" data-out="use-notebooklm-ai-research-assistant/better-questions">
+  <p class="kicker">Questions that get useful answers</p>
+  <h2>Swap “tell me everything” for a question with a job</h2>
+  <div class="head"><span>Instead of</span><span>Ask</span></div>
+  <div class="pairs">
+    <div class="card q vague" data-n="v1"><div class="tile tile--w" data-i="chat"></div>Summarize these.</div>
+    <div class="card q good" data-n="g1"><div class="tile tile--y" data-i="target"></div><span>What are the <b>three recommendations</b> these sources share? Cite each one.</span></div>
+    <div class="card q vague" data-n="v2"><div class="tile tile--w" data-i="chat"></div>Is this true?</div>
+    <div class="card q good" data-n="g2"><div class="tile" data-i="eye"></div><span>Which source supports the claim about <b>training costs</b>? Quote the passage.</span></div>
+    <div class="card q vague" data-n="v3"><div class="tile tile--w" data-i="chat"></div>What do experts think?</div>
+    <div class="card q good" data-n="g3"><div class="tile tile--y" data-i="process"></div><span>Where do the sources <b>disagree</b>, and what does each one say?</span></div>
+    <div class="card q vague" data-n="v4"><div class="tile tile--w" data-i="chat"></div>Write me a report.</div>
+    <div class="card q good" data-n="g4"><div class="tile" data-i="doc"></div><span>Write a <b>one-page brief for managers</b>: findings, open questions, sources.</span></div>
+  </div>
+  <svg class="wires" data-wires="ask-better"></svg>
+</section>
+
+<!-- ================= What not to share with AI ================= -->
+<section class="fig fig--pink" id="billboard-test" data-out="what-not-to-share-with-ai/billboard-test">
+  <p class="kicker">The billboard test</p>
+  <h2>Before you paste, picture it on a billboard</h2>
+  <div class="wrap2">
+    <div>
+      <div class="card board" data-n="board"><p class="say">Would I be fine seeing this on a billboard by the highway?</p><p class="sub">Your name, a client’s details, your password, your company’s plans, in letters three metres high.</p><div class="bars"><span style="width:38%"></span><span style="width:22%;background:var(--pink)"></span><span style="width:30%"></span></div></div>
+      <div class="posts"><span></span><span></span></div>
+    </div>
+    <div class="ans">
+      <div class="card a-yes" data-n="yes"><div class="tile tile--y" data-i="done"></div><div><p class="if">If yes</p><p class="t">Paste it</p><p class="s">Public, general or made-up information.</p></div></div>
+      <div class="card a-maybe" data-n="maybe"><div class="tile tile--w" data-i="scissors"></div><div><p class="if">If you’re not sure</p><p class="t">Redact it first</p><p class="s">Swap names and numbers for placeholders, or use a tool your work has approved.</p></div></div>
+      <div class="card a-no" data-n="no"><div class="tile" data-i="stop"></div><div><p class="if">If no</p><p class="t">Keep it out</p><p class="s">Passwords, codes, card numbers, IDs, other people’s private details.</p></div></div>
+    </div>
+  </div>
+  <p class="note">A habit, not a prediction: most prompts never become public. The test protects you on the day one does.</p>
+  <svg class="wires" data-wires="billboard-test"></svg>
+</section>
+
+<section class="fig fig--both" id="share-tiers" data-out="what-not-to-share-with-ai/what-to-share">
+  <p class="kicker">What to share, and where</p>
+  <h2>Sort information into three groups before you paste</h2>
+  <div class="cols">
+    <div class="card c1"><div class="head"><div class="tile" data-i="stop"></div><p class="t">Never paste</p></div><ul><li>Passwords and PINs</li><li>One-time and recovery codes</li><li>API keys and access tokens</li><li>Card and bank account numbers</li><li>Passport, SSS, TIN and other ID numbers</li><li>Someone else’s health or legal details</li></ul></div>
+    <div class="card c2"><div class="head"><div class="tile tile--y" data-i="shield"></div><p class="t">Approved tools only</p></div><ul><li>Customer and employee records</li><li>Contracts and pricing</li><li>Financial reports and forecasts</li><li>Unpublished plans and strategy</li><li>Source code and system details</li><li>Internal emails and reports</li></ul></div>
+    <div class="card c3"><div class="head"><div class="tile tile--w" data-i="done"></div><p class="t">Usually fine</p></div><ul><li>Public information</li><li>General questions</li><li>Your own writing, names removed</li><li>Made-up or sample data</li><li>Published articles and reports</li><li>Templates and outlines</li></ul></div>
+  </div>
+  <p class="foot">Not sure which group? Treat it as the stricter one.</p>
+</section>
+
+<section class="fig fig--yellow" id="redact" data-out="what-not-to-share-with-ai/redact-before-you-paste">
+  <p class="kicker">Redact before you paste</p>
+  <h2>Same request, same useful answer, nothing personal in it</h2>
+  <div class="pair">
+    <div><p class="lbl">Before</p><div class="card msg" data-n="before">Write a reminder to <mark>Maria Dela Cruz</mark> (<mark>maria.dc@example.com</mark>, <mark>0917 555 0142</mark>). Invoice <mark>INV-20931</mark> for <mark>₱48,500</mark> is 30 days late. Our account: <mark>1234-5678-90</mark>. Polite but firm.</div></div>
+    <div class="after"><p class="lbl">After</p><div class="card msg" data-n="after">Write a reminder to <mark>[CLIENT NAME]</mark>. Invoice <mark>[INVOICE NO.]</mark> for <mark>[AMOUNT]</mark> is 30 days late. Polite but firm.</div></div>
+  </div>
+  <div class="keys">
+    <div><span class="tile" data-i="person"></span>Names become [CLIENT NAME]</div>
+    <div><span class="tile tile--y" data-i="mail"></span>Emails and phone numbers: delete</div>
+    <div><span class="tile" data-i="card"></span>Account numbers: delete</div>
+    <div><span class="tile tile--y" data-i="doc"></span>Add the real details back yourself</div>
+  </div>
+  <svg class="wires" data-wires="redact"></svg>
+</section>
+
 <script>
 const I = (() => {
   const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
@@ -388,6 +598,11 @@ const I = (() => {
     heart: `<path ${N} d="M24 41C11 32 5 25 5 17a9.5 9.5 0 0 1 19-3 9.5 9.5 0 0 1 19 3c0 8-6 15-19 24Z"/><path ${K} d="M24 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
     assist: `<path ${N} d="M8 5h21l8 8v30H8Z"/><path ${L} d="M29 5v8h8M14 21h15M14 28h10"/><path ${K} d="M37 27l2.6 6.4L46 36l-6.4 2.6L37 45l-2.6-6.4L28 36l6.4-2.6Z"/>`,
     scissors: `<circle ${N} cx="12" cy="36" r="6"/><circle ${N} cx="36" cy="36" r="6"/><path ${L} d="M16 32L36 6M32 32L12 6"/><circle ${K} cx="24" cy="21" r="2.6"/>`,
+    form: `<rect ${N} x="8" y="4" width="32" height="40" rx="3"/><path ${L} d="M15 14h18M15 24h18M15 34h10"/><circle ${K} cx="33" cy="34" r="3.5"/>`,
+    done: `<rect ${N} x="6" y="6" width="36" height="36" rx="4"/><path ${L} d="M15 25l6 6 12-14"/>`,
+    alert: `<path ${N} d="M24 5l20 36H4Z"/><path ${L} d="M24 18v11"/><circle ${K} cx="24" cy="35" r="2.6"/>`,
+    copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
+    card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
   };
 })();
 document.querySelectorAll("[data-i]").forEach((t) => (t.innerHTML = `<svg viewBox="0 0 48 48">${I[t.dataset.i]}</svg>`));
@@ -454,6 +669,35 @@ const WIRES = {
     lines.push([[q[3].cx, q[3].b], [q[3].cx, o[4].cy], [o[4].l, o[4].cy]]); dots.push([q[3].cx, q[3].b], [o[4].l, o[4].cy]); labs.push([(q[3].cx + o[4].l) / 2, o[4].cy - 40, "Not sure"]);
     draw(fig.querySelector(".wires"), lines, dots);
     for (const [x, y, t] of labs) { const s = document.createElement("span"); s.className = "lab"; s.textContent = t; s.style.left = x + "px"; s.style.top = y + "px"; s.style.transform = "translate(-50%,-50%)"; fig.appendChild(s); }
+  },
+  "auto-flow"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), f = g("fail"), o = g("ok"), y = c[0].t + 150;
+    const lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], [c[i + 1].l, y]); }
+    lines.push([[c[3].cx, c[3].b], [c[3].cx, o.t]]); dots.push([c[3].cx, c[3].b], [c[3].cx, o.t, "y"]);
+    const fx = Math.min(c[1].cx, f.r - 60); lines.push([[fx, c[1].b], [fx, f.t]]); dots.push([fx, c[1].b], [fx, f.t]);
+    draw(fig.querySelector(".wires"), lines, dots);
+    const s = document.createElement("span"); s.className = "lab"; s.textContent = "Something missing?"; s.style.left = fx + "px"; s.style.top = (c[1].b + f.t) / 2 + "px"; fig.appendChild(s);
+  },
+  "research-loop"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), y = c[0].t + 150, lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], i === 2 ? [c[i + 1].l, y, "y"] : [c[i + 1].l, y]); }
+    const by = c[0].b + 92; lines.push([[c[2].cx, c[2].b], [c[2].cx, by], [c[0].cx, by], [c[0].cx, c[0].b]]); dots.push([c[2].cx, c[2].b], [c[0].cx, c[0].b]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "ask-better"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), lines = [], dots = [];
+    for (let i = 1; i <= 4; i++) { const v = g("v" + i), q = g("g" + i); lines.push([[v.r, v.cy], [q.l, v.cy]]); dots.push([v.r, v.cy], [q.l, v.cy, "y"]); }
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "billboard-test"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), b = g("board"), a = [g("yes"), g("maybe"), g("no")], mx = Math.round(b.r + 50);
+    const lines = [[[b.r, b.cy], [mx, b.cy]], [[mx, a[0].cy], [mx, a[2].cy]], ...a.map((k) => [[mx, k.cy], [k.l, k.cy]])];
+    draw(fig.querySelector(".wires"), lines, [[b.r, b.cy], ...a.map((k, i) => [k.l, k.cy, i === 0 ? "y" : ""])]);
+  },
+  redact(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), b = g("before"), a = g("after");
+    draw(fig.querySelector(".wires"), [[[b.r, b.cy], [a.l, b.cy]]], [[b.r, b.cy], [a.l, b.cy, "y"]]);
   },
   combo(fig) {
     const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), i = rel(fig.querySelector("[data-n=in]"), fig), nt = rel(fig.querySelector(".under .notes"), fig), bt = rel(fig.querySelector(".under .bot"), fig), y = c[0].t + 70;
