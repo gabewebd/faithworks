@@ -45,6 +45,12 @@ const ICONS = {
   shield: `<path ${N} d="M24 4l16 6v12c0 10-7 17-16 22C15 39 8 32 8 22V10Z"/><path ${L} d="M17 24l5 5 9-10"/>`,
   assist: `<path ${N} d="M8 5h21l8 8v30H8Z"/><path ${L} d="M29 5v8h8M14 21h15M14 28h10"/><path ${K} d="M37 27l2.6 6.4L46 36l-6.4 2.6L37 45l-2.6-6.4L28 36l6.4-2.6Z"/>`,
   branch: `<circle ${N} cx="14" cy="10" r="4"/><circle ${N} cx="14" cy="38" r="4"/><circle ${K} cx="34" cy="14" r="4"/><path ${L} d="M14 14v20M34 18v6L14 34"/>`,
+  search: `<circle ${N} cx="20" cy="20" r="13"/><path ${L} d="M30 30l12 12"/><circle ${K} cx="20" cy="20" r="4"/>`,
+  form: `<rect ${N} x="8" y="4" width="32" height="40" rx="3"/><path ${L} d="M15 14h18M15 24h18M15 34h10"/><circle ${K} cx="33" cy="34" r="3.5"/>`,
+  person: `<circle ${N} cx="24" cy="15" r="9"/><path ${N} d="M7 43c1-10 8-16 17-16s16 6 17 16Z"/><circle ${K} cx="24" cy="15" r="3"/>`,
+  key: `<circle ${N} cx="15" cy="24" r="10"/><circle ${K} cx="15" cy="24" r="3.5"/><path ${L} d="M25 24h18M37 24v7M43 24v5"/>`,
+  card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
+  id: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><circle ${N} cx="16" cy="22" r="5"/><path ${L} d="M8 34c1-5 4-7 8-7s7 2 8 7M28 18h10M28 25h10"/><rect ${K} x="28" y="30" width="7" height="3"/>`,
 };
 
 /* ---- Pieces ---- */
@@ -227,7 +233,72 @@ async function modes() {
   return doc("Chatbot, Copilot, or AI Agent", "Three ways to use AI (a chatbot that answers your questions, a copilot that helps while you work, an AI agent that carries out the steps) joined by one straight line, framed by tilted, softly blurred AI tool logos, each shown once (Perplexity, NotebookLM, Codex, Grok, Claude, Gemini, ChatGPT, Hermes Agent, Obsidian, Claude Code and Gamma).", await defs(bg, extra), body);
 }
 
-const SCENES = { niche, agents, beginners, purpose, github, setup, modes };
+// A concept icon on a large white tile, the same lift as a logo tile
+function iconCard(x, y, s, name, fill) {
+  const rx = Math.round(s * 0.22), m = Math.round(s * 0.2);
+  return `<g>${halo(x, y, s, s, rx)}<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="#FFFFFF"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${rx}" fill="url(#light)"/>${iconTile(x + m, y + m, s - 2 * m, name, fill)}</g>`;
+}
+
+/* ---- 8. Automate a repetitive task — horizontal gradient, reversed (yellow left to pink right):
+   a form response runs through a sheet and an AI draft to your approval, then out by email ---- */
+async function automate() {
+  const bg = `<linearGradient id="bg" x1="0" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F3C0CB"/></linearGradient>`;
+  const trig = ["form", "yellow", "New form response", "The trigger"], ok = ["person", "pink", "Your OK", "Before anything is sent"];
+  const tw = chip(0, 0, ...trig).w, ow = chip(0, 0, ...ok).w;
+  const ss = 160, as = 220, gs = 160, gap = 70, y = 540;
+  const total = tw + gap + ss + gap + as + gap + ow + gap + gs, x0 = Math.round(960 - total / 2);
+  const t = chip(x0 + tw / 2, 380, ...trig);
+  const sx = t.right + gap, ax = sx + ss + gap, o = chip(Math.round(ax + as + gap + ow / 2), 700, ...ok), gx = o.right + gap;
+  const wires = [
+    [[t.right, 380], [Math.round(t.right + gap / 2), 380], [Math.round(t.right + gap / 2), y], [sx, y]],
+    [[sx + ss, y], [ax, y]],
+    [[ax + as, y], [Math.round(ax + as + gap / 2), y], [Math.round(ax + as + gap / 2), 700], [o.left, 700]],
+    [[o.right, 700], [Math.round(o.right + gap / 2), 700], [Math.round(o.right + gap / 2), y], [gx, y]],
+  ];
+  const nodes = [[t.right, 380], [sx, y], [sx + ss, y], [ax, y], [ax + as, y], [o.left, 700], [o.right, 700]].map((p) => node(...p)).join("") + node(gx, y, C.yellow);
+  const body = layer("connectors", wires.map(wire).join("")) + layer("trigger", t.svg) + layer("sheet", logo(sx, y - ss / 2, ss, "google-sheets")) +
+    layer("ai-step", logo(ax, y - as / 2, as, "claude-color")) + layer("approval", o.svg) + layer("action", logo(gx, y - gs / 2, gs, "gmail")) + layer("nodes", nodes);
+  return doc("Automate a Repetitive Task Without Coding", "A new form response (the trigger) joined by straight lines to Google Sheets, then an AI step (Claude), then your OK before anything is sent, then Gmail.", await defs(bg), body);
+}
+
+/* ---- 9. Build your own AI research assistant — radial gradient from the top: three kinds of
+   source feed one notebook, which answers with citations and builds a briefing ---- */
+async function research() {
+  const bg = `<radialGradient id="bg" cx="960" cy="0" r="1300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F5C9D2"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE3A2"/></radialGradient>`;
+  const ys = [300, 540, 780], ss = 150, sx = 300, ns = 300, nx = 960 - ns / 2 - 40;
+  const outs = [["chat", "yellow", "Answers from your sources", "Every claim cited"], ["doc", "pink", "A briefing you can check", "Table, FAQ or summary"]];
+  const left = nx + ns + 150; // both chips share a left edge
+  const o = [chip(left + chip(0, 0, ...outs[0]).w / 2, 400, ...outs[0]), chip(left + chip(0, 0, ...outs[1]).w / 2, 680, ...outs[1])];
+  const lb = Math.round(sx + ss + (nx - sx - ss) / 2), rb = Math.round(nx + ns + 75);
+  const wires = [
+    ...ys.map((yy) => (yy === 540 ? [[sx + ss, 540], [nx, 540]] : [[sx + ss, yy], [lb, yy], [lb, 540]])),
+    [[nx + ns, 540], [rb, 540]], [[rb, 400], [rb, 680]], [[rb, 400], [o[0].left, 400]], [[rb, 680], [o[1].left, 680]],
+  ];
+  const sources = logo(sx, ys[0] - ss / 2, ss, "google-docs") + iconCard(sx, ys[1] - ss / 2, ss, "doc", "yellow") + iconCard(sx, ys[2] - ss / 2, ss, "search", "pink");
+  const nb = `<g>${halo(nx, 540 - ns / 2, ns, ns, 66)}<rect x="${nx}" y="${540 - ns / 2}" width="${ns}" height="${ns}" rx="66" fill="#FFFFFF"/><rect x="${nx}" y="${540 - ns / 2}" width="${ns}" height="${ns}" rx="66" fill="url(#light)"/>${iconTile(nx + 60, 540 - ns / 2 + 60, ns - 120, "book", "pink")}</g>`;
+  const nodes = ys.map((yy) => node(sx + ss, yy)).join("") + node(nx, 540) + node(nx + ns, 540, C.yellow) + o.map((c, i) => node(c.left, i ? 680 : 400)).join("");
+  const body = layer("connectors", wires.map(wire).join("")) + layer("sources", sources) + layer("notebook", nb) + layer("outputs", o.map((c) => c.svg).join("")) + layer("nodes", nodes);
+  return doc("Build Your Own AI Research Assistant", "Three kinds of source (a Google Doc, a PDF report and a web page) joined by straight lines to one AI notebook, which gives answers from your sources with every claim cited, and a briefing you can check.", await defs(bg), body);
+}
+
+/* ---- 10. What should you never give to AI? — vertical gradient, reversed (yellow top to pink
+   bottom): a billboard holding a password, a card and an ID, fed by the AI tools you type into ---- */
+async function billboard() {
+  const bg = `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE2A0"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></linearGradient>`;
+  const bx = 600, by = 170, bw = 720, bh = 420, ts = 150, gap = 56, tx0 = 960 - (3 * ts + 2 * gap) / 2, ty = by + (bh - ts) / 2;
+  const board = `<g>${halo(bx, by, bw, bh, 44)}<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="44" fill="#FFFFFF"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="44" fill="url(#light)"/>` +
+    [["key", "pink"], ["card", "yellow"], ["id", "pink"]].map(([n, f], i) => iconTile(tx0 + i * (ts + gap), ty, ts, n, f)).join("") + `</g>`;
+  const posts = [760, 1132].map((x) => `<rect x="${x}" y="${by + bh}" width="28" height="330" rx="6" fill="${C.ink}" fill-opacity="0.12"/>`).join("");
+  const s = chip(960, 790, "shield", "yellow", "Share less", "Redact before you paste");
+  const L1 = 180, L2 = 200, lx = 250, rx = 1490;
+  const wires = [[[lx + L1, 300], [bx, 300]], [[lx + L1, 600], [500, 600], [500, 470], [bx, 470]], [[bx + bw, 380], [rx, 380]]];
+  const logos = logo(lx, 300 - L1 / 2, L1, "gemini") + logo(lx, 600 - L1 / 2, L1, "chatgpt") + logo(rx, 380 - L2 / 2, L2, "claude-color");
+  const nodes = ends(wires.slice(0, 2)) + node(bx + bw, 380) + node(rx, 380);
+  const body = layer("posts", posts) + layer("connectors", wires.map(wire).join("")) + layer("billboard", board) + layer("ai-tools", logos) + layer("advice", s.svg) + layer("nodes", nodes);
+  return doc("What Should You Never Give to AI?", "A billboard on two posts showing a key, a payment card and an ID card, joined by straight lines to Gemini, ChatGPT and Claude, with the advice: share less, redact before you paste.", await defs(bg), body);
+}
+
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>

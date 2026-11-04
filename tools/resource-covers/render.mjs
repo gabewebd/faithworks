@@ -28,6 +28,9 @@ const SCENES = {
   github: "github-for-beginners",
   setup: "how-to-set-up-an-ai-agent",
   modes: "chatbot-vs-copilot-vs-ai-agent",
+  automate: "no-code-ai-automation-beginners",
+  research: "use-notebooklm-ai-research-assistant",
+  billboard: "what-not-to-share-with-ai",
 };
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
 for (const k of Object.keys(SCENES)) if (only.length && !only.includes(k)) delete SCENES[k];
