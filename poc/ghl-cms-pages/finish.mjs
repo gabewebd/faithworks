@@ -5,8 +5,9 @@ import { cleanPath } from "../../tools/layout.mjs";
 import { currentUrl } from "../../tools/content.mjs";
 
 // The template calls whose output comes from the CMS: event cards, the Workshops calendar, the
-// events photo gallery and the testimonial stack. Everything else on the page stays as built.
-export const LIVE = ["events", "eventCalendar", "eventGallery", "voices"];
+// events photo gallery, the testimonial stack, the event announcement bar and the latest
+// resources. Everything else on the page stays as built.
+export const LIVE = ["events", "eventCalendar", "eventGallery", "voices", "eventBanner", "latestResources"];
 
 // <!--fw-live:name:arg:hash--> … <!--/fw-live--> around each one
 export const START = /^fw-live:(\w+):([\w.-]*):([0-9a-z]+)$/;

@@ -1,6 +1,7 @@
 // js/fw-live.js (bundled by build.mjs): on a GHL page, loads the CMS's published content
 // (GET /api/public/content, open to any site, read only, no key) and brings each CMS-driven section
-// up to date: event cards, the Workshops calendar, the events gallery and the testimonial stack.
+// up to date: event cards, the Workshops calendar, the events gallery, the testimonial stack, the
+// event announcement bar and the latest resources (published only: drafts never reach this endpoint).
 //
 // The page arrives with those sections as they were when it was built, each between
 // <!--fw-live:name:arg:hash--> and <!--/fw-live-->. That markup is the loading state, and it stays
