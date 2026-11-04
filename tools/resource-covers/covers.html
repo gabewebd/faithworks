@@ -262,7 +262,7 @@ async function automate() {
 }
 
 /* ---- 9. Build your own AI research assistant — radial gradient from the top: three kinds of
-   source feed one notebook, which answers with citations and builds a briefing ---- */
+   source feed NotebookLM, which answers with citations and builds a briefing ---- */
 async function research() {
   const bg = `<radialGradient id="bg" cx="960" cy="0" r="1300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F5C9D2"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE3A2"/></radialGradient>`;
   const ys = [300, 540, 780], ss = 150, sx = 300, ns = 300, nx = 960 - ns / 2 - 40;
@@ -275,10 +275,10 @@ async function research() {
     [[nx + ns, 540], [rb, 540]], [[rb, 400], [rb, 680]], [[rb, 400], [o[0].left, 400]], [[rb, 680], [o[1].left, 680]],
   ];
   const sources = logo(sx, ys[0] - ss / 2, ss, "google-docs") + iconCard(sx, ys[1] - ss / 2, ss, "doc", "yellow") + iconCard(sx, ys[2] - ss / 2, ss, "search", "pink");
-  const nb = `<g>${halo(nx, 540 - ns / 2, ns, ns, 66)}<rect x="${nx}" y="${540 - ns / 2}" width="${ns}" height="${ns}" rx="66" fill="#FFFFFF"/><rect x="${nx}" y="${540 - ns / 2}" width="${ns}" height="${ns}" rx="66" fill="url(#light)"/>${iconTile(nx + 60, 540 - ns / 2 + 60, ns - 120, "book", "pink")}</g>`;
+  const nb = logo(nx, 540 - ns / 2, ns, "notebooklm"); // the NotebookLM mark at the centre
   const nodes = ys.map((yy) => node(sx + ss, yy)).join("") + node(nx, 540) + node(nx + ns, 540, C.yellow) + o.map((c, i) => node(c.left, i ? 680 : 400)).join("");
   const body = layer("connectors", wires.map(wire).join("")) + layer("sources", sources) + layer("notebook", nb) + layer("outputs", o.map((c) => c.svg).join("")) + layer("nodes", nodes);
-  return doc("Build Your Own AI Research Assistant", "Three kinds of source (a Google Doc, a PDF report and a web page) joined by straight lines to one AI notebook, which gives answers from your sources with every claim cited, and a briefing you can check.", await defs(bg), body);
+  return doc("Build Your Own AI Research Assistant", "Three kinds of source (a Google Doc, a PDF report and a web page) joined by straight lines to the NotebookLM logo, which gives answers from your sources with every claim cited, and a briefing you can check.", await defs(bg), body);
 }
 
 /* ---- 10. What should you never give to AI? — vertical gradient, reversed (yellow top to pink
