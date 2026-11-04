@@ -44,8 +44,15 @@ window.FW_CONFIG = {
    Motion lives in CSS; this file adds/removes state classes, except the pointer-driven hero
    and the testimonial deck, which need per-frame values.
    ========================================================================== */
+/* If this file is loaded twice (e.g. a page pasted twice into one GHL Custom Code element), the
+   second copy does nothing: running twice sets every GSAP "from" animation up twice, and the
+   second starts from the first one's hidden state, which leaves things (the kit story frame)
+   invisible for good. */
+window.__fwMainDup = !!window.__fwMainLoaded;
+window.__fwMainLoaded = true;
 (function () {
   "use strict";
+  if (window.__fwMainDup) return; // this file already ran on the page (see the top)
 
   /* ---- 1. Helpers --------------------------------------------------------- */
   var doc = document;
@@ -1386,6 +1393,7 @@ window.FW_CONFIG = {
    ========================================================================== */
 (function () {
   "use strict";
+  if (window.__fwMainDup) return; // this file already ran on the page (see the top)
 
   /* ---- 1. Setup ----------------------------------------------------------- */
   var doc = document;
@@ -1644,7 +1652,7 @@ window.FW_CONFIG = {
       var first = 0;
       triggers.forEach(function (t, n) { if (t.scroll() >= t.start) first = n; });
       show(first, 1, true);
-      gsap.from("[data-story-frame]", {
+      gsap.from(story.querySelector("[data-story-frame]"), {
         autoAlpha: 0, y: 40, duration: 1, ease: "expo.out",
         scrollTrigger: { trigger: story, start: "top 85%", once: true, onEnter: function () { settleArt(arts[current], 0.15, 1); } }
       });
@@ -1895,6 +1903,7 @@ window.FW_CONFIG = {
    ========================================================================== */
 (function () {
   "use strict";
+  if (window.__fwMainDup) return; // this file already ran on the page (see the top)
   var doc = document;
   var cfg = window.FW_CONFIG || { forms: { mode: "preview" } };
   var track = window.fwTrack || function () {};
@@ -2125,6 +2134,7 @@ window.FW_CONFIG = {
    ========================================================================== */
 (function () {
   "use strict";
+  if (window.__fwMainDup) return; // this file already ran on the page (see the top)
 
   var doc = document;
   var page = doc.querySelector(".hr-page");
@@ -2261,6 +2271,7 @@ window.FW_CONFIG = {
 /* fw-lightbox:start */
 (function () {
   "use strict";
+  if (window.__fwMainDup) return; // this file already ran on the page (see the top)
   if (window.FWLightbox) return;
   var CSS = ".fw-zoom{cursor:zoom-in}" +
     ".fw-zoom:focus-visible{outline:3px solid #FBC522;outline-offset:3px}" +
