@@ -1,17 +1,13 @@
 // Publishing workflow. The server enforces these rules (server/services/records.mjs);
 // the dashboard uses the same table only to decide which buttons to show.
-import { isSuperAdmin, normalizeRole, COLLECTIONS } from "./schema.mjs";
+import { isSuperAdmin, normalizeRole } from "./schema.mjs";
 
 // who: "editor" = every CMS user (Authors and Super Admins), whoever created the item;
 // "admin" = Super Admins only. Publishing is one step: there is no review or approval role.
-// schedule / unschedule: only collections marked `schedulable` (resources). Schedule again on a
-// scheduled item reschedules it. Publish on a scheduled item publishes it now.
 export const ACTIONS = {
-  publish: { label: "Publish", from: ["draft", "scheduled"], to: "published", who: "editor", confirm: true },
-  schedule: { label: "Schedule", from: ["draft", "scheduled"], to: "scheduled", who: "editor", confirm: true, schedulable: true },
-  unschedule: { label: "Cancel schedule", from: ["scheduled"], to: "draft", who: "editor", confirm: true, schedulable: true },
+  publish: { label: "Publish", from: ["draft"], to: "published", who: "editor", confirm: true },
   unpublish: { label: "Unpublish", from: null, to: "draft", who: "editor", live: true, confirm: true },
-  archive: { label: "Archive", from: ["draft", "scheduled", "published"], to: "archived", who: "editor", confirm: true },
+  archive: { label: "Archive", from: ["draft", "published"], to: "archived", who: "editor", confirm: true },
   restore: { label: "Restore to draft", from: ["archived"], to: "draft", who: "editor" },
   delete: { label: "Delete", from: null, to: null, who: "editor", confirm: true },
 };
@@ -66,7 +62,6 @@ export function allowedActions(user, collection, rec, { live = false } = {}) {
     if (a.who === "editor" && !edit) continue;
     if (a.live && !live) continue;
     if (a.from && !a.from.includes(rec.status)) continue;
-    if (a.schedulable && !COLLECTIONS[collection]?.schedulable) continue;
     if (collection === "settings" && ["archive", "delete", "unpublish", "restore"].includes(name)) continue;
     out.push(name);
   }
@@ -74,8 +69,7 @@ export function allowedActions(user, collection, rec, { live = false } = {}) {
 }
 
 // Status after a save. Editing published content makes a new draft; the live copy keeps
-// serving until the draft is published. A scheduled item stays scheduled (the server checks
-// that it can still be published at its time; services/records.mjs).
+// serving until the draft is published.
 export function statusAfterSave(status) {
-  return status === "archived" || status === "scheduled" ? status : "draft";
+  return status === "archived" ? "archived" : "draft";
 }
