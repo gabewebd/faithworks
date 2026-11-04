@@ -218,16 +218,40 @@ window.FW_CONFIG = {
     var stageTop = function (i) {
       return journey.getBoundingClientRect().top + window.scrollY - headH() + pinRun() * (i + 0.5) / scenes.length;
     };
+    // Stacked layout (home journey, narrow screens): the open stage's scene sits right under its tab,
+    // like an accordion, instead of below all five; wider screens keep it in its own column
+    var stackQuery = window.matchMedia("(max-width: 900px)");
+    var scenesBox = $("#journey.section--field .scenes");
+    var stepsBox = scenesBox && $("#journey.section--field .steps");
+    var introBox = scenesBox && $("#journey.section--field .journey__intro");
+    var placeScenes = function (i) {
+      if (!stepsBox || !introBox) return;
+      if (stackQuery.matches) stepsBox.insertBefore(scenesBox, stepTabs[i].nextSibling);
+      else if (scenesBox.parentNode === stepsBox) introBox.parentNode.insertBefore(scenesBox, introBox.nextSibling);
+    };
     var selectStep = tablist($(".steps"), stepTabs, function (i) {
       current = i;
+      // keep the tapped tab where it was on screen when the scene above it closes
+      var tabTop = stepTabs[i].getBoundingClientRect().top;
       scenes.forEach(function (s, n) {
         var on = n === i;
         s.hidden = !on;
         s.classList.toggle("is-active", on);
       });
+      if (stepsBox && stackQuery.matches) {
+        placeScenes(i);
+        var shift = stepTabs[i].getBoundingClientRect().top - tabTop;
+        if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+      }
       // A click or arrow key moves the page to that stage so scrolling carries on from there
       if (!fromScroll && pinned()) window.scrollTo({ top: stageTop(i), behavior: "smooth" });
     });
+    if (stepsBox) {
+      placeScenes(current);
+      var onStackChange = function () { placeScenes(current); };
+      if (stackQuery.addEventListener) stackQuery.addEventListener("change", onStackChange);
+      else if (stackQuery.addListener) stackQuery.addListener(onStackChange);
+    }
 
     // Pinned on wide screens: scrolling through the section steps through the stages, no clicks needed
     if (journey && selectStep) {
