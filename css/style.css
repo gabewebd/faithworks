@@ -2390,6 +2390,13 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 @media (max-width: 640px) { .event-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Event cards (Workshops list) */
 .events { display: grid; gap: 14px; }
+/* event cards: no picture (the calendar panel keeps the posters), two per row so a yellow stub sits beside a pink one */
+.events { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+.events > .event:only-child { grid-column: 1 / -1; }
+.events > .event > .event__img { display: none; }
+@media (min-width: 1241px) { .events > .event { grid-template-columns: clamp(112px, 8.5vw, 136px) minmax(0, 1fr); } }
+@media (max-width: 1240px) { .events > .event > .event__date { grid-row: auto; } }
+@media (max-width: 960px) { .events { grid-template-columns: minmax(0, 1fr); } }
 /* The date is a full-height AI Yellow stub flush with the card's left edge; time and place sit
    under the summary as the calendar's badges (.cal__tag), so the card reads like a ticket. */
 .event { --event-pad: clamp(18px, 2vw, 26px); display: grid; grid-template-columns: clamp(124px, 10vw, 148px) minmax(0, 1fr) minmax(0, 0.42fr); gap: clamp(20px, 2.4vw, 34px); align-items: start; padding: var(--event-pad); overflow: hidden; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
