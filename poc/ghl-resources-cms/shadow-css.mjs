@@ -75,10 +75,8 @@ export const EXTRA_CSS = `.fw-main [id]{scroll-margin-top:calc(var(--header-h) +
 .rcards .rcard__body{flex:1;justify-content:flex-start;gap:8px;padding:0}
 .rcards .rcard h3,.rcards .rcard--lead h3{font-size:clamp(20px,1.7vw,24px)}
 .rcards .rcard__excerpt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.rcards .rcard__more{margin-top:auto;padding-top:6px}
 .rcards .rcard--lead{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,6fr) minmax(0,6fr);align-items:center;gap:clamp(20px,3.4vw,56px);padding-bottom:clamp(40px,4vw,56px);border-bottom:1px solid var(--line)}
 .rcards .rcard--lead .rcard__body{justify-content:center}
-.rcards .rcard--lead .rcard__more{margin-top:6px;padding-top:0}
 .rcards .rcard--lead h3{font-size:clamp(28px,3.2vw,46px)}
 @media (max-width:960px){.rcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){
@@ -87,12 +85,36 @@ export const EXTRA_CSS = `.fw-main [id]{scroll-margin-top:calc(var(--header-h) +
 .rcards .rcard h3,.rcards .rcard--lead h3{font-size:22px}
 .rcards .rcard__meta{font-size:13px}
 .rcards .rcard__excerpt{font-size:15px}
-.rcards .rcard__more{display:none}
 }
+/* Resource pages (9 cards a page): page numbers as the type chips' pink-outlined pills, the current
+   page filled Charcoal; Previous / Next as light grey outlined pills with arrow icons */
+.rcards__pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 12px;margin-top:clamp(40px,5vw,64px)}
+.rcards__pages{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;padding:0;list-style:none}
+.rcards__page{min-width:40px;height:40px;padding:0 12px;border:1px solid var(--pink);border-radius:999px;background:transparent;font-family:inherit;font-size:14px;font-weight:600;line-height:1;color:var(--ink);cursor:pointer;transition:background-color var(--dur-fast,.15s)}
+.rcards__page:hover{background:var(--pink-tint)}
+.rcards__page[aria-current="page"]{border-color:var(--ink);background:var(--ink);color:var(--white);cursor:default}
+.rcards__step{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:transparent;font-family:inherit;font-size:14px;font-weight:600;line-height:1;color:var(--ink);cursor:pointer;transition:background-color var(--dur-fast,.15s),border-color var(--dur-fast,.15s)}
+.rcards__step:hover:not(:disabled){border-color:var(--pink);background:var(--pink-tint)}
+.rcards__step:disabled{opacity:.4;cursor:default}
+.rcards__arrow{flex:none;transition:transform var(--dur-fast,.15s)}
+.rcards__step:hover:not(:disabled) .rcards__arrow{transform:translateX(2px)}
+.rcards__step:first-child:hover:not(:disabled) .rcards__arrow{transform:translateX(-2px)}
+.rcards__gap{min-width:20px;text-align:center;color:var(--ink)}
+@media (max-width:640px){.rcards__pager{margin-top:32px}.rcards__step{padding:0 14px}}
 /* Article contents: no rail or bar; the heading in view sits on a filled Faith Pink tint */
 .toc__list{gap:2px;border-left:0}
 .toc__link{margin-left:0;padding:8px 12px;border-left:0;border-radius:var(--r-sm);transition:color var(--dur-fast),background-color var(--dur) var(--ease-out)}
 .toc__link:hover{background:rgb(247 229 230/.6)}
 .toc__link.is-active{background:var(--pink-tint)}
 @keyframes fw-skel{0%{background-position:100% 0}100%{background-position:0 0}}
-@media (prefers-reduced-motion:reduce){.fw-skel .fw-skel__bar,.fw-skel .fw-skel__img{animation:none}}`;
+@media (prefers-reduced-motion:reduce){.fw-skel .fw-skel__bar,.fw-skel .fw-skel__img{animation:none}}
+/* Page hero: heading and lead rise in, as on the site (main.js .motion + .is-in → fw-rise). Scoped to the
+   hero only: the site's global .motion mode would also gate cards and sections the embed shows at once.
+   runtime.js keeps the hero element when the live content replaces the loading frame, so it plays once. */
+@keyframes fw-hero-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:no-preference){
+.phero__copy[data-reveal]>*{animation:fw-hero-rise 700ms var(--ease-out,cubic-bezier(.215,.61,.355,1)) both}
+.phero__copy[data-reveal]>:nth-child(2){animation-delay:80ms}
+.phero__copy[data-reveal]>:nth-child(3){animation-delay:160ms}
+.phero__copy[data-reveal]>:nth-child(n+4){animation-delay:240ms}
+}`;

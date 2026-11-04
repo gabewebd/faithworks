@@ -154,7 +154,7 @@ code { font-size: 0.9em; }
 .band--yellow { background: var(--yellow-pastel); }
 
 /* Pink & Yellow tech-textured gradient band (Sound familiar / challenges) ---- */
-.band--gradient-textured {
+.band--gradient-textured, .resource {
   position: relative;
   overflow: hidden;
   background-color: var(--paper, #FAF8F4);
@@ -173,7 +173,7 @@ code { font-size: 0.9em; }
 }
 
 /* Technical scanline raster overlay */
-.band--gradient-textured::before {
+.band--gradient-textured::before, .resource::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1392,7 +1392,9 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .faq details[open]:nth-child(odd) summary::after { background: var(--pink); color: var(--ink); }
 .faq details[open]:nth-child(even) summary::after { background: var(--yellow); color: var(--ink); }
 
-.resource { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 96px); align-items: center; padding: clamp(28px, 4vw, 48px); background: var(--pink-tint); border-radius: 22px; }
+/* the card sits on the textured Pink/Yellow gradient (.band--gradient-textured, shared above) */
+.resource { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 96px); align-items: center; padding: clamp(28px, 4vw, 48px); border: 1px solid rgb(26 26 26 / 0.07); border-radius: 22px; }
+.resource > * { position: relative; z-index: 1; }
 .resource h2 + p { margin-top: 16px; max-width: 480px; font-size: var(--fs-lead); }
 .resource .btn { margin-top: 6px; }
 .resource .small { margin: 12px 0 0; }
@@ -2058,21 +2060,32 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .preview__plan b { grid-column: 1 / -1; }
   .preview__table { font-size: 12px; }
   .preview__table th, .preview__table td { padding: 7px 6px; }
-  .founder { grid-template-columns: minmax(0, 1fr) 110px; padding: 16px; }
+  /* founder: the photo leads, full width, the text runs the card width below it */
+  .founder { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 12px 12px 20px; }
+  .founder__photo { order: -1; aspect-ratio: 5 / 4; }
+  .founder__text { padding-inline: 8px; }
+  .founder p { max-width: none; }
+  .ecosystem__list { gap: 0; }
+  .ecosystem__list a { padding: 20px 0 22px; border-top: 1px solid var(--line); }
+  .ecosystem__list a::after { top: -1px; height: 1px; }
   .resource { padding: 24px 18px; border-radius: var(--r-lg); }
   .business { border-radius: 24px; }
   .business h2, .resource h2 { font-size: var(--fs-h2); }
-  .kitart { padding: 40px 22px 40px 60px; }
-  .kitart__back { inset: -18px -12px 40px 36px; }
-  .kitart__doc { padding: 16px 16px 8px; }
+  /* kit graphic: the workflow runs across the top (task, AI, reviewed) and drops into the kit */
+  .kitart { padding: 96px 26px 30px; }
+  .kitart__stack { width: min(300px, 100%); }
+  .kitart__back { inset: -14px -10px 36px 18px; rotate: 3deg; }
+  .kitart__doc { padding: 16px 16px 8px; rotate: -1deg; }
   .kitart__head { gap: 10px; }
-  .kitart__node--task { left: -42px; top: 16px; width: 40px; height: 36px; }
-  .kitart__node--task svg { width: 36px; height: 30px; }
-  .kitart__node--ai { left: -42px; top: 120px; width: 40px; height: 40px; }
-  .kitart__node--ai img { width: 20px; height: 20px; }
-  .kitart__node--ok { left: -42px; top: 230px; width: 40px; height: 36px; }
-  .kitart__wire { left: -23px; top: 52px; height: 178px; }
-  .kitart__wire::after { top: 88px; width: 23px; }
+  .kitart__node { top: -72px; }
+  .kitart__node--task { left: 0; width: 44px; height: 38px; }
+  .kitart__node--task svg { width: 38px; height: 32px; }
+  .kitart__node--ai { left: calc(50% - 21px); top: -74px; width: 42px; height: 42px; }
+  .kitart__node--ai img { width: 21px; height: 21px; }
+  .kitart__node--ok { left: auto; right: 0; width: 44px; height: 38px; }
+  .kitart__node--ok svg { width: 20px; height: 20px; }
+  .kitart__wire { left: 44px; right: 44px; top: -53px; height: 0; border-left: 0; border-top: 1.5px dashed rgb(26 26 26 / 0.45); }
+  .kitart__wire::after { left: 50%; top: 0; width: 0; height: 53px; border-top: 0; border-left: 2px solid var(--ink); }
   .cta__side { width: 150px; opacity: 0.7; }
   .cta h2 { font-size: var(--fs-h2); }
   .actions--center .btn, .band-cta .btn { width: 100%; }
@@ -3132,6 +3145,10 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
   .pgrid > .pstep { border: 0; border-radius: 0; background: none; overflow: visible; }
   .pgrid > .pstep .pstep__visual { overflow: hidden; border-radius: var(--r-lg); }
   .pgrid .prog__body { padding: 24px 0 0; }
+  .pscene__steps { gap: clamp(48px, 12vw, 64px); }
+  .pscene__steps > .pstep { border: 0; border-radius: 0; background: none; overflow: visible; }
+  .pscene__steps > .pstep .pstep__visual { overflow: hidden; border-radius: var(--r-lg); }
+  .pscene__steps > .pstep .pstep__body { padding: 24px 0 0; }
 }
 @media (max-width: 640px) {
   .lhero__actions .btn { width: 100%; }
@@ -3231,6 +3248,9 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .bw-uses { --bw-glass: inset 0 0 0 1px rgb(255 255 255 / 0.85), inset 0 1px 0 1px rgb(255 255 255 / 0.5); }
 
 .bw-story__num { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; color: var(--pink); font: 600 13px/1 var(--font-display); transition: background-color 500ms var(--ease-out), color 500ms var(--ease-out); }
+/* Stacked (phones, no scroll story): the numbers are filled, alternating Faith Pink and AI Yellow, Charcoal inside */
+.bw-story:not(.is-live) .bw-story__num { background: var(--pink); color: var(--ink); box-shadow: none; }
+.bw-story:not(.is-live) .bw-story__step:nth-of-type(even) .bw-story__num { background: var(--yellow); }
 
 /* Live (motion.js §5d, wide and tall screens): the cases scroll in the left column, past a rail
    that fills as you go; the frame on the right stays centred on screen and shows the output of
