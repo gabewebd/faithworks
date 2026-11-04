@@ -154,7 +154,7 @@ code { font-size: 0.9em; }
 .band--yellow { background: var(--yellow-pastel); }
 
 /* Pink & Yellow tech-textured gradient band (Sound familiar / challenges) ---- */
-.band--gradient-textured, .resource {
+.band--gradient-textured {
   position: relative;
   overflow: hidden;
   background-color: var(--paper, #FAF8F4);
@@ -173,7 +173,7 @@ code { font-size: 0.9em; }
 }
 
 /* Technical scanline raster overlay */
-.band--gradient-textured::before, .resource::before {
+.band--gradient-textured::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1098,8 +1098,8 @@ body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper
 .trusted__mark--ring { border: 3.5px solid currentColor; border-radius: 50%; background: none; }
 .trusted__mark--bars { width: 20px; background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 8px); }
 
-.section-head > .egallery__intro { grid-column: 9 / -1; display: grid; justify-items: start; gap: 14px; padding-bottom: 0.35em; }
-.egallery__intro p { max-width: 40ch; margin: 0; font-size: var(--fs-lead); }
+.section-head > .egallery__intro, .section-head > .latest__intro { grid-column: 9 / -1; display: grid; justify-items: start; gap: 14px; padding-bottom: 0.35em; }
+.egallery__intro p, .latest__intro p { max-width: 40ch; margin: 0; font-size: var(--fs-lead); }
 .mgrid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: clamp(40px, 4.6vw, 66px); grid-auto-flow: dense; gap: clamp(10px, 1.1vw, 16px); margin: 0; padding: 0; list-style: none; }
 .mgrid__tile { grid-column: span var(--c); grid-row: span var(--r); min-width: 0; }
 .mgrid__tile figure { position: relative; height: 100%; margin: 0; overflow: hidden; border-radius: var(--r-lg); background: var(--stone); transition: translate 700ms var(--ease-expo), box-shadow 700ms var(--ease-expo); }
@@ -1117,7 +1117,7 @@ body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper
   .egallery--bleed .mgrid { --cols: 6; --k: 0.6; }
   .mgrid__tile { grid-column: span var(--ct); grid-row: span var(--rt); }
 }
-@media (max-width: 900px) { .section-head > .egallery__intro { grid-column: 1 / -1; } }
+@media (max-width: 900px) { .section-head > .egallery__intro, .section-head > .latest__intro { grid-column: 1 / -1; } .section-head > .latest__intro { margin-top: 18px; } }
 
 /* Homepage gallery rows (tools/event-gallery.mjs scrollRows) -----------------
    Three full-bleed rows, one height per row (--h) and widths from each tile's --ar. Without
@@ -1392,9 +1392,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .faq details[open]:nth-child(odd) summary::after { background: var(--pink); color: var(--ink); }
 .faq details[open]:nth-child(even) summary::after { background: var(--yellow); color: var(--ink); }
 
-/* the card sits on the textured Pink/Yellow gradient (.band--gradient-textured, shared above) */
-.resource { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 96px); align-items: center; padding: clamp(28px, 4vw, 48px); border: 1px solid rgb(26 26 26 / 0.07); border-radius: 22px; }
-.resource > * { position: relative; z-index: 1; }
+.resource { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 7vw, 96px); align-items: center; padding: clamp(28px, 4vw, 48px); background: var(--pink-tint); border-radius: 22px; }
 .resource h2 + p { margin-top: 16px; max-width: 480px; font-size: var(--fs-lead); }
 .resource .btn { margin-top: 6px; }
 .resource .small { margin: 12px 0 0; }
@@ -4705,4 +4703,124 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
   .preview__chat, .preview__table { max-width: 280px; margin-inline: auto; }
   .kit-preview { gap: 12px; }
   .kit-preview__cover { min-height: 140px; padding: 14px; }
+}
+
+/* 25. Event announcement bar and latest resources (2026-11-04) ===============
+   Announcement bar: the first thing under the header on the main pages (tools/render.mjs
+   eventBanner, js/main.js §22). A Faith Pink tint strip, inset like the home hero card, with a
+   Faith Pink hairline edge, the line-and-node motif at its right end, and one Charcoal button.
+   It shows only once script has chosen the event (hidden until then), so it never flashes. */
+.announce[hidden], .announce__item[hidden] { display: none; }
+.announce {
+  --inset: clamp(8px, 1vw, 14px);
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center;
+  margin: 0 var(--inset) var(--inset); padding: 10px 60px 10px clamp(14px, 1.6vw, 22px);
+  min-height: 60px; border-radius: var(--r-lg);
+  background: linear-gradient(100deg, var(--pink-tint) 0%, rgb(247 229 230 / 0.72) 58%, rgb(239 172 186 / 0.38) 100%);
+  box-shadow: inset 0 0 0 1px rgb(239 172 186 / 0.95), 0 1px 0 rgb(255 255 255 / 0.7) inset;
+  transition: height var(--dur) var(--ease-io), opacity 260ms var(--ease-out), margin var(--dur) var(--ease-io), padding var(--dur) var(--ease-io);
+}
+.motion .announce[data-announce-ready] { animation: fw-announce-in 700ms var(--ease-expo) 80ms both; }
+.announce.is-entering { animation: fw-announce-in 600ms var(--ease-expo) both; }
+.announce.is-leaving { opacity: 0; margin-bottom: 0; padding-block: 0; min-height: 0; }
+@keyframes fw-announce-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.announce__lines { position: absolute; z-index: -1; top: 0; right: 0; width: min(300px, 40%); height: 100%; pointer-events: none; fill: none; stroke: rgb(26 26 26 / 0.16); stroke-width: 1; }
+.announce__lines circle { fill: var(--pink); stroke: var(--white); stroke-width: 1.5; }
+.announce__item { display: flex; align-items: center; gap: clamp(12px, 1.4vw, 22px); flex: 1; min-width: 0; }
+.announce__item > p { margin: 0; }
+.announce__tag {
+  flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px 5px 9px;
+  border-radius: 999px; background: rgb(255 255 255 / 0.78); box-shadow: inset 0 0 0 1px rgb(239 172 186 / 0.9);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.3; white-space: nowrap;
+}
+.announce__pulse { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 1.5px var(--ink) inset; }
+.motion .announce__pulse::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1.5px solid var(--pink); animation: fw-announce-pulse 2.4s var(--ease-out) infinite; }
+@keyframes fw-announce-pulse { 0% { opacity: 0.9; transform: scale(0.5); } 70%, 100% { opacity: 0; transform: scale(1.5); } }
+.announce__when { flex: none; display: flex; align-items: baseline; gap: 10px; padding-left: clamp(12px, 1.4vw, 22px); border-left: 1px solid rgb(26 26 26 / 0.16); font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.announce__time { font-family: var(--font); font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.announce__text { flex: 1; min-width: 0; overflow: hidden; font-size: 14px; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; }
+.announce__title { font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.announce__summary::before { content: "\2014"; margin-right: 0.45em; opacity: 0.5; }
+.announce__cta {
+  flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 14px 8px 16px;
+  border-radius: var(--r-sm); background: var(--ink); color: var(--white); font-size: 13.5px; font-weight: 600; line-height: 1.2; white-space: nowrap;
+  transition: background-color var(--dur-fast), color var(--dur-fast), transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+}
+.announce__cta .btn__arrow { width: 16px; height: 16px; }
+.announce__cta:hover { background: var(--white); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); transform: translateY(-1px); }
+.announce__cta:hover .btn__arrow { transform: translate(2px, -2px); }
+.announce__cta:focus-visible, .announce__close:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.announce__close {
+  position: absolute; top: 50%; right: 12px; translate: 0 -50%; display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; transition: background-color var(--dur-fast);
+}
+.announce__close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.announce__close:hover { background: rgb(255 255 255 / 0.75); }
+/* Medium screens: the summary goes (the title and the date carry it) */
+@media (max-width: 1100px) { .announce__summary { display: none; } }
+/* Phones: tag and date on one line, the title below (two lines at most), then the button */
+@media (max-width: 640px) {
+  .announce { align-items: flex-start; padding: 14px 52px 14px 14px; }
+  .announce__item { flex-wrap: wrap; row-gap: 10px; column-gap: 10px; }
+  .announce__when { padding-left: 10px; font-size: 14px; }
+  .announce__text { flex-basis: 100%; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .announce__title { font-size: 16px; }
+  .announce__cta { min-height: 44px; }
+  .announce__close { top: 8px; right: 6px; translate: none; width: 44px; height: 44px; }
+  .announce__lines { width: 70%; opacity: 0.7; }
+}
+@media (max-width: 380px) { .announce__time { display: none; } }
+@media (prefers-reduced-motion: reduce) { .announce { transition: none; } }
+
+/* Latest resources (Home, Learn; tools/render.mjs latestResources): an editorial "latest" module.
+   The newest resource leads with a large picture; the next ones are numbered entries beside it,
+   divided by hairlines, each with a small picture. Type in a Faith Pink pill (as on Resources). */
+.latest__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); align-content: start; }
+.latest__entry { position: relative; min-width: 0; }
+@media (min-width: 901px) { .section-head > .latest__intro { grid-column: 8 / -1; } } /* starts where the lead's text does */
+.latest__entry--lead { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; row-gap: 22px; align-items: center; }
+.latest__entry--lead .latest__media { grid-column: 1 / span 7; }
+.latest__entry--lead .latest__body { grid-column: 8 / -1; padding-right: clamp(0px, 2vw, 32px); }
+.latest__entry:not(.latest__entry--lead) {
+  grid-column: span 6; display: grid; grid-template-columns: minmax(0, 1fr) clamp(112px, 11vw, 168px); gap: clamp(16px, 1.8vw, 24px); align-items: start;
+  margin-top: clamp(28px, 3.4vw, 48px); padding-top: clamp(20px, 2.2vw, 28px); border-top: 1px solid var(--line);
+}
+.latest__entry:not(.latest__entry--lead) .latest__media { order: 2; }
+.latest__media { display: block; overflow: hidden; border-radius: var(--r-lg); background: var(--stone-2); }
+.latest__img, .latest__img img { display: block; width: 100%; }
+.latest__img img { aspect-ratio: 16 / 10; object-fit: cover; transition: scale 700ms var(--ease-expo); }
+.latest__entry:not(.latest__entry--lead) .latest__media { border-radius: var(--r); }
+.latest__entry:not(.latest__entry--lead) .latest__img img, .latest__entry:not(.latest__entry--lead) .latest__blank { aspect-ratio: 4 / 3; }
+.latest__entry:hover .latest__img img { scale: 1.04; }
+/* No picture: a quiet Faith Pink panel with the line-and-node motif */
+.latest__blank { display: block; aspect-ratio: 16 / 10; background: radial-gradient(120% 90% at 100% 0%, rgb(239 172 186 / 0.55), rgb(239 172 186 / 0) 70%), var(--pink-tint); }
+.latest__blank svg { display: block; width: 100%; height: 100%; fill: none; stroke: rgb(26 26 26 / 0.18); stroke-width: 1; }
+.latest__blank circle { fill: var(--pink); stroke: var(--white); stroke-width: 1.5; }
+.latest__body { display: flex; flex-direction: column; align-items: start; gap: 10px; min-width: 0; }
+.latest__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; }
+.latest__type ~ *::before { content: "\00B7"; margin: 0 0.6em; }
+.latest__num { display: inline-flex; align-items: center; gap: 10px; margin-right: 12px; font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.latest__num::after { content: ""; width: 22px; height: 1px; background: rgb(26 26 26 / 0.35); }
+.latest__type { padding: 3px 10px; border-radius: 999px; background: var(--pink); font-size: 12px; font-weight: 700; }
+.latest__title { margin: 0; font-size: clamp(19px, 1.5vw, 23px); line-height: 1.2; letter-spacing: -0.03em; }
+.latest__entry--lead .latest__title { font-size: clamp(26px, 2.6vw, 40px); line-height: 1.08; letter-spacing: -0.04em; max-width: 24ch; }
+.latest__title a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.latest__title a:focus-visible { outline: none; }
+.latest__entry:focus-within { outline: 3px solid var(--focus); outline-offset: 6px; border-radius: var(--r); }
+.latest__entry:hover .latest__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.latest__excerpt { margin: 0; max-width: 60ch; font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.latest__entry--lead .latest__excerpt { font-size: 17px; -webkit-line-clamp: 3; line-clamp: 3; }
+.latest__more { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; font-size: var(--fs-small); font-weight: 600; }
+.latest__entry:hover .latest__more .link-arrow { transform: translateX(3px); }
+@media (max-width: 900px) {
+  .latest__entry--lead, .latest__entry:not(.latest__entry--lead) { grid-column: 1 / -1; }
+  .latest__entry--lead .latest__media, .latest__entry--lead .latest__body { grid-column: 1 / -1; padding-right: 0; }
+  .latest__entry:not(.latest__entry--lead) { margin-top: 0; padding-block: 20px; }
+  .latest__entry--lead + .latest__entry { margin-top: 28px; }
+  .latest__entry:not(.latest__entry--lead):last-child { border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 640px) {
+  .latest__entry:not(.latest__entry--lead) { grid-template-columns: minmax(0, 1fr) 96px; }
+  .latest__entry:not(.latest__entry--lead) .latest__excerpt { display: none; }
 }

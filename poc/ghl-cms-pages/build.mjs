@@ -1,6 +1,9 @@
 // ESBUILD_FROM=<path inside a project that has esbuild installed> node poc/ghl-cms-pages/build.mjs
-// GHL versions of four pages whose events and testimonials come from the CMS at runtime:
-//   dist/home.html, dist/learn.html, dist/professionals.html, dist/workshops.html
+// GHL versions of the pages whose events, testimonials, event announcement bar and latest resources
+// come from the CMS at runtime:
+//   dist/home.html, dist/learn.html, dist/professionals.html, dist/workshops.html, and (for the
+//   announcement bar) dist/about.html, dist/build.html, dist/business.html, dist/community.html,
+//   dist/speaking.html
 //       the whole page, to paste into that page's GHL custom-code element in place of the root
 //       page pasted there today (index.html, learn.html, professionals.html, workshops.html). The
 //       same page, with every CMS-driven section marked (events, calendar, events gallery,
@@ -29,8 +32,12 @@ const envFile = (key) => (existsSync(join(ROOT, "cms/.env")) ? (read("cms/.env")
 const CMS = (process.env.CMS_CONTENT_URL || envFile("CMS_CONTENT_URL") || "").replace(/\/$/, "");
 if (!CMS) throw new Error("CMS_CONTENT_URL is not set (the CMS address, e.g. https://cms.example.com).");
 const CDN = (process.env.CDN_URL || "https://faithworks.vercel.app").replace(/\/$/, "");
-// GHL page → [root page pasted there today, its template]
-const PAGES = { home: ["index.html", "home.html"], learn: ["learn.html", "learn.html"], professionals: ["professionals.html", "professionals.html"], workshops: ["workshops.html", "workshops.html"] };
+// GHL page → [root page pasted there today, its template]. About, Build, Business, Community and
+// Speaking are here for the event announcement bar only (their other sections stay as built).
+const PAGES = {
+  home: ["index.html", "home.html"], learn: ["learn.html", "learn.html"], professionals: ["professionals.html", "professionals.html"], workshops: ["workshops.html", "workshops.html"],
+  about: ["about.html", "about.html"], build: ["build.html", "build.html"], business: ["business.html", "business.html"], community: ["community.html", "community.html"], speaking: ["speaking.html", "speaking.html"],
+};
 
 /* ---- Content: the published snapshot, as the website build reads it ---- */
 const res = await fetch(`${CMS}/api/public/content`, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(20000) });
@@ -57,6 +64,7 @@ const CALL = /\{\{(\w+)(?::([\w.-]+))?\}\}/g;
 const SIGNS = {
   events: /<div class="(?:events|empty)">/, eventCalendar: /<div class="cal" data-fw-calendar>/,
   eventGallery: /<(?:div class="srows"|ul class="mgrid"|div class="hr-photos")[ >]/, voices: /<div class="voices[ "]/,
+  eventBanner: /<div class="announce"[ >]/, latestResources: /<div class="latest"[ >]/,
 };
 const keyOf = (open) => (open.match(/\saria-labelledby="([^"]+)"/) || open.match(/\sid="([^"]+)"/) || [])[1];
 // [start, end] of the <section> with this aria-labelledby (or id) in html
@@ -97,10 +105,12 @@ function page(rootFile, template, cdn) {
     if (!calls.length) return;
     const key = keyOf(s[0].match(/^<section\b[^>]*>/)[0]);
     const at = sectionAt(html, key);
-    if (!at) { // not on the root page: render it, and put it after the section before it
+    if (!at) { // not on the root page: render it, and put it after the section before it (the first one: at the top of <main>)
       const prev = sections.slice(0, i).reverse().map((p) => sectionAt(html, keyOf(p[0].match(/^<section\b[^>]*>/)[0]))).find(Boolean);
-      if (!prev) throw new Error(`${rootFile}: no place for the section "${key}"`);
-      html = `${html.slice(0, prev[1])}\n\n    ${renderSection(s[0], cdn)}${html.slice(prev[1])}`;
+      const main = !prev && i === 0 && /<main\b[^>]*>\n?/.exec(html);
+      if (!prev && !main) throw new Error(`${rootFile}: no place for the section "${key}"`);
+      if (prev) html = `${html.slice(0, prev[1])}\n\n    ${renderSection(s[0], cdn)}${html.slice(prev[1])}`;
+      else html = `${html.slice(0, main.index + main[0].length)}    ${renderSection(s[0], cdn)}\n\n${html.slice(main.index + main[0].length)}`;
       return;
     }
     let from = at[0];

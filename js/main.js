@@ -38,7 +38,8 @@ window.FW_CONFIG = {
    11. Logo strip pause  12. Testimonial carousel  13. Video (click to load) and booking
    14. Article contents (sticky sidebar)  15. Resource search and filters  16. Share this (articles)
    17. Card pager (professionals: challenges)  18. Event gallery marquee
-   19. Event buttons after the event  20. Event photo slideshows
+   19. Event buttons after the event  20. Event photo slideshows  22. Event announcement bar
+   21. CMS sections put in after load (GHL pages)
    Each module checks that its elements exist, so one file serves every page.
    Motion lives in CSS; this file adds/removes state classes, except the pointer-driven hero
    and the testimonial deck, which need per-frame values.
@@ -224,6 +225,17 @@ window.FW_CONFIG = {
     var scenesBox = $("#journey.section--field .scenes");
     var stepsBox = scenesBox && $("#journey.section--field .steps");
     var introBox = scenesBox && $("#journey.section--field .journey__intro");
+    // Put the tab back at `top` on screen with one instant jump. The two-number scrollTo works in every
+    // browser (the { behavior: "instant" } option does not, older iOS Safari rejects it and the page
+    // jumped up to the section top); the page's smooth scrolling is held off for that one jump.
+    var holdTab = function (tab, top) {
+      var shift = tab.getBoundingClientRect().top - top;
+      if (Math.abs(shift) < 1) return;
+      var root = doc.documentElement, was = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(window.pageXOffset, window.pageYOffset + shift);
+      root.style.scrollBehavior = was;
+    };
     var placeScenes = function (i) {
       if (!stepsBox || !introBox) return;
       if (stackQuery.matches) stepsBox.insertBefore(scenesBox, stepTabs[i].nextSibling);
@@ -240,8 +252,9 @@ window.FW_CONFIG = {
       });
       if (stepsBox && stackQuery.matches) {
         placeScenes(i);
-        var shift = stepTabs[i].getBoundingClientRect().top - tabTop;
-        if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+        holdTab(stepTabs[i], tabTop);
+        // and once more after the frame settles (a browser's own scroll anchoring may have moved it meanwhile)
+        requestAnimationFrame(function () { holdTab(stepTabs[i], tabTop); });
       }
       // A click or arrow key moves the page to that stage so scrolling carries on from there
       if (!fromScroll && pinned()) window.scrollTo({ top: stageTop(i), behavior: "smooth" });
@@ -1235,6 +1248,51 @@ window.FW_CONFIG = {
     });
   }
 
+  /* ---- 22. Event announcement bar ------------------------------------------ */
+  // The bar under the header (tools/render.mjs eventBanner) holds the next few upcoming events,
+  // hidden. The first one that has not ended shows, unless this visitor dismissed it: the close
+  // button stores its key (event + date + start time) in localStorage, so it stays closed on every
+  // page and after reloads, while a different announcement (the next event, or this one on a new
+  // date) shows again. Its own inline script already did this before the page was drawn; this
+  // repeats it for markup put in later (GHL pages, §21) and while the event is on says "Happening now".
+  var ANNOUNCE_KEY = "fw-announce-dismissed";
+  function dismissedAnnouncements() {
+    try { var v = JSON.parse(localStorage.getItem(ANNOUNCE_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (err) { return []; }
+  }
+  function announce(root) {
+    $$("[data-announce]", root).forEach(function (bar) {
+      var items = $$("[data-announce-key]", bar), now = Date.now(), gone = dismissedAnnouncements();
+      var item = items.filter(function (it) { return !(Date.parse(it.getAttribute("data-ends-at")) <= now); })[0];
+      if (!item || gone.indexOf(item.getAttribute("data-announce-key")) > -1) { bar.hidden = true; return; }
+      items.forEach(function (it) { it.hidden = it !== item; });
+      var status = $("[data-announce-status]", item);
+      if (status && Date.parse(item.getAttribute("data-starts-at")) <= now) status.textContent = "Happening now";
+      // Shown only now (not by its inline script): ease it in rather than jump
+      if (bar.hidden && !reduceMotion) replay(bar, "is-entering");
+      bar.hidden = false;
+      if (bar.__fwOn) return;
+      bar.__fwOn = true;
+      var close = $("[data-announce-close]", bar);
+      if (close) close.addEventListener("click", function () {
+        var shown = $("[data-announce-key]:not([hidden])", bar), list = dismissedAnnouncements();
+        if (shown && list.indexOf(shown.getAttribute("data-announce-key")) < 0) list.push(shown.getAttribute("data-announce-key"));
+        try { localStorage.setItem(ANNOUNCE_KEY, JSON.stringify(list.slice(-20))); } catch (err) { /* private mode: closed for this page only */ }
+        track("announcement_dismiss", {});
+        // Focus would be lost with the button: put it at the start of the page content
+        var main = $("#main-content");
+        if (main && bar.contains(doc.activeElement)) main.focus({ preventScroll: true });
+        var done = function () { bar.hidden = true; bar.classList.remove("is-leaving"); bar.style.height = ""; };
+        if (reduceMotion) { done(); return; }
+        bar.style.height = bar.offsetHeight + "px";
+        void bar.offsetHeight;
+        bar.classList.add("is-leaving");
+        bar.style.height = "0px";
+        setTimeout(done, 420);
+      });
+    });
+  }
+  announce();
+
   /* ---- 21. CMS sections put in after load (GHL pages) ----------------------- */
   // GHL pages load the CMS's published content in the browser (js/fw-live.js) and swap in a
   // section whose events or testimonials changed since the page was built. FW_SITE.mount(el)
@@ -1246,6 +1304,7 @@ window.FW_CONFIG = {
     quotePhotos,
     function (root) { $$("[data-carousel]", root).forEach(carousel); },
     endedButtons,
+    announce,
     function (root) { $$("[data-slides]", root).forEach(slideshow); },
     function (root) { $$("[data-reveal]", root).forEach(function (el) { if (io) io.observe(el); else el.classList.add("is-in"); }); }
   ];
