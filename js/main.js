@@ -571,6 +571,16 @@ window.FW_CONFIG = {
       }
       if (dir) replay(grid, dir > 0 ? "is-turning-next" : "is-turning-prev");
     };
+    // The calendar can show an event poster at its original size: an image in assets/images/events/
+    // with a "<name>-cal.jpg" beside it uses that here (the card keeps <name>); without one, the card image
+    var calArt = function (fig) {
+      var img = fig.querySelector("img"), src = img ? img.getAttribute("src") || "" : "";
+      var m = fig.hasAttribute("data-slides") ? null : src.match(/^(.*\/images\/events\/[^\/?#]+?)\.(png|jpe?g|webp)$/i);
+      if (!m || /-cal$/.test(m[1])) return;
+      img.removeAttribute("width"); img.removeAttribute("height");
+      img.addEventListener("error", function () { img.src = src; }, { once: true });
+      img.src = m[1] + "-cal.jpg";
+    };
     var eventItem = function (ev, i) {
       var li = el("li", "cal__item" + (ev.past ? " cal__item--past" : ""));
       li.style.setProperty("--c", i);
@@ -579,7 +589,7 @@ window.FW_CONFIG = {
         var tmp = el("div");
         tmp.innerHTML = ev.figure;
         var fig = tmp.firstElementChild;
-        if (fig) { fig.classList.add("cal__photo"); li.appendChild(fig); if (fig.hasAttribute("data-slides")) slideshow(fig); }
+        if (fig) { fig.classList.add("cal__photo"); calArt(fig); li.appendChild(fig); if (fig.hasAttribute("data-slides")) slideshow(fig); }
       }
       // A past event: its photos, "Past event" and its title only, without details or a link
       if (ev.past) {
@@ -622,10 +632,11 @@ window.FW_CONFIG = {
       } else {
         panel.appendChild(el("p", "cal__none", calEvents.length ? "Nothing is scheduled on this day." : "No events are scheduled yet. New dates appear here as soon as they are confirmed."));
       }
-      // Next up: the next event after the chosen day (or after today, whichever is later)
+      // Next up: the next event after the chosen day (or after today, whichever is later); not shown
+      // when the chosen day has an event of its own
       var from = sel > todayIso ? sel : todayIso;
       var next = upcoming.filter(function (ev) { return ev.first > from || (ev.first === from && from !== sel); })[0];
-      if (next) {
+      if (next && !list.length) {
         panel.appendChild(el("p", "cal__kicker", "Next up"));
         // A white card: the event's first photo, its countdown, its title as a heading and its date
         var jump = el("button", "cal__next");
