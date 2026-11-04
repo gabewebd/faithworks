@@ -1661,6 +1661,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 .formblock__intro h2 { margin-top: 0; }
 .formblock__intro > p { margin-top: 14px; max-width: 46ch; font-size: var(--fs-lead); }
 /* The intro stays in view while the taller form beside it scrolls past */
+.formblock__intro, .contact__side { position: sticky; top: calc(var(--header-h) + 32px); }
 .formblock .form { padding: clamp(22px, 3vw, 36px); border-radius: var(--r-lg); background: var(--white); }
 .form--ghl { position: relative; width: 100%; display: block; overflow: hidden; }
 .form--ghl iframe { display: block; width: 100%; border: none; background: transparent; }
