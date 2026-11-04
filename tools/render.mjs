@@ -674,22 +674,23 @@ function eventFigure(e) {
 function eventCard(e) {
   const d = eventDate(e);
   const past = isPast(e);
-  const dateText = d
-    ? `<time datetime="${e.date}">${fmt(d, { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</time>${e.endDate && e.endDate !== e.date ? ` – <time datetime="${e.endDate}">${fmt(eventDate({ date: e.endDate }), { day: "numeric", month: "long", year: "numeric" })}</time>` : ""}`
-    : "Date to be announced";
-  const facts = [["Date", dateText]];
-  if (e.time) facts.push([`Time (${esc(tzAbbrev(e.timeZone))})`, esc(e.time)]);
-  if (e.venue) facts.push(["Location", esc(e.venue)]);
+  // When, where: the same time (yellow) and place (pink) badges as the Workshops calendar panel.
+  // The date itself is the yellow stub on the card's left; a multi-day event adds its range here.
+  const multiDay = d && e.endDate && e.endDate !== e.date;
+  const tags = [];
+  if (multiDay) tags.push(["date", `<time datetime="${e.date}">${fmt(d, { day: "numeric", month: "short" })}</time> – <time datetime="${e.endDate}">${fmt(eventDate({ date: e.endDate }), { day: "numeric", month: "short", year: "numeric" })}</time>`]);
+  if (e.time) tags.push(["time", `${esc(e.time)} ${esc(tzAbbrev(e.timeZone))}`]);
+  if (e.venue) tags.push(["place", esc(e.venue)]);
   const cta = eventCta(e.rec, past);
   const details = !past && e.hasPage && e.registration.type !== "page" ? `<a class="text-link" href="/events/${esc(e.slug)}/">Event details <span class="link-arrow" aria-hidden="true">↗</span></a>` : "";
   const actions = cta + details;
   return `<article class="event${past ? " event--past" : ""}" id="event-${esc(e.slug)}">
-      <div class="event__date" aria-hidden="true">${d ? `<b>${fmt(d, { day: "numeric" })}</b><span>${fmt(d, { month: "short" })} ${fmt(d, { year: "numeric" })}</span>` : `<b>TBA</b><span>Date soon</span>`}</div>
+      ${d ? `<time class="event__date" datetime="${e.date}"><span class="event__dow">${fmt(d, { weekday: "short" })}</span> <b>${fmt(d, { day: "numeric" })}</b> <span>${fmt(d, { month: "short" })} ${fmt(d, { year: "numeric" })}</span></time>` : `<p class="event__date"><b>TBA</b> <span>Date soon</span></p>`}
       <div class="event__body">
         <p class="event__type">${badge(eventStatus(e.rec, today))}</p>
         <h3>${esc(e.title)}</h3>
         ${e.summary ? `<p>${esc(e.summary)}</p>` : ""}
-        <dl class="event__facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+        ${tags.length ? `<p class="event__meta">${tags.map(([k, v]) => `<span class="cal__tag cal__tag--${k}">${v}</span>`).join("")}</p>` : ""}
         ${actions ? `<div class="event__cta">${actions}</div>` : ""}
       </div>
       ${eventFigure(e)}
