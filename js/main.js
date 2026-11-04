@@ -1269,45 +1269,71 @@ window.FW_CONFIG = {
   }
 
   /* ---- 22. Event announcement bar ------------------------------------------ */
-  // The bar under the header (tools/render.mjs eventBanner) holds the next few upcoming events,
-  // hidden. The first one that has not ended shows, unless this visitor dismissed it: the close
+  // The card under the header (tools/render.mjs eventBanner) holds the next few upcoming events,
+  // hidden. The first one that has not ended shows, unless this visitor closed it: the close
   // button stores its key (event + date + start time) in localStorage, so it stays closed on every
   // page and after reloads, while a different announcement (the next event, or this one on a new
   // date) shows again. Its own inline script already did this before the page was drawn; this
   // repeats it for markup put in later (GHL pages, §21) and while the event is on says "Happening now".
-  var ANNOUNCE_KEY = "fw-announce-dismissed";
+  // Each page view previews it for 10 seconds: the ring on the close button drains and the seconds
+  // count down, then it slides up under the header (not remembered: the next page previews it
+  // again). Hovering or focusing it holds the countdown; time in a background tab does not count.
+  var ANNOUNCE_KEY = "fw-announce-dismissed", PREVIEW_MS = 10000;
+  var previewLeft = {}; // this page view's preview time left, per announcement (survives a §21 swap)
   function dismissedAnnouncements() {
     try { var v = JSON.parse(localStorage.getItem(ANNOUNCE_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (err) { return []; }
+  }
+  function slideAway(bar) {
+    if (reduceMotion) { bar.hidden = true; return; }
+    bar.classList.add("is-leaving");
+    setTimeout(function () { bar.hidden = true; bar.classList.remove("is-leaving"); }, 480);
   }
   function announce(root) {
     $$("[data-announce]", root).forEach(function (bar) {
       var items = $$("[data-announce-key]", bar), now = Date.now(), gone = dismissedAnnouncements();
       var item = items.filter(function (it) { return !(Date.parse(it.getAttribute("data-ends-at")) <= now); })[0];
-      if (!item || gone.indexOf(item.getAttribute("data-announce-key")) > -1) { bar.hidden = true; return; }
+      var key = item && item.getAttribute("data-announce-key");
+      if (!item || gone.indexOf(key) > -1 || previewLeft[key] === 0) { bar.hidden = true; return; }
       items.forEach(function (it) { it.hidden = it !== item; });
       var status = $("[data-announce-status]", item);
       if (status && Date.parse(item.getAttribute("data-starts-at")) <= now) status.textContent = "Happening now";
-      // Shown only now (not by its inline script): ease it in rather than jump
-      if (bar.hidden && !reduceMotion) replay(bar, "is-entering");
       bar.hidden = false;
       if (bar.__fwOn) return;
       bar.__fwOn = true;
+      // Not shown by its inline script (put in later): this plays the slide-in
+      bar.setAttribute("data-announce-ready", "");
+
+      // The countdown
+      var count = $("[data-announce-count]", bar), secs = $("[data-announce-secs]", bar);
+      if (previewLeft[key] == null) previewLeft[key] = PREVIEW_MS;
+      if (count) count.hidden = false;
+      var frame = 0, last = performance.now();
+      var held = function () { return bar.matches(":hover") || bar.contains(doc.activeElement); };
+      var tick = function (t) {
+        if (!bar.isConnected) return; // replaced by newer markup (§21): that one carries on from here
+        var dt = Math.min(t - last, 250); // a background tab pauses frames; that time does not count
+        last = t;
+        if (!held()) previewLeft[key] = Math.max(0, previewLeft[key] - dt);
+        var left = previewLeft[key];
+        bar.style.setProperty("--announce-p", (1 - left / PREVIEW_MS).toFixed(4));
+        if (secs) secs.textContent = String(Math.ceil(left / 1000));
+        if (left <= 0) { frame = 0; slideAway(bar); return; }
+        frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+
       var close = $("[data-announce-close]", bar);
       if (close) close.addEventListener("click", function () {
-        var shown = $("[data-announce-key]:not([hidden])", bar), list = dismissedAnnouncements();
-        if (shown && list.indexOf(shown.getAttribute("data-announce-key")) < 0) list.push(shown.getAttribute("data-announce-key"));
+        var list = dismissedAnnouncements();
+        if (list.indexOf(key) < 0) list.push(key);
         try { localStorage.setItem(ANNOUNCE_KEY, JSON.stringify(list.slice(-20))); } catch (err) { /* private mode: closed for this page only */ }
+        previewLeft[key] = 0;
+        if (frame) cancelAnimationFrame(frame);
         track("announcement_dismiss", {});
         // Focus would be lost with the button: put it at the start of the page content
         var main = $("#main-content");
         if (main && bar.contains(doc.activeElement)) main.focus({ preventScroll: true });
-        var done = function () { bar.hidden = true; bar.classList.remove("is-leaving"); bar.style.height = ""; };
-        if (reduceMotion) { done(); return; }
-        bar.style.height = bar.offsetHeight + "px";
-        void bar.offsetHeight;
-        bar.classList.add("is-leaving");
-        bar.style.height = "0px";
-        setTimeout(done, 420);
+        slideAway(bar);
       });
     });
   }
@@ -1328,9 +1354,19 @@ window.FW_CONFIG = {
     function (root) { $$("[data-slides]", root).forEach(slideshow); },
     function (root) { $$("[data-reveal]", root).forEach(function (el) { if (io) io.observe(el); else el.classList.add("is-in"); }); }
   ];
+  var hashFound = false;
   window.FW_SITE = {
     add: function (fn) { mounts.push(fn); },
-    mount: function (root) { mounts.forEach(function (fn) { try { fn(root); } catch (err) { console.error(err); } }); }
+    mount: function (root) {
+      mounts.forEach(function (fn) { try { fn(root); } catch (err) { console.error(err); } });
+      // A link to something only the live content has (the announcement bar's /workshops#event-…
+      // for an event published after the page was pasted): the browser found no target on load,
+      // so go to it now, unless the visitor has already scrolled down the page.
+      var id = "";
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch (err) { /* malformed hash */ }
+      var target = id && doc.getElementById(id);
+      if (target && root.contains(target) && !hashFound && window.pageYOffset < 80) { hashFound = true; target.scrollIntoView({ block: "start" }); }
+    }
   };
 
   window.__fwReady = true;

@@ -362,3 +362,47 @@ test("listings: empty states, resource cards, Keep reading cards, article conten
   assert.match(page, /<a class="kr" href="\/resources\/[^"]+\/">\s*<picture class="kr__img">/, "Keep reading cards carry the featured image");
   assert.equal((page.match(/class="kr"/g) || []).length, 3);
 });
+
+test("announcement bar: next upcoming events only, dismiss key, View Event link; latest resources: published only, newest first", async () => {
+  const R = await import("../../tools/render.mjs");
+  const { toRenderData } = await import("../../tools/content.mjs");
+  const { buildSnapshot } = await import("../shared/public.mjs");
+  const ev = (id, date, extra = {}) => ({ id, slug: id, title: `Event ${id}`, status: "published", version: 1, visible: true, event_date: date, start_time: "10:00", end_time: "12:00", time_zone: "Asia/Manila", registration_type: "external", registration_url: `https://example.test/${id}`, ...extra });
+  const res = (id, date, status, extra = {}) => ({ id, slug: id, title: `Res ${id}`, status, version: 1, publish_date: date, resource_type: "article", category: "Tutorials", summary: `About ${id}`, body_html: "<p>Body.</p>", ...extra });
+  const records = {
+    settings: seed.settings,
+    events: [ev("past", "2020-01-01"), ev("later", "2099-03-01", { summary: "<b>Bold</b> & co" }), ev("soon", "2099-01-01"), ev("hidden", "2099-01-02", { visible: false }), ev("d", "2099-04-01"), ev("e", "2099-05-01")],
+    resources: [
+      res("draft", "2099-01-01", "draft"), res("scheduled", "2099-01-02", "scheduled"), res("archived", "2099-01-03", "archived"),
+      res("new-a", "2026-11-04", "published", { published_at: "2026-11-04T01:00:00Z" }), res("new-b", "2026-11-04", "published", { published_at: "2026-11-04T02:00:00Z", summary: "" }),
+      res("old", "2026-10-01", "published"), res("older", "2026-09-01", "published"),
+    ],
+  };
+  R.init(toRenderData(buildSnapshot({ records, view: "preview" })));
+  const bar = R.eventBanner();
+  const keys = [...bar.matchAll(/data-announce-key="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(keys, ["soon:2099-01-01:10:00", "later:2099-03-01:10:00", "d:2099-04-01:10:00"], "the next three upcoming, in date order; past and hidden events left out");
+  assert.match(bar, /^<div class="announce" data-announce hidden>/, "hidden until script picks the event (no flash for a visitor who closed it)");
+  assert.match(bar, /data-ends-at="2099-01-01T12:00:00\+08:00"/);
+  assert.match(bar, /<a class="announce__cta" href="\/workshops\/#event-soon" data-track="announcement_click">View Event/, "View Event always opens the event's card on Workshops");
+  assert.ok(!bar.includes("example.test"), "never the registration site, from the bar");
+  assert.match(bar, /data-announce-count aria-hidden="true" hidden>[^]*data-announce-secs>10</, "a 10-second countdown, shown by script");
+  assert.match(bar, /&lt;b&gt;Bold&lt;\/b&gt; &amp; co/, "CMS text is escaped");
+  assert.match(bar, /<button class="announce__close" type="button" data-announce-close aria-label="[^"]+">/);
+  assert.ok(!bar.includes("{{"), "nothing GHL would read as a merge field");
+
+  const titles = (html) => [...html.matchAll(/class="latest__title"><a href="\/resources\/([^/]+)\/"/g)].map((m) => m[1]);
+  assert.deepEqual(titles(R.latestResources(3)).sort(), ["new-a", "new-b", "old"], "staging (preview) build: drafts, scheduled and archived left out");
+  // The published view (production): live copies carry published_at, which orders same-day resources
+  const live = records.resources.filter((r) => r.status === "published").map((r) => ({ collection: "resources", state: "live", payload: r }));
+  R.init(toRenderData(buildSnapshot({ published: [{ collection: "settings", state: "live", payload: seed.settings }, ...live], view: "published" })));
+  const latest = R.latestResources(3);
+  assert.deepEqual(titles(latest), ["new-b", "new-a", "old"], "newest first (same day: the one that went live last)");
+  assert.equal((latest.match(/latest__entry--lead/g) || []).length, 1);
+  assert.match(latest, /<span class="latest__blank" aria-hidden="true">/, "no picture: the placeholder panel");
+  assert.ok(!/<p class="latest__excerpt">About new-b/.test(latest) && /<p class="latest__excerpt">About new-a<\/p>/.test(latest), "no summary: no empty paragraph");
+
+  R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings, events: [ev("past", "2020-01-01")], resources: [res("draft", "2026-01-01", "draft")] }, view: "preview" })));
+  assert.equal(R.eventBanner(), R.EMPTY_SECTION, "no upcoming event: the bar's section is removed");
+  assert.equal(R.latestResources(3), R.EMPTY_SECTION, "nothing published: the section is removed");
+});

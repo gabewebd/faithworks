@@ -736,11 +736,68 @@ export function calendarData() {
     const base = { id: e.slug, title: e.title, start: e.start, end: e.end, timeZone: e.timeZone, allDay: !e.rec.start_time, past };
     if (past) return base;
     const r = e.registration;
-    const url = e.hasPage ? `/events/${e.slug}/` : r.type === "external" && r.url ? r.url : `/workshops/#event-${e.slug}`;
+    const url = eventUrl(e);
     const cta = r.type === "external" && r.url ? (e.registration.label || "Register") : r.type === "page" ? (e.registration.label || "Register") : null;
     // endsAt: the calendar treats the event as past once it ends, even on an older build
     return { ...base, summary: e.summary, endsAt: eventEndsAt(e.rec), time: e.time ? `${e.time} ${tzAbbrev(e.timeZone)}` : null, location: e.venue, url, external: /^https?:/i.test(url), cta };
   });
+}
+// Where an event is shown: its own page, else its registration site, else its card on Workshops.
+const eventUrl = (e) => e.hasPage ? `/events/${e.slug}/` : e.registration.type === "external" && e.registration.url ? e.registration.url : `/workshops/#event-${e.slug}`;
+
+// Announcement bar ({{eventBanner}}, the first section of a page): a Soft Charcoal card that hangs
+// just under the navigation and stays there while the page scrolls (it sits over the page, so it
+// moves nothing). It previews for 10 seconds with a countdown on its close button, then slides up
+// under the header (js/main.js §22); hovering or focusing it holds the countdown. The close button
+// closes it for good. "View Event" always goes to the event's card on Workshops.
+// The next few upcoming events are all in the markup, hidden; the browser shows the first that has
+// not ended (so a page built before an event ended moves on to the next one by itself) unless the
+// visitor closed that one. A close is remembered per announcement (event id + date + start time,
+// in localStorage): moving the event to a new date, or the next event coming up, is a new
+// announcement; editing its words is not. The script inside shows it before the page is first
+// drawn; js/main.js §22 does the same for markup put in later (GHL pages) and runs the countdown.
+// No upcoming event: the section is removed.
+const BANNER_EVENTS = 3;
+// A calendar with the Apply step's spark, in the site's line-icon style (.route__* strokes on an
+// AI Yellow tile, as the home journey steps)
+const BANNER_ICON = `<span class="announce__icon" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false"><rect class="route__node" x="5" y="9" width="31" height="30" rx="3.5"/><path class="route__line" d="M5 18h31M13 5v8M28 5v8M11 25h7M11 31h11"/><path class="route__node route__node--lead" d="M36 25l2.2 5.8L44 33l-5.8 2.2L36 41l-2.2-5.8L28 33l5.8-2.2Z"/></svg></span>`;
+const CLOSE_ICON = `<svg class="announce__x" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg>`;
+// The countdown ring around the close button (js/main.js §22 drains it over the 10 seconds)
+const BANNER_RING = `<svg class="announce__ring" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle class="announce__ring-track" cx="22" cy="22" r="20"/><circle class="announce__ring-bar" cx="22" cy="22" r="20" pathLength="100"/></svg>`;
+function bannerWhen(e) {
+  const d = eventDate(e);
+  if (!d) return "";
+  const multiDay = e.endDate && e.endDate !== e.date;
+  const dm = (x) => `${fmt(x, { day: "numeric" })} ${fmt(x, { month: "short" })}`; // "14 Nov", as on the event cards
+  const day = multiDay
+    ? `<time datetime="${e.date}">${dm(d)}</time>–<time datetime="${e.endDate}">${dm(eventDate({ date: e.endDate }))}</time>`
+    : `<time datetime="${e.date}">${fmt(d, { weekday: "short" })} ${dm(d)}</time>`;
+  return `<span class="announce__when">${day}</span>${e.time ? `<span class="announce__time">${esc(e.time)} ${esc(tzAbbrev(e.timeZone))}</span>` : ""}`;
+}
+function bannerItem(e, i) {
+  const key = [e.rid, e.date, e.rec.start_time || ""].join(":");
+  return `<div class="announce__item" data-announce-key="${esc(key)}" data-starts-at="${esc(e.start || "")}" data-ends-at="${esc(eventEndsAt(e.rec) || "")}"${i ? " hidden" : ""}>
+          ${BANNER_ICON}
+          <div class="announce__copy">
+            <p class="announce__kicker"><span class="announce__tag" data-announce-status>Upcoming event</span>${bannerWhen(e)}</p>
+            <p class="announce__text"><strong class="announce__title">${esc(e.title)}</strong>${e.summary ? ` <span class="announce__summary">${esc(e.summary)}</span>` : ""}</p>
+          </div>
+          <a class="announce__cta" href="/workshops/#event-${esc(e.slug)}" data-track="announcement_click">View Event<span class="btn__arrow" aria-hidden="true">→</span></a>
+        </div>`;
+}
+// Runs where it stands, before the page is drawn (no "{{": GHL would take it for a merge field)
+const BANNER_SCRIPT = `<script>(function(b){var d=[],n=Date.now(),s=b.querySelectorAll("[data-announce-key]"),i=0;try{d=JSON.parse(localStorage.getItem("fw-announce-dismissed")||"[]")}catch(e){}for(;i<s.length&&Date.parse(s[i].getAttribute("data-ends-at"))<=n;i++);if(s[i]&&d.indexOf(s[i].getAttribute("data-announce-key"))<0){for(var k=0;k<s.length;k++)s[k].hidden=k!==i;b.hidden=false;b.setAttribute("data-announce-ready","")}})(document.currentScript.parentNode)</script>`;
+export function eventBanner() {
+  const up = D.events.filter((e) => e.date && !isPast(e)).sort(byStart).slice(0, BANNER_EVENTS);
+  if (!up.length) return EMPTY_SECTION;
+  return `<div class="announce" data-announce hidden>
+        ${up.map(bannerItem).join("\n        ")}
+        <div class="announce__end">
+          <span class="announce__count" data-announce-count aria-hidden="true" hidden><span class="announce__count-label">Closes in </span><b data-announce-secs>10</b>s</span>
+          <button class="announce__close" type="button" data-announce-close aria-label="Close this event announcement">${BANNER_RING}${CLOSE_ICON}</button>
+        </div>
+        ${BANNER_SCRIPT}
+      </div>`;
 }
 // The Event Calendar (Workshops). js/main.js §8 draws the month from the embedded data: days are
 // buttons (arrow keys move between them), choosing one lists its events in the panel beside the
@@ -806,7 +863,7 @@ export function resourceCards() {
           ${chips}
         </div>
       <ul class="rcards" data-rcards-list>${items.map((a, i) => {
-    const attrs = a.download ? ` download data-track="download_click"` : a.external ? ` target="_blank" rel="noopener"` : "";
+    const attrs = resLink(a);
     const lead = i === 0 && a.featured;
     const words = [a.title, a.excerpt, a.category, a.typeLabel, ...a.topics].filter(Boolean).join(" ").toLowerCase();
     return `
@@ -823,6 +880,41 @@ export function resourceCards() {
   }).join("")}
       </ul>
       <p class="rcards__none small" data-rcards-none hidden>No resources match your search.</p>`;
+}
+
+// Latest resources ({{latestResources:3}}, Home and Learn): the newest published resources, one
+// lead and the next ones as numbered entries beside it, each with its picture, type, category,
+// date and summary. Only published content: the published view holds nothing else, and a staging
+// (preview) build leaves out anything whose status is not "published" (drafts, scheduled, edits
+// awaiting publishing). Newest by publish date, then by when it went live. Strictly by date (the
+// Resources page puts Featured first). No picture: a quiet Faith Pink panel; no summary: none.
+// Nothing published: the section is removed.
+const byPublished = (a, b) => newest(a, b) || String(b.rec.published_at || "").localeCompare(String(a.rec.published_at || ""));
+const resLink = (a) => a.download ? ` download data-track="download_click"` : a.external ? ` target="_blank" rel="noopener"` : "";
+const LATEST_BLANK = `<span class="latest__blank" aria-hidden="true"><svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" focusable="false"><path d="M0 70 H52 Q62 70 62 60 V38 Q62 28 72 28 H160"/><path d="M104 100 V62 Q104 52 114 52 H160"/><circle cx="62" cy="48" r="3"/><circle cx="114" cy="52" r="3"/></svg></span>`;
+export function latestResources(limit) {
+  const items = D.articles.filter((a) => a.href && (!a.status || a.status === "published")).sort(byPublished).slice(0, Number(limit) || 3);
+  if (!items.length) return EMPTY_SECTION;
+  const entry = (a, i) => {
+    const lead = i === 0, attrs = resLink(a);
+    const cats = String(a.category || "").split("·").map((c) => c.trim()).filter(Boolean);
+    const date = articleDate(a);
+    const media = a.image ? img(a.image, lead ? "(min-width: 900px) 56vw, 100vw" : "(min-width: 900px) 14vw, 30vw", "latest__img") : LATEST_BLANK;
+    return `<li class="latest__entry${lead ? " latest__entry--lead" : ""}">
+          <a class="latest__media" href="${esc(a.href)}"${attrs} tabindex="-1" aria-hidden="true">${media}</a>
+          <div class="latest__body">
+            <p class="latest__meta"><span class="latest__num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><span class="latest__type">${esc(a.typeLabel)}</span>${cats.map((c) => `<span>${esc(c)}</span>`).join("")}${date ? `<time datetime="${esc(a.date.slice(0, 10))}">${esc(date)}</time>` : ""}</p>
+            <h3 class="latest__title"><a href="${esc(a.href)}"${attrs}>${esc(a.title)}${a.external ? `<span class="sr-only"> (opens in a new tab)</span>` : ""}</a></h3>
+            ${a.excerpt ? `<p class="latest__excerpt">${esc(a.excerpt)}</p>` : ""}
+            ${lead ? `<span class="latest__more" aria-hidden="true">${esc(cardLabel(a))} <span class="link-arrow">${a.download ? "↓" : "→"}</span></span>` : ""}
+          </div>
+        </li>`;
+  };
+  return `<div class="latest">
+        <ol class="latest__list" aria-label="Newest resources">
+        ${items.map(entry).join("\n        ")}
+        </ol>
+      </div>`;
 }
 
 export function block(b) {
