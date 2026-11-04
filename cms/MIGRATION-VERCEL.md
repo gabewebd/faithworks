@@ -43,7 +43,7 @@ CMS ──► PUBLIC_SITE_DEPLOY_HOOK_URL (Vercel deploy hook of the website) on
 | Google sign-in | ✓ code is host-neutral | Add the new callback URL in Google Cloud; set `CMS_BASE_URL` per environment |
 | Image upload | | **Vercel request body limit is 4.5 MB**; the CMS accepts up to 5 MB (Netlify allows 6 MB). Lower `MAX_BYTES` to 4 MB or upload straight to Supabase with a signed URL |
 | `included_files` (netlify.toml) | | Vercel equivalent: `functions["api/index.mjs"].includeFiles`, plus *Include files outside the Root Directory* ON. Verify the preview renders on a preview deploy |
-| Scheduled functions (`publish-scheduled` every 5 min, `daily-rebuild` 16:05 UTC) | | Rewrite as Vercel Cron Jobs: two GET routes (e.g. `/api/cron/publish-scheduled`, `/api/cron/daily-rebuild`) guarded by `CRON_SECRET`, and `crons` in `vercel.json`. **Every 5 minutes needs Vercel Pro** (Hobby: once a day, imprecise time) |
+| Scheduled functions | ✓ none needed | **Scheduled publishing was removed** (user decision, 2026-11-04): no 5-minute job. `daily-rebuild` (Netlify only) is not needed either, since the website build hook is no longer used. No Vercel Cron Jobs required |
 | Netlify *Visitor access* | | Vercel *Deployment Protection*: protect Preview only. Production must stay public (`/api/public/content` is read by the website build and by GHL pages) |
 | Node version | | `engines: ">=20"` is open-ended; pin `22.x` in Project Settings or `package.json` |
 | Root `.vercelignore` | ✓ fixed on this branch | **Confirmed: Vercel applies the repo-root `.vercelignore` to the CMS project too** (first build failed: `Cannot find module /vercel/path0/cms/scripts/build-static.mjs`). This branch allowlists `cms/package.json`, `vercel.json`, `api/`, `server/`, `scripts/`, `public/`, `fixtures/`. `main`'s CDN-only `.vercelignore` needs the same lines (plus `!/tools` and `!/data` without `/data/migration`) before the CMS can deploy from `main` |
@@ -72,7 +72,6 @@ secret as **Sensitive** in Vercel. None of these may use a `NEXT_PUBLIC_` prefix
 | `PUBLIC_SITE_DEPLOY_HOOK_URL` | opt. | – | ✓ | Not needed any more: `main` on Vercel is only the asset CDN and the GHL pages load content live (`poc/ghl-cms-pages`, `poc/ghl-resources-cms`). Unset = publishing skips the rebuild. The daily-rebuild cron is then unnecessary too |
 | `CMS_PREVIEW_TOKEN` | opt. | opt. | ✓ | ≥ 32 chars |
 | `CMS_IFRAME_HOSTS` | opt. | opt. | | |
-| `CRON_SECRET` | ✓ | – | ✓ | **New**, for the cron routes |
 | `CMS_DEV_LOGIN` | ✗ | ✗ | | Refused on hosted deployments; do not copy |
 
 Do **not** copy obsolete variables if Netlify still has them (README §6): `FORMS_ALLOWED_ORIGINS`,
@@ -118,12 +117,11 @@ Vercel's own `VERCEL*` variables are set automatically.
 ## 7. Limits and cost
 
 * **Hobby is for non-commercial use only**; a business CMS belongs on **Pro** (per-member monthly fee,
-  usage included, then metered). Pro is also needed for the 5-minute scheduler.
+  usage included, then metered). (Scheduled publishing was removed, so no cron job needs Pro.)
 * Function request and response bodies: 4.5 MB (affects image upload; `/api/backup` grows with
   `cms_history`, so watch its size).
-* Cron Jobs run on Production deployments only.
 * Expected usage is tiny (a handful of editors, one public JSON read per website build and per GHL page
-  view, 288 scheduler calls a day). GHL page views calling `/api/public/content` are the main volume:
+  view). GHL page views calling `/api/public/content` are the main volume:
   check the Netlify usage page for current request counts before choosing a plan.
 
 ## 8. Ordered plan
@@ -132,17 +130,15 @@ Vercel's own `VERCEL*` variables are set automatically.
    variables into `cms/env.local.copy` (all contexts). ← blocked, see report.
 2. Approve the plan tier, the Vercel owner/team and whether Preview gets its own Supabase project.
 3. Code adaptations on this branch, tests green, no behaviour change on Netlify:
-   a. cron routes + `CRON_SECRET` + `crons` in `vercel.json`;
-   b. one shared switch (e.g. `CMS_SCHEDULER_ENABLED`) honoured by both the Netlify and Vercel
-      schedulers, so publishing never runs on both hosts at once;
-   c. upload limit ≤ 4 MB (or signed direct upload);
-   d. `includeFiles` for the preview renderer; Node 22 pin; `cms/.vercelignore`;
-   e. confirm the rewrite keeps the request path.
+   a. ~~cron routes~~ not needed: scheduled publishing removed;
+   b. upload limit ≤ 4 MB (or signed direct upload);
+   c. `includeFiles` for the preview renderer; Node 22 pin; `cms/.vercelignore`;
+   d. confirm the rewrite keeps the request path.
 4. Create the Vercel project (no domain), set env vars, Preview first: `/api/health` reports
    `configured: true`, sign-in, edit a draft, upload an image, page preview, `/api/public/content`.
 5. Production deploy on the `*.vercel.app` URL in parallel; compare `/api/public/content` from both
-   hosts (same JSON). Netlify stays primary; Vercel scheduler off.
-6. Cutover window: scheduler off on Netlify, on on Vercel; website `CMS_CONTENT_URL` → new URL;
+   hosts (same JSON). Netlify stays primary.
+6. Cutover window: website `CMS_CONTENT_URL` → new URL;
    redeploy website; GHL `data-cms-url` updated (or custom domain live).
 7. Watch for 2–4 weeks with Netlify kept as rollback (switch the URLs back). Then retire Netlify
    (separate approval).
