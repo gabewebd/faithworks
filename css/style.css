@@ -2510,6 +2510,10 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .article__body > h2 { margin: 52px 0 14px; font-size: clamp(28px, 3vw, 42px); line-height: 1.08; letter-spacing: -0.045em; }
 .article__body > h3 { margin: 32px 0 10px; font-size: clamp(21px, 1.9vw, 26px); }
 .article__body > ul, .article__body > ol { padding-left: 22px; margin-bottom: 1em; display: grid; gap: 8px; }
+/* Every text link in an article reads as a link (same look as a.inline), whether or not the CMS
+   body gave it the class: sources, internal links and video links were showing as plain text. */
+.article__body :is(p, li, td, figcaption, blockquote, dd) a:not(.btn):not([class*="btn"]) { text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+.article__body :is(p, li, td, figcaption, blockquote, dd) a:not(.btn):not([class*="btn"]):hover { color: var(--rose); }
 .callout { margin: 28px 0; padding: 22px 24px; border-radius: var(--r); background: var(--stone-2); }
 .callout__label { margin: 0 0 6px; font-size: var(--fs-small); font-weight: 700; color: var(--rose); }
 .callout h3 { margin-bottom: 8px; font-size: 19px; }
