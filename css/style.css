@@ -2475,6 +2475,7 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .rcard__more .link-arrow { width: auto; height: auto; text-indent: 0; background: none; -webkit-mask: none; mask: none; transition: transform var(--dur) var(--ease-out); }
 .rcard:hover .rcard__more .link-arrow { transform: translateX(4px); }
 .rcard--lead { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+.rcard--lead .rcard__img { height: 100%; }
 .rcard--lead .rcard__img img { aspect-ratio: auto; height: 100%; min-height: 340px; }
 .rcard--lead .rcard__body { justify-content: center; padding: clamp(28px, 3.4vw, 48px); }
 .rcard--lead h3 { font-size: clamp(28px, 3vw, 44px); }
@@ -2484,7 +2485,8 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 @media (max-width: 760px) {
   .rcards { grid-template-columns: minmax(0, 1fr); }
   .rcard--lead { display: flex; }
-  .rcard--lead .rcard__img img { aspect-ratio: 16 / 10; height: auto; min-height: 0; }
+  .rcard--lead .rcard__img, .rcard--lead .rcard__img img { height: auto; }
+  .rcard--lead .rcard__img img { aspect-ratio: 16 / 10; min-height: 0; }
   .rcards__search { max-width: none; }
 }
 @media (max-width: 640px) {
@@ -4788,54 +4790,7 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 }
 @media (prefers-reduced-motion: reduce) { .announce { transition: none; } .motion .announce[data-announce-ready] { animation: none; } }
 
-/* Latest resources (Home, Learn; tools/render.mjs latestResources): an editorial "latest" module.
-   The newest resource leads with a large picture; the next ones are numbered entries beside it,
-   divided by hairlines, each with a small picture. Type in a Faith Pink pill (as on Resources). */
-.latest__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: var(--grid); column-gap: var(--col-gap); align-content: start; }
-.latest__entry { position: relative; min-width: 0; }
-@media (min-width: 901px) { .section-head > .latest__intro { grid-column: 8 / -1; } } /* starts where the lead's text does */
-.latest__entry--lead { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; row-gap: 22px; align-items: center; }
-.latest__entry--lead .latest__media { grid-column: 1 / span 7; }
-.latest__entry--lead .latest__body { grid-column: 8 / -1; padding-right: clamp(0px, 2vw, 32px); }
-.latest__entry:not(.latest__entry--lead) {
-  grid-column: span 6; display: grid; grid-template-columns: minmax(0, 1fr) clamp(112px, 11vw, 168px); gap: clamp(16px, 1.8vw, 24px); align-items: start;
-  margin-top: clamp(28px, 3.4vw, 48px); padding-top: clamp(20px, 2.2vw, 28px); border-top: 1px solid var(--line);
-}
-.latest__entry:not(.latest__entry--lead) .latest__media { order: 2; }
-.latest__media { display: block; overflow: hidden; border-radius: var(--r-lg); background: var(--stone-2); }
-.latest__img, .latest__img img { display: block; width: 100%; }
-.latest__img img { aspect-ratio: 16 / 10; object-fit: cover; transition: scale 700ms var(--ease-expo); }
-.latest__entry:not(.latest__entry--lead) .latest__media { border-radius: var(--r); }
-.latest__entry:not(.latest__entry--lead) .latest__img img, .latest__entry:not(.latest__entry--lead) .latest__blank { aspect-ratio: 4 / 3; }
-.latest__entry:hover .latest__img img { scale: 1.04; }
-/* No picture: a quiet Faith Pink panel with the line-and-node motif */
-.latest__blank { display: block; aspect-ratio: 16 / 10; background: radial-gradient(120% 90% at 100% 0%, rgb(239 172 186 / 0.55), rgb(239 172 186 / 0) 70%), var(--pink-tint); }
-.latest__blank svg { display: block; width: 100%; height: 100%; fill: none; stroke: rgb(26 26 26 / 0.18); stroke-width: 1; }
-.latest__blank circle { fill: var(--pink); stroke: var(--white); stroke-width: 1.5; }
-.latest__body { display: flex; flex-direction: column; align-items: start; gap: 10px; min-width: 0; }
-.latest__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; }
-.latest__type ~ *::before { content: "\00B7"; margin: 0 0.6em; }
-.latest__num { display: inline-flex; align-items: center; gap: 10px; margin-right: 12px; font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
-.latest__num::after { content: ""; width: 22px; height: 1px; background: rgb(26 26 26 / 0.35); }
-.latest__type { padding: 3px 10px; border-radius: 999px; background: var(--pink); font-size: 12px; font-weight: 700; }
-.latest__title { margin: 0; font-size: clamp(19px, 1.5vw, 23px); line-height: 1.2; letter-spacing: -0.03em; }
-.latest__entry--lead .latest__title { font-size: clamp(26px, 2.6vw, 40px); line-height: 1.08; letter-spacing: -0.04em; max-width: 24ch; }
-.latest__title a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
-.latest__title a:focus-visible { outline: none; }
-.latest__entry:focus-within { outline: 3px solid var(--focus); outline-offset: 6px; border-radius: var(--r); }
-.latest__entry:hover .latest__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.latest__excerpt { margin: 0; max-width: 60ch; font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
-.latest__entry--lead .latest__excerpt { font-size: 17px; -webkit-line-clamp: 3; line-clamp: 3; }
-.latest__more { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; font-size: var(--fs-small); font-weight: 600; }
-.latest__entry:hover .latest__more .link-arrow { transform: translateX(3px); }
-@media (max-width: 900px) {
-  .latest__entry--lead, .latest__entry:not(.latest__entry--lead) { grid-column: 1 / -1; }
-  .latest__entry--lead .latest__media, .latest__entry--lead .latest__body { grid-column: 1 / -1; padding-right: 0; }
-  .latest__entry:not(.latest__entry--lead) { margin-top: 0; padding-block: 20px; }
-  .latest__entry--lead + .latest__entry { margin-top: 28px; }
-  .latest__entry:not(.latest__entry--lead):last-child { border-bottom: 1px solid var(--line); }
-}
-@media (max-width: 640px) {
-  .latest__entry:not(.latest__entry--lead) { grid-template-columns: minmax(0, 1fr) 96px; }
-  .latest__entry:not(.latest__entry--lead) .latest__excerpt { display: none; }
-}
+/* Latest resources (Home, Learn; tools/render.mjs latestResources): the Resources page's cards
+   (.rcards, .rcard--lead), the newest as the wide lead and one row of three below it. The row
+   stays three across until the cards stack, so the third never sits alone. */
+@media (min-width: 761px) { .latest .rcards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
