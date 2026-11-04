@@ -15,3 +15,15 @@
 !/cms
 /cms/*
 !/cms/shared
+# The CMS Vercel project (Root Directory "cms") is built from this same repository and Vercel applies
+# this file to it too. It needs its dashboard, API, build script and the seed fixture; its page preview
+# imports tools/ and reads data/*.json and assets/icons (all allowed above). Never the CMS's .env files,
+# local data, backups, tests or SQL. The website project still serves only dist/, so none of these
+# files becomes public there.
+!/cms/package.json
+!/cms/vercel.json
+!/cms/api
+!/cms/server
+!/cms/scripts
+!/cms/public
+!/cms/fixtures
