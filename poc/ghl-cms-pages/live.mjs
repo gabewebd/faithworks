@@ -5,7 +5,8 @@
 //
 // The page arrives with those sections as they were when it was built, each between
 // <!--fw-live:name:arg:hash--> and <!--/fw-live-->. That markup is the loading state, and it stays
-// if the CMS cannot be reached. Here the same site renderers run on the live content; a section
+// if the CMS cannot be reached; the calendar and event cards instead arrive as shimmer placeholders,
+// with the built markup in a <template> that comes back only if the CMS cannot be reached. Here the same site renderers run on the live content; a section
 // whose HTML hash differs (an event published, moved or now past, a testimonial added) is
 // replaced, and js/main.js FW_SITE.mount gives the new markup its behaviour. A section the CMS
 // leaves empty is hidden, and shown again when it has content. Nothing else on the page changes.
@@ -36,7 +37,21 @@ import { finish, hash, LIVE, START, END, startMark } from "./finish.mjs";
     while (end && !(end.nodeType === 8 && end.data.trim() === END)) end = end.nextSibling;
     if (end) marks.push({ start: c, end: end, name: m[1], arg: m[2], hash: m[3] });
   }
-  if (!cms || !marks.length) return;
+  if (!marks.length) return;
+  // Calendar and event cards arrive as placeholders with the built markup in a <template>; when
+  // the CMS cannot be reached, that built markup is shown instead (and set up by js/main.js).
+  var fallback = function () {
+    marks.forEach(function (mk) {
+      var tpl = null;
+      for (var n = mk.start.nextSibling; n && n !== mk.end; n = n.nextSibling) if (n.nodeName === "TEMPLATE" && n.hasAttribute("data-fw-live-fallback")) tpl = n;
+      if (!tpl) return;
+      var parent = mk.start.parentNode;
+      while (mk.start.nextSibling && mk.start.nextSibling !== mk.end) parent.removeChild(mk.start.nextSibling);
+      parent.insertBefore(tpl.content, mk.end);
+      if (window.FW_SITE) window.FW_SITE.mount(parent);
+    });
+  };
+  if (!cms) return fallback();
 
   root.setAttribute("data-fw-live", "loading");
   var ctrl = "AbortController" in window ? new AbortController() : null;
@@ -79,6 +94,7 @@ import { finish, hash, LIVE, START, END, startMark } from "./finish.mjs";
     .catch(function (e) {
       clearTimeout(timer);
       root.setAttribute("data-fw-live", "failed");
+      fallback();
       log("Showing the content as built; the live CMS content could not be loaded (" + (e && e.message) + ").");
     });
 })();

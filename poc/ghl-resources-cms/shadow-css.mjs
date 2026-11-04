@@ -65,23 +65,40 @@ export const EXTRA_CSS = `.fw-main [id]{scroll-margin-top:calc(var(--header-h) +
 /* Resource cards: no white card, photo on top at 16/10 and the details below; three columns on
    desktop, two on tablets, one on phones. The featured (lead) card spans the row, photo left and
    details right, with a hairline under it, until phones stack it like the rest; on phones every
-   card has hairlines between */
-.rcards{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(40px,4vw,56px) clamp(20px,2.4vw,32px);border-top:0}
+   card has hairlines between. Desktop and tablets: a hairline across the full grid width,
+   centred in the gap between rows (the featured card's own line sits the same way) */
+.rcards{--fw-rgap:clamp(40px,4vw,56px);--fw-cgap:clamp(20px,2.4vw,32px);grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--fw-rgap) var(--fw-cgap);border-top:0}
 .rcards .rcard,.rcards .rcard--lead{display:flex;flex-direction:column;grid-column:auto;gap:18px;padding:0;overflow:visible;border:0;border-radius:0;background:none;box-shadow:none}
 .rcards .rcard:hover{transform:none;box-shadow:none}
 .rcards .rcard:focus-within{outline-offset:6px}
 .rcards .rcard__media{border-radius:var(--r-lg)}
 .rcards .rcard__img img,.rcards .rcard__img--blank{aspect-ratio:16/10;height:auto;min-height:0}
 .rcards .rcard__body{flex:1;justify-content:flex-start;gap:8px;padding:0}
-.rcards .rcard h3,.rcards .rcard--lead h3{font-size:clamp(20px,1.7vw,24px)}
-.rcards .rcard__excerpt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.rcards .rcard--lead{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,6fr) minmax(0,6fr);align-items:center;gap:clamp(20px,3.4vw,56px);padding-bottom:clamp(40px,4vw,56px);border-bottom:1px solid var(--line)}
-.rcards .rcard--lead .rcard__body{justify-content:center}
-.rcards .rcard--lead h3{font-size:clamp(28px,3.2vw,46px)}
-@media (max-width:960px){.rcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rcards .rcard h3,.rcards .rcard--lead h3{font-size:clamp(19px,1.5vw,22px);line-height:1.22;letter-spacing:-0.025em}
+.rcards .rcard__excerpt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Lighter reading: the type pill and the meta share one line, and the meta and summary sit in
+   softer Charcoal (translucent ink) at a smaller size, so each card reads title first */
+.rcards .rcard__body{flex-direction:row;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:10px 12px}
+.rcards .rcard__body>:not(.rcard__badges):not(.rcard__meta){flex:0 0 100%;min-width:0}
+.rcards .rcard__meta{font-size:13px;font-weight:500;color:rgb(26 26 26 / 0.66)}
+.rcards .rcard__excerpt{font-size:15px;line-height:1.6;color:rgb(26 26 26 / 0.72)}
+.rcards .rcard h3{margin-top:2px}
+.rcards .rcard--lead{display:grid;grid-column:1/-1;grid-template-columns:minmax(0,6fr) minmax(0,6fr);align-items:center;gap:clamp(20px,3.4vw,56px);padding-bottom:calc(var(--fw-rgap) / 2);margin-bottom:calc(var(--fw-rgap) / -2);border-bottom:1px solid var(--line)}
+.rcards .rcard--lead .rcard__body{align-content:center;justify-content:flex-start}
+.rcards .rcard--lead h3{font-size:clamp(28px,3.2vw,46px);line-height:1.12;letter-spacing:-0.035em}
+.rcards .rcard--lead .rcard__excerpt{-webkit-line-clamp:3;font-size:17px}
+/* Row lines hang off the first card of every row after the first, counted among the visible
+   non-featured cards only (paging, search and the type filter hide cards with [hidden]) */
+.rcards .rcard:nth-child(3n+4 of .rcard:not([hidden]):not(.rcard--lead))::before{content:"";position:absolute;top:calc(var(--fw-rgap) / -2);left:0;width:calc(300% + 2 * var(--fw-cgap));border-top:1px solid var(--line);pointer-events:none}
+@media (max-width:960px){
+.rcards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rcards .rcard:nth-child(3n+4 of .rcard:not([hidden]):not(.rcard--lead))::before{content:none}
+.rcards .rcard:nth-child(2n+3 of .rcard:not([hidden]):not(.rcard--lead))::before{content:"";position:absolute;top:calc(var(--fw-rgap) / -2);left:0;width:calc(200% + var(--fw-cgap));border-top:1px solid var(--line);pointer-events:none}
+}
 @media (max-width:640px){
 .rcards{grid-template-columns:minmax(0,1fr);gap:0;border-top:1px solid var(--line)}
-.rcards .rcard,.rcards .rcard--lead{display:flex;gap:16px;padding-block:24px;border-bottom:1px solid var(--line)}
+.rcards .rcard,.rcards .rcard--lead{display:flex;gap:16px;padding-block:24px;margin-bottom:0;border-bottom:1px solid var(--line)}
+.rcards .rcard:nth-child(n of .rcard:not([hidden]):not(.rcard--lead))::before{content:none}
 .rcards .rcard h3,.rcards .rcard--lead h3{font-size:22px}
 .rcards .rcard__meta{font-size:13px}
 .rcards .rcard__excerpt{font-size:15px}

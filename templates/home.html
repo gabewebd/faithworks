@@ -4,11 +4,6 @@
   "description": "Practical workshops, guided programs and business support that help founders, professionals and teams turn AI learning into work they can use.",
   "nav": "home"
 }-->
-    <!-- ANNOUNCEMENT: the next upcoming CMS event, under the header (tools/render.mjs eventBanner); removed when there is none -->
-    <section class="announce-slot" id="announcement" aria-label="Event announcement">
-      {{eventBanner}}
-    </section>
-
     <!-- HERO: centred copy on the feather gradient (brand guidelines p.18, G1), with the node web below
          the CTAs (p.21) and the motto under it. The web runs the full width of the hero: lines come in
          from the edge through the AI tools, merge at a junction and enter the Faith Works hub; on the
@@ -76,7 +71,7 @@
         </div>
         <div class="egallery__intro">
           <p>Masterclasses, hands-on workshops, keynotes and community gatherings, with real people working on real tasks.</p>
-          <a class="text-link" href="/workshops/#gallery">View all events</a>
+          <a class="text-link" href="/workshops/">View all events</a>
         </div>
       </div>
       {{eventGallery:home}}
@@ -469,21 +464,6 @@
         <a href="/build/#faith-ai"><h3 class="ecosystem__brand"><img class="brandmark brandmark--ai" src="https://faithworks.vercel.app/assets/icons/faith-ai.svg" alt="Faith AI" width="2030" height="496" loading="lazy" decoding="async"></h3><p>AI-supported business systems, starting with your use case.</p></a>
         <a href="/community/"><h3 class="ecosystem__brand"><img class="brandmark brandmark--community" src="https://faithworks.vercel.app/assets/icons/faith-works-community.svg" alt="Faith Works Community" width="2922" height="740" loading="lazy" decoding="async"></h3><p>People who keep learning and applying together.</p></a>
       </div>
-    </section>
-
-    <!-- RESOURCES: the three newest published resources from the CMS (tools/render.mjs latestResources); removed when none is published -->
-    <section class="section section--rule wrap" id="latest" aria-labelledby="latest-title">
-      <div class="section-head">
-        <div data-reveal>
-          <p class="eyebrow">Fresh from the library</p>
-          <h2 id="latest-title" data-split>Practical reads<br>for real work.</h2>
-        </div>
-        <div class="latest__intro" data-reveal>
-          <p>Free guides and articles for using AI at work with more confidence. The newest first.</p>
-          <a class="btn btn--light" href="/resources/">Explore All Resources</a>
-        </div>
-      </div>
-      {{latestResources:3}}
     </section>
 
     <!-- FAQ (brief §3 suggested FAQ copy) -->

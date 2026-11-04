@@ -391,16 +391,17 @@ test("announcement bar: next upcoming events only, dismiss key, View Event link;
   assert.match(bar, /<button class="announce__close" type="button" data-announce-close aria-label="[^"]+">/);
   assert.ok(!bar.includes("{{"), "nothing GHL would read as a merge field");
 
-  const titles = (html) => [...html.matchAll(/class="latest__title"><a href="\/resources\/([^/]+)\/"/g)].map((m) => m[1]);
+  const titles = (html) => [...html.matchAll(/<h3><a href="\/resources\/([^/]+)\/"/g)].map((m) => m[1]);
   assert.deepEqual(titles(R.latestResources(3)).sort(), ["new-a", "new-b", "old"], "staging (preview) build: drafts, scheduled and archived left out");
   // The published view (production): live copies carry published_at, which orders same-day resources
   const live = records.resources.filter((r) => r.status === "published").map((r) => ({ collection: "resources", state: "live", payload: r }));
   R.init(toRenderData(buildSnapshot({ published: [{ collection: "settings", state: "live", payload: seed.settings }, ...live], view: "published" })));
   const latest = R.latestResources(3);
   assert.deepEqual(titles(latest), ["new-b", "new-a", "old"], "newest first (same day: the one that went live last)");
-  assert.equal((latest.match(/latest__entry--lead/g) || []).length, 1);
-  assert.match(latest, /<span class="latest__blank" aria-hidden="true">/, "no picture: the placeholder panel");
-  assert.ok(!/<p class="latest__excerpt">About new-b/.test(latest) && /<p class="latest__excerpt">About new-a<\/p>/.test(latest), "no summary: no empty paragraph");
+  assert.equal((latest.match(/rcard--lead/g) || []).length, 1, "the newest leads, as on Resources");
+  assert.match(latest, /^\s*<div class="latest">\s*<ul class="rcards" aria-label="Newest resources">\s*<li class="rcard rcard--lead">/, "the Resources page's cards; no search or filter hooks");
+  assert.match(latest, /<span class="rcard__img rcard__img--blank"><\/span>/, "no picture: the placeholder panel");
+  assert.ok(!/<p class="rcard__excerpt">About new-b/.test(latest) && /<p class="rcard__excerpt">About new-a<\/p>/.test(latest), "no summary: no empty paragraph");
 
   R.init(toRenderData(buildSnapshot({ records: { settings: seed.settings, events: [ev("past", "2020-01-01")], resources: [res("draft", "2026-01-01", "draft")] }, view: "preview" })));
   assert.equal(R.eventBanner(), R.EMPTY_SECTION, "no upcoming event: the bar's section is removed");
