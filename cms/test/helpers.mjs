@@ -29,12 +29,12 @@ export const USERS = {
   author2: "second.author@example.test",
 };
 
-export function testApp({ env = {}, store, fetchImpl } = {}) {
+export function testApp({ env = {}, store, fetchImpl, generateCopy } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "fwcms-"));
   const logs = [];
   const app = createApp({
     env: { CMS_STORE: "json", CMS_JSON_PATH: join(dir, "store.json"), CMS_DEV_LOGIN: "true", CMS_PREVIEW_TOKEN: "p".repeat(40), PUBLIC_SITE_URL: "https://faithph.ai", ...env },
-    store: store || (process.env.CMS_TEST_SUPABASE_URL ? supabaseTestStore() : undefined), fetchImpl, log: { error: (m) => logs.push(m) },
+    store: store || (process.env.CMS_TEST_SUPABASE_URL ? supabaseTestStore() : undefined), fetchImpl, generateCopy, log: { error: (m) => logs.push(m) },
   });
   return { app, dir, logs, cleanup: () => rmSync(dir, { recursive: true, force: true }) };
 }

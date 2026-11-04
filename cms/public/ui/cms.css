@@ -468,3 +468,15 @@ fieldset.card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1
 fieldset.card > * { grid-column: 1 / -1; }
 fieldset.card > .field--half { grid-column: auto; }
 @media (max-width: 700px) { fieldset.card > .field--half { grid-column: 1 / -1; } }
+
+/* ---- Newsletter ---- */
+.nl-text { margin: 0; white-space: pre-line; }
+.nl-label { font-weight: 500; font-size: .9rem; margin: 4px 0 6px; }
+.nl-items li { align-items: flex-start; }
+.nl-item { display: grid; gap: 6px; min-width: 0; flex: 1; }
+.nl-item .mono { overflow-wrap: anywhere; }
+.nl-img { flex: none; width: 112px; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+.nl-img--none { display: grid; place-items: center; font-size: .75rem; }
+.nl-url { overflow-wrap: anywhere; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; }
+.nl-actions { margin-top: 12px; }
+@media (max-width: 640px) { .nl-items li { flex-direction: column; } .nl-img { width: 100%; } .nl-preview .two { grid-template-columns: 1fr; } }

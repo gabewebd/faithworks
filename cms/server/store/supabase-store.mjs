@@ -34,6 +34,9 @@ const COLUMNS = {
 for (const c of Object.keys(COLLECTIONS)) COLUMNS[c] = [...SYSTEM_FIELDS, ...(hasSlug(c) ? ["slug"] : [])];
 // CMS content and system tables (check, seed, import and backup work on these).
 export const SUPABASE_TABS = Object.keys(COLUMNS);
+// Newsletter issues (supabase/migrations/20261105000000_newsletters.sql). Kept out of
+// SUPABASE_TABS so check/seed/import/backup keep working before that migration is applied.
+COLUMNS.newsletters = ["id", "status", "version", "write_id", "created_at", "created_by", "updated_at", "updated_by", "data"];
 // cms_form_submissions (supabase/migrations/20261021000000_form_submissions.sql) still holds the
 // submissions the CMS took before website forms moved to GoHighLevel. The CMS no longer reads or
 // writes it; keeping or deleting those rows is a separate decision.

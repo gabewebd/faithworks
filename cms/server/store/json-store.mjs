@@ -18,6 +18,7 @@ export function createJsonStore({ path, seedPath }) {
   const load = () => {
     const data = JSON.parse(readFileSync(path, "utf8"));
     for (const t of ALL_TABS) data[t] ||= [];
+    data.newsletters ||= []; // newsletter issues (not part of backups/seed)
     return data;
   };
   const save = (data) => {
