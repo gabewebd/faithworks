@@ -1991,14 +1991,16 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
   .bio__main, .talks { grid-template-columns: minmax(0, 1fr); }
   .ahero__grid { grid-template-columns: minmax(0, 1fr); min-height: 0; }
   .ahero__copy { grid-column: 1; padding: clamp(40px, 8vw, 64px) var(--gutter) clamp(40px, 8vw, 56px); }
-  .ahero__photo { grid-column: 1; min-height: 0; aspect-ratio: 4 / 5; max-height: 82svh; }
+  /* Full width, 4:5 tall up to 82% of the screen: a height, not aspect-ratio + max-height, which
+     would shrink the width too and leave an empty band beside the photo */
+  .ahero__photo { grid-column: 1; min-height: 0; width: 100%; height: min(125vw, 82svh); }
   .bio__main > .bio__head, .bio__main > .bio__body { grid-column: 1 / -1; }
   .bio__main { row-gap: 28px; }
   .bio__head { position: static; }
   .bio__head h2 { max-width: 20ch; }
   .bio__proof { grid-template-columns: minmax(0, 1fr); }
-  .talks__photo { width: min(100%, 420px); }
-  .talks__photo img { aspect-ratio: 4 / 4.4; }
+  .talks__photo { width: 100%; }
+  .talks__photo img { aspect-ratio: 3 / 2; }
   .site-footer__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .flow__cards { grid-template-columns: minmax(0, 1fr); }
 }
@@ -2006,6 +2008,7 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
 @media (max-width: 640px) {
   .art__label { font-size: 20px; }
   .art__mono { font-size: 15px; }
+  .talks__photo img { aspect-ratio: 4 / 4.4; }
   :root { --header-h: 64px; --head-gap: 24px; }
   .logo img { width: 144px; }
   h2 { font-size: var(--fs-h2); line-height: 1.05; letter-spacing: -0.045em; }
@@ -3775,9 +3778,9 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
   .bw-path__row::before { left: -1.4em; width: 1.4em; }
   .bw-path__row::after { left: calc(-1.4em - 0.36em); }
   .bw-learn .ticks li, .bw-learn .numbered li { font-size: 16px; }
-  /* kit pages: the cover above the start page; the sheet's five columns kept inside the page */
+  /* kit pages: the start page alone (no cover on phones); the sheet's five columns kept inside the page */
   .bw-kitpage__pair { grid-template-columns: minmax(0, 1fr); }
-  .bw-kitpage__pair .kit-preview__cover { width: min(12em, 60%); justify-self: center; }
+  .bw-kitpage__pair .kit-preview__cover { display: none; }
   .bw-kitpage { padding: 1em; }
   .bw-kitpage__table th, .bw-kitpage__table td { padding: 0.6em 0.4em; }
   .bw-kitpage__prompt > span { grid-template-columns: 6.5em minmax(0, 1fr); }
