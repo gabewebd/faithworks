@@ -233,6 +233,9 @@ code { font-size: 0.9em; }
   touch-action: manipulation;
 }
 .btn:hover { transform: translateY(-2px); }
+/* Hidden link text (.sr-only) before the arrow leaves a blank flex item that doubled the gap; the arrow hugs the label */
+.btn:has(> .sr-only + .btn__arrow) { gap: 0; }
+.btn > .sr-only + .btn__arrow { margin-left: 14px; }
 .btn:active { transform: translateY(1px) scale(0.98); }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
 .btn__arrow, .link-arrow, .route__arrow, .step__arrow { display: inline-block; transition: transform var(--dur) var(--ease-spring); }
@@ -629,6 +632,8 @@ body[data-page="/"] main { background: linear-gradient(var(--white), var(--paper
 #journey.section--field .step:hover .step__arrow { color: var(--ink); }
 #journey.section--field .step[aria-selected="true"] .step__arrow { color: var(--white); }
 #journey.section--field .step:focus-visible { outline-offset: 3px; }
+/* narrow screens: main.js moves the scene right under the open tab (accordion) */
+#journey.section--field .steps > .scenes { margin: 4px 0 14px; }
 #journey .scene--learn, #journey .scene--implement { --field: radial-gradient(85% 110% at 0% 0%, rgb(239 172 186 / 0.5), transparent 78%), radial-gradient(80% 90% at 100% 100%, rgb(251 197 34 / 0.34), transparent 80%), linear-gradient(135deg, #F9E2E6, #FCF1EC 55%, #FDF1D4); }
 #journey .scene--apply, #journey .scene--improve { --field: radial-gradient(90% 100% at 85% 0%, rgb(251 197 34 / 0.42), transparent 78%), radial-gradient(80% 90% at 0% 100%, rgb(239 172 186 / 0.45), transparent 78%), linear-gradient(160deg, #FDF4DC, #FCF7F2 60%, #FAE7EA); }
 #journey .scene--build { --field: radial-gradient(70% 90% at 0% 35%, rgb(239 172 186 / 0.4), transparent 78%), radial-gradient(70% 80% at 85% 100%, rgb(251 197 34 / 0.28), transparent 78%), linear-gradient(180deg, #FFFFFF, #FCF6F3); }
@@ -2378,8 +2383,8 @@ details p { max-width: 680px; margin: 0 0 20px; color: var(--muted); }
    under the summary as the calendar's badges (.cal__tag), so the card reads like a ticket. */
 .event { --event-pad: clamp(18px, 2vw, 26px); display: grid; grid-template-columns: clamp(124px, 10vw, 148px) minmax(0, 1fr) minmax(0, 0.42fr); gap: clamp(20px, 2.4vw, 34px); align-items: start; padding: var(--event-pad); overflow: hidden; border-radius: var(--r-lg); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
 .event__date { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin: calc(-1 * var(--event-pad)) 0 calc(-1 * var(--event-pad)) calc(-1 * var(--event-pad)); padding: 22px 12px; background: var(--yellow); color: var(--ink); text-align: center; }
-.event__date b { font-size: clamp(60px, 5.6vw, 88px); font-weight: 600; line-height: 0.9; letter-spacing: -0.05em; }
-.event__date span { font-size: 15px; font-weight: 600; line-height: 1.2; }
+.event__date b { font-size: clamp(60px, 5.6vw, 88px); font-weight: 700; line-height: 0.9; letter-spacing: -0.05em; }
+.event__date span { font-size: 15px; font-weight: 700; line-height: 1.2; }
 p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
 .event__date .event__dow { font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
 .event--past .event__date { background: var(--stone); }
