@@ -82,7 +82,43 @@ function elementAt(html, from, to, sign) {
   for (let depth = 0, t; (t = re.exec(html));) if ((depth += t[1] ? -1 : 1) === 0) return [start, re.lastIndex];
   return null;
 }
-const marked = (name, arg, html) => `<!--${startMark(name, arg, hash(html))}-->${html}<!--${END}-->`;
+// The calendar and event cards arrive as shimmer placeholders (as the Resources page's cards), so a
+// visitor never sees events as they were at build time before the CMS's current ones. The built
+// markup travels in a <template> (inert: no images load, main.js does not set it up) that
+// js/fw-live.js puts back only if the CMS cannot be reached. The marker hashes the placeholder, so
+// the live content always replaces it (also with an older fw-live.js still on the asset host).
+const bar = (cls = "") => `<span class="fw-skel__bar${cls && ` ${cls}`}"></span>`;
+const SKELETONS = {
+  eventCalendar: () => `<div class="cal fw-skel" role="status"><span class="sr-only">Loading the event calendar…</span>
+        <div class="cal__main" aria-hidden="true">
+          <div class="cal__head">${bar("fw-skel__month")}<div class="cal__controls">${bar("fw-skel__pill")}${bar("fw-skel__dot")}${bar("fw-skel__dot")}</div></div>
+          <div class="cal__grid">${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => `<span class="cal__dow">${d}</span>`).join("")}${'<span class="cal__day fw-skel__img"></span>'.repeat(35)}</div>
+        </div>
+        <div class="cal__panel" aria-hidden="true">${bar("fw-skel__w30")}${bar("fw-skel__h fw-skel__w90")}${bar("fw-skel__h fw-skel__w60")}${bar("fw-skel__w90")}${bar("fw-skel__w70")}</div>
+      </div>`,
+  events: () => `<div class="events fw-skel" role="status"><span class="sr-only">Loading events…</span>${`<article class="event" aria-hidden="true"><div class="event__date fw-skel__img"><b>&nbsp;</b></div><div class="event__body">${bar("fw-skel__chip")}${bar("fw-skel__h fw-skel__w90")}${bar("fw-skel__h fw-skel__w60")}${bar("fw-skel__w90")}${bar("fw-skel__w70")}${bar("fw-skel__btn")}</div></article>`.repeat(2)}</div>`,
+};
+// Their styles, once per page (palette: Faith Pink tints on white, as the Resources page)
+const SKELETON_CSS = `<style data-fw-live-skel>
+.fw-skel{pointer-events:none}
+.fw-skel .fw-skel__bar,.fw-skel .fw-skel__img{background:linear-gradient(100deg,rgb(239 172 186/.14) 30%,rgb(239 172 186/.42) 50%,rgb(239 172 186/.14) 70%) #fff!important;background-size:300% 100%!important;animation:fw-skel 1.5s ease-in-out infinite}
+.fw-skel .fw-skel__bar{display:block;height:12px;margin:0 0 12px;border-radius:6px}
+.fw-skel .fw-skel__h{height:22px;margin-bottom:10px}
+.fw-skel .fw-skel__chip{width:120px;height:22px;margin-bottom:16px;border-radius:999px}
+.fw-skel .fw-skel__btn{width:160px;height:48px;margin:18px 0 0;border-radius:999px}
+.fw-skel .fw-skel__month{width:min(180px,45%);height:30px;margin:0;border-radius:8px}
+.fw-skel .fw-skel__pill{width:80px;height:44px;margin:0;border-radius:999px}
+.fw-skel .fw-skel__dot{width:44px;height:44px;margin:0;border-radius:50%}
+.fw-skel .cal__panel{min-height:220px}
+.fw-skel__w30{width:30%}.fw-skel__w60{width:60%}.fw-skel__w70{width:70%}.fw-skel__w90{width:90%}
+.fw-skel .event+.event .fw-skel__bar,.fw-skel .event+.event .fw-skel__img{animation-delay:.12s}
+@keyframes fw-skel{0%{background-position:100% 0}100%{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.fw-skel .fw-skel__bar,.fw-skel .fw-skel__img{animation:none}}
+</style>`;
+const marked = (name, arg, html) => {
+  if (SKELETONS[name] && html) html = `${SKELETONS[name]()}<template data-fw-live-fallback>${html}</template>`;
+  return `<!--${startMark(name, arg, hash(html))}-->${html}<!--${END}-->`;
+};
 // A template section rendered for the page: static markup finished as the build does, each call's output marked
 function renderSection(src, cdn) {
   const parts = [];
@@ -123,6 +159,10 @@ function page(rootFile, template, cdn) {
       from = el[0] + mark.length;
     }
   });
+  if (html.includes('class="cal fw-skel"') || html.includes('class="events fw-skel"')) {
+    if (!html.includes("</head>")) throw new Error(`${rootFile}: no </head> for the placeholder styles`);
+    html = html.replace("</head>", `${SKELETON_CSS}\n</head>`);
+  }
   // style.css and fw-live.js are versioned by their content, so a re-pasted page never gets a cached older copy
   html = html.replace(/(\/js\/main\.js\?v=)\w+/, `$1${VERSION}`).replace(/(\/css\/style\.css\?v=)\w+/, `$1${CSS_V}`);
   // The live script runs after js/main.js (both deferred, in order), so FW_SITE is there for it
