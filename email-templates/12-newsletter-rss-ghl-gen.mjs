@@ -31,8 +31,9 @@ let ghl = shell.slice(0, a) + loop + shell.slice(b);
 ghl = ghl
   .replace('<body style="margin:0;padding:0;background-color:#FAF8F4;">', '<body style="margin:0;padding:0;">')
   .replace(' bgcolor="#FAF8F4" style="background-color:#FAF8F4;"', '')
-  // Faint grey outline down both sides of the white body (header and footer close it top and bottom).
-  .replaceAll('background-color:#FFFFFF;', 'background-color:#FFFFFF;border-left:1px solid #E6E1D8;border-right:1px solid #E6E1D8;')
+  // Header and footer are rounded on all four corners.
+  .replace("border-radius:16px 16px 0 0;", "border-radius:16px;")
+  .replace("border-radius:0 0 16px 16px;", "border-radius:16px;")
   .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="760" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:760px;">')
   .replace('<tr><td align="center" style="padding:28px 12px 40px 12px;">', '<tr><td align="center" class="fw-outer" style="padding:24px 12px 40px 12px;">')
   .replace("</style>", "  @media only screen and (max-width:620px) { .fw-outer { padding:0 !important; } }\n</style>");
