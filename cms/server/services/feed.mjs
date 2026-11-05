@@ -26,9 +26,12 @@ export function feedConfig(env = process.env, cfg = {}) {
     feedLink: env.NEWSLETTER_FEED_LINK || (site ? `${site}/resources` : ""),
     feedSelf: (cfg.baseUrl || "").replace(/\/$/, "") + "/rss.xml",
     title: env.NEWSLETTER_FEED_TITLE || "Faith Works: latest resources and upcoming events",
-    // Kept small so the email stays under Gmail's 102 KB clipping limit (GHL adds click tracking to every link).
-    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 4),
-    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 4),
+    // Resources: everything published in the last NEWSLETTER_RESOURCE_DAYS days (a week by default); when nothing
+    // is new, the newest NEWSLETTER_FALLBACK_RESOURCES so the email is never empty. MAX values are safety caps.
+    resourceDays: num(env.NEWSLETTER_RESOURCE_DAYS, 7),
+    fallbackResources: num(env.NEWSLETTER_FALLBACK_RESOURCES, 3),
+    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 20),
+    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 10),
   };
 }
 
@@ -80,6 +83,9 @@ export function feedItems(snap, fc, now = new Date()) {
     .filter((r) => r.url)
     .sort((a, b) => String(b.date).localeCompare(String(a.date)))
     .slice(0, fc.maxResources);
+  const since = now.getTime() - (fc.resourceDays ?? 7) * 86400000;
+  const fresh = resources.filter((r) => Date.parse(r.date) >= since);
+  const picked = fresh.length ? fresh : resources.slice(0, fc.fallbackResources ?? 3);
 
   const events = (snap.events || [])
     .filter((e) => e.id && e.title && DATE.test(e.event_date || "") && e.visible !== false)
@@ -101,7 +107,7 @@ export function feedItems(snap, fc, now = new Date()) {
     .sort((a, b) => a.start.localeCompare(b.start))
     .slice(0, fc.maxEvents);
 
-  return [...events, ...resources];
+  return [...events, ...picked];
 }
 
 // GHL fills {{{rss_item.content}}} from <description>, so it carries the same email card as <content:encoded>.

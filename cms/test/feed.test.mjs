@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { feedConfig, feedItems, buildFeed } from "../server/services/feed.mjs";
 
-const fc = feedConfig({ NEWSLETTER_ASSET_ORIGIN: "https://cdn.example.test" }, { publicSiteUrl: "https://site.example.test", baseUrl: "https://cms.example.test" });
+// A 50-day window so both sample resources count as recent; the weekly rule has its own test below.
+const fc = feedConfig({ NEWSLETTER_ASSET_ORIGIN: "https://cdn.example.test", NEWSLETTER_RESOURCE_DAYS: "50" }, { publicSiteUrl: "https://site.example.test", baseUrl: "https://cms.example.test" });
 const now = new Date("2026-11-05T04:00:00Z");
 const snap = {
   resources: [
@@ -46,6 +47,15 @@ test("feed: no image without asset origin; xml escaped; categories and stable gu
   assert.match(soonDesc, /FRI · NOV 20[\s\S]*7:00 PM – 9:00 PM \(Manila\)[\s\S]*Makati/);
   assert.doesNotMatch(xml, /evt_past|evt_hidden|res_noslug/);
   assert.equal(xml, buildFeed(feedItems(snap, fc, now), fc, now));
+});
+
+test("feed: resources published this week, or the newest few when nothing is new", () => {
+  const weekly = feedConfig({}, { publicSiteUrl: "https://site.example.test" });
+  assert.equal(weekly.resourceDays, 7);
+  const ids = (n) => feedItems(snap, weekly, n).filter((i) => i.kind === "resource").map((i) => i.guid);
+  assert.deepEqual(ids(now), ["resource:res_new"]); // res_old (Oct 1) is older than a week
+  assert.deepEqual(ids(new Date("2026-12-31T00:00:00Z")), ["resource:res_new", "resource:res_old"]); // nothing new: fallback
+  assert.deepEqual(feedItems(snap, { ...weekly, fallbackResources: 1 }, new Date("2026-12-31T00:00:00Z")).filter((i) => i.kind === "resource").map((i) => i.guid), ["resource:res_new"]);
 });
 
 test("feed: limits", () => {
