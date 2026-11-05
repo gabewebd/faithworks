@@ -26,6 +26,12 @@ const loop = `  <!-- 3–4. RESOURCES + EVENTS: one block per RSS item. The feed
 
 `;
 let ghl = shell.slice(0, a) + loop + shell.slice(b);
+// Full width: no 600px column, no outer margin, square corners (GHL wraps the email itself).
+ghl = ghl
+  .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">')
+  .replace('<tr><td align="center" style="padding:28px 12px 40px 12px;">', '<tr><td align="center" style="padding:0;">')
+  .replace("border-radius:16px 16px 0 0;", "")
+  .replace("border-radius:0 0 16px 16px;", "");
 ghl = ghl
   .replace(/(<div style="display:none[^>]*>)[^&]*/, "$1New guides to read and live sessions to join this week.")
   .replace("Think better with AI, then put it to work.", "This week at Faith Works")
