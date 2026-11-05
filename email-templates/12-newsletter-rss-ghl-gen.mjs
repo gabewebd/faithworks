@@ -26,15 +26,9 @@ const loop = `  <!-- 3–4. RESOURCES + EVENTS: one block per RSS item. The feed
 
 `;
 let ghl = shell.slice(0, a) + loop + shell.slice(b);
-// No page or section fill: only the charcoal header/footer and the card accents carry colour.
+// Desktop: a 760px column (Works White page, white body) with rounded header and footer; phones: full width.
 ghl = ghl
-  .replace('<body style="margin:0;padding:0;background-color:#FAF8F4;">', '<body style="margin:0;padding:0;">')
-  .replace(' bgcolor="#FAF8F4" style="background-color:#FAF8F4;"', '')
-  .replaceAll('bgcolor="#FFFFFF" ', '')
-  .replaceAll('background-color:#FFFFFF;', '');
-// Desktop: a 680px column with rounded header and footer; phones: full width.
-ghl = ghl
-  .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:680px;">')
+  .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="760" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:760px;">')
   .replace('<tr><td align="center" style="padding:28px 12px 40px 12px;">', '<tr><td align="center" class="fw-outer" style="padding:24px 12px 40px 12px;">')
   .replace("</style>", "  @media only screen and (max-width:620px) { .fw-outer { padding:0 !important; } }\n</style>");
 ghl = ghl
