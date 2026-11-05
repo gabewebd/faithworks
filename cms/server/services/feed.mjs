@@ -26,12 +26,14 @@ export function feedConfig(env = process.env, cfg = {}) {
     feedLink: env.NEWSLETTER_FEED_LINK || (site ? `${site}/resources` : ""),
     feedSelf: (cfg.baseUrl || "").replace(/\/$/, "") + "/rss.xml",
     title: env.NEWSLETTER_FEED_TITLE || "Faith Works: latest resources and upcoming events",
-    // Resources: everything published in the last NEWSLETTER_RESOURCE_DAYS days (a week by default); when nothing
-    // is new, the newest NEWSLETTER_FALLBACK_RESOURCES so the email is never empty. MAX values are safety caps.
+    // Resources, picked automatically (no manual selection): the newest published in the last
+    // NEWSLETTER_RESOURCE_DAYS days (a week), or the newest few when nothing is new; at most NEWSLETTER_MAX_RESOURCES (5).
     resourceDays: num(env.NEWSLETTER_RESOURCE_DAYS, 7),
     fallbackResources: num(env.NEWSLETTER_FALLBACK_RESOURCES, 3),
-    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 20),
-    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 10),
+    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 5),
+    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 4),
+    // Whole email: at most NEWSLETTER_MAX_ITEMS cards (8), so Gmail does not clip it (GHL adds tracking to every link).
+    maxItems: num(env.NEWSLETTER_MAX_ITEMS, 8),
   };
 }
 
@@ -81,11 +83,10 @@ export function feedItems(snap, fc, now = new Date()) {
       };
     })
     .filter((r) => r.url)
-    .sort((a, b) => String(b.date).localeCompare(String(a.date)))
-    .slice(0, fc.maxResources);
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)));
   const since = now.getTime() - (fc.resourceDays ?? 7) * 86400000;
   const fresh = resources.filter((r) => Date.parse(r.date) >= since);
-  const picked = fresh.length ? fresh : resources.slice(0, fc.fallbackResources ?? 3);
+  const picked = (fresh.length ? fresh : resources.slice(0, fc.fallbackResources ?? 3)).slice(0, fc.maxResources);
 
   const events = (snap.events || [])
     .filter((e) => e.id && e.title && DATE.test(e.event_date || "") && e.visible !== false)
@@ -107,7 +108,8 @@ export function feedItems(snap, fc, now = new Date()) {
     .sort((a, b) => a.start.localeCompare(b.start))
     .slice(0, fc.maxEvents);
 
-  return [...events, ...picked];
+  // Events first; articles fill the remaining room up to maxItems.
+  return [...events, ...picked.slice(0, Math.max(0, (fc.maxItems ?? 50) - events.length))];
 }
 
 // GHL fills {{{rss_item.content}}} from <description>, so it carries the same email card as <content:encoded>.

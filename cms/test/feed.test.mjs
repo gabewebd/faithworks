@@ -58,6 +58,12 @@ test("feed: resources published this week, or the newest few when nothing is new
   assert.deepEqual(feedItems(snap, { ...weekly, fallbackResources: 1 }, new Date("2026-12-31T00:00:00Z")).filter((i) => i.kind === "resource").map((i) => i.guid), ["resource:res_new"]);
 });
 
+test("feed: at most 8 cards: up to 4 events, articles fill the rest (max 5)", () => {
+  const d = feedConfig({}, {});
+  assert.deepEqual([d.maxItems, d.maxEvents, d.maxResources], [8, 4, 5]);
+  assert.deepEqual(feedItems(snap, { ...fc, maxItems: 4 }, now).map((i) => i.guid), ["event:evt_multi", "event:evt_soon", "event:evt_later", "resource:res_new"]);
+});
+
 test("feed: limits", () => {
   const items = feedItems(snap, { ...fc, maxResources: 1, maxEvents: 1 }, now);
   assert.deepEqual(items.map((i) => i.guid), ["event:evt_multi", "resource:res_new"]);
