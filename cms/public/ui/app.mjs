@@ -40,7 +40,7 @@ async function login() {
   const card = h("div", { class: "card" },
     h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")),
     h("h1", {}, "Sign in"),
-    h("p", { class: "muted" }, "Manage programs, events, resources, testimonials and site settings for faithph.ai."),
+    h("p", { class: "muted" }, "Manage events, resources and testimonials for faithph.ai."),
     err ? h("div", { class: "alert alert--error" }, h("div", {}, LOGIN_ERRORS[err] || "Sign-in failed.")) : null,
     h("a", { class: "btn google", href: "/api/auth/google/start" }, googleMark(), "Continue with Google"),
     h("p", { class: "small muted", style: "margin-top:14px" }, "Only people added by a Super Admin can sign in. The CMS never stores passwords."));
@@ -72,8 +72,8 @@ function shell(content, active, loading = false) {
   const nav = h("nav", { class: "nav", "aria-label": "CMS" },
     navLink("#/", "home", "Dashboard", "dashboard"),
     h("p", { class: "nav-label" }, "Content"),
-    CONTENT_COLLECTIONS.map((c) => navLink(`#/c/${c}`, icons[c], COLLECTIONS[c].label, c)),
-    admin ? [h("p", { class: "nav-label" }, "Site"), navLink("#/c/settings/site", "settings", "Site settings", "settings"), navLink("#/tags", "tag", "Tags", "tags"), navLink("#/activity", "log", "Activity log", "activity")] : null,
+    CONTENT_COLLECTIONS.filter((c) => c !== "programs").map((c) => navLink(`#/c/${c}`, icons[c], COLLECTIONS[c].label, c)),
+    admin ? [h("p", { class: "nav-label" }, "Site"), navLink("#/tags", "tag", "Tags", "tags"), navLink("#/activity", "log", "Activity log", "activity")] : null,
     admin ? [h("p", { class: "nav-label" }, "Administration"), navLink("#/users", "users", "Users and roles", "users"), navLink("#/recovery", "shield", "Recovery and backup", "recovery")] : null);
   const logout = h("button", { type: "button", onclick: async () => { if (app.current?.isDirty?.() && !(await dialog({ title: "Sign out?", body: "You have unsaved changes that will be lost.", confirm: "Sign out", danger: true })).ok) return; await api("POST", "/api/auth/logout", {}).catch(() => {}); location.hash = ""; location.reload(); } }, "Sign out");
   const sidebar = h("aside", { class: "sidebar", id: "sidebar" }, h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")), nav,

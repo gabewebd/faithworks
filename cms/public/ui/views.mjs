@@ -21,7 +21,7 @@ export async function dashboardView(app) {
   const alerts = [];
   if (d.repair.length) alerts.push(h("div", { class: "alert alert--error" }, h("div", {}, h("p", {}, h("strong", {}, "Publishing needs attention. "), `${d.repair.length} item(s) are live but their status was not updated: `), d.repair.map((r) => [link(r.collection, r.id, r.label), " "]))));
   const icons = { programs: "book", events: "calendar", resources: "file", testimonials: "quote" };
-  const stats = CONTENT_COLLECTIONS.map((c) => {
+  const stats = CONTENT_COLLECTIONS.filter((c) => c !== "programs").map((c) => {
     const n = d.counts[c] || {};
     const total = Object.entries(n).filter(([k]) => k !== "live").reduce((a, [, v]) => a + v, 0);
     return h("a", { class: "card stat", href: `#/c/${c}` }, h("h3", { class: "row" }, icon(icons[c]), COLLECTIONS[c].label), h("p", { class: "num" }, String(total)),
@@ -35,7 +35,7 @@ export async function dashboardView(app) {
     pageHead(`${hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"}, ${app.user.name.split(" ")[0] || ""}`.replace(/, $/, ""), `Signed in as ${roleLabel(app.user.role)}.`,
       admin && app.config.deployHook ? h("button", { class: "btn btn--light", type: "button", onclick: (e) => busy(e.currentTarget, async () => { try { const r = await api("POST", "/api/deploy", {}); toast(r.triggered ? "Website rebuild started." : r.error || r.reason, r.triggered ? "ok" : "error"); } catch (err) { toast(errorText(err), "error"); } }) }, icon("rocket"), "Rebuild website") : null),
     alerts,
-    h("div", { class: "grid grid--4", style: "margin-bottom:16px" }, stats),
+    h("div", { class: "grid grid--3", style: "margin-bottom:16px" }, stats),
     h("div", { class: "card" }, h("h2", {}, admin ? "Drafts" : "Your drafts"), h("p", { class: "small muted" }, "Saved but not on the website yet. Open one and press Publish when it is ready."),
       itemList(d.mine, "No drafts. Use “New” on any content type to start.")),
     d.recent.length ? h("div", { class: "card", style: "margin-top:16px" }, h("h2", {}, admin ? "Recent activity" : "Your recent activity"),
