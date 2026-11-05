@@ -41,7 +41,9 @@ test("feed: no image without asset origin; xml escaped; categories and stable gu
   assert.match(xml, /<guid isPermaLink="false">event:evt_soon<\/guid>/);
   assert.match(xml, /<category>Event<\/category>/);
   assert.match(xml, /<ev:startdate>2026-11-20T19:00<\/ev:startdate>/);
-  assert.match(xml, /Event · Fri, Nov 20, 2026, 7:00 PM – 9:00 PM \(Asia\/Manila\) · Makati/);
+  // GHL reads <description>, so it carries the email card (date label, time, venue), not plain text.
+  const soonDesc = xml.split("<item>").find((b) => b.includes("event:evt_soon")).match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)[1];
+  assert.match(soonDesc, /FRI · NOV 20[\s\S]*7:00 PM – 9:00 PM \(Manila\)[\s\S]*Makati/);
   assert.doesNotMatch(xml, /evt_past|evt_hidden|res_noslug/);
   assert.equal(xml, buildFeed(feedItems(snap, fc, now), fc, now));
 });
@@ -58,8 +60,8 @@ test("feed: email cards carry date label, time, icons and one heading per sectio
   assert.equal(soon.time, "7:00 PM – 9:00 PM (Manila)");
   assert.equal(items.find((i) => i.guid === "event:evt_multi").time, "Nov 1 – Nov 6 (Manila)");
   const xml = buildFeed(items, fc, now);
-  assert.equal((xml.match(/Learn with us, live/g) || []).length, 1);
-  assert.equal((xml.match(/New to read this week/g) || []).length, 1);
+  assert.equal((xml.match(/Learn with us, live/g) || []).length, 2);
+  assert.equal((xml.match(/New to read this week/g) || []).length, 2);
   assert.match(xml, /https:\/\/cdn\.example\.test\/assets\/email\/icon-clock-pink\.png/);
   assert.match(xml, /https:\/\/cdn\.example\.test\/assets\/email\/icon-book-yellow\.png/);
 });

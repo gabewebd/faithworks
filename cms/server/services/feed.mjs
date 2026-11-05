@@ -103,11 +103,9 @@ export function feedItems(snap, fc, now = new Date()) {
   return [...events, ...resources];
 }
 
+// GHL fills {{{rss_item.content}}} from <description>, so it carries the same email card as <content:encoded>.
 export function buildFeed(items, fc, now = new Date()) {
   const out = items.map((it, i) => {
-    const text = it.kind === "event"
-      ? `Event · ${it.when}${it.location ? ` · ${it.location}` : ""}${it.summary ? ` — ${it.summary}` : ""}`
-      : `Resource${it.categories[1] ? ` · ${it.categories[1]}` : ""}${it.summary ? ` — ${it.summary}` : ""}`;
     const html = emailCard(it, { icons: fc.assetOrigin, first: !items.slice(0, i).some((o) => o.kind === it.kind) });
     const type = /\.png(\?|$)/i.test(it.image) ? "image/png" : /\.webp(\?|$)/i.test(it.image) ? "image/webp" : /\.gif(\?|$)/i.test(it.image) ? "image/gif" : "image/jpeg";
     return `    <item>
@@ -116,7 +114,7 @@ export function buildFeed(items, fc, now = new Date()) {
       <guid isPermaLink="false">${xml(it.guid)}</guid>
       <pubDate>${rfc822(it.date)}</pubDate>
 ${it.categories.map((c) => `      <category>${xml(c)}</category>`).join("\n")}
-      <description>${xml(text)}</description>
+      <description>${cdata(html)}</description>
       <content:encoded>${cdata(html)}</content:encoded>${it.kind === "event" ? `
       <ev:type>Event</ev:type>
       <ev:startdate>${xml(it.start)}</ev:startdate>${it.end ? `
