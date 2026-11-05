@@ -50,3 +50,16 @@ test("feed: limits", () => {
   const items = feedItems(snap, { ...fc, maxResources: 1, maxEvents: 1 }, now);
   assert.deepEqual(items.map((i) => i.guid), ["event:evt_multi", "resource:res_new"]);
 });
+
+test("feed: email cards carry date label, time, icons and one heading per section", () => {
+  const items = feedItems(snap, fc, now);
+  const soon = items.find((i) => i.guid === "event:evt_soon");
+  assert.equal(soon.chip, "FRI · NOV 20");
+  assert.equal(soon.time, "7:00 PM – 9:00 PM (Manila)");
+  assert.equal(items.find((i) => i.guid === "event:evt_multi").time, "Nov 1 – Nov 6 (Manila)");
+  const xml = buildFeed(items, fc, now);
+  assert.equal((xml.match(/Learn with us, live/g) || []).length, 1);
+  assert.equal((xml.match(/New to read this week/g) || []).length, 1);
+  assert.match(xml, /https:\/\/cdn\.example\.test\/assets\/email\/icon-clock-pink\.png/);
+  assert.match(xml, /https:\/\/cdn\.example\.test\/assets\/email\/icon-book-yellow\.png/);
+});
