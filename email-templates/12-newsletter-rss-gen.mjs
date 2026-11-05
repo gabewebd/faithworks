@@ -160,7 +160,6 @@ fs.writeFileSync(S + "/12-newsletter-rss-fields.html", fields);
 fs.writeFileSync(S + "/12-newsletter-rss-template.html", html);
 fs.writeFileSync(S + "/12-newsletter-rss-preview.html", html
   .replace("{{contact.first_name}}", "Gabrielle")
-  .replaceAll(ICON + "icon-", "../assets/email/icon-")
   .replace("{{location.name}} · {{location.full_address}}", "Faith Works · [business address, filled by GHL]")
   .replace("{{email.unsubscribe_link}}", "#"));
 console.log("ok", html.length);

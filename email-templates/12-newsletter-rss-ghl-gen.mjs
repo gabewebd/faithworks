@@ -60,8 +60,6 @@ const xml = buildFeed(feedItems(snap, fc), fc);
 const items = [...xml.matchAll(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/g)].map((m) => m[1]);
 const body = ghl.match(/\{\{#rss_items rss_items\}\}([\s\S]*?)\{\{\/rss_items\}\}/)[1];
 let preview = ghl.replace(/\{\{#rss_items rss_items\}\}[\s\S]*?\{\{\/rss_items\}\}/, items.map((c) => body.replace("{{{rss_item.content}}}", c)).join(""))
-  .replace("{{contact.first_name}}", "Gabrielle").replace("{{email.unsubscribe_link}}", "#")
-  // New icons aren't on the asset CDN until pushed to main; the local preview uses the repo copies.
-  .replace(/https:\/\/faithworks\.vercel\.app\/assets\/email\/icon-(clock|pin|book)/g, "../assets/email/icon-$1");
+  .replace("{{contact.first_name}}", "Gabrielle").replace("{{email.unsubscribe_link}}", "#");
 fs.writeFileSync(path.join(DIR, "12-newsletter-rss-ghl-preview.html"), preview);
 console.log(`ghl template + preview: ${items.length} items`);
