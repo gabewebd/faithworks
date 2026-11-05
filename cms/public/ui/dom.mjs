@@ -27,7 +27,6 @@ function append(el, children) {
 export const clear = (el, ...children) => { el.replaceChildren(); append(el, children); return el; };
 
 const ICONS = {
-  mail: "M3 6h18v12H3zM3 7l9 6 9-6",
   home: "M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z", book: "M3 5h5a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H3zM21 5h-5a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h6z", calendar: "M4 6h16v14H4zM4 10h16M9 3v4M15 3v4",
   file: "M6 3h8l4 4v14H6zM14 3v4h4", quote: "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4zM8.5 8.5h2v2a2 2 0 0 1-2 2M13.5 8.5h2v2a2 2 0 0 1-2 2", tag: "M3 12V4h8l10 10-8 8zM7.5 7.5h.01", settings: "M3 7h10M19 7h2M3 17h2M11 17h10M16 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM8 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
   users: "M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 11a3 3 0 1 0 0-6M22 20c0-3-2-5.5-5-6", log: "M5 4h14v16H5zM9 8h6M9 12h6M9 16h3",

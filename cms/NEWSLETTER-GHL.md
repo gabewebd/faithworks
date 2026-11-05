@@ -1,78 +1,118 @@
-# Newsletter generator → GoHighLevel RSS
+# Newsletter: automatic RSS feed → GoHighLevel writes, approves and sends
 
-The CMS writes the newsletter and publishes it as an RSS feed. **GoHighLevel does everything else**:
-contacts, tags and audience, the email template, scheduling, sending and unsubscribes. The CMS never
-sends email and stores no contact or campaign data.
+**Plan revised 2026-11-05.** No AI service runs in the CMS or Vercel (no Anthropic/Claude API). There is no
+manual selection screen, no checkboxes and no "Send to GHL" button. The CMS publishes one automatic feed;
+GHL does all copy, template, review, approval, audience, scheduling, sending and unsubscribes.
 
-## How it works
+```
+Supabase → eligibility filter → /rss.xml (cached) → GHL RSS email → admin review + approval in GHL
+```
 
-1. **CMS → Newsletter**: choose published resources (drafts and private fields are never listed).
-2. **Generate newsletter**: one Claude call writes the subject, preview text, introduction, a summary
-   per resource, a button label and a closing. Picking the same selection again reuses the open draft
-   (no second AI call). Copy can be edited before approval (no AI call).
-3. **Approve** → the issue becomes the feed at `https://<cms-host>/rss.xml` (replacing the previous one).
-   **Reject** → discarded; the feed is unchanged. Only one draft is open at a time.
-4. GHL's RSS Schedule campaign reads the feed and sends the email to your tagged audience.
+## 1. Feed contents (automatic)
 
-Scheduled drafts: Vercel Cron calls `/api/cron/newsletter` daily (`vercel.json`). It makes a **draft only**
-when no draft is waiting, the last issue is at least `NEWSLETTER_INTERVAL_DAYS` (default 3) old, and
-there are published resources that were not in an approved issue yet (up to 5, newest first). Nothing
-reaches the feed until someone approves it. Daily cron is allowed on Vercel Hobby and Pro.
+Built on request from Supabase; no stored issues, no drafts, no approval state in the CMS.
 
-Data: one table, `cms_newsletters` (`supabase/migrations/20261105000000_newsletters.sql`, **apply it in
-Supabase before deploying**). It is not part of `/api/backup` or `npm run supabase:*` yet.
+**Resources:** every resource that is published and public. Excluded: drafts, unpublished, private/hidden,
+anything not reachable on the public site.
 
-## Environment variables (Vercel CMS project; names only)
+**Events:** published events whose start time is in the future. Excluded: past, draft, unpublished, private,
+cancelled. (Confirm the exact status/visibility column names in the events table before coding.)
 
-| Variable | Needed | Notes |
+Optional cap: newest `NEWSLETTER_MAX_RESOURCES` resources (default 10) and all upcoming events up to
+`NEWSLETTER_MAX_EVENTS` (default 10), so the feed stays a sensible email length.
+
+Only public fields leave the CMS. No editor/author ids, notes, internal flags, contact or registration data.
+All links and images are absolute: article links from `NEWSLETTER_RESOURCE_URL`
+(default `PUBLIC_SITE_URL/resources?{slug}`), site-relative images prefixed with `NEWSLETTER_ASSET_ORIGIN`.
+No hardcoded domains.
+
+## 2. Item format
+
+| RSS element | Resource | Event |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | yes | Secret. Server only. |
-| `ANTHROPIC_MODEL` | no | Default `claude-opus-5-5`. |
-| `NEWSLETTER_RESOURCE_URL` | recommended | Public article link, `{slug}` replaced. Default `PUBLIC_SITE_URL/resources?{slug}` (the GHL Resources page form). |
-| `NEWSLETTER_ASSET_ORIGIN` | yes for images | Origin for site-relative covers (`/assets/...`): the website asset CDN. Without it, items have no image. |
-| `NEWSLETTER_FEED_LINK` | no | Channel `<link>` (GHL `{{rss_feed.url}}`, use as the button link). Default `PUBLIC_SITE_URL/resources`. |
-| `NEWSLETTER_INTERVAL_DAYS` | no | Default 3. |
-| `CRON_SECRET` | for cron | Secret, ≥ 32 chars. Vercel sends it to the cron route automatically. |
-| `GHL_NEWSLETTER_WEBHOOK_URL` | no | GHL Inbound Webhook trigger URL, called on Approve (see below). Secret-ish. |
-| `CMS_BASE_URL` | already required | Builds the absolute feed address. |
+| `<guid isPermaLink="false">` | `resource:<id>` (stable forever) | `event:<id>` (stable forever) |
+| `<title>` | Title | Title |
+| `<link>` | Public article URL | Registration URL (fallback: public event page) |
+| `<description>` | Summary (plain text) | "Sat 14 Dec, 7:00 pm · Location — " + short description (plain text) |
+| `<content:encoded>` | Image + summary + "Read more" (HTML) | Image + date/time + location + description + "Register" (HTML) |
+| `<category>` | `Resource` + its category | `Event` |
+| `<pubDate>` | Publication date | Event's publish/created date (not start date) |
+| `<enclosure>` / `<media:content>` / `<media:thumbnail>` | Cover image | Event image |
+| `ev:startdate`, `ev:enddate`, `ev:location` (RSS event module) | — | Machine-readable date/time and location |
 
-## Feed → GHL email builder mapping
+Stable GUIDs mean an item is never sent twice as "new"; editing a resource does not create a duplicate.
+Events also carry the date/location inside `<description>`, because GHL is unlikely to read the event module.
 
-From HighLevel's help articles on the email builder RSS blocks and "RSS email body showing HTML tags":
+## 3. Freshness without cost
 
-| Feed | GHL merge field | Use in the template |
-| --- | --- | --- |
-| `<channel><title>` | `{{rss_feed.title}}` | Heading (and subject, if GHL accepts it there — **unverified**) |
-| `<channel><description>` | `{{rss_feed.description}}` | Introduction |
-| `<channel><link>` | `{{rss_feed.url}}` | "See all resources" button |
-| `<item><title>` / `<link>` | `{{rss_item.title}}` / `{{rss_item.url}}` | Resource heading and link |
-| `<item><description>` | `{{rss_item.content}}` | Summary (plain text, no triple braces needed) |
-| `<content:encoded>` | `{{rss_item.content_full}}` (presumed) | Image + summary + "Read more" as HTML (`{{{…}}}`) |
-| `<enclosure>`, `<media:content>`, `<media:thumbnail>` | `{{rss_item.imageUrl}}` | Image URL — **which tag GHL reads is unverified**, so all three are present |
-| `<pubDate>` | `{{rss_item.date}}` | Approval time (so GHL treats the items as new) |
+- No cron and no scheduled job. `/rss.xml` queries Supabase only when requested.
+- Response sent with `Cache-Control: public, s-maxage=900, stale-while-revalidate=3600`: Vercel's CDN serves
+  repeats for 15 min; at most a few DB queries per hour however often GHL polls.
+- Optional later: purge/revalidate the cached feed when a resource or event is saved in the CMS. Not needed
+  for v1 — a 15-minute delay is fine for a newsletter.
+- Two small indexed queries (published + public; published + start > now), selected columns only.
 
-Layout in GHL: RSS Header block (title + description) followed by an RSS Items block (Custom) looping
-over the items. That gives **one email: introduction followed by every selected resource**.
+## 4. URL
 
-**Not in the feed GHL can read:** preview text, button label and closing. They are shown in the CMS for
-copying into the campaign's preview-text field and the template. RSS has no standard place for them.
+The only existing feed address is `/rss.xml` on the CMS host (branch only, never deployed). Keep it.
+The server routes `/rss.xml` itself (Next rewrites keep the original path).
 
-## Still to verify in GHL (test sends to an internal address only)
+## 5. GHL: verify before implementation (internal test address only)
 
-1. Does the RSS Schedule subject line accept `{{rss_feed.title}}`? If not, set a fixed subject or paste the
-   generated one each time.
-2. Which element feeds `{{rss_item.imageUrl}}`? Check the test email; drop the unused tags afterwards.
-3. How GHL decides an item is "new" (guid vs pubDate) and whether it sends when the feed changes but the
-   schedule interval has not passed. Each approved issue has new guids (`<issue id>:<resource id>`) and a new
-   pubDate, so a new issue should always count as new.
-4. `.webp` covers may not show in some email clients (Outlook). Prefer PNG/JPG covers for emailed resources.
+Nothing below is assumed. Each check gets a recorded result in this file before code starts.
+From HighLevel help articles: the email builder has an **RSS Header** block and an **RSS Items** block that
+loops items with merge fields `{{rss_item.title}}`, `{{rss_item.url}}`, `{{rss_item.content}}`,
+`{{rss_item.imageUrl}}`, `{{rss_item.date}}`; campaigns can use an **RSS Schedule** that sends when new items appear.
 
-## Webhook (optional)
+1. **Feed accepted** — paste `/rss.xml` (preview URL) into the RSS block; does it load? Any size/item limits?
+2. **Fields read** — which of guid, category, content:encoded, enclosure/media tags, pubDate actually show up?
+3. **Mixed sections** — can one RSS Items block be filtered by `<category>`, or can a single email hold two RSS
+   blocks pointing at different feeds? This decides whether "Latest Resources" and "Upcoming Events" can be
+   separate sections.
+4. **New-item logic** — does the RSS Schedule use guid or pubDate? Does it send only new items or the whole feed?
+   (Events published long ago but still upcoming may be treated as old.)
+5. **Approval** — can an RSS Schedule campaign be held for review instead of auto-sending?
+6. **AI copy** — is Content AI (or a workflow AI action) available on this account, and can it write the subject,
+   preview and intro for an RSS campaign, or only inside the editor by hand?
 
-On Approve, if `GHL_NEWSLETTER_WEBHOOK_URL` is set, the CMS POSTs flat JSON (`subject`, `preview_text`,
-`feed_url`, `item_count`, `item_1_title`, `item_1_url`, …) — GHL custom values cannot hold arrays.
-A GHL Inbound Webhook trigger starts a **workflow**, which runs per contact (a contact email or phone in the
-payload is typically required to create or match one) and can send one email to that contact. It does **not**
-create or send a broadcast email campaign; no documented action does that. Use it only as an internal
-"newsletter approved" alert (for example, an email to the admin) while the RSS Schedule campaign does the
-sending.
+## 6. Recommended setup by result
+
+- **Best case (check 3 passes):** one email, RSS Header + "Latest Resources" RSS block (category `Resource`) +
+  "Upcoming Events" RSS block (category `Event`, or a second feed).
+  If GHL needs separate feeds, add `/rss/resources.xml` and `/rss/events.xml` alongside `/rss.xml` (same code,
+  filtered) — cheap to add.
+- **Simplest fallback (no filtering, one block):** one mixed RSS Items loop. Order events first, then resources;
+  every item's text starts with its type ("Event · Sat 14 Dec …" / "Resource · Guide"), so the single list still
+  reads clearly.
+- **If the RSS Schedule can't be held for approval or always sends the full feed:** don't use RSS Schedule. The
+  admin makes a normal campaign from the newsletter template each issue; the RSS blocks pull the current feed;
+  the admin writes/refines copy with Content AI in the editor, reviews, then schedules. This is the most
+  likely-to-work path and needs nothing extra from the CMS.
+
+## 7. Code changes on `feature/nextjs-newsletter` (after the checks; none made yet)
+
+Remove: `@anthropic-ai/sdk`, generation module/prompts, Newsletter selection/generate/approve UI and endpoints,
+`/api/cron/newsletter` + `vercel.json` cron, `cms_newsletters` table and migration `20261105000000`, optional webhook.
+Env vars dropped: `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `NEWSLETTER_INTERVAL_DAYS`, `GHL_NEWSLETTER_WEBHOOK_URL`,
+`CRON_SECRET` (if unused elsewhere).
+
+Change: `/rss.xml` builds from live Supabase data per sections 1–3, with tests for eligibility (drafts, private,
+past events excluded), absolute URLs, stable GUIDs and categories.
+
+Keep: Next.js wrap, existing routes, auth, dashboard design.
+
+Env vars (Vercel CMS project, names only, all optional except the asset origin for images):
+`NEWSLETTER_ASSET_ORIGIN` (needed for site-relative images), `NEWSLETTER_RESOURCE_URL` (default
+`PUBLIC_SITE_URL/resources?{slug}`), `NEWSLETTER_EVENT_PAGE_URL` (default `PUBLIC_SITE_URL/events/{slug}/`),
+`NEWSLETTER_EVENTS_URL` (link for events with no registration or page; default `PUBLIC_SITE_URL/workshops`),
+`NEWSLETTER_FEED_LINK`, `NEWSLETTER_FEED_TITLE`, `NEWSLETTER_MAX_RESOURCES`, `NEWSLETTER_MAX_EVENTS` (default 10 each),
+plus existing `PUBLIC_SITE_URL`, `CMS_BASE_URL`.
+
+**Status (2026-11-05):** test feed implemented in `server/services/feed.mjs` (tests: `test/feed.test.mjs`); the AI
+generator, selection UI, cron and table were removed. GHL checks in section 5 still to run against the preview.
+
+## Known risks
+
+- `.webp` covers may not render in Outlook; prefer PNG/JPG for emailed items.
+- GHL may ignore the event module, categories or `content:encoded`; the plain-text description carries the
+  essentials so items still make sense.

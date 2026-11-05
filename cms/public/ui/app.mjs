@@ -4,7 +4,6 @@ import { h, clear, api, toast, errorText, roleLabel, icon, skeleton, setUnauthor
 import { COLLECTIONS, CONTENT_COLLECTIONS, isSuperAdmin } from "/shared/schema.mjs";
 import { editorView } from "./editor.mjs";
 import { dashboardView, listView, tagsView, usersView, activityView, recoveryView } from "./views.mjs";
-import { newsletterView } from "./newsletter.mjs";
 
 const appEl = document.getElementById("app");
 const app = { user: null, config: {}, current: null, lastHash: location.hash, reload: () => route(true), refreshCounts: () => {} };
@@ -74,7 +73,6 @@ function shell(content, active, loading = false) {
     navLink("#/", "home", "Dashboard", "dashboard"),
     h("p", { class: "nav-label" }, "Content"),
     CONTENT_COLLECTIONS.map((c) => navLink(`#/c/${c}`, icons[c], COLLECTIONS[c].label, c)),
-    h("p", { class: "nav-label" }, "Email"), navLink("#/newsletter", "mail", "Newsletter", "newsletter"),
     admin ? [h("p", { class: "nav-label" }, "Site"), navLink("#/c/settings/site", "settings", "Site settings", "settings"), navLink("#/tags", "tag", "Tags", "tags"), navLink("#/activity", "log", "Activity log", "activity")] : null,
     admin ? [h("p", { class: "nav-label" }, "Administration"), navLink("#/users", "users", "Users and roles", "users"), navLink("#/recovery", "shield", "Recovery and backup", "recovery")] : null);
   const logout = h("button", { type: "button", onclick: async () => { if (app.current?.isDirty?.() && !(await dialog({ title: "Sign out?", body: "You have unsaved changes that will be lost.", confirm: "Sign out", danger: true })).ok) return; await api("POST", "/api/auth/logout", {}).catch(() => {}); location.hash = ""; location.reload(); } }, "Sign out");
@@ -115,7 +113,6 @@ async function route(force = false) {
       else if (!path[2]) view = { el: await listView(app, { collection }) };
       else view = await editorView(app, { collection, id: path[2] === "new" ? null : path[2] });
     }
-    else if (path[0] === "newsletter") { active = "newsletter"; view = { el: await newsletterView(app) }; }
     else if (path[0] === "tags") { active = "tags"; view = { el: await tagsView(app) }; }
     else if (path[0] === "users") { active = "users"; view = { el: await usersView(app) }; }
     else if (path[0] === "activity") { active = "activity"; view = { el: await activityView(app) }; }

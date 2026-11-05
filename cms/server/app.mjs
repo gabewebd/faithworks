@@ -18,11 +18,11 @@ import { createAdmin } from "./services/admin.mjs";
 import { createPublic } from "./services/public.mjs";
 import { createPreview } from "./services/preview.mjs";
 import { createMedia } from "./services/media.mjs";
-import { createNewsletter, newsletterConfig } from "./services/newsletter.mjs";
+import { createFeed, feedConfig } from "./services/feed.mjs";
 import { safeEqual } from "./session.mjs";
 import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
 
-export function createApp({ env = process.env, store: injectedStore, fetchImpl = globalThis.fetch, log = console, generateCopy } = {}) {
+export function createApp({ env = process.env, store: injectedStore, fetchImpl = globalThis.fetch, log = console } = {}) {
   const cfg = loadConfig(env);
   let store = injectedStore;
   if (!store && !cfg.errors.length) {
@@ -38,8 +38,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   const admin = store && createAdmin({ store, cfg, log: logSvc, auth });
   const preview = store && createPreview({ store, cfg });
   const media = store && createMedia({ cfg, store, log: logSvc, fetchImpl });
-  const nl = newsletterConfig(env, cfg);
-  const newsletter = store && createNewsletter({ store, pub, nl, log: logSvc, fetchImpl, ...(generateCopy ? { generateCopy } : {}) });
+  const feed = store && createFeed({ pub, fc: feedConfig(env, cfg) });
   // Website forms are GoHighLevel embeds: GHL stores submissions and runs alerts and follow-up.
   const headers = securityHeaders(cfg);
 
@@ -105,24 +104,12 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     return json(await preview.render(user, body.collection, body));
   });
 
-  /* ---- Newsletter (drafts for GHL RSS campaigns; GHL sends the email) ---- */
-  route("GET", "/api/newsletter", async () => json(await newsletter.overview()));
-  route("POST", "/api/newsletter/generate", async ({ user, request, rid }) => json(await newsletter.generate(user, await readJson(request), { requestId: rid }), 201));
-  route("PUT", "/api/newsletter/:id", async ({ user, params, request, rid }) => json(await newsletter.edit(user, params.id, await readJson(request), { requestId: rid })));
-  route("POST", "/api/newsletter/:id/approve", async ({ user, params, request, rid }) => json(await newsletter.approve(user, params.id, await readJson(request), { requestId: rid })));
-  route("POST", "/api/newsletter/:id/reject", async ({ user, params, request, rid }) => json(await newsletter.reject(user, params.id, await readJson(request), { requestId: rid })));
-  const rss = async () => new Response(await newsletter.rss(), {
-    status: 200, headers: { "content-type": "application/rss+xml; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=300", "access-control-allow-origin": "*" },
+  /* ---- Newsletter RSS for GoHighLevel (automatic; GHL writes, approves and sends) ---- */
+  const rss = async () => new Response(await feed.rss(), {
+    status: 200, headers: { "content-type": "application/rss+xml; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=900, stale-while-revalidate=3600", "access-control-allow-origin": "*" },
   });
   route("GET", "/api/public/newsletter/rss", rss, { auth: false });
   route("GET", "/rss.xml", rss, { auth: false }); // Next.js rewrites /rss.xml here and keeps the original path
-
-  // Vercel Cron (vercel.json) calls this with "Authorization: Bearer $CRON_SECRET". Creates a draft only.
-  route("GET", "/api/cron/newsletter", async ({ request, rid }) => {
-    const given = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-    if (!nl.cronSecret || !given || !safeEqual(given, nl.cronSecret)) throw new HttpError(401, "Unauthorized.", "unauthorized");
-    return json(await newsletter.scheduled({ requestId: rid }));
-  }, { auth: false });
 
   /* ---- Admin ---- */
   route("GET", "/api/tags", async () => json(await admin.listTags()));

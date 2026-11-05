@@ -20,7 +20,6 @@
     "supabase:backup": "node scripts/supabase.mjs backup"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "1.4.0",
     "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1"
