@@ -60,6 +60,6 @@ const xml = buildFeed(feedItems(snap, fc), fc);
 const items = [...xml.matchAll(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/g)].map((m) => m[1]);
 const body = ghl.match(/\{\{#rss_items rss_items\}\}([\s\S]*?)\{\{\/rss_items\}\}/)[1];
 let preview = ghl.replace(/\{\{#rss_items rss_items\}\}[\s\S]*?\{\{\/rss_items\}\}/, items.map((c) => body.replace("{{{rss_item.content}}}", c)).join(""))
-  .replace("{{contact.first_name}}", "Gabrielle").replace("{{email.unsubscribe_link}}", "#");
+  .replace("{{email.unsubscribe_link}}", "#");
 fs.writeFileSync(path.join(DIR, "12-newsletter-rss-ghl-preview.html"), preview);
 console.log(`ghl template + preview: ${items.length} items`);
