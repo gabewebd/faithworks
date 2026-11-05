@@ -18,3 +18,6 @@ for (const dir of SERVED) {
   cpSync(join(ROOT, dir), join(OUT, dir), { recursive: true });
   console.log(`dist/${dir}/  ${count(join(OUT, dir))} files`);
 }
+// Google Search Console ownership file for the faithworks.vercel.app property (used to remove the
+// old website pages from search results). Must stay at the root address.
+cpSync(join(ROOT, "google8e0d95c12a780efd.html"), join(OUT, "google8e0d95c12a780efd.html"));
