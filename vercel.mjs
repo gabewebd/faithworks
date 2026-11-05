@@ -17,6 +17,9 @@ export const config = {
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Strict-Transport-Security", value: "max-age=31536000" },
+        // The CDN address is not a website: keep it and its files (images included) out of search
+        // results. Does not affect the GHL pages that load these files.
+        { key: "X-Robots-Tag", value: "noindex, nofollow, noimageindex" },
       ],
     },
   ],
