@@ -26,12 +26,11 @@ const loop = `  <!-- 3–4. RESOURCES + EVENTS: one block per RSS item. The feed
 
 `;
 let ghl = shell.slice(0, a) + loop + shell.slice(b);
-// Full width: no 600px column, no outer margin, square corners (GHL wraps the email itself).
+// Desktop: a 680px column with rounded header and footer; phones: full width.
 ghl = ghl
-  .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">')
-  .replace('<tr><td align="center" style="padding:28px 12px 40px 12px;">', '<tr><td align="center" style="padding:0;">')
-  .replace("border-radius:16px 16px 0 0;", "")
-  .replace("border-radius:0 0 16px 16px;", "");
+  .replace('<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">', '<table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:680px;">')
+  .replace('<tr><td align="center" style="padding:28px 12px 40px 12px;">', '<tr><td align="center" class="fw-outer" style="padding:24px 12px 40px 12px;">')
+  .replace("</style>", "  @media only screen and (max-width:620px) { .fw-outer { padding:0 !important; } }\n</style>");
 ghl = ghl
   .replace(/(<div style="display:none[^>]*>)[^&]*/, "$1New guides to read and live sessions to join this week.")
   .replace("Think better with AI, then put it to work.", "This week at Faith Works")
@@ -55,7 +54,7 @@ const xml = buildFeed(feedItems(snap, fc), fc);
 const items = [...xml.matchAll(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/g)].map((m) => m[1]);
 const body = ghl.match(/\{\{#rss_items rss_items\}\}([\s\S]*?)\{\{\/rss_items\}\}/)[1];
 let preview = ghl.replace(/\{\{#rss_items rss_items\}\}[\s\S]*?\{\{\/rss_items\}\}/, items.map((c) => body.replace("{{{rss_item.content}}}", c)).join(""))
-  .replace("{{contact.first_name}}", "Gabrielle")
+  .replace("{{contact.first_name}}", "Gabrielle").replace("{{email.unsubscribe_link}}", "#")
   // New icons aren't on the asset CDN until pushed to main; the local preview uses the repo copies.
   .replace(/https:\/\/faithworks\.vercel\.app\/assets\/email\/icon-(clock|pin|book)/g, "../assets/email/icon-$1");
 fs.writeFileSync(path.join(DIR, "12-newsletter-rss-ghl-preview.html"), preview);

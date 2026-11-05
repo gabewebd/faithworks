@@ -2,8 +2,8 @@ import fs from "fs";
 import { fileURLToPath } from "url"; import path from "path";
 const S = process.argv[2] || path.dirname(fileURLToPath(import.meta.url));
 const A = "https://faithworks.vercel.app/assets/images/";
-const P = "font-family:Poppins,'Helvetica Neue',Helvetica,Arial,sans-serif;";
-const I = "font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;";
+const P = "font-family:Poppins,'Avenir Next',Avenir,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
+const I = "font-family:Inter,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;";
 const INK = "color:#1A1A1A;";
 const res = [
  { t:"Build Your Own AI Research Assistant With Gemini Notebook (Formerly NotebookLM)", u:"https://faithph.ai/resources?use-notebooklm-ai-research-assistant", img:A+"resources/use-notebooklm-ai-research-assistant.png?v=5706992", k:"Guide · Tutorials", d:"A beginner-friendly NotebookLM tutorial, updated for Gemini Notebook: add trusted sources, ask focused questions, check every citation and turn your reading into a briefing someone can use." },
@@ -87,7 +87,6 @@ const build = (res, ev) => { const lead = res[0]; return `<!DOCTYPE html>
   <tr><td bgcolor="#1A1A1A" class="fw-pad" style="background-color:#1A1A1A;border-radius:16px 16px 0 0;padding:26px 40px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td valign="middle"><a href="https://faithph.ai/" target="_blank"><img src="https://faithworks.vercel.app/assets/email/wordmark-reversed.png" width="150" alt="Faith Works" style="display:block;width:150px;height:auto;"></a></td>
-      <td align="right" valign="middle" style="${P}font-size:12px;line-height:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#FAF8F4;">The Faith Works Letter</td>
     </tr></table>
   </td></tr>
 
@@ -141,6 +140,7 @@ const build = (res, ev) => { const lead = res[0]; return `<!DOCTYPE html>
     </tr></table>
     <p style="margin:26px 0 0 0;${I}font-size:13px;line-height:21px;color:#FAF8F4;"><a href="https://faithph.ai/" target="_blank" style="color:#FAF8F4;text-decoration:underline;">faithph.ai</a></p>
     <p style="margin:14px 0 0 0;${I}font-size:12px;line-height:19px;color:#FAF8F4;">You’re receiving this because you subscribed to Faith Works updates.</p>
+    <p style="margin:10px 0 0 0;${I}font-size:12px;line-height:19px;color:#FAF8F4;"><a href="{{email.unsubscribe_link}}" target="_blank" style="color:#FAF8F4;text-decoration:underline;">Unsubscribe</a></p>
   </td></tr>
 
 </table>
@@ -163,5 +163,5 @@ fs.writeFileSync(S + "/12-newsletter-rss-preview.html", html
   .replace("{{contact.first_name}}", "Gabrielle")
   .replaceAll(ICON + "icon-", "../assets/email/icon-")
   .replace("{{location.name}} · {{location.full_address}}", "Faith Works · [business address, filled by GHL]")
-  .replace("{{unsubscribe_link}}", "#"));
+  .replace("{{email.unsubscribe_link}}", "#"));
 console.log("ok", html.length);
