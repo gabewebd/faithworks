@@ -26,8 +26,9 @@ export function feedConfig(env = process.env, cfg = {}) {
     feedLink: env.NEWSLETTER_FEED_LINK || (site ? `${site}/resources` : ""),
     feedSelf: (cfg.baseUrl || "").replace(/\/$/, "") + "/rss.xml",
     title: env.NEWSLETTER_FEED_TITLE || "Faith Works: latest resources and upcoming events",
-    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 10),
-    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 10),
+    // Kept small so the email stays under Gmail's 102 KB clipping limit (GHL adds click tracking to every link).
+    maxResources: num(env.NEWSLETTER_MAX_RESOURCES, 4),
+    maxEvents: num(env.NEWSLETTER_MAX_EVENTS, 4),
   };
 }
 

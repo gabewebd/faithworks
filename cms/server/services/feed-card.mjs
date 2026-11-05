@@ -3,8 +3,9 @@
 // layout lives here: email-safe tables, inline styles, Poppins/Inter with fallbacks, black text only.
 // The first event and the first resource also carry their section heading, so one loop renders two sections.
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const P = "font-family:Poppins,'Helvetica Neue',Helvetica,Arial,sans-serif;";
-const I = "font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;";
+// Gmail ignores web fonts: fall back to the closest system fonts (Avenir on Apple, Segoe UI on Windows), not Arial.
+const P = "font-family:Poppins,'Avenir Next',Avenir,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
+const I = "font-family:Inter,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;";
 const INK = "color:#1A1A1A;";
 const KIND = `${I}font-size:12px;line-height:16px;font-weight:600;letter-spacing:1px;text-transform:uppercase;${INK}`;
 const META = `${I}font-size:14px;line-height:20px;font-weight:600;${INK}`;
