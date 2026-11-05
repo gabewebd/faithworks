@@ -140,7 +140,6 @@ const build = (res, ev) => { const lead = res[0]; return `<!DOCTYPE html>
     </tr></table>
     <p style="margin:26px 0 0 0;${I}font-size:13px;line-height:21px;color:#FAF8F4;"><a href="https://faithph.ai/" target="_blank" style="color:#FAF8F4;text-decoration:underline;">faithph.ai</a></p>
     <p style="margin:14px 0 0 0;${I}font-size:12px;line-height:19px;color:#FAF8F4;">You’re receiving this because you subscribed to Faith Works updates.</p>
-    <p style="margin:10px 0 0 0;${I}font-size:12px;line-height:19px;color:#FAF8F4;"><a href="{{email.unsubscribe_link}}" target="_blank" style="color:#FAF8F4;text-decoration:underline;">Unsubscribe</a></p>
   </td></tr>
 
 </table>
