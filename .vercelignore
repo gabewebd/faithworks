@@ -1,12 +1,30 @@
-# Allowlist: main deploys only the asset CDN (vercel.mjs → tools/build-cdn.mjs → dist/), so Vercel
-# receives just the files it serves (css/, js/, assets/) and the two files that build them.
-# Everything else (pages, templates, cms/, docs, briefs, screenshots) stays in the repository.
+# Allowlist for BOTH Vercel projects built from this repository (Vercel applies this root file to each):
+#
+# 1. Asset CDN (repo root, production = main): vercel.mjs → tools/build-cdn.mjs copies css/, js/ and
+#    assets/ into dist/, the only folder it serves. Nothing else listed here becomes public on it.
+# 2. CMS (Root Directory "cms", faithworks-cms.vercel.app): Next.js shell around the CMS. It needs its
+#    dashboard, API, build script and seed fixture; its page preview imports tools/ and reads data/*.json
+#    and assets/icons. Never the CMS's .env files, local data, backups, tests or SQL.
+#
+# Without the cms/ lines the CMS build fails with "Cannot find module .../cms/scripts/build-static.mjs".
 /*
 !/vercel.mjs
 !/tools
-/tools/*
-!/tools/build-cdn.mjs
 !/css
 !/js
 !/assets
 !/google8e0d95c12a780efd.html
+!/data
+/data/migration
+!/cms
+/cms/*
+!/cms/shared
+!/cms/package.json
+!/cms/package-lock.json
+!/cms/vercel.json
+!/cms/next.config.mjs
+!/cms/app
+!/cms/server
+!/cms/scripts
+!/cms/public
+!/cms/fixtures

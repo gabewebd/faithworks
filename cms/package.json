@@ -2,17 +2,26 @@
   "name": "faithworks-cms",
   "private": true,
   "version": "1.0.0",
-  "description": "Faith Works headless CMS: dashboard + API, Supabase content store. No runtime dependencies.",
+  "description": "Faith Works headless CMS: Next.js shell (App Router API + static dashboard), Supabase content store.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "build": "node scripts/build-static.mjs",
+    "dev": "node scripts/build-static.mjs && next dev -p 5174",
+    "dev:legacy": "node scripts/dev.mjs",
+    "build": "node scripts/build-static.mjs && next build",
+    "start": "next start",
     "test": "node --test \"test/*.test.mjs\"",
     "seed:fixtures": "node scripts/seed-from-site.mjs",
     "supabase:check": "node scripts/supabase.mjs check",
     "supabase:seed": "node scripts/supabase.mjs seed",
     "supabase:import": "node scripts/supabase.mjs import",
     "supabase:backup": "node scripts/supabase.mjs backup"
+  },
+  "dependencies": {
+    "next": "16.4.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   }
 }

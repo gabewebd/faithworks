@@ -18,6 +18,7 @@ import { createAdmin } from "./services/admin.mjs";
 import { createPublic } from "./services/public.mjs";
 import { createPreview } from "./services/preview.mjs";
 import { createMedia } from "./services/media.mjs";
+import { createFeed, feedConfig } from "./services/feed.mjs";
 import { safeEqual } from "./session.mjs";
 import { isSuperAdmin, normalizeRole } from "../shared/schema.mjs";
 
@@ -37,6 +38,7 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
   const admin = store && createAdmin({ store, cfg, log: logSvc, auth });
   const preview = store && createPreview({ store, cfg });
   const media = store && createMedia({ cfg, store, log: logSvc, fetchImpl });
+  const feed = store && createFeed({ pub, fc: feedConfig(env, cfg) });
   // Website forms are GoHighLevel embeds: GHL stores submissions and runs alerts and follow-up.
   const headers = securityHeaders(cfg);
 
@@ -101,6 +103,13 @@ export function createApp({ env = process.env, store: injectedStore, fetchImpl =
     const body = await readJson(request);
     return json(await preview.render(user, body.collection, body));
   });
+
+  /* ---- Newsletter RSS for GoHighLevel (automatic; GHL writes, approves and sends) ---- */
+  const rss = async () => new Response(await feed.rss(), {
+    status: 200, headers: { "content-type": "application/rss+xml; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=900, stale-while-revalidate=3600", "access-control-allow-origin": "*" },
+  });
+  route("GET", "/api/public/newsletter/rss", rss, { auth: false });
+  route("GET", "/rss.xml", rss, { auth: false }); // Next.js rewrites /rss.xml here and keeps the original path
 
   /* ---- Admin ---- */
   route("GET", "/api/tags", async () => json(await admin.listTags()));

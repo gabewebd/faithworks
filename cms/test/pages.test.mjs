@@ -217,7 +217,7 @@ test("testimonial cards: the quote, the name and role, an optional round photo; 
   cleanup();
 });
 
-test("home testimonial deck: brand colours by position, never charcoal; role below the name; previous and next buttons", async () => {
+test("home testimonial deck: brand colours by position, never charcoal; role below the name; endless track, no buttons", async () => {
   const R = await import("../../tools/render.mjs");
   const { toRenderData } = await import("../../tools/content.mjs");
   const { buildSnapshot } = await import("../shared/public.mjs");
@@ -231,11 +231,10 @@ test("home testimonial deck: brand colours by position, never charcoal; role bel
   tones.forEach((c, i) => assert.notEqual(c, tones[(i + 1) % tones.length], "neighbours differ, round the loop too"));
   assert.match(html, /<b class="voice__name">A<\/b><span class="voice__role">HR Manager<\/span>/);
   assert.match(html, /<b class="voice__name">B<\/b><span class="voice__role">Faith Works participant<\/span>/, "no role: the standard line");
-  assert.match(html, /data-carousel-prev aria-controls="voices-track" aria-label="Previous testimonial"/);
-  assert.match(html, /data-carousel-next aria-controls="voices-track" aria-label="Next testimonial"/);
-  assert.match(html, /data-carousel-count>1 \/ 7<\/p>/);
+  assert.match(html, /<div class="voices__track" id="voices-track" tabindex="0"/, "keyboard-focusable track");
+  assert.ok(!html.includes("voices__nav") && !html.includes("data-carousel-prev"), "the endless carousel has no previous/next buttons (redesign f8d8f80)");
   R.init(toRenderData(buildSnapshot({ records: { ...records, testimonials: records.testimonials.slice(0, 1) }, view: "preview" })));
-  assert.ok(!R.voices().includes("voices__nav"), "one card: nothing to flip through, so no buttons");
+  assert.match(R.voices(), /class="voices voices--single"/, "one card: single layout");
 });
 
 test("event cards: registration buttons follow the destination; no empty buttons", async () => {
