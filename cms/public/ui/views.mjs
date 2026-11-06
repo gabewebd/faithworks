@@ -61,12 +61,12 @@ export async function listView(app, { collection }) {
     body.setAttribute("aria-busy", "true");
     try {
       const rows = await api("GET", `/api/records/${collection}?${qs}`);
-      clear(body, rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table" },
+      clear(body, rows.length ? h("div", { class: "table-wrap" }, h("table", { class: "table table--records" },
         h("thead", {}, h("tr", {}, h("th", {}, "Title"), h("th", {}, "Status"), h("th", {}, "Authors"), h("th", {}, "Last saved"), h("th", {}, h("span", { class: "sr-only" }, "Actions")))),
         h("tbody", {}, rows.map((r) => {
           const tr = h("tr", { onclick: (e) => { if (!e.target.closest("a, .menu-wrap")) location.hash = `#/c/${collection}/${encodeURIComponent(r.id)}`; } },
             h("td", { class: "title" }, h("div", { class: "row", style: "gap:10px;flex-wrap:nowrap" }, thumb(r), h("div", {}, link(collection, r.id, r.label || "(untitled)"), r.can_edit || r.status === "archived" ? null : h("span", { class: "badge badge--stone", title: "Only its authors and Super Admins can change this item" }, "View only"), subline(r), tagged && (r.tags || []).length ? h("div", {}, r.tags.map((t) => h("span", { class: "tag" }, tags.find((x) => x.id === t)?.label || t))) : null))),
-            h("td", {}, h("div", { class: "row", style: "gap:6px" }, statusBadge(r.status), r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : hiddenBadge(r.live))),
+            h("td", { class: "status" }, h("div", { class: "row", style: "gap:6px" }, statusBadge(r.status), r.needs_repair ? h("span", { class: "badge badge--red" }, "Needs repair") : hiddenBadge(r.live))),
             h("td", { class: "small" }, r.byline || r.content_owner || h("span", { class: "muted" }, "—")),
             h("td", { class: "small muted" }, `${when(r.updated_at)} · ${who(r.updated_by)}`),
             h("td", { class: "row-actions" }, itemMenu(r)));

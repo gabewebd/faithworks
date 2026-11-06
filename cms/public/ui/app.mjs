@@ -67,7 +67,16 @@ function googleMark() {
 /* ---- Shell ---- */
 function shell(content, active, loading = false) {
   const admin = isSuperAdmin(app.user.role);
-  const navLink = (href, ic, label, key) => h("a", { href, "aria-current": active === key ? "page" : null, onclick: () => shellEl.classList.remove("nav-open") }, icon(ic), label);
+  document.documentElement.classList.remove("nav-lock");
+  // Phones and tablets: the sidebar is a drawer opened from the top bar. Closes on a link, the backdrop or Escape.
+  const setNav = (open) => {
+    shellEl.classList.toggle("nav-open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.documentElement.classList.toggle("nav-lock", open);
+    if (open) sidebar.querySelector("a[aria-current]")?.focus(); else if (shellEl.contains(document.activeElement)) menuBtn.focus();
+  };
+  const navLink = (href, ic, label, key) => h("a", { href, "aria-current": active === key ? "page" : null, onclick: () => { shellEl.classList.remove("nav-open"); document.documentElement.classList.remove("nav-lock"); } }, icon(ic), label);
   const icons = { programs: "book", events: "calendar", resources: "file", testimonials: "quote" };
   const nav = h("nav", { class: "nav", "aria-label": "CMS" },
     navLink("#/", "home", "Dashboard", "dashboard"),
@@ -78,9 +87,12 @@ function shell(content, active, loading = false) {
   const logout = h("button", { type: "button", onclick: async () => { if (app.current?.isDirty?.() && !(await dialog({ title: "Sign out?", body: "You have unsaved changes that will be lost.", confirm: "Sign out", danger: true })).ok) return; await api("POST", "/api/auth/logout", {}).catch(() => {}); location.hash = ""; location.reload(); } }, "Sign out");
   const sidebar = h("aside", { class: "sidebar", id: "sidebar" }, h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")), nav,
     h("div", { class: "me" }, h("b", {}, app.user.name), h("span", { class: "role" }, roleLabel(app.user.role)), h("div", { class: "small", style: "opacity:.7;overflow:hidden;text-overflow:ellipsis" }, app.user.email), logout));
-  const topbar = h("div", { class: "topbar" }, h("button", { type: "button", "aria-controls": "sidebar", "aria-label": "Open menu", onclick: () => shellEl.classList.toggle("nav-open") }, icon("menu")), h("b", {}, "Faith Works CMS"));
+  const menuBtn = h("button", { type: "button", "aria-controls": "sidebar", "aria-expanded": "false", "aria-label": "Open menu", onclick: () => setNav(!shellEl.classList.contains("nav-open")) }, icon("menu"));
+  const topbar = h("div", { class: "topbar" }, menuBtn, h("div", { class: "brand" }, h("b", {}, "Faith Works"), h("span", {}, "CMS")));
+  const scrim = h("div", { class: "scrim", "aria-hidden": "true", onclick: () => setNav(false) });
   const envNote = app.config.store === "json" ? h("div", { class: "env-note" }, "Development mode: content is saved to a local JSON file, not the Supabase database.") : null;
-  const shellEl = h("div", { class: `shell${loading ? " is-loading" : ""}` }, sidebar, h("div", { class: "main" }, topbar, envNote, h("main", { class: "page", id: "page", tabindex: "-1" }, content)));
+  const shellEl = h("div", { class: `shell${loading ? " is-loading" : ""}`, onkeydown: (e) => { if (e.key === "Escape" && shellEl.classList.contains("nav-open")) setNav(false); } },
+    sidebar, scrim, h("div", { class: "main" }, topbar, envNote, h("main", { class: "page", id: "page", tabindex: "-1" }, content)));
   return shellEl;
 }
 
@@ -127,5 +139,20 @@ async function route(force = false) {
   if (!force) document.getElementById("page")?.focus({ preventScroll: true });
   window.scrollTo(0, 0);
 }
+
+// Phones show every table as stacked cards (cms.css); each cell carries its column header as a label.
+// Tables are rendered by several screens, some after an async load, so one observer covers them all.
+let labelling = false;
+new MutationObserver(() => {
+  if (labelling) return;
+  labelling = true;
+  queueMicrotask(() => {
+    labelling = false;
+    for (const t of appEl.querySelectorAll("table.table")) {
+      const heads = [...t.querySelectorAll("thead th")].map((th) => th.textContent.trim());
+      for (const tr of t.querySelectorAll("tbody tr")) [...tr.children].forEach((td, i) => { if (heads[i] && !td.dataset.label) td.dataset.label = heads[i]; });
+    }
+  });
+}).observe(appEl, { childList: true, subtree: true });
 
 start();
