@@ -31,6 +31,9 @@ const SCENES = {
   automate: "no-code-ai-automation-beginners",
   research: "use-notebooklm-ai-research-assistant",
   billboard: "what-not-to-share-with-ai",
+  promptpack: "everyday-ai-prompts-for-work",
+  toolkit: "best-ai-tools-for-work-2026",
+  business: "ai-for-business-marketing-sales-operations",
 };
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
 for (const k of Object.keys(SCENES)) if (only.length && !only.includes(k)) delete SCENES[k];

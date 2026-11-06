@@ -281,6 +281,131 @@
   #redact .keys div { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 20px; background: #fff; font-size: 23px; font-weight: 600; line-height: 1.3; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.08); }
   #redact .keys .tile { width: 56px; height: 56px; border-radius: 14px; }
   #redact .keys .tile svg { width: 34px; height: 34px; }
+
+  /* ================= Shared by the prompt pack, tools and business figures: text stays solid Charcoal ================= */
+  .fig--ink .s, .fig--ink .foot { color: var(--ink); }
+  .fig--ink .lbl { margin: 0 0 10px; font-size: 24px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+
+  /* ---- prompt pack: anatomy of a prompt ---- */
+  #pp-anatomy .sheet { padding: 40px 48px 44px; }
+  #pp-anatomy .bar { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; padding-bottom: 24px; border-bottom: 1px solid rgb(26 26 26 / 0.12); font-size: 26px; font-weight: 600; }
+  #pp-anatomy .bar span:last-child { margin-left: 8px; }
+  #pp-anatomy .part { display: grid; grid-template-columns: 58px 230px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-bottom: 1px solid rgb(26 26 26 / 0.08); }
+  #pp-anatomy .part:last-child { border-bottom: 0; padding-bottom: 0; }
+  #pp-anatomy .part b { font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 34px; letter-spacing: -0.02em; }
+  #pp-anatomy .part p { margin: 0; font-size: 31px; line-height: 1.4; }
+  #pp-anatomy mark { padding: 2px 8px; border-radius: 8px; background: var(--yellow-pastel); color: inherit; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #pp-anatomy .part:nth-child(even) mark { background: var(--pink-tint); }
+  #pp-anatomy .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 40px; }
+  #pp-anatomy .extras .card { display: flex; align-items: center; gap: 22px; padding: 24px 28px; }
+  #pp-anatomy .extras .tile { width: 72px; height: 72px; border-radius: 18px; }
+  #pp-anatomy .extras .tile svg { width: 44px; height: 44px; }
+  #pp-anatomy .extras .t { font-size: 31px; }
+  #pp-anatomy .extras-lbl { margin: 40px 0 0; font-size: 26px; font-weight: 700; }
+
+  /* ---- prompt pack: vague vs effective ---- */
+  #pp-compare .head, #pp-compare .pair { display: grid; grid-template-columns: 1fr 1.65fr; column-gap: 96px; }
+  #pp-compare .head { margin-bottom: 16px; font-size: 25px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  #pp-compare .rows { position: relative; display: grid; gap: 30px; }
+  #pp-compare .q { padding: 28px 32px; font-size: 30px; line-height: 1.4; }
+  #pp-compare .vague { display: flex; align-items: center; background: var(--stone-2); box-shadow: none; }
+  #pp-compare .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  #pp-compare .tags span { padding: 6px 16px; border-radius: 999px; background: var(--yellow-pastel); font-size: 22px; font-weight: 700; }
+  #pp-compare .pair:nth-child(2) .tags span { background: var(--pink-tint); }
+
+  /* ---- prompt pack: prompt → response → refine → output ---- */
+  #pp-loop .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 60px; }
+  #pp-loop .row .card { display: flex; flex-direction: column; padding: 32px 30px 34px; min-height: 330px; }
+  #pp-loop .row .card .tile { margin-bottom: 22px; }
+  #pp-loop .row .card:last-child { background: var(--yellow-pastel); }
+  #pp-loop .row .t { font-size: 35px; }
+  #pp-loop .row .s { font-size: 27px; }
+  #pp-loop .under { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 60px; margin-top: 120px; }
+  #pp-loop .note { grid-column: 3 / span 2; justify-self: end; width: 620px; display: flex; align-items: center; gap: 18px; padding: 22px 24px; background: var(--pink-tint); }
+  #pp-loop .note .tile { width: 64px; height: 64px; border-radius: 16px; }
+  #pp-loop .note .tile svg { width: 40px; height: 40px; }
+  #pp-loop .note p { margin: 0; font-size: 26px; font-weight: 600; line-height: 1.3; }
+
+  /* ---- tools: grouped by purpose ---- */
+  #tl-groups .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  #tl-groups .grp { display: flex; flex-direction: column; padding: 30px 32px 34px; }
+  #tl-groups .grp--wide { grid-column: span 2; }
+  #tl-groups .grp .head { display: flex; align-items: center; gap: 20px; margin-bottom: 26px; }
+  #tl-groups .grp .tile { width: 72px; height: 72px; border-radius: 18px; }
+  #tl-groups .grp .tile svg { width: 44px; height: 44px; }
+  #tl-groups .grp .t { font-size: 33px; }
+  #tl-groups .grp .lbl { margin: 4px 0 0; font-size: 21px; }
+  #tl-groups .apps { display: flex; flex-wrap: wrap; gap: 26px; margin-top: auto; }
+  #tl-groups .app { display: grid; justify-items: center; gap: 12px; width: 150px; text-align: center; font-size: 24px; font-weight: 600; line-height: 1.2; }
+  #tl-groups .logo--lg { width: 104px; height: 104px; border-radius: 24px; }
+  #tl-groups .logo--lg img { width: 58px; height: 58px; }
+  #tl-groups .agents { display: flex; align-items: center; gap: 22px; margin-top: 34px; padding: 22px 30px; background: var(--yellow-pastel); }
+  #tl-groups .agents p { margin: 0; font-size: 27px; line-height: 1.35; }
+  #tl-groups .agents .logos { display: flex; gap: 12px; margin-left: auto; }
+
+  /* ---- tools: decision guide ---- */
+  #tl-choose .tree { position: relative; display: grid; grid-template-columns: 430px 1fr; column-gap: 130px; align-items: center; }
+  #tl-choose .ask { display: flex; flex-direction: column; gap: 22px; padding: 36px 34px; background: var(--yellow-pastel); }
+  #tl-choose .ask .t { font-size: 42px; }
+  #tl-choose .outs { display: grid; gap: 18px; }
+  #tl-choose .out { display: flex; align-items: center; gap: 24px; padding: 18px 26px; min-height: 112px; }
+  #tl-choose .out .need { flex: 1; margin: 0; font-size: 29px; font-weight: 600; line-height: 1.25; }
+  #tl-choose .out .pick { display: flex; align-items: center; gap: 10px; }
+  #tl-choose .out .pick b { margin-left: 8px; font-size: 26px; font-weight: 700; white-space: nowrap; }
+  #tl-choose .logo { width: 60px; height: 60px; }
+  #tl-choose .logo img { width: 36px; height: 36px; }
+
+  /* ---- business: manual vs AI-assisted ---- */
+  #biz-compare .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  #biz-compare .col { display: flex; flex-direction: column; padding: 36px 36px 38px; }
+  #biz-compare .col--manual { background: var(--stone-2); box-shadow: none; }
+  #biz-compare .col--manual .tile--w { background: #fff; }
+  #biz-compare .col .head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+  #biz-compare .col .head .t { font-size: 40px; }
+  #biz-compare .step { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 29px; line-height: 1.3; }
+  #biz-compare .step .tile { width: 60px; height: 60px; border-radius: 15px; }
+  #biz-compare .step .tile svg { width: 38px; height: 38px; }
+  #biz-compare .keep { margin: 14px 0 0; padding: 16px 20px; border-radius: 16px; background: var(--pink-tint); font-size: 27px; font-weight: 600; }
+  #biz-compare .res { margin: 24px 0 0; padding-top: 20px; border-top: 2px solid rgb(26 26 26 / 0.14); font-size: 27px; line-height: 1.35; }
+  #biz-compare .res b { display: block; margin-bottom: 4px; font-size: 22px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ---- business: four teams on one shared knowledge layer ---- */
+  #biz-map .loop { position: relative; height: 96px; }
+  #biz-map .loop span { position: absolute; left: 50%; top: 18px; transform: translate(-50%, -50%); z-index: 2; padding: 6px 20px; border-radius: 999px; background: var(--paper); font-size: 25px; font-weight: 700; white-space: nowrap; }
+  #biz-map .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  #biz-map .row .card { display: flex; flex-direction: column; padding: 30px 28px 32px; min-height: 300px; }
+  #biz-map .row .tile { margin-bottom: 20px; }
+  #biz-map .row .t { font-size: 35px; }
+  #biz-map .row .s { font-size: 26px; }
+  #biz-map .base { display: flex; align-items: center; gap: 26px; margin-top: 90px; padding: 28px 34px; background: var(--yellow-pastel); }
+  #biz-map .base .t { font-size: 33px; white-space: nowrap; }
+  #biz-map .base .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-left: auto; }
+  #biz-map .people { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 30px; font-size: 27px; font-weight: 600; }
+  #biz-map .people .tile { width: 56px; height: 56px; border-radius: 14px; }
+  #biz-map .people .tile svg { width: 36px; height: 36px; }
+
+  /* ---- business: lead workflow ---- */
+  #biz-leads .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  #biz-leads .row .card { display: flex; flex-direction: column; padding: 28px 28px 30px; min-height: 300px; }
+  #biz-leads .row .tile { margin-bottom: 18px; }
+  #biz-leads .row .t, #biz-leads .routes .t { font-size: 33px; }
+  #biz-leads .row .s, #biz-leads .routes .s { font-size: 26px; }
+  #biz-leads .logos { display: flex; gap: 10px; margin-top: auto; padding-top: 20px; }
+  #biz-leads .routes { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 110px; }
+  #biz-leads .routes .card { padding: 24px 28px 26px; }
+  #biz-leads .routes .card:nth-child(1) { background: var(--yellow-pastel); }
+  #biz-leads .routes .card:nth-child(3) { background: var(--stone-2); }
+  #biz-leads .final { display: flex; align-items: center; gap: 26px; margin: 100px auto 0; width: 1000px; padding: 26px 32px; background: var(--pink-tint); }
+  #biz-leads .final .t { font-size: 35px; }
+
+  /* ---- business: implementation roadmap ---- */
+  #biz-roadmap .grid { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 64px; row-gap: 96px; }
+  #biz-roadmap .card { display: flex; flex-direction: column; padding: 30px 30px 32px; min-height: 290px; }
+  #biz-roadmap .card .top { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  #biz-roadmap .card .t { font-size: 35px; }
+  #biz-roadmap .card .s { font-size: 27px; }
+  #biz-roadmap .card:last-child { background: var(--yellow-pastel); }
+  #biz-roadmap .next { display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 30px; font-size: 27px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -574,6 +699,158 @@
   <svg class="wires" data-wires="redact"></svg>
 </section>
 
+
+<!-- ================= The Everyday AI Prompt Pack ================= -->
+<section class="fig fig--yellow fig--ink" id="pp-anatomy" data-out="everyday-ai-prompts-for-work/prompt-anatomy">
+  <p class="kicker">The prompt formula</p>
+  <h2>Five parts of a prompt that gets a useful first answer</h2>
+  <div class="card sheet">
+    <div class="bar"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/microsoft-copilot.svg" alt=""></span><span>One template, any AI assistant</span></div>
+    <div class="part"><span class="num">1</span><b>Goal</b><p>I need <mark>a short project update</mark>.</p></div>
+    <div class="part"><span class="num">2</span><b>Context</b><p>It’s <mark>for my manager, who missed Monday’s meeting</mark>.</p></div>
+    <div class="part"><span class="num">3</span><b>Material</b><p>Work from <mark>my notes, pasted below</mark>.</p></div>
+    <div class="part"><span class="num">4</span><b>Format</b><p><mark>Three bullet points and one line on what I need from them</mark>.</p></div>
+    <div class="part"><span class="num">5</span><b>Guardrails</b><p><mark>Don’t add anything that isn’t in my notes. Ask me if something is unclear.</mark></p></div>
+  </div>
+  <p class="extras-lbl">Optional extras when the first answer misses</p>
+  <div class="extras">
+    <div class="card"><div class="tile" data-i="person"></div><p class="t">Give it a role</p></div>
+    <div class="card"><div class="tile tile--y" data-i="copy"></div><p class="t">Show an example</p></div>
+    <div class="card"><div class="tile" data-i="chat"></div><p class="t">Ask it to ask you questions first</p></div>
+  </div>
+</section>
+
+<section class="fig fig--pink fig--ink" id="pp-compare" data-out="everyday-ai-prompts-for-work/vague-vs-effective">
+  <p class="kicker">Vague versus effective</p>
+  <h2>The fix is usually missing details, not clever wording</h2>
+  <div class="head"><span>Vague</span><span>Effective</span></div>
+  <div class="rows">
+    <div class="pair"><div class="card q vague" data-n="v1">“Write an email to my client.”</div><div class="card q" data-n="g1">“Write a short, friendly email to a client whose website launch moved from Friday to next Wednesday. Explain why in one line, offer a 15-minute call. Under 100 words.”<div class="tags"><span>Audience</span><span>Situation</span><span>Next step</span><span>Length</span></div></div></div>
+    <div class="pair"><div class="card q vague" data-n="v2">“Summarize this.”</div><div class="card q" data-n="g2">“Summarize this 12-page report for my team in 5 bullets. Start with the decision they need to make and flag any numbers I should double-check.”<div class="tags"><span>Audience</span><span>Length</span><span>Priority</span><span>Checks</span></div></div></div>
+    <div class="pair"><div class="card q vague" data-n="v3">“Help me plan my week.”</div><div class="card q" data-n="g3">“Here are my 9 tasks and 3 fixed meetings. Sort the tasks into must, should and could, and suggest a day for each. Keep mornings for focused work.”<div class="tags"><span>Material</span><span>Structure</span><span>Constraints</span></div></div></div>
+  </div>
+  <svg class="wires" data-wires="pp-compare"></svg>
+</section>
+
+<section class="fig fig--both fig--ink" id="pp-loop" data-out="everyday-ai-prompts-for-work/prompt-workflow">
+  <p class="kicker">From prompt to final output</p>
+  <h2>The first answer is a draft. The follow-ups make it good.</h2>
+  <div class="row">
+    <div class="card"><div class="tile" data-i="chat"></div><p class="t">1. Prompt</p><p class="s">You give the goal, context, material and format.</p></div>
+    <div class="card"><div class="tile tile--y" data-i="idea"></div><p class="t">2. AI response</p><p class="s">A first draft in seconds.</p></div>
+    <div class="card"><div class="tile" data-i="eye"></div><p class="t">3. Check and refine</p><p class="s">Accurate? Complete? In your voice? Say what to change.</p></div>
+    <div class="card"><div class="tile tile--w" data-i="done"></div><p class="t">4. Final output</p><p class="s">You edit, fact-check and decide what to use.</p></div>
+  </div>
+  <div class="under"><div class="card note" data-n="note"><div class="tile" data-i="person"></div><p>You’re responsible for what you send.</p></div></div>
+  <svg class="wires" data-wires="pp-loop"></svg>
+</section>
+
+<!-- ================= The 10 AI Tools Worth Knowing Right Now ================= -->
+<section class="fig fig--both fig--ink" id="tl-groups" data-out="best-ai-tools-for-work-2026/tools-by-purpose">
+  <p class="kicker">Ten tools, five jobs</p>
+  <h2>Choose by the job you need done</h2>
+  <div class="grid">
+    <div class="card grp grp--wide"><div class="head"><div class="tile" data-i="chat"></div><div><p class="t">Think and write</p><p class="lbl">AI assistants</p></div></div>
+      <div class="apps"><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span>ChatGPT</div><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/claude-color.svg" alt=""></span>Claude</div><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/gemini.svg" alt=""></span>Gemini</div><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/grok.svg" alt=""></span>Grok</div></div></div>
+    <div class="card grp"><div class="head"><div class="tile tile--y" data-i="assist"></div><div><p class="t">Work inside your apps</p><p class="lbl">Copilot</p></div></div>
+      <div class="apps"><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/microsoft-copilot.svg" alt=""></span>Microsoft 365 Copilot</div></div></div>
+    <div class="card grp"><div class="head"><div class="tile tile--y" data-i="search"></div><div><p class="t">Research with sources</p><p class="lbl">Research</p></div></div>
+      <div class="apps"><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/perplexity.svg" alt=""></span>Perplexity</div><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/notebooklm.svg" alt=""></span>Gemini Notebook</div></div></div>
+    <div class="card grp"><div class="head"><div class="tile" data-i="idea"></div><div><p class="t">Create visuals and slides</p><p class="lbl">Creative</p></div></div>
+      <div class="apps"><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/canva.svg" alt=""></span>Canva</div><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/gamma.svg" alt=""></span>Gamma</div></div></div>
+    <div class="card grp"><div class="head"><div class="tile tile--y" data-i="process"></div><div><p class="t">Automate between apps</p><p class="lbl">Automation</p></div></div>
+      <div class="apps"><div class="app"><span class="logo logo--lg"><img src="/assets/icons/tools/zapier.svg" alt=""></span>Zapier</div></div></div>
+  </div>
+  <div class="card agents"><div class="tile" data-i="target"></div><p><b>Agent modes:</b> ChatGPT, Claude and Zapier can also work through several steps for you.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/zapier.svg" alt=""></span></div></div>
+</section>
+
+<section class="fig fig--yellow fig--ink" id="tl-choose" data-out="best-ai-tools-for-work-2026/which-tool">
+  <p class="kicker">Which tool should you explore?</p>
+  <h2>Start from the work, not the tool</h2>
+  <div class="tree">
+    <div class="card ask" data-n="ask"><div class="tile" data-i="target"></div><p class="t">What do you need help with?</p><p class="s">Pick the line that sounds most like your week.</p></div>
+    <div class="outs">
+      <div class="card out"><p class="need">Writing, thinking and everyday questions</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/grok.svg" alt=""></span><b>Pick one</b></div></div>
+      <div class="card out"><p class="need">Help inside Word, Excel or Outlook</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/microsoft-copilot.svg" alt=""></span><b>Microsoft 365 Copilot</b></div></div>
+      <div class="card out"><p class="need">Current answers with web sources</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/perplexity.svg" alt=""></span><b>Perplexity</b></div></div>
+      <div class="card out"><p class="need">Answers from your own documents</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/notebooklm.svg" alt=""></span><b>Gemini Notebook</b></div></div>
+      <div class="card out"><p class="need">Social posts and visuals</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/canva.svg" alt=""></span><b>Canva</b></div></div>
+      <div class="card out"><p class="need">A slide deck from an outline</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/gamma.svg" alt=""></span><b>Gamma</b></div></div>
+      <div class="card out"><p class="need">The same steps between apps, every week</p><div class="pick"><span class="logo"><img src="/assets/icons/tools/zapier.svg" alt=""></span><b>Zapier</b></div></div>
+    </div>
+  </div>
+  <svg class="wires" data-wires="tl-choose"></svg>
+</section>
+
+<!-- ================= AI for Business ================= -->
+<section class="fig fig--pink fig--ink" id="biz-compare" data-out="ai-for-business-marketing-sales-operations/manual-vs-ai">
+  <p class="kicker">One website enquiry, two ways</p>
+  <h2>Manual versus AI-assisted: the judgment stays, the copying goes</h2>
+  <div class="cols">
+    <div class="card col col--manual"><div class="head"><div class="tile tile--w" data-i="mail"></div><p class="t">Manual</p></div>
+      <div class="step"><div class="tile tile--w" data-i="mail"></div>Check the inbox several times a day</div>
+      <div class="step"><div class="tile tile--w" data-i="copy"></div>Copy the details into a spreadsheet</div>
+      <div class="step"><div class="tile tile--w" data-i="doc"></div>Write each reply from scratch</div>
+      <div class="step"><div class="tile tile--w" data-i="week"></div>Remember to follow up</div>
+      <p class="res"><b>Typical result</b>Replies take hours or days, and some enquiries are missed.</p></div>
+    <div class="card col"><div class="head"><div class="tile tile--y" data-i="idea"></div><p class="t">AI-assisted</p></div>
+      <div class="step"><div class="tile tile--y" data-i="form"></div>The form logs the enquiry automatically</div>
+      <div class="step"><div class="tile" data-i="idea"></div>AI summarizes it and suggests a category</div>
+      <div class="step"><div class="tile tile--y" data-i="doc"></div>A draft reply waits for review</div>
+      <div class="step"><div class="tile" data-i="week"></div>A follow-up reminder is set</div>
+      <p class="keep">A person still reads, edits and sends.</p>
+      <p class="res"><b>Typical result</b>Every enquiry is logged, and replies go out the same day.</p></div>
+  </div>
+</section>
+
+<section class="fig fig--both fig--ink" id="biz-map" data-out="ai-for-business-marketing-sales-operations/business-workflow">
+  <p class="kicker">How AI connects a small business</p>
+  <h2>Four teams, one shared source of business knowledge</h2>
+  <div class="loop"><span>Results shape the next plan</span></div>
+  <div class="row">
+    <div class="card"><div class="tile" data-i="megaphone"></div><p class="t">Marketing</p><p class="s">Plan and repurpose content. Research the audience.</p></div>
+    <div class="card"><div class="tile tile--y" data-i="growth"></div><p class="t">Sales</p><p class="s">Research and qualify leads. Draft follow-ups.</p></div>
+    <div class="card"><div class="tile" data-i="chat"></div><p class="t">Customer service</p><p class="s">Answer common questions. Route the rest.</p></div>
+    <div class="card"><div class="tile tile--y" data-i="chart"></div><p class="t">Operations</p><p class="s">Process documents. Report on results.</p></div>
+  </div>
+  <div class="card base" data-n="base"><div class="tile tile--w" data-i="book"></div><p class="t">Your business knowledge</p><div class="chips"><span class="chip">CRM</span><span class="chip chip--y">Shared drive</span><span class="chip">Help articles</span><span class="chip chip--y">Price list</span></div></div>
+  <p class="people"><span class="tile" data-i="person"></span>A person approves anything customer-facing.</p>
+  <svg class="wires" data-wires="biz-map"></svg>
+</section>
+
+<section class="fig fig--yellow fig--ink" id="biz-leads" data-out="ai-for-business-marketing-sales-operations/lead-workflow">
+  <p class="kicker">A sample lead workflow</p>
+  <h2>From enquiry to qualification to a person who follows up</h2>
+  <div class="row">
+    <div class="card"><div class="tile tile--y" data-i="form"></div><p class="t">1. Enquiry</p><p class="s">Someone fills in the website form.</p></div>
+    <div class="card"><div class="tile tile--w" data-i="chart"></div><p class="t">2. Log</p><p class="s">Added to the CRM or a sheet automatically.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/google-sheets.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/zapier.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile" data-i="idea"></div><p class="t">3. AI summary</p><p class="s">Summarizes the request and suggests a fit score.</p><div class="logos"><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span></div></div>
+    <div class="card"><div class="tile tile--y" data-i="process"></div><p class="t">4. Qualify</p><p class="s">A simple rule routes it using your criteria.</p></div>
+  </div>
+  <div class="routes">
+    <div class="card"><p class="t">Strong fit</p><p class="s">A salesperson is told to call today.</p></div>
+    <div class="card"><p class="t">Unclear fit</p><p class="s">A draft asks one question for more detail.</p></div>
+    <div class="card"><p class="t">Poor fit</p><p class="s">A polite draft points to free resources.</p></div>
+  </div>
+  <div class="card final" data-n="final"><div class="tile" data-i="person"></div><div><p class="t">5. Human follow-up</p><p class="s">A person reviews the draft, edits it and replies or calls. Nothing is sent without their OK.</p></div></div>
+  <svg class="wires" data-wires="biz-leads"></svg>
+</section>
+
+<section class="fig fig--pink fig--ink" id="biz-roadmap" data-out="ai-for-business-marketing-sales-operations/implementation-roadmap">
+  <p class="kicker">An AI implementation roadmap</p>
+  <h2>Six steps from one problem to a workflow that works</h2>
+  <div class="grid">
+    <div class="card"><div class="top"><span class="num">1</span><div class="tile" data-i="target"></div></div><p class="t">Pick one problem</p><p class="s">Frequent, repetitive and low-risk.</p></div>
+    <div class="card"><div class="top"><span class="num">2</span><div class="tile tile--y" data-i="process"></div></div><p class="t">Map it, measure today</p><p class="s">Write the steps. Note the time and errors now.</p></div>
+    <div class="card"><div class="top"><span class="num">3</span><div class="tile" data-i="tools"></div></div><p class="t">Choose the simplest tool</p><p class="s">A built-in feature, an assistant or a two-step automation.</p></div>
+    <div class="card"><div class="top"><span class="num">4</span><div class="tile tile--y" data-i="eye"></div></div><p class="t">Pilot with review</p><p class="s">Two to four weeks, a person checking every output.</p></div>
+    <div class="card"><div class="top"><span class="num">5</span><div class="tile" data-i="chart"></div></div><p class="t">Measure</p><p class="s">Time, errors and customer response against the baseline.</p></div>
+    <div class="card"><div class="top"><span class="num">6</span><div class="tile tile--w" data-i="done"></div></div><p class="t">Improve, expand or stop</p><p class="s">Fix what failed, document it, name an owner.</p></div>
+  </div>
+  <p class="next"><span class="chip chip--y">Then pick the next problem and start again at step 1</span></p>
+  <svg class="wires" data-wires="biz-roadmap"></svg>
+</section>
+
 <script>
 const I = (() => {
   const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
@@ -602,6 +879,8 @@ const I = (() => {
     done: `<rect ${N} x="6" y="6" width="36" height="36" rx="4"/><path ${L} d="M15 25l6 6 12-14"/>`,
     alert: `<path ${N} d="M24 5l20 36H4Z"/><path ${L} d="M24 18v11"/><circle ${K} cx="24" cy="35" r="2.6"/>`,
     copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
+    megaphone: `<path ${N} d="M7 18h9l18-10v32L16 30H7Z"/><path ${L} d="M16 30l3 10h6l-3-10M40 20v8"/><rect ${K} x="7" y="18" width="5" height="12"/>`,
+    growth: `<path ${L} d="M5 42h38M8 34l10-10 7 7 14-14"/><path ${K} d="M31 13h10v10Z"/>`,
     card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
   };
 })();
@@ -706,6 +985,46 @@ const WIRES = {
     lines.push([[nt.cx, nt.t], [nt.cx, c[1].b]]); dots.push([nt.cx, nt.t], [nt.cx, c[1].b]);
     const my = (c[1].b + bt.t) / 2, ax = c[1].r - 50;
     lines.push([[bt.cx, bt.t], [bt.cx, my], [ax, my], [ax, c[1].b]]); dots.push([bt.cx, bt.t], [ax, c[1].b]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "pp-compare"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), lines = [], dots = [];
+    for (let i = 1; i <= 3; i++) { const v = g("v" + i), q = g("g" + i); lines.push([[v.r, v.cy], [q.l, v.cy]]); dots.push([v.r, v.cy], [q.l, v.cy, "y"]); }
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "pp-loop"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), n = rel(fig.querySelector("[data-n=note]"), fig), y = c[0].t + 130, lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], i === 2 ? [c[i + 1].l, y, "y"] : [c[i + 1].l, y]); }
+    const by = Math.round((c[0].b + n.t) / 2); lines.push([[c[2].cx, c[2].b], [c[2].cx, by], [c[1].cx, by], [c[1].cx, c[1].b]]); dots.push([c[2].cx, c[2].b], [c[1].cx, c[1].b]);
+    lines.push([[c[3].cx, c[3].b], [c[3].cx, n.t]]); dots.push([c[3].cx, c[3].b], [c[3].cx, n.t]);
+    draw(fig.querySelector(".wires"), lines, dots);
+    const s = document.createElement("span"); s.className = "lab"; s.textContent = "Not there yet? Ask again"; s.style.left = (c[1].cx + c[2].cx) / 2 + "px"; s.style.top = by + "px"; fig.appendChild(s);
+  },
+  "tl-choose"(fig) {
+    const a = rel(fig.querySelector("[data-n=ask]"), fig), o = [...fig.querySelectorAll(".out")].map((e) => rel(e, fig)), x = Math.round(a.r + 65);
+    const lines = [[[a.r, a.cy], [x, a.cy]], [[x, o[0].cy], [x, o[o.length - 1].cy]], ...o.map((k) => [[x, k.cy], [k.l, k.cy]])];
+    draw(fig.querySelector(".wires"), lines, [[a.r, a.cy], ...o.map((k) => [k.l, k.cy, "y"])]);
+  },
+  "biz-map"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), b = rel(fig.querySelector("[data-n=base]"), fig), l = rel(fig.querySelector(".loop span"), fig), y = c[0].t + 120, lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], [c[i + 1].l, y]); }
+    for (const k of c) { lines.push([[k.cx, k.b], [k.cx, b.t]]); dots.push([k.cx, k.b], [k.cx, b.t, "y"]); }
+    lines.push([[c[3].cx, c[3].t], [c[3].cx, l.cy], [c[0].cx, l.cy], [c[0].cx, c[0].t]]); dots.push([c[3].cx, c[3].t], [c[0].cx, c[0].t]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "biz-leads"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), r = [...fig.querySelectorAll(".routes .card")].map((e) => rel(e, fig)), f = rel(fig.querySelector("[data-n=final]"), fig), y = c[0].t + 120, lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], [c[i + 1].l, y]); }
+    const b1 = Math.round((c[0].b + r[0].t) / 2), b2 = Math.round((r[0].b + f.t) / 2);
+    lines.push([[c[3].cx, c[3].b], [c[3].cx, b1]], [[r[0].cx, b1], [Math.max(c[3].cx, r[2].cx), b1]]); dots.push([c[3].cx, c[3].b]);
+    for (const k of r) { lines.push([[k.cx, b1], [k.cx, k.t]], [[k.cx, k.b], [k.cx, b2]]); dots.push([k.cx, k.t], [k.cx, k.b]); }
+    lines.push([[r[0].cx, b2], [r[2].cx, b2]], [[f.cx, b2], [f.cx, f.t]]); dots.push([f.cx, f.t, "y"]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "biz-roadmap"(fig) {
+    const c = [...fig.querySelectorAll(".grid .card")].map((e) => rel(e, fig)), lines = [], dots = [];
+    for (const [a, b] of [[0, 1], [1, 2], [3, 4], [4, 5]]) { const yy = c[a].t + 64; lines.push([[c[a].r, yy], [c[b].l, yy]]); dots.push([c[a].r, yy], b === 5 ? [c[b].l, yy, "y"] : [c[b].l, yy]); }
+    const my = Math.round((c[2].b + c[3].t) / 2); lines.push([[c[2].cx, c[2].b], [c[2].cx, my], [c[3].cx, my], [c[3].cx, c[3].t]]); dots.push([c[2].cx, c[2].b], [c[3].cx, c[3].t]);
     draw(fig.querySelector(".wires"), lines, dots);
   },
 };

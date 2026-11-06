@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -50,6 +50,7 @@ const ICONS = {
   person: `<circle ${N} cx="24" cy="15" r="9"/><path ${N} d="M7 43c1-10 8-16 17-16s16 6 17 16Z"/><circle ${K} cx="24" cy="15" r="3"/>`,
   key: `<circle ${N} cx="15" cy="24" r="10"/><circle ${K} cx="15" cy="24" r="3.5"/><path ${L} d="M25 24h18M37 24v7M43 24v5"/>`,
   card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
+  copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
   id: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><circle ${N} cx="16" cy="22" r="5"/><path ${L} d="M8 34c1-5 4-7 8-7s7 2 8 7M28 18h10M28 25h10"/><rect ${K} x="28" y="30" width="7" height="3"/>`,
 };
 
@@ -298,7 +299,79 @@ async function billboard() {
   return doc("What Should You Never Give to AI?", "A billboard on two posts showing a key, a payment card and an ID card, joined by straight lines to Gemini, ChatGPT and Claude, with the advice: share less, redact before you paste.", await defs(bg), body);
 }
 
-const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard };
+/* ---- 11. The Everyday AI Prompt Pack — radial gradient from the top-left corner: one prompt at the
+   centre, wired to ten everyday tasks (five above, five below), with copy and refine either side ---- */
+async function promptpack() {
+  const bg = `<radialGradient id="bg" cx="0" cy="0" r="2100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3BFCA"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE2A0"/></radialGradient>`;
+  const cs = 240, cx = 960 - cs / 2, cy = 540 - cs / 2; // the prompt, centre
+  const ts = 120, xs = [480, 720, 960, 1200, 1440], ty = 215, by = 865, busT = 330, busB = 750;
+  const top = ["mail", "search", "doc", "idea", "week"], bottom = ["book", "assist", "chat", "chart", "person"];
+  const L = chip(0, 0, "copy", "yellow", "Copy and fill in", "Ready-to-use prompts"), R = chip(0, 0, "done", "pink", "Refine", "Follow-ups that improve it");
+  const l = chip(cx - 90 - L.w / 2, 540, "copy", "yellow", "Copy and fill in", "Ready-to-use prompts"), r = chip(cx + cs + 90 + R.w / 2, 540, "done", "pink", "Refine", "Follow-ups that improve it");
+  const wires = [
+    [[xs[0], busT], [xs[4], busT]], ...xs.map((x) => [[x, ty + ts / 2], [x, busT]]), [[960, busT], [960, cy]],
+    [[xs[0], busB], [xs[4], busB]], ...xs.map((x) => [[x, by - ts / 2], [x, busB]]), [[960, cy + cs], [960, busB]],
+    [[l.right, 540], [cx, 540]], [[cx + cs, 540], [r.left, 540]],
+  ];
+  const tiles = top.map((n, i) => iconCard(xs[i] - ts / 2, ty - ts / 2, ts, n, i % 2 ? "yellow" : "pink")).join("") + bottom.map((n, i) => iconCard(xs[i] - ts / 2, by - ts / 2, ts, n, i % 2 ? "pink" : "yellow")).join("");
+  const nodes = xs.map((x) => node(x, ty + ts / 2) + node(x, by - ts / 2)).join("") + node(960, cy) + node(960, cy + cs) + node(l.right, 540) + node(cx, 540) + node(cx + cs, 540) + node(r.left, 540, C.yellow);
+  const body = layer("connectors", wires.map(wire).join("")) + layer("tasks", tiles) + layer("prompt", iconCard(cx, cy, cs, "chat", "pink")) + layer("copy-refine", l.svg + r.svg) + layer("nodes", nodes);
+  return doc("The Everyday AI Prompt Pack", "One prompt at the centre, joined by straight lines to ten everyday tasks (email, research, summaries, ideas, planning, learning, presentations, editing, data and personal tasks), with copy and fill in on one side and refine with follow-ups on the other.", await defs(bg), body);
+}
+
+/* ---- 12. The 10 AI tools worth knowing — radial gradient from the right edge: five jobs as chips
+   down the left, each wired to the tools that do it ---- */
+async function toolkit() {
+  const bg = `<radialGradient id="bg" cx="1920" cy="540" r="1900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F3C0CB"/></radialGradient>`;
+  const rows = [
+    [["chat", "pink", "Think and write", "AI assistants"], ["chatgpt", "claude-color", "gemini", "grok"]],
+    [["assist", "yellow", "Inside your apps", "Copilot"], ["microsoft-copilot"]],
+    [["search", "pink", "Research", "With sources"], ["perplexity", "notebooklm"]],
+    [["idea", "yellow", "Create", "Visuals and slides"], ["canva", "gamma"]],
+    [["process", "pink", "Automate", "Between apps"], ["zapier"]],
+  ];
+  const ys = [205, 372, 540, 708, 875], ls = 124, gap = 50;
+  const ws = rows.map(([c]) => chip(0, 0, ...c).w), cw = Math.max(...ws), right = Math.round((1920 - (cw + 150 + 4 * ls + 3 * gap)) / 2) + cw, lx = right + 150; // chips share a right edge; the whole block is centred
+  const chips = rows.map(([c], i) => chip(right - ws[i] / 2, ys[i], ...c));
+  const wires = [], nodes = [];
+  let logos = "";
+  rows.forEach(([, names], i) => {
+    const y = ys[i];
+    wires.push([[chips[i].right, y], [lx, y]]); nodes.push(node(chips[i].right, y), node(lx, y));
+    names.forEach((n, k) => {
+      const x = lx + k * (ls + gap);
+      logos += logo(x, y - ls / 2, ls, n);
+      if (k) { wires.push([[x - gap, y], [x, y]]); nodes.push(node(x - gap, y, C.yellow, 8), node(x, y, C.yellow, 8)); }
+    });
+  });
+  const body = layer("connectors", wires.map(wire).join("")) + layer("jobs", chips.map((c) => c.svg).join("")) + layer("tools", logos) + layer("nodes", nodes.join(""));
+  return doc("The 10 AI Tools Worth Knowing Right Now", "Five jobs down the left (think and write, inside your apps, research with sources, create visuals and slides, automate between apps), each joined by a straight line to its tools: ChatGPT, Claude, Gemini and Grok; Microsoft Copilot; Perplexity and Gemini Notebook; Canva and Gamma; Zapier.", await defs(bg), body);
+}
+
+/* ---- 13. AI for business — diagonal gradient (bottom right to top left): marketing, sales,
+   customer service and operations wired into one AI-assisted workflow, which runs on everyday apps ---- */
+async function business() {
+  const bg = `<linearGradient id="bg" x1="1920" y1="1080" x2="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BFCA"/></linearGradient>`;
+  const hs = 250, hc = 440, hx = 960 - hs / 2, hy = hc - hs / 2; // the workflow hub
+  const tl = chip(470, 230, "megaphone", "pink", "Marketing", "Content and campaigns"), tr = chip(1450, 230, "growth", "yellow", "Sales", "Leads and follow-ups");
+  const bl = chip(470, 650, "chat", "yellow", "Customer service", "Answers and handover"), br = chip(1450, 650, "chart", "pink", "Operations", "Documents and reports");
+  const ls = 120, ly = 610, lxs = [960 - ls * 1.5 - 40, 960 - ls / 2, 960 + ls / 2 + 40]; // everyday apps under the hub
+  const p = chip(960, 880, "person", "pink", "Your team decides", "A person approves what goes out");
+  const wires = [
+    [[470, tl.bottom], [470, hc], [hx, hc]], [[470, bl.top], [470, hc]],
+    [[1450, tr.bottom], [1450, hc], [hx + hs, hc]], [[1450, br.top], [1450, hc]],
+    [[960, hy + hs], [960, ly]], [[960, ly + ls], [960, p.top]],
+    [[lxs[0] + ls, ly + ls / 2], [lxs[1], ly + ls / 2]], [[lxs[1] + ls, ly + ls / 2], [lxs[2], ly + ls / 2]],
+  ];
+  const apps = ["gmail", "google-sheets", "zapier"].map((n, i) => logo(lxs[i], ly, ls, n)).join("");
+  const nodes = [node(470, tl.bottom), node(470, bl.top), node(1450, tr.bottom), node(1450, br.top), node(hx, hc), node(hx + hs, hc), node(960, hy + hs), node(960, ly, C.yellow), node(960, ly + ls), node(960, p.top),
+    node(lxs[0] + ls, ly + ls / 2, C.yellow, 8), node(lxs[1], ly + ls / 2, C.yellow, 8), node(lxs[1] + ls, ly + ls / 2, C.yellow, 8), node(lxs[2], ly + ls / 2, C.yellow, 8)].join("");
+  const body = layer("connectors", wires.map(wire).join("")) + layer("teams", [tl, tr, bl, br].map((c) => c.svg).join("")) + layer("workflow", iconCard(hx, hy, hs, "process", "yellow")) +
+    layer("everyday-apps", apps) + layer("people", p.svg) + layer("nodes", nodes);
+  return doc("AI for Business: Marketing, Sales and Operations", "Marketing, sales, customer service and operations joined by straight lines to one AI-assisted workflow, which runs on everyday apps (Gmail, Google Sheets, Zapier), with the note that your team decides and a person approves what goes out.", await defs(bg), body);
+}
+
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>
