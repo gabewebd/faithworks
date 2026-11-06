@@ -2,7 +2,8 @@
 // script-src 'self' means no inline or third-party script can run in the dashboard, and the
 // same policy is inherited by the sandboxed preview iframes (srcdoc), on top of their own.
 export function csp(cfg) {
-  const site = cfg?.publicSiteUrl ? ` ${cfg.publicSiteUrl}` : " https:";
+  const origins = [...new Set([cfg?.publicSiteUrl, cfg?.assetOrigin].filter(Boolean))];
+  const site = origins.length ? origins.map((o) => ` ${o}`).join("") : " https:";
   const frames = (cfg?.iframeHosts || []).map((h) => ` https://${h}`).join("");
   return [
     "default-src 'self'",

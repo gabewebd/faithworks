@@ -72,7 +72,7 @@ export function createPreview({ store, cfg }) {
       } else throw new HttpError(400, "This content type has no page preview.", "no_preview");
       if (!page) throw new HttpError(422, "Add a title, slug and page content to preview this page.", "incomplete");
       let html = R.dropEmptySections(L.layout({ ...page, site: d.site }));
-      if (cfg.production) html = html.replace("<head>", `<head>\n  <base href="${cfg.publicSiteUrl}/">`);
+      if (cfg.production) html = html.replace("<head>", `<head>\n  <base href="${cfg.assetOrigin || cfg.publicSiteUrl}/">`);
       return { html, report, path: page.path, view: live ? "live" : "draft" };
     },
   };

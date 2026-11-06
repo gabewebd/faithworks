@@ -15,7 +15,7 @@ const isLocal = () => ["localhost", "127.0.0.1"].includes(location.hostname);
 export function assetUrl(url, cfg) {
   if (!url) return "";
   if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith("/") && !url.startsWith("//")) return isLocal() ? url : cfg.publicSiteUrl + url;
+  if (url.startsWith("/") && !url.startsWith("//")) return isLocal() ? url : (cfg.assetOrigin || cfg.publicSiteUrl) + url;
   return "";
 }
 

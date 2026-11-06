@@ -120,7 +120,7 @@ export function createHtmlEditor({
 }) {
   const card = collection === "testimonials"; // a reusable card, not a full page
   const state = { mode: "visual", device: "desktop", siteStyles: true, html: trimDoc(html), css: trimDoc(css), layout: layout === "custom" ? "custom" : "site", dirtyVisual: false, kept: new Map(), comps: new Map(), undo: [], redo: [], sel: null, editing: null, editStart: "", editBefore: "", headNote: "" };
-  const siteBase = isLocal() ? "" : config.publicSiteUrl;
+  const siteBase = isLocal() ? "" : config.assetOrigin || config.publicSiteUrl; // site CSS and images come from the asset CDN
 
   /* ---- Toolbar ---- */
   const modeBtns = {

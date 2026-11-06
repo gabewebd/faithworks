@@ -351,8 +351,10 @@ See `cms/.env.example`. Required on a hosted deployment (the CMS refuses to star
 | Sign-in (Google OAuth) | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` |
 | Session and access | `CMS_SESSION_SECRET` (32+ random characters), `CMS_SUPER_ADMINS`; optional `CMS_SESSION_HOURS`, `CMS_ALLOWED_EMAIL_DOMAINS` |
 
-Optional website settings: `PUBLIC_SITE_URL` (the public site's address, no path: dashboard
-previews load images from it), `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild),
+Optional website settings: `PUBLIC_SITE_URL` (the public site's address, no path: links and
+"view on the website"), `SITE_ASSET_ORIGIN` (where `/css`, `/js` and `/assets` are served, i.e. the
+asset CDN: the visual editor and page preview load the site styles and images from it; falls back to
+`NEWSLETTER_ASSET_ORIGIN`, then `PUBLIC_SITE_URL`), `PUBLIC_SITE_DEPLOY_HOOK_URL` (also used by the daily rebuild),
 `CMS_PREVIEW_TOKEN`, `CMS_IFRAME_HOSTS`.
 
 **No longer used** (delete them from the host): `FORMS_ALLOWED_ORIGINS` and `FORMS_RATE_LIMIT`

@@ -40,6 +40,9 @@ export function loadConfig(env = process.env) {
     devLogin: env.CMS_DEV_LOGIN === "true" && !production,
     previewToken: env.CMS_PREVIEW_TOKEN || "",
     publicSiteUrl: (env.PUBLIC_SITE_URL || "https://faithph.ai").replace(/\/$/, ""),
+    // Where the website's /css, /js and /assets are served (the asset CDN). The public site (GHL) does not
+    // serve them, so the visual editor and page preview load the site styles and images from here.
+    assetOrigin: (env.SITE_ASSET_ORIGIN || env.NEWSLETTER_ASSET_ORIGIN || env.PUBLIC_SITE_URL || "https://faithph.ai").replace(/\/$/, ""),
     deployHookUrl: env.PUBLIC_SITE_DEPLOY_HOOK_URL || "",
     iframeHosts: env.CMS_IFRAME_HOSTS ? list(env.CMS_IFRAME_HOSTS) : DEFAULT_IFRAME_HOSTS,
   };
@@ -89,7 +92,7 @@ function serviceKeyProblem(key, name) {
 // Settings safe to show in the dashboard (no secrets).
 export function publicConfig(cfg) {
   return {
-    store: cfg.store, publicSiteUrl: cfg.publicSiteUrl, devLogin: cfg.devLogin, deployHook: !!cfg.deployHookUrl,
+    store: cfg.store, publicSiteUrl: cfg.publicSiteUrl, assetOrigin: cfg.assetOrigin, devLogin: cfg.devLogin, deployHook: !!cfg.deployHookUrl,
     previewBuilds: !!cfg.previewToken, iframeHosts: cfg.iframeHosts, sessionHours: cfg.sessionHours,
   };
 }
