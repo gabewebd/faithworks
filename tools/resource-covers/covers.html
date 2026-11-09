@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier", "netlify"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier", "netlify", "shadcn", "magicui", "motion", "threejs", "remotion", "groq", "openai", "playwright"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -471,7 +471,31 @@ async function roles() {
   return doc("Role Engineering: AI Teammates with Grok Bots", "An illustrated group chat for a sample AI Team. You ask for a coffee subscription campaign; Nova, the research analyst, shares findings and hands over to Maya, the marketing strategist, who plans it and hands over to Pixel, the content creator, who drafts the email and posts and waits for your approval, while Sam, the operations manager, is typing. The sidebar lists all five pillow-shaped Bots, including Alex, the sales assistant.", await defs(bg), layer("chat-window", out));
 }
 
-const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles };
+/* ---- 16. The GitHub Toolkit — radial gradient from the top-right corner: GitHub feeds five kinds of
+   project (agent skills, component libraries, MCP servers, ready-to-use tools, APIs) into your AI
+   agent, framed by tilted, feathered logos of projects from the article ---- */
+async function ghkit() {
+  const bg = `<radialGradient id="bg" cx="1920" cy="0" r="2150" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FCE19C"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#F3BECA"/></radialGradient>`;
+  const blurs = [3, 4, 5, 6];
+  const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
+  const kinds = [["book", "pink", "Agent skills", "Know-how for your AI"], ["copy", "yellow", "Component libraries", "Ready-made interface parts"], ["process", "pink", "MCP servers", "New abilities for agents"], ["done", "yellow", "Ready-to-use tools", "Install, then run"], ["key", "pink", "APIs and SDKs", "Build your own workflow"]];
+  const ys = [190, 365, 540, 715, 890], gs = 280, as = 280, g1 = 110, g2 = 150;
+  const ws = kinds.map((k) => chip(0, 0, ...k).w), cw = Math.max(...ws);
+  const x0 = Math.round((1920 - (gs + g1 + cw + g2 + as)) / 2), lx = x0 + gs + g1, b1 = Math.round(x0 + gs + g1 / 2), b2 = Math.round(lx + cw + g2 / 2), ax = lx + cw + g2;
+  const chips = kinds.map((k, i) => chip(lx + ws[i] / 2, ys[i], ...k));
+  const wires = [[[x0 + gs, 540], [b1, 540]], [[b1, ys[0]], [b1, ys[4]]], ...ys.map((y) => [[b1, y], [lx, y]]),
+    ...chips.map((c, i) => [[c.right, ys[i]], [b2, ys[i]]]), [[b2, ys[0]], [b2, ys[4]]], [[b2, 540], [ax, 540]]];
+  const agent = `<g>${halo(ax, 540 - as / 2, as, as, 62)}<rect x="${ax}" y="${540 - as / 2}" width="${as}" height="${as}" rx="62" fill="#FFFFFF"/><rect x="${ax}" y="${540 - as / 2}" width="${as}" height="${as}" rx="62" fill="url(#light)"/>${iconTile(ax + 56, 540 - as / 2 + 56, as - 112, "idea", "yellow")}</g>`;
+  const nodes = [node(x0 + gs, 540), ...ys.map((y) => node(lx, y)), ...chips.map((c, i) => node(c.right, ys[i], C.yellow, 8)), node(ax, 540, C.yellow)].join("");
+  // [centre x, centre y, size, logo, tilt, blur, opacity]
+  const soft = [[140, 190, 170, "shadcn", -14, 4, 0.8], [170, 640, 150, "threejs", 12, 3, 0.8], [250, 985, 180, "remotion", -10, 5, 0.8], [1010, 52, 120, "motion", 8, 3, 0.75],
+    [1790, 170, 170, "groq", 14, 4, 0.85], [1770, 600, 150, "openai", -12, 3, 0.8], [1800, 965, 180, "playwright", 16, 5, 0.8], [1190, 1035, 130, "magicui", -16, 4, 0.75]];
+  const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) + layer("connectors", wires.map(wire).join("")) +
+    layer("github", logo(x0, 540 - gs / 2, gs, "github")) + layer("kinds-of-project", chips.map((c) => c.svg).join("")) + layer("your-ai-agent", agent) + layer("nodes", nodes);
+  return doc("The GitHub Toolkit", "The GitHub mark joined by straight lines to five kinds of project (agent skills, component libraries, MCP servers, ready-to-use tools, APIs and SDKs), which all lead to your AI agent. Around the edges, tilted, softly blurred logos: shadcn/ui, Three.js, Remotion, Motion, Groq, OpenAI, Playwright and Magic UI.", await defs(bg, extra), body);
+}
+
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles, ghkit };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>
