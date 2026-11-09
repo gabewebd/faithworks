@@ -1,0 +1,264 @@
+<!doctype html>
+<!-- In-article diagrams for "From Grok to Live Website" (build-and-deploy-landing-page-with-grok-and-netlify).
+     Same house style as figures.html (brand palette only, Poppins 600 headings, Inter text, solid Charcoal
+     text, white cards, hairline straight connectors with Faith Pink dot nodes, real logos from
+     assets/icons/tools). Kept in its own file so other articles' figures are never re-rendered by accident.
+     Serve the repository root (python -m http.server 8775), then:
+       PAGE=grok-netlify.html node tools/resource-figures/render.mjs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=block">
+<style>
+  :root { --pink: #EFACBA; --pink-tint: #F7E5E6; --yellow: #FBC522; --yellow-pastel: #FAEBC0; --ink: #1A1A1A; --paper: #FAF8F4; --stone: #E4E2DE; --stone-2: #F1EFEB; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccc; font-family: Inter, Arial, sans-serif; color: var(--ink); }
+  .fig { position: relative; width: 1600px; margin: 0 0 40px; padding: 80px 88px; overflow: hidden; background: var(--paper); }
+  .fig--pink { background: radial-gradient(1200px 700px at 15% 0%, #F6D3DA 0%, rgb(246 211 218 / 0) 70%), var(--paper); }
+  .fig--yellow { background: radial-gradient(1200px 700px at 85% 0%, #FCE6A6 0%, rgb(252 230 166 / 0) 70%), var(--paper); }
+  .fig--both { background: radial-gradient(1000px 600px at 0% 0%, #F6D3DA 0%, rgb(246 211 218 / 0) 70%), radial-gradient(1000px 600px at 100% 100%, #FCE6A6 0%, rgb(252 230 166 / 0) 70%), var(--paper); }
+  .kicker { margin: 0 0 14px; font-size: 26px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .kicker::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 50%; background: var(--pink); vertical-align: 2px; }
+  .fig--yellow .kicker::before { background: var(--yellow); }
+  h2 { margin: 0 0 56px; max-width: 1300px; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 58px; line-height: 1.08; letter-spacing: -0.035em; }
+  .card { position: relative; z-index: 2; border-radius: 28px; background: #fff; box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  .tile { display: grid; place-items: center; flex: none; width: 84px; height: 84px; border-radius: 20px; background: var(--pink); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.45); }
+  .tile--y { background: var(--yellow); }
+  .tile--w { background: var(--stone-2); }
+  .tile svg { width: 52px; height: 52px; overflow: visible; }
+  .logo { display: grid; place-items: center; flex: none; width: 84px; height: 84px; border-radius: 20px; background: #fff; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.1), 0 10px 20px -12px rgb(26 26 26 / 0.3); }
+  .logo img { width: 50px; height: 50px; }
+  .num { display: inline-grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; font-size: 24px; }
+  .t { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 34px; line-height: 1.12; letter-spacing: -0.02em; }
+  .s { margin: 10px 0 0; font-size: 26px; line-height: 1.38; color: var(--ink); }
+  .lbl { margin: 0 0 10px; font-size: 22px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .foot { margin: 48px 0 0; font-size: 26px; line-height: 1.4; }
+  code { font-family: "Cascadia Mono", Consolas, monospace; font-size: 0.92em; padding: 2px 8px; border-radius: 8px; background: var(--stone-2); }
+  .wires { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .wires polyline { fill: none; stroke: var(--ink); stroke-opacity: 0.22; stroke-width: 3; }
+  .wires circle { fill: var(--pink); stroke: #fff; stroke-width: 5; }
+  .wires circle.y { fill: var(--yellow); }
+  .pill { position: absolute; z-index: 3; padding: 6px 18px; border-radius: 999px; background: var(--paper); font-size: 23px; font-weight: 700; white-space: nowrap; transform: translate(-50%, -50%); }
+
+  /* ---- 1. the workflow ---- */
+  #gn-flow .row { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 44px; }
+  #gn-flow .card { padding: 30px 26px 32px; min-height: 380px; }
+  #gn-flow .card .tile, #gn-flow .card .logo { margin-bottom: 24px; }
+  #gn-flow .card .t { font-size: 31px; }
+  #gn-flow .card .s { font-size: 24px; }
+  #gn-flow .card--live { background: var(--yellow-pastel); }
+  #gn-flow .you { min-height: 0; display: flex; align-items: center; gap: 26px; margin: 96px auto 0; width: max-content; padding: 26px 36px 26px 28px; background: var(--pink-tint); }
+
+  /* ---- 2. connecting Netlify in Grok (illustration of the steps) ---- */
+  #gn-connect .row { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 40px; }
+  #gn-connect .card { padding: 28px 26px 32px; min-height: 330px; }
+  #gn-connect .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  #gn-connect .card .t { font-size: 30px; }
+  #gn-connect .card .s { font-size: 23px; }
+  #gn-connect .card--ok { background: var(--yellow-pastel); }
+  #gn-connect .note { display: inline-block; margin: -30px 0 46px; padding: 10px 20px; border-radius: 12px; background: #fff; font-size: 24px; font-weight: 600; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.1); }
+
+  /* ---- 3. lifecycle ---- */
+  #gn-cycle .grid { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 56px; row-gap: 120px; }
+  #gn-cycle .card { display: flex; gap: 22px; align-items: flex-start; padding: 28px 26px 30px; min-height: 230px; }
+  #gn-cycle .card .t { font-size: 30px; }
+  #gn-cycle .card .s { margin-top: 8px; font-size: 23px; }
+  #gn-cycle .card .num { margin-top: 2px; }
+  #gn-cycle .card--opt { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #gn-cycle .card--live { background: var(--yellow-pastel); }
+  #gn-cycle .back { height: 110px; }
+
+  /* ---- 4. DNS ---- */
+  #gn-dns .grid { position: relative; display: grid; grid-template-columns: 370px minmax(0, 1fr) 320px; column-gap: 50px; row-gap: 56px; align-items: center; }
+  #gn-dns .card { padding: 28px 30px; }
+  #gn-dns .addr { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+  #gn-dns .addr .t { font-size: 27px; line-height: 1.2; }
+  #gn-dns .rec { display: grid; grid-template-columns: 170px 1fr; gap: 0 16px; align-items: center; font-size: 25px; }
+  #gn-dns .rec span { padding: 6px 0; }
+  #gn-dns .rec .h { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid rgb(26 26 26 / 0.12); padding-bottom: 12px; margin-bottom: 8px; }
+  #gn-dns .rec b { font-weight: 700; }
+  #gn-dns .rec--new { background: var(--yellow-pastel); }
+  #gn-dns .rec--keep { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #gn-dns .dest { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+  #gn-dns .dest .t { font-size: 29px; }
+  #gn-dns .dest .s { margin-top: 6px; font-size: 23px; }
+  #gn-dns .dest--keep { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #gn-dns .head { font-size: 22px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: -26px; }
+  #gn-dns .https { display: flex; align-items: center; gap: 22px; margin-top: 56px; padding: 22px 28px; width: max-content; background: var(--pink-tint); font-size: 26px; }
+
+  /* ---- 5. before and after ---- */
+  #gn-compare .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  #gn-compare .col { padding: 34px 34px 36px; }
+  #gn-compare .col--manual { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #gn-compare .head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+  #gn-compare .head .t { font-size: 38px; }
+  #gn-compare .step { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 26px; line-height: 1.3; }
+  #gn-compare .step .num { width: 40px; height: 40px; font-size: 21px; }
+  #gn-compare .col--manual .step .num { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+  #gn-compare .res { margin: 22px 0 0; padding: 18px 22px; border-radius: 16px; background: #fff; font-size: 25px; line-height: 1.4; }
+  #gn-compare .col:not(.col--manual) .res { background: var(--yellow-pastel); }
+  #gn-compare .res b { display: block; margin-bottom: 4px; }
+  #gn-compare .both { display: flex; align-items: center; gap: 22px; margin-top: 44px; padding: 24px 30px; background: var(--pink-tint); font-size: 27px; }
+</style>
+</head>
+<body>
+
+<section class="fig fig--both" id="gn-flow" data-out="build-and-deploy-landing-page-with-grok-and-netlify/grok-to-netlify-workflow">
+  <p class="kicker">The workflow in this guide</p>
+  <h2>From a conversation to a live landing page</h2>
+  <div class="row">
+    <div class="card"><div class="tile" data-i="chat"></div><p class="t">1. Brief</p><p class="s">You describe the page: purpose, audience, sections, colours, call to action.</p></div>
+    <div class="card"><div class="logo"><img src="/assets/icons/tools/grok.svg" alt=""></div><p class="t">2. Build</p><p class="s">Grok writes the HTML and CSS, then refines it with your feedback.</p></div>
+    <div class="card"><div class="logo"><img src="/assets/icons/tools/netlify.svg" alt=""></div><p class="t">3. Connect</p><p class="s">You add the Netlify connector in Grok and authorize it once.</p></div>
+    <div class="card"><div class="tile tile--y" data-i="upload"></div><p class="t">4. Deploy</p><p class="s">Grok checks the project, confirms the target, then deploys.</p></div>
+    <div class="card card--live"><div class="tile tile--y" data-i="globe"></div><p class="t">5. Live</p><p class="s">You get a <b>.netlify.app</b> address to test, share and refine.</p></div>
+  </div>
+  <div class="card you" data-you><div class="tile" data-i="person"></div><div><p class="t" style="font-size:31px">You review at every step</p><p class="s" style="margin-top:6px;font-size:24px">Read the code, approve the deploy target, test the live page.</p></div></div>
+  <svg class="wires" data-wires="flow"></svg>
+</section>
+
+<section class="fig fig--pink" id="gn-connect" data-out="build-and-deploy-landing-page-with-grok-and-netlify/connect-netlify-in-grok">
+  <p class="kicker">Illustration of the steps, not a screenshot</p>
+  <h2>Connecting Netlify to Grok takes five steps</h2>
+  <p class="note">Labels follow Netlify's setup guide. Your screens may look different.</p>
+  <div class="row">
+    <div class="card"><div class="top"><span class="num">1</span><div class="logo"><img src="/assets/icons/tools/grok.svg" alt=""></div></div><p class="t">Open Connectors</p><p class="s">In Grok, go to <b>Connectors</b> (grok.com/connectors).</p></div>
+    <div class="card"><div class="top"><span class="num">2</span><div class="tile" data-i="search"></div></div><p class="t">Search “Netlify”</p><p class="s">Find the Netlify connector in the list.</p></div>
+    <div class="card"><div class="top"><span class="num">3</span><div class="tile tile--y" data-i="plus"></div></div><p class="t">Select Add</p><p class="s">Then follow the setup prompts.</p></div>
+    <div class="card"><div class="top"><span class="num">4</span><div class="logo"><img src="/assets/icons/tools/netlify.svg" alt=""></div></div><p class="t">Authorize</p><p class="s">Sign in to Netlify and approve access for Grok.</p></div>
+    <div class="card card--ok"><div class="top"><span class="num">5</span><div class="tile tile--y" data-i="done"></div></div><p class="t">Check the list</p><p class="s">Netlify now shows among your connected connectors.</p></div>
+  </div>
+  <svg class="wires" data-wires="connect"></svg>
+</section>
+
+<section class="fig fig--yellow" id="gn-cycle" data-out="build-and-deploy-landing-page-with-grok-and-netlify/landing-page-lifecycle">
+  <p class="kicker">The landing page lifecycle</p>
+  <h2>Plan, build and review before you deploy, then test and refine</h2>
+  <div class="grid">
+    <div class="card"><span class="num">1</span><div><p class="t">Plan</p><p class="s">Write the brief: goal, audience, sections, call to action.</p></div></div>
+    <div class="card"><span class="num">2</span><div><p class="t">Build</p><p class="s">Grok generates the first version of the page.</p></div></div>
+    <div class="card"><span class="num">3</span><div><p class="t">Review</p><p class="s">Preview it, read the code, ask for fixes.</p></div></div>
+    <div class="card"><span class="num">4</span><div><p class="t">Connect</p><p class="s">Add and authorize the Netlify connector.</p></div></div>
+    <div class="card card--live"><span class="num">5</span><div><p class="t">Deploy</p><p class="s">Approve the target, get the live address.</p></div></div>
+    <div class="card"><span class="num">6</span><div><p class="t">Test</p><p class="s">Phone and desktop, links, forms, console.</p></div></div>
+    <div class="card"><span class="num">7</span><div><p class="t">Refine</p><p class="s">Ask Grok for changes, then redeploy.</p></div></div>
+    <div class="card card--opt"><span class="num">8</span><div><p class="t">Custom domain</p><p class="s">Optional: point a subdomain at the site.</p></div></div>
+  </div>
+  <div class="back"></div>
+  <span class="pill" data-pill>Redeploy after each round of changes</span>
+  <svg class="wires" data-wires="cycle"></svg>
+</section>
+
+<section class="fig fig--both" id="gn-dns" data-out="build-and-deploy-landing-page-with-grok-and-netlify/custom-subdomain-dns">
+  <p class="kicker">Custom domain example</p>
+  <h2>Point one subdomain at Netlify and leave the main domain alone</h2>
+  <p class="note" style="margin:-34px 0 44px;font-size:24px">Little Kettle Café and its domain are made up for this guide.</p>
+  <div class="grid">
+    <p class="head">A visitor types</p><p class="head">DNS records at your domain registrar</p><p class="head">Where it goes</p>
+    <div class="card addr" data-n="a1"><div class="tile tile--y" data-i="globe"></div><p class="t">classes.<br>littlekettlecafe.com</p></div>
+    <div class="card rec rec--new" data-n="r1"><span class="h">Host</span><span class="h">Type</span><span><b>classes</b></span><span><b>CNAME</b></span><span class="h" style="grid-column:1/-1;margin-top:14px">Points to</span><span style="grid-column:1/-1"><b>littlekettle-classes.netlify.app</b></span><span style="grid-column:1/-1;font-size:22px;padding-top:12px">The one record you add</span></div>
+    <div class="card dest" data-n="d1"><div class="logo"><img src="/assets/icons/tools/netlify.svg" alt=""></div><div><p class="t">Class page</p><p class="s">Hosted on Netlify</p></div></div>
+    <div class="card addr" data-n="a2" style="background:var(--stone-2)"><div class="tile tile--w" data-i="globe"></div><p class="t">littlekettlecafe.com</p></div>
+    <div class="card rec rec--keep" data-n="r2"><span class="h">Host</span><span class="h">Type</span><span><b>@</b> (apex)</span><span>A / ALIAS</span><span class="h" style="grid-column:1/-1;margin-top:14px">Points to</span><span style="grid-column:1/-1">The café’s current website host</span><span style="grid-column:1/-1;font-size:22px;padding-top:12px">Existing records: leave them as they are</span></div>
+    <div class="card dest dest--keep" data-n="d2"><div class="tile tile--w" data-i="home"></div><div><p class="t">Main website</p><p class="s">Unchanged</p></div></div>
+  </div>
+  <div class="card https"><div class="tile" data-i="lock"></div><div>Once DNS checks out, Netlify issues a free <b>Let’s Encrypt</b> certificate, so the subdomain loads over <b>HTTPS</b>.</div></div>
+  <svg class="wires" data-wires="dns"></svg>
+</section>
+
+<section class="fig fig--pink" id="gn-compare" data-out="build-and-deploy-landing-page-with-grok-and-netlify/manual-vs-connected">
+  <p class="kicker">Before and after</p>
+  <h2>Setting up a deployment by hand versus a connected AI workflow</h2>
+  <div class="cols">
+    <div class="card col col--manual"><div class="head"><div class="tile tile--w" data-i="code"></div><p class="t">By hand</p></div>
+      <div class="step"><span class="num">1</span>Create a project folder and write the code</div>
+      <div class="step"><span class="num">2</span>Set up a Git repository and push it</div>
+      <div class="step"><span class="num">3</span>Create a Netlify project and link the repository</div>
+      <div class="step"><span class="num">4</span>Check the build settings and publish folder</div>
+      <div class="step"><span class="num">5</span>Deploy, then find and copy the live address</div>
+      <p class="res"><b>Best when</b>you want full control, a Git history and a team workflow.</p></div>
+    <div class="card col"><div class="head"><div class="tile tile--y" data-i="chat"></div><p class="t">Connected AI workflow</p></div>
+      <div class="step"><span class="num">1</span>Give Grok a clear brief</div>
+      <div class="step"><span class="num">2</span>Review and refine what Grok builds</div>
+      <div class="step"><span class="num">3</span>Add the Netlify connector once and authorize it</div>
+      <div class="step"><span class="num">4</span>Ask Grok to check the project and deploy it</div>
+      <div class="step"><span class="num">5</span>Open the live address Grok returns and test it</div>
+      <p class="res"><b>Best when</b>you want a first version live quickly and will review it carefully.</p></div>
+  </div>
+  <div class="card both"><div class="tile" data-i="shield"></div><div><b>Both still need</b> testing, a security check and a person who approves what goes live.</div></div>
+</section>
+
+<script>
+const I = (() => {
+  const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
+  const L = 'fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+  const K = 'fill="#1A1A1A"';
+  return {
+    chat: `<path ${N} d="M6 8h36v24H20l-9 8v-8H6Z"/><path ${L} d="M13 17h22M13 24h13"/><circle ${K} cx="34" cy="24" r="3"/>`,
+    globe: `<circle ${N} cx="24" cy="24" r="19"/><path ${L} d="M5 24h38M24 5c-6 6-8 12-8 19s2 13 8 19M24 5c6 6 8 12 8 19s-2 13-8 19"/><circle ${K} cx="24" cy="24" r="3.5"/>`,
+    upload: `<path ${L} d="M6 30v12h36V30"/><path ${N} d="M24 5l12 13h-7v15h-10V18h-7Z"/><rect ${K} x="19" y="37" width="10" height="3" rx="1"/>`,
+    person: `<circle ${N} cx="24" cy="15" r="9"/><path ${N} d="M7 43c1-10 8-16 17-16s16 6 17 16Z"/><circle ${K} cx="24" cy="15" r="3"/>`,
+    search: `<circle ${N} cx="20" cy="20" r="13"/><path ${L} d="M30 30l12 12"/><circle ${K} cx="20" cy="20" r="4"/>`,
+    plus: `<rect ${N} x="6" y="6" width="36" height="36" rx="8"/><path ${L} d="M24 15v18M15 24h18"/><circle ${K} cx="24" cy="24" r="2.6"/>`,
+    done: `<rect ${N} x="6" y="6" width="36" height="36" rx="4"/><path ${L} d="M15 25l6 6 12-14"/>`,
+    home: `<path ${N} d="M6 22L24 7l18 15v20H6Z"/><rect ${K} x="19" y="29" width="10" height="13"/>`,
+    lock: `<rect ${N} x="9" y="21" width="30" height="22" rx="4"/><path ${L} d="M15 21v-6a9 9 0 0 1 18 0v6"/><circle ${K} cx="24" cy="32" r="3.5"/>`,
+    code: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><path ${L} d="M4 16h40M18 23l-6 6 6 6M30 23l6 6-6 6"/><circle ${K} cx="10" cy="12" r="2"/>`,
+    shield: `<path ${N} d="M24 4l17 6v13c0 10-7 18-17 21C14 41 7 33 7 23V10Z"/><path ${L} d="M16 24l6 6 10-12"/>`,
+  };
+})();
+document.querySelectorAll("[data-i]").forEach((t) => (t.innerHTML = `<svg viewBox="0 0 48 48">${I[t.dataset.i]}</svg>`));
+
+function rel(el, fig) { const r = el.getBoundingClientRect(), f = fig.getBoundingClientRect(); return { l: r.left - f.left, r: r.right - f.left, t: r.top - f.top, b: r.bottom - f.top, cx: (r.left + r.right) / 2 - f.left, cy: (r.top + r.bottom) / 2 - f.top }; }
+function draw(svg, lines, dots) {
+  svg.innerHTML = lines.map((p) => `<polyline points="${p.map((q) => q.join(",")).join(" ")}"/>`).join("") + dots.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="10"${c ? ` class="${c}"` : ""}/>`).join("");
+}
+function chain(cards, y, lastYellow) {
+  const lines = [], dots = [];
+  for (let i = 0; i < cards.length - 1; i++) { const yy = y ?? cards[i].t + 72; lines.push([[cards[i].r, yy], [cards[i + 1].l, yy]]); dots.push([cards[i].r, yy], [cards[i + 1].l, yy, lastYellow && i === cards.length - 2 ? "y" : ""]); }
+  return { lines, dots };
+}
+const WIRES = {
+  flow(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), you = rel(fig.querySelector("[data-you]"), fig);
+    const { lines, dots } = chain(c, c[0].t + 72, true);
+    const my = Math.round((c[0].b + you.t) / 2);
+    lines.push([[c[0].cx, c[0].b], [c[0].cx, my], [c[4].cx, my], [c[4].cx, c[4].b]]);
+    for (const k of [1, 2, 3]) lines.push([[c[k].cx, c[k].b], [c[k].cx, my]]);
+    lines.push([[you.cx, my], [you.cx, you.t]]);
+    dots.push(...[0, 1, 2, 3, 4].map((k) => [c[k].cx, c[k].b]), [you.cx, you.t]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  connect(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig));
+    const { lines, dots } = chain(c, c[0].t + 51, true);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  cycle(fig) {
+    const c = [...fig.querySelectorAll(".grid .card")].map((e) => rel(e, fig)), lines = [], dots = [];
+    const y1 = c[0].t + 52, y2 = c[4].t + 52;
+    for (const [a, b] of [[0, 1], [1, 2], [2, 3], [4, 5], [5, 6], [6, 7]]) { const yy = a < 4 ? y1 : y2; lines.push([[c[a].r, yy], [c[b].l, yy]]); dots.push([c[a].r, yy], [c[b].l, yy, b === 7 ? "y" : ""]); }
+    const my = Math.round((c[3].b + c[4].t) / 2); // 4 Connect → 5 Deploy
+    lines.push([[c[3].cx, c[3].b], [c[3].cx, my], [c[4].cx, my], [c[4].cx, c[4].t]]); dots.push([c[3].cx, c[3].b], [c[4].cx, c[4].t, "y"]);
+    const by = c[4].b + 64; // 7 Refine → back to 5 Deploy
+    lines.push([[c[6].cx, c[6].b], [c[6].cx, by], [c[4].cx, by], [c[4].cx, c[4].b]]); dots.push([c[6].cx, c[6].b], [c[4].cx, c[4].b]);
+    const pill = fig.querySelector("[data-pill]"); pill.style.left = `${(c[4].cx + c[6].cx) / 2}px`; pill.style.top = `${by}px`;
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  dns(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), lines = [], dots = [];
+    for (const k of ["1", "2"]) {
+      const a = g("a" + k), r = g("r" + k), d = g("d" + k);
+      lines.push([[a.r, a.cy], [r.l, a.cy]], [[r.r, d.cy], [d.l, d.cy]]);
+      dots.push([a.r, a.cy], [r.l, a.cy], [r.r, d.cy], [d.l, d.cy, k === "1" ? "y" : ""]);
+    }
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+};
+window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))))).then(() => {
+  document.querySelectorAll("[data-wires]").forEach((s) => WIRES[s.dataset.wires](s.closest(".fig")));
+  return [...document.querySelectorAll(".fig")].map((f) => { const r = f.getBoundingClientRect(); return { out: f.dataset.out, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; });
+});
+</script>
+</body>
+</html>

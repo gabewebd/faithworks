@@ -3,7 +3,7 @@
 // DevTools Protocol (no dependencies), then recompresses losslessly with Pillow when Python has it.
 //   1. Serve the repository root:  python -m http.server 8775
 //   2. node tools/resource-figures/render.mjs [id …]
-// Options: BASE=http://localhost:8775  CHROME=<path to chrome>
+// Options: BASE=http://localhost:8775  CHROME=<path to chrome>  PAGE=<another figures file in this folder>
 import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -35,9 +35,11 @@ const evaluate = async (expression) => {
 try {
   await send("Page.enable");
   await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 1000, deviceScaleFactor: 1, mobile: false });
-  await send("Page.navigate", { url: `${BASE}/tools/resource-figures/figures.html` });
+  await send("Page.navigate", { url: `${BASE}/tools/resource-figures/${process.env.PAGE || "figures.html"}` });
   for (let i = 0; i < 80; i++) { await sleep(250); if ((await evaluate("document.readyState")) === "complete") break; }
-  const figs = await evaluate("window.ready");
+  let figs = await evaluate("window.ready");
+  // With ids given, drop the other figures and measure again: Chrome can't capture far down a very tall page
+  if (only.length) figs = await evaluate(`(() => { const only = ${JSON.stringify(only)}; document.querySelectorAll(".fig").forEach((f) => { if (!only.some((o) => f.dataset.out.endsWith(o))) f.remove(); }); scrollTo(0, 0); return [...document.querySelectorAll(".fig")].map((f) => { const r = f.getBoundingClientRect(); return { out: f.dataset.out, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }); })()`);
   for (const f of figs) {
     if (only.length && !only.some((o) => f.out.endsWith(o))) continue;
     const { result } = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: f.x, y: f.y, width: f.w, height: f.h, scale: 1 } });

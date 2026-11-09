@@ -20,7 +20,7 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier", "netlify"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -51,6 +51,7 @@ const ICONS = {
   key: `<circle ${N} cx="15" cy="24" r="10"/><circle ${K} cx="15" cy="24" r="3.5"/><path ${L} d="M25 24h18M37 24v7M43 24v5"/>`,
   card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
   copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
+  globe: `<circle ${N} cx="24" cy="24" r="19"/><path ${L} d="M5 24h38M24 5c-6 6-8 12-8 19s2 13 8 19M24 5c6 6 8 12 8 19s-2 13-8 19"/><circle ${K} cx="24" cy="24" r="3.5"/>`,
   id: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><circle ${N} cx="16" cy="22" r="5"/><path ${L} d="M8 34c1-5 4-7 8-7s7 2 8 7M28 18h10M28 25h10"/><rect ${K} x="28" y="30" width="7" height="3"/>`,
 };
 
@@ -371,7 +372,106 @@ async function business() {
   return doc("AI for Business: Marketing, Sales and Operations", "Marketing, sales, customer service and operations joined by straight lines to one AI-assisted workflow, which runs on everyday apps (Gmail, Google Sheets, Zapier), with the note that your team decides and a person approves what goes out.", await defs(bg), body);
 }
 
-const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business };
+/* ---- 14. Grok to Netlify — radial gradient from the bottom-left corner: a brief goes to Grok, Grok
+   deploys through the Netlify connector, and the page goes live, with you approving the deploy ---- */
+async function deploy() {
+  const bg = `<radialGradient id="bg" cx="0" cy="1080" r="2100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F2BAC6"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE29E"/></radialGradient>`;
+  const brief = ["chat", "pink", "Describe your page", "Brief, sections, colours"], live = ["globe", "yellow", "Live website", "Your Netlify address"];
+  const bw = chip(0, 0, ...brief).w, lw = chip(0, 0, ...live).w, ts = 220, gap = 80, mid = 170, cy = 440;
+  const total = bw + gap + ts + mid + ts + gap + lw, x0 = Math.round(960 - total / 2);
+  const b = chip(x0 + bw / 2, cy, ...brief), gx = b.right + gap, nx = gx + ts + mid, l = chip(nx + ts + gap + lw / 2, cy, ...live);
+  const jx = Math.round(gx + ts + mid / 2), a = chip(jx, 800, "person", "pink", "You approve the deploy", "Check the project and the target first");
+  const wires = [[[b.right, cy], [gx, cy]], [[gx + ts, cy], [nx, cy]], [[nx + ts, cy], [l.left, cy]], [[jx, cy], [jx, a.top]]];
+  const nodes = [node(b.right, cy), node(gx, cy), node(gx + ts, cy), node(nx, cy), node(nx + ts, cy), node(l.left, cy, C.yellow), node(jx, cy, C.yellow, 12), node(jx, a.top)].join("");
+  const body = layer("connectors", wires.map(wire).join("")) + layer("brief", b.svg) + layer("grok", logo(gx, cy - ts / 2, ts, "grok")) + layer("netlify", logo(nx, cy - ts / 2, ts, "netlify")) +
+    layer("live", l.svg) + layer("approval", a.svg) + layer("nodes", nodes);
+  return doc("From Grok to Live Website", "A page brief joined by straight lines to the Grok logo, then the Netlify logo, then a live website, with a branch down to the note that you approve the deploy after checking the project and the target.", await defs(bg), body);
+}
+
+/* ---- 15. Role engineering with Grok Bots — radial gradient from the bottom-left corner: an illustrated chat
+   window (Faith Works styling, not a product screenshot) for a sample "AI Team" group chat. Your message
+   comes first, then the Bots (xAI Grok Bot avatars, cut from xAI’s Grok Bot for Marketing guide) reply and hand the work along; the sidebar lists each Bot
+   with its role ---- */
+async function roles() {
+  const bg = `<radialGradient id="bg" cx="0" cy="1080" r="2150" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3BCC8"/><stop offset="0.48" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE29E"/></radialGradient>`;
+  const team = [["maya", "Maya", "Marketing Strategist"], ["alex", "Alex", "Sales Assistant"], ["nova", "Nova", "Research Analyst"], ["sam", "Sam", "Operations Manager"], ["pixel", "Pixel", "Content Creator"]];
+  const who = Object.fromEntries(team.map(([id, n, r]) => [id, { n, r }]));
+  const dir = "/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering";
+  const T = (x, y, s, size, weight = 500, extra = "") => `<text x="${x}" y="${y}" font-family="Inter" font-weight="${weight}" font-size="${size}" fill="${C.ink}"${extra}>${esc(s)}</text>`;
+  const bot = (id, x, y, s) => `<image href="${dir}/bot-${id}.png" x="${x}" y="${y}" width="${s}" height="${s}"/>`; // xAI Grok Bot avatars
+  const grok = (x, y, s) => `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${Math.round(s * 0.26)}" fill="#FFFFFF" stroke="${C.ink}" stroke-opacity="0.1"/><use href="#logo-grok" x="${x + s * 0.2}" y="${y + s * 0.2}" width="${s * 0.6}" height="${s * 0.6}" color="${C.ink}"/>`;
+
+  // Wrap words to a width; @mentions in 600, the rest in 500. Returns lines of [word, weight].
+  const FS = 21, LH = 30;
+  function wrap(text, max) {
+    const lines = [[]]; let w = 0;
+    for (const word of text.split(" ")) {
+      const wt = word.startsWith("@") ? 600 : 500, ww = width(word + " ", wt, FS);
+      if (w + ww > max && lines[lines.length - 1].length) { lines.push([]); w = 0; }
+      lines[lines.length - 1].push([word, wt]); w += ww;
+    }
+    return lines;
+  }
+  const lineSvg = (x, y, line) => `<text x="${x}" y="${y}" font-family="Inter" font-size="${FS}" fill="${C.ink}">${line.map(([w, wt]) => `<tspan font-weight="${wt}">${esc(w)} </tspan>`).join("")}</text>`;
+
+  // window
+  const X = 170, Y = 132, W = 1580, H = 816, SB = 420, TB = 54, MX = X + SB, MW = W - SB;
+  let out = `<g>${halo(X, Y, W, H, 34)}<rect x="${X}" y="${Y}" width="${W}" height="${H}" rx="34" fill="#FFFFFF"/>`;
+  out += `<clipPath id="win"><rect x="${X}" y="${Y}" width="${W}" height="${H}" rx="34"/></clipPath><g clip-path="url(#win)">`;
+  out += `<rect x="${X}" y="${Y}" width="${SB}" height="${H}" fill="${C.white}"/><line x1="${X + SB}" y1="${Y}" x2="${X + SB}" y2="${Y + H}" stroke="${C.ink}" stroke-opacity="0.08" stroke-width="2"/>`;
+  out += [C.pink, C.yellow, "#E4E2DE"].map((f, i) => `<circle cx="${X + 34 + i * 26}" cy="${Y + 30}" r="8" fill="${f}"/>`).join("");
+  // sidebar: search, the group chat (selected), the Bots
+  let sy = Y + TB + 14;
+  out += `<rect x="${X + 22}" y="${sy}" width="${SB - 44}" height="46" rx="23" fill="#FFFFFF" stroke="${C.ink}" stroke-opacity="0.08"/>` +
+    `<circle cx="${X + 50}" cy="${sy + 22}" r="8" fill="none" stroke="${C.ink}" stroke-width="2.2"/><line x1="${X + 56}" y1="${sy + 28}" x2="${X + 62}" y2="${sy + 34}" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round"/>` + T(X + 74, sy + 30, "Search", 19);
+  sy += 74; out += T(X + 30, sy, "Group chats", 17, 600, ' letter-spacing="0.5"');
+  sy += 14; out += `<rect x="${X + 14}" y="${sy}" width="${SB - 28}" height="74" rx="18" fill="#F7E5E6"/>` + grok(X + 28, sy + 12, 50) + T(X + 92, sy + 33, "AI Team", 21, 600) + T(X + 92, sy + 60, "Pixel: Drafts are ready", 17);
+  sy += 112; out += T(X + 30, sy, "Bots", 17, 600, ' letter-spacing="0.5"');
+  sy += 12;
+  for (const [id, n, r] of team) { out += bot(id, X + 26, sy + 6, 54) + T(X + 94, sy + 32, n, 21, 600) + T(X + 94, sy + 57, r, 17); sy += 76; }
+
+  // chat header
+  out += grok(MX + 32, Y + 18, 58) + T(MX + 106, Y + 46, "AI Team", 27, 600) + T(MX + 106, Y + 72, "Sample team · 5 Bots and you", 18);
+  const fx = X + W - 36 - 44 - 4 * 50;
+  team.forEach(([id], i) => { out += bot(id, fx + i * 50, Y + 24, 44); });
+  out += `<line x1="${MX}" y1="${Y + 98}" x2="${X + W}" y2="${Y + 98}" stroke="${C.ink}" stroke-opacity="0.08" stroke-width="2"/>`;
+
+  // messages: you first, then the Bots hand the work along
+  const msgs = [
+    ["you", "Goal for this month: more coffee subscriptions. @Nova research first, @Maya plan it, @Pixel draft it. Nothing goes out without my OK."],
+    ["nova", "Done: 3 customer questions and 2 competitor offers, each with a link. @Maya over to you."],
+    ["maya", "Plan ready: 3 angles over 4 weeks, leading with “roasted the week you get it.” @Pixel your turn."],
+    ["pixel", "1 email and 8 posts drafted. Waiting for your approval before anything is posted."],
+  ];
+  let y = Y + 124; const AV = 50, BX = MX + 32 + AV + 16, MAXW = 640, PADX = 20, PADY = 14;
+  for (const [id, text] of msgs) {
+    const lines = wrap(text, MAXW), bw = Math.round(Math.max(...lines.map((l) => width(l.map(([w]) => w).join(" "), 500, FS))) + PADX * 2 + 6), bh = lines.length * LH + PADY * 2 - 6;
+    if (id === "you") {
+      const bx = X + W - 36 - bw;
+      out += T(X + W - 36, y + 18, "You", 18, 600, ' text-anchor="end"');
+      out += `<rect x="${bx}" y="${y + 28}" width="${bw}" height="${bh}" rx="20" fill="#FAEBC0"/>` + lines.map((l, i) => lineSvg(bx + PADX, y + 28 + PADY + 20 + i * LH, l)).join("");
+    } else {
+      out += bot(id, MX + 32, y + 2, AV) + `<text x="${BX}" y="${y + 18}" font-family="Inter" font-size="18" fill="${C.ink}"><tspan font-weight="600">${who[id].n}</tspan><tspan font-weight="500" dx="10">${who[id].r}</tspan></text>`;
+      out += `<rect x="${BX}" y="${y + 28}" width="${bw}" height="${bh}" rx="20" fill="#F1EFEB"/>` + lines.map((l, i) => lineSvg(BX + PADX, y + 28 + PADY + 20 + i * LH, l)).join("");
+    }
+    y += 28 + bh + 22;
+  }
+  // Sam is typing
+  out += bot("sam", MX + 32, y, 40) + `<rect x="${MX + 84}" y="${y + 4}" width="76" height="34" rx="17" fill="#F1EFEB"/>` + [0, 1, 2].map((i) => `<circle cx="${MX + 104 + i * 18}" cy="${y + 21}" r="5" fill="${C.ink}" fill-opacity="${0.35 + i * 0.25}"/>`).join("") + T(MX + 174, y + 28, "Sam is typing", 17);
+  const typingBottom = y + 44;
+
+  // composer
+  const cy = Y + H - 82;
+  out += `<rect x="${MX + 32}" y="${cy}" width="${MW - 64}" height="56" rx="28" fill="#FFFFFF" stroke="${C.ink}" stroke-opacity="0.12" stroke-width="1.5"/>` +
+    `<circle cx="${MX + 62}" cy="${cy + 28}" r="16" fill="${C.white}" stroke="${C.ink}" stroke-opacity="0.12"/><path d="M${MX + 62} ${cy + 20}v16M${MX + 54} ${cy + 28}h16" stroke="${C.ink}" stroke-width="2.2" stroke-linecap="round"/>` +
+    T(MX + 92, cy + 35, "Message AI Team", 19) +
+    `<circle cx="${X + W - 64}" cy="${cy + 28}" r="20" fill="${C.yellow}"/><path d="M${X + W - 64} ${cy + 37}v-17M${X + W - 71} ${cy + 26}l7-7 7 7" fill="none" stroke="${C.ink}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  out += `</g></g>`;
+  if (typingBottom > cy - 10) console.warn("messages overlap the composer by", typingBottom - (cy - 10), "px");
+  return doc("Role Engineering: AI Teammates with Grok Bots", "An illustrated group chat for a sample AI Team. You ask for a coffee subscription campaign; Nova, the research analyst, shares findings and hands over to Maya, the marketing strategist, who plans it and hands over to Pixel, the content creator, who drafts the email and posts and waits for your approval, while Sam, the operations manager, is typing. The sidebar lists all five pillow-shaped Bots, including Alex, the sales assistant.", await defs(bg), layer("chat-window", out));
+}
+
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>

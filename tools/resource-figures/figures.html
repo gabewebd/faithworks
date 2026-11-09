@@ -406,6 +406,103 @@
   #biz-roadmap .card .s { font-size: 27px; }
   #biz-roadmap .card:last-child { background: var(--yellow-pastel); }
   #biz-roadmap .next { display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 30px; font-size: 27px; font-weight: 600; }
+
+  /* ================= Role engineering (goodbye-prompt-engineering-hello-role-engineering) ================= */
+  .fig ul.dots { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .fig ul.dots li { position: relative; padding-left: 30px; font-size: 28px; line-height: 1.35; }
+  .fig ul.dots li::before { content: ""; position: absolute; left: 0; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: var(--pink); }
+  .fig ul.dots.y li::before { background: var(--yellow); }
+
+  /* ---- role engineering: prompt vs role ---- */
+  #re-compare .cols { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; }
+  #re-compare .col { display: flex; flex-direction: column; padding: 36px 36px 38px; }
+  #re-compare .col--manual { background: var(--stone-2); box-shadow: none; }
+  #re-compare .col--manual .tile--w { background: #fff; }
+  #re-compare .head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+  #re-compare .head .t { font-size: 40px; }
+  #re-compare .head .s { margin-top: 6px; font-size: 26px; }
+  #re-compare .step { display: flex; align-items: center; gap: 20px; margin: 0; padding: 16px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 29px; line-height: 1.3; }
+  #re-compare .step .tile { width: 60px; height: 60px; border-radius: 15px; }
+  #re-compare .step .tile svg { width: 38px; height: 38px; }
+  #re-compare .res { margin: auto 0 0; padding-top: 20px; border-top: 2px solid rgb(26 26 26 / 0.14); font-size: 27px; line-height: 1.35; }
+  #re-compare .res b { display: block; margin-bottom: 4px; font-size: 22px; letter-spacing: 0.1em; text-transform: uppercase; }
+  #re-compare .mid { position: absolute; left: 50%; top: 52px; z-index: 2; transform: translate(-50%, -50%); padding: 6px 14px; border-radius: 999px; background: var(--paper); font-size: 22px; font-weight: 700; white-space: nowrap; }
+
+  /* ---- role engineering: six-part blueprint ---- */
+  #re-blueprint .grid { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 64px; row-gap: 96px; }
+  #re-blueprint .card { display: flex; flex-direction: column; padding: 30px 30px 32px; min-height: 330px; }
+  #re-blueprint .top { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  #re-blueprint .t { font-size: 38px; }
+  #re-blueprint .q { margin: 10px 0 12px; font-size: 28px; font-weight: 700; line-height: 1.3; }
+  #re-blueprint .s { margin: 0; font-size: 26px; }
+  #re-blueprint .s i { font-style: normal; font-weight: 600; }
+  #re-blueprint .card:last-child { background: var(--yellow-pastel); }
+
+  /* ---- role engineering: team org chart ---- */
+  #re-team .lead { display: flex; align-items: center; gap: 24px; width: 940px; margin: 0 auto; padding: 24px 30px; }
+  #re-team .lead .t { font-size: 36px; }
+  #re-team .lead .s { margin-top: 4px; font-size: 26px; }
+  #re-team .you { background: var(--pink-tint); }
+  #re-team .lead + .lead { margin-top: 70px; }
+  #re-team .row { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; margin-top: 110px; }
+  #re-team .row .card { display: flex; flex-direction: column; padding: 26px 22px 28px; min-height: 290px; }
+  #re-team .row .tile { width: 72px; height: 72px; margin-bottom: 18px; border-radius: 18px; }
+  #re-team .row .tile svg { width: 44px; height: 44px; }
+  #re-team .row .t { font-size: 30px; }
+  #re-team .row .s { font-size: 24px; }
+  #re-team .base { display: flex; align-items: center; gap: 24px; margin-top: 90px; padding: 26px 32px; background: var(--yellow-pastel); }
+  #re-team .base .t { font-size: 31px; }
+  #re-team .base .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-left: auto; justify-content: flex-end; max-width: 700px; }
+  #re-team .base .chip { font-size: 22px; padding: 8px 16px; }
+
+  /* ---- role engineering: campaign handoffs ---- */
+  #re-campaign .row { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 56px; }
+  #re-campaign .row .card { display: flex; flex-direction: column; padding: 28px 28px 30px; min-height: 420px; }
+  #re-campaign .row .tile { margin-bottom: 18px; }
+  #re-campaign .row .t { font-size: 34px; }
+  #re-campaign .row .s { font-size: 26px; min-height: 144px; }
+  #re-campaign .ft { margin: 14px 0 0; padding-top: 18px; border-top: 1px solid rgb(26 26 26 / 0.12); font-size: 24px; line-height: 1.35; }
+  #re-campaign .ft b { display: block; margin-bottom: 2px; font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase; }
+  #re-campaign .final { display: flex; align-items: center; gap: 26px; margin: 120px 0 0 auto; width: 760px; padding: 26px 32px; background: var(--pink-tint); }
+  #re-campaign .final .t { font-size: 34px; }
+  #re-campaign .final .s { margin-top: 6px; font-size: 26px; }
+
+  /* ---- role engineering: approval flow ---- */
+  #re-approval .cols { position: relative; display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: 90px; }
+  #re-approval .card { display: flex; flex-direction: column; padding: 32px 32px 36px; }
+  #re-approval .card.ask { background: var(--pink-tint); }
+  #re-approval .head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+  #re-approval .head .t { font-size: 34px; }
+  #re-approval .choices { display: grid; gap: 14px; }
+  #re-approval .choices span { display: block; padding: 14px 20px; border-radius: 16px; background: var(--stone-2); font-size: 27px; font-weight: 600; }
+  #re-approval .choices span:first-child { background: var(--yellow-pastel); }
+  #re-approval .choices small { display: block; margin-top: 2px; font-size: 22px; font-weight: 500; }
+
+  /* ---- role engineering: sample AI team group chat (illustration, not a product screenshot) ---- */
+  #re-chat { padding-top: 64px; padding-bottom: 72px; }
+  #re-chat .win { overflow: hidden; border-radius: 34px; background: #fff; box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  #re-chat .head { display: flex; align-items: center; gap: 24px; padding: 26px 36px; background: var(--pink-tint); }
+  #re-chat .faces { display: flex; gap: 6px; }
+  #re-chat .faces img { width: 60px; height: 60px; }
+  #re-chat .title { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 40px; letter-spacing: -0.02em; line-height: 1.1; }
+  #re-chat .sub { margin: 6px 0 0; font-size: 26px; }
+  #re-chat .tag { margin-left: auto; padding: 8px 18px; border-radius: 999px; background: #fff; font-size: 22px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  #re-chat .members { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 30px 28px 26px; border-bottom: 2px solid rgb(26 26 26 / 0.08); text-align: center; }
+  #re-chat .members img { width: 108px; height: 108px; }
+  #re-chat .members b { display: block; margin-top: 8px; font-size: 32px; }
+  #re-chat .members span { display: block; font-size: 24px; line-height: 1.3; }
+  #re-chat .msgs { display: grid; gap: 22px; padding: 34px 36px 30px; }
+  #re-chat .msg { display: flex; align-items: flex-start; gap: 18px; }
+  #re-chat .msg > img { flex: none; width: 72px; height: 72px; }
+  #re-chat .bubble { max-width: 1060px; padding: 16px 26px 20px; border-radius: 6px 28px 28px 28px; background: var(--stone-2); font-size: 29px; line-height: 1.45; }
+  #re-chat .bubble .who { margin: 0 0 4px; font-size: 24px; }
+  #re-chat .bubble .who b { margin-right: 10px; font-size: 26px; }
+  #re-chat .bubble p { margin: 0; }
+  #re-chat .at { font-weight: 700; }
+  #re-chat .you { justify-content: flex-end; }
+  #re-chat .you .bubble { border-radius: 28px 6px 28px 28px; background: var(--yellow-pastel); }
+  #re-chat .wait { display: flex; align-items: center; gap: 16px; margin: 0; padding: 24px 36px; border-top: 2px solid rgb(26 26 26 / 0.08); font-size: 27px; font-weight: 600; }
+  #re-chat .wait::before { content: ""; width: 16px; height: 16px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 7px var(--yellow-pastel); }
 </style>
 </head>
 <body>
@@ -851,6 +948,117 @@
   <svg class="wires" data-wires="biz-roadmap"></svg>
 </section>
 
+<section class="fig fig--both fig--ink" id="re-compare" data-out="goodbye-prompt-engineering-hello-role-engineering/prompt-vs-role">
+  <p class="kicker">Prompt engineering vs role engineering</p>
+  <h2>From asking well every time to defining the job once</h2>
+  <div class="cols">
+    <div class="card col col--manual" data-n="l">
+      <div class="head"><div class="tile tile--w" data-i="chat"></div><div><p class="t">Prompt engineering</p><p class="s">One request at a time</p></div></div>
+      <p class="step"><span class="tile tile--w" data-i="chat"></span>You write the full request, context and all</p>
+      <p class="step"><span class="tile tile--w" data-i="done"></span>The AI answers that one request</p>
+      <p class="step"><span class="tile tile--w" data-i="copy"></span>Next time, you explain everything again</p>
+      <p class="step"><span class="tile tile--w" data-i="person"></span>You remember the rules and check each answer</p>
+      <p class="res"><b>Best for</b>One-off questions, drafts and ideas</p>
+    </div>
+    <div class="card col" data-n="r">
+      <div class="head"><div class="tile tile--y" data-i="id"></div><div><p class="t">Role engineering</p><p class="s">A teammate with a standing job</p></div></div>
+      <p class="step"><span class="tile" data-i="id"></span>You define the role, mission and limits once</p>
+      <p class="step"><span class="tile tile--y" data-i="book"></span>It keeps its sources, context and your preferences</p>
+      <p class="step"><span class="tile" data-i="tools"></span>It uses connected apps and can run on a schedule</p>
+      <p class="step"><span class="tile tile--y" data-i="shield"></span>It asks before anything risky, and you review</p>
+      <p class="res"><b>Best for</b>Work that repeats every week</p>
+    </div>
+    <span class="mid">builds on</span>
+  </div>
+  <p class="foot">Role engineering doesn’t replace prompting. A good role instruction is still a well-written prompt, with its context, kept on file.</p>
+  <svg class="wires" data-wires="re-compare"></svg>
+</section>
+
+<section class="fig fig--pink fig--ink" id="re-blueprint" data-out="goodbye-prompt-engineering-hello-role-engineering/role-blueprint">
+  <p class="kicker">The Role Engineering Blueprint</p>
+  <h2>Six parts that turn an AI assistant into a dependable teammate</h2>
+  <div class="grid">
+    <div class="card"><div class="top"><span class="num">1</span><span class="tile" data-i="id"></span></div><p class="t">Identity</p><p class="q">What is its professional role?</p><p class="s"><i>Example:</i> marketing strategist for a family-run coffee roaster.</p></div>
+    <div class="card"><div class="top"><span class="num">2</span><span class="tile tile--y" data-i="target"></span></div><p class="t">Mission</p><p class="q">What outcome is it responsible for?</p><p class="s"><i>Example:</i> a monthly campaign plan that grows subscriptions.</p></div>
+    <div class="card"><div class="top"><span class="num">3</span><span class="tile" data-i="book"></span></div><p class="t">Knowledge</p><p class="q">What information does it need?</p><p class="s"><i>Example:</i> brand guide, past campaigns, customer reviews.</p></div>
+    <div class="card"><div class="top"><span class="num">4</span><span class="tile tile--y" data-i="tools"></span></div><p class="t">Tools</p><p class="q">What apps can it use?</p><p class="s"><i>Example:</i> Google Drive and the web browser. No ad accounts yet.</p></div>
+    <div class="card"><div class="top"><span class="num">5</span><span class="tile" data-i="shield"></span></div><p class="t">Boundaries</p><p class="q">What needs your approval?</p><p class="s"><i>Example:</i> drafts freely; never publishes, sends or spends.</p></div>
+    <div class="card"><div class="top"><span class="num">6</span><span class="tile tile--y" data-i="chart"></span></div><p class="t">Performance</p><p class="q">How will you judge its work?</p><p class="s"><i>Example:</i> accurate claims, on-brand voice, usable with light edits.</p></div>
+  </div>
+  <svg class="wires" data-wires="re-blueprint"></svg>
+</section>
+
+<section class="fig fig--yellow fig--ink" id="re-team" data-out="goodbye-prompt-engineering-hello-role-engineering/ai-team">
+  <p class="kicker">A specialized AI team</p>
+  <h2>One person sets the direction. Each Bot owns one job.</h2>
+  <div class="card lead you" data-n="you"><span class="tile" data-i="person"></span><div><p class="t">You</p><p class="s">Set the roles, answer questions, approve what goes out</p></div></div>
+  <div class="card lead" data-n="lead"><span class="tile tile--y" data-i="process"></span><div><p class="t">Primary Bot</p><p class="s">Takes your requests and passes work to the right Bot</p></div></div>
+  <div class="row">
+    <div class="card"><span class="tile tile--y" data-i="search"></span><p class="t">Research and Intelligence</p><p class="s">Sources, evidence, weekly briefs</p></div>
+    <div class="card"><span class="tile" data-i="megaphone"></span><p class="t">Marketing Strategist</p><p class="s">Audiences, campaigns, results</p></div>
+    <div class="card"><span class="tile tile--y" data-i="doc"></span><p class="t">Social Media Content</p><p class="s">Posts, calendar, brand voice</p></div>
+    <div class="card"><span class="tile" data-i="growth"></span><p class="t">Lead Research and Sales</p><p class="s">Lead notes, outreach drafts</p></div>
+    <div class="card"><span class="tile tile--y" data-i="week"></span><p class="t">Business Operations</p><p class="s">Reports, action items, documents</p></div>
+  </div>
+  <div class="card base" data-n="base"><span class="tile tile--w" data-i="tools"></span><p class="t">Shared cloud computer and connected apps</p><div class="chips"><span class="chip">Browser</span><span class="chip chip--y">Files</span><span class="chip">Gmail</span><span class="chip chip--y">Google Drive</span><span class="chip">Slack</span><span class="chip chip--y">Notion</span></div></div>
+  <svg class="wires" data-wires="re-team"></svg>
+</section>
+
+<section class="fig fig--both fig--ink" id="re-campaign" data-out="goodbye-prompt-engineering-hello-role-engineering/campaign-workflow">
+  <p class="kicker">Illustrative workflow: a campaign, Bot to Bot</p>
+  <h2>Each Bot hands its work to the next, and a person approves the result</h2>
+  <div class="row">
+    <div class="card"><span class="tile tile--y" data-i="search"></span><p class="t">Research Bot</p><p class="s">Finds customer questions, trends and competitor offers.</p><p class="ft"><b>Hands over</b>Findings with source links</p></div>
+    <div class="card"><span class="tile" data-i="megaphone"></span><p class="t">Marketing Bot</p><p class="s">Turns the findings into a campaign brief.</p><p class="ft"><b>Hands over</b>Brief, angles and channels</p></div>
+    <div class="card"><span class="tile tile--y" data-i="doc"></span><p class="t">Content Bot</p><p class="s">Drafts posts, an email and a calendar.</p><p class="ft"><b>Hands over</b>A draft pack</p></div>
+    <div class="card"><span class="tile" data-i="eye"></span><p class="t">Review Bot</p><p class="s">Checks facts, tone and brand rules.</p><p class="ft"><b>Hands over</b>Checked drafts and notes</p></div>
+  </div>
+  <div class="card final" data-n="final"><span class="tile" data-i="person"></span><div><p class="t">You approve, edit or send back</p><p class="s">Nothing is published or sent until you say so.</p></div></div>
+  <svg class="wires" data-wires="re-campaign"></svg>
+</section>
+
+<section class="fig fig--pink fig--ink" id="re-approval" data-out="goodbye-prompt-engineering-hello-role-engineering/approval-workflow">
+  <p class="kicker">Human approval, AI execution</p>
+  <h2>Bots do the groundwork. Anything that leaves the building waits for you.</h2>
+  <div class="cols">
+    <div class="card" data-n="a"><div class="head"><span class="tile tile--y" data-i="tools"></span><p class="t">The Bot works on its own</p></div>
+      <ul class="dots y"><li>Researches and reads sources</li><li>Drafts emails, posts and reports</li><li>Organizes files and notes</li><li>Prepares summaries and options</li></ul></div>
+    <div class="card ask" data-n="b"><div class="head"><span class="tile" data-i="alert"></span><p class="t">It pauses and asks first</p></div>
+      <ul class="dots"><li>Sending or publishing anything</li><li>Buying or spending money</li><li>Deleting or overwriting records</li><li>Changing access or settings</li></ul></div>
+    <div class="card" data-n="c"><div class="head"><span class="tile" data-i="person"></span><p class="t">You decide</p></div>
+      <div class="choices"><span>Allow once<small>The usual answer</small></span><span>Always allow<small>Only for small, safe actions</small></span><span>Deny<small>The Bot won’t retry</small></span></div></div>
+  </div>
+  <p class="foot">Approving one step doesn’t undo work already done, so write the limits into the Bot’s role as well.</p>
+  <svg class="wires" data-wires="re-approval"></svg>
+</section>
+
+<section class="fig fig--both fig--ink" id="re-chat" data-out="goodbye-prompt-engineering-hello-role-engineering/sample-ai-team-chat">
+  <p class="kicker">Illustration: a sample AI team</p>
+  <div class="win">
+    <div class="head">
+      <div class="faces"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-maya.png" alt=""><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-alex.png" alt=""><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-nova.png" alt=""><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-sam.png" alt=""><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-pixel.png" alt=""></div>
+      <div><p class="title">AI Team</p><p class="sub">Group chat · 5 Bots and you</p></div>
+      <span class="tag">Sample team</span>
+    </div>
+    <div class="members">
+      <div><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-maya.png" alt=""><b>Maya</b><span>Marketing Strategist</span></div>
+      <div><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-alex.png" alt=""><b>Alex</b><span>Sales Assistant</span></div>
+      <div><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-nova.png" alt=""><b>Nova</b><span>Research Analyst</span></div>
+      <div><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-sam.png" alt=""><b>Sam</b><span>Operations Manager</span></div>
+      <div><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-pixel.png" alt=""><b>Pixel</b><span>Content Creator</span></div>
+    </div>
+    <div class="msgs">
+      <div class="msg you"><div class="bubble"><p class="who"><b>You</b></p><p>Goal for this month: more coffee subscriptions. I’d like a campaign pack to review by Friday. <span class="at">@Nova</span>, can you start with research?</p></div></div>
+      <div class="msg"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-nova.png" alt=""><div class="bubble"><p class="who"><b>Nova</b>Research Analyst</p><p>Done: three customer questions and two competitor offers, each with a link. <span class="at">@Maya</span>, over to you.</p></div></div>
+      <div class="msg"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-maya.png" alt=""><div class="bubble"><p class="who"><b>Maya</b>Marketing Strategist</p><p>Plan’s ready: three angles over four weeks, leading with “roasted the week you get it.” <span class="at">@Pixel</span>, can you draft the email and posts?</p></div></div>
+      <div class="msg"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-pixel.png" alt=""><div class="bubble"><p class="who"><b>Pixel</b>Content Creator</p><p>One email and eight posts drafted. I flagged two claims to check. Nothing has been posted.</p></div></div>
+      <div class="msg"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-alex.png" alt=""><div class="bubble"><p class="who"><b>Alex</b>Sales Assistant</p><p>I found twelve cafés that could stock our beans. Outreach drafts are ready, not sent.</p></div></div>
+      <div class="msg"><img src="/assets/images/resources/goodbye-prompt-engineering-hello-role-engineering/bot-sam.png" alt=""><div class="bubble"><p class="who"><b>Sam</b>Operations Manager</p><p>Tracker updated. Three items are waiting for your approval.</p></div></div>
+    </div>
+    <p class="wait">Waiting for you: approve, edit or send back</p>
+  </div>
+</section>
+
 <script>
 const I = (() => {
   const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
@@ -881,6 +1089,7 @@ const I = (() => {
     copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
     megaphone: `<path ${N} d="M7 18h9l18-10v32L16 30H7Z"/><path ${L} d="M16 30l3 10h6l-3-10M40 20v8"/><rect ${K} x="7" y="18" width="5" height="12"/>`,
     growth: `<path ${L} d="M5 42h38M8 34l10-10 7 7 14-14"/><path ${K} d="M31 13h10v10Z"/>`,
+    id: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><circle ${N} cx="16" cy="22" r="5"/><path ${L} d="M8 34c1-5 4-7 8-7s7 2 8 7M28 18h10M28 25h10"/><rect ${K} x="28" y="30" width="7" height="3"/>`,
     card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
   };
 })();
@@ -1020,6 +1229,34 @@ const WIRES = {
     for (const k of r) { lines.push([[k.cx, b1], [k.cx, k.t]], [[k.cx, k.b], [k.cx, b2]]); dots.push([k.cx, k.t], [k.cx, k.b]); }
     lines.push([[r[0].cx, b2], [r[2].cx, b2]], [[f.cx, b2], [f.cx, f.t]]); dots.push([f.cx, f.t, "y"]);
     draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "re-compare"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), l = g("l"), r = g("r"), m = rel(fig.querySelector(".mid"), fig), y = Math.round(m.cy);
+    draw(fig.querySelector(".wires"), [[[l.r, y], [r.l, y]]], [[l.r, y], [r.l, y, "y"]]);
+  },
+  "re-blueprint"(fig) {
+    const c = [...fig.querySelectorAll(".grid .card")].map((e) => rel(e, fig)), lines = [], dots = [];
+    for (const [a, b] of [[0, 1], [1, 2], [3, 4], [4, 5]]) { const yy = c[a].t + 64; lines.push([[c[a].r, yy], [c[b].l, yy]]); dots.push([c[a].r, yy], b === 5 ? [c[b].l, yy, "y"] : [c[b].l, yy]); }
+    const my = Math.round((c[2].b + c[3].t) / 2); lines.push([[c[2].cx, c[2].b], [c[2].cx, my], [c[3].cx, my], [c[3].cx, c[3].t]]); dots.push([c[2].cx, c[2].b], [c[3].cx, c[3].t]);
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "re-team"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), you = g("you"), lead = g("lead"), b = g("base"), c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig));
+    const bus = Math.round((lead.b + c[0].t) / 2), lines = [[[you.cx, you.b], [you.cx, lead.t]], [[lead.cx, lead.b], [lead.cx, bus]], [[c[0].cx, bus], [c[4].cx, bus]]], dots = [[you.cx, you.b], [lead.cx, lead.t], [lead.cx, lead.b]];
+    for (const k of c) { lines.push([[k.cx, bus], [k.cx, k.t]], [[k.cx, k.b], [k.cx, b.t]]); dots.push([k.cx, k.t], [k.cx, k.b], [k.cx, b.t, "y"]); }
+    draw(fig.querySelector(".wires"), lines, dots);
+  },
+  "re-campaign"(fig) {
+    const c = [...fig.querySelectorAll(".row .card")].map((e) => rel(e, fig)), f = rel(fig.querySelector("[data-n=final]"), fig), y = c[0].t + 120, lines = [], dots = [];
+    for (let i = 0; i < 3; i++) { lines.push([[c[i].r, y], [c[i + 1].l, y]]); dots.push([c[i].r, y], [c[i + 1].l, y]); }
+    const by = Math.round(c[0].b + 55), lx = c[3].cx - 70; lines.push([[lx, c[3].b], [lx, by], [c[2].cx, by], [c[2].cx, c[2].b]]); dots.push([lx, c[3].b], [c[2].cx, c[2].b]);
+    const fx = c[3].cx + 70; lines.push([[fx, c[3].b], [fx, f.t]]); dots.push([fx, c[3].b], [fx, f.t, "y"]);
+    draw(fig.querySelector(".wires"), lines, dots);
+    const s = document.createElement("span"); s.className = "lab"; s.textContent = "Fixes go back"; s.style.left = (c[2].cx + lx) / 2 + "px"; s.style.top = by + "px"; s.style.transform = "translate(-50%,-50%)"; fig.appendChild(s);
+  },
+  "re-approval"(fig) {
+    const g = (n) => rel(fig.querySelector(`[data-n="${n}"]`), fig), a = g("a"), b = g("b"), c = g("c"), y = a.t + 72;
+    draw(fig.querySelector(".wires"), [[[a.r, y], [b.l, y]], [[b.r, y], [c.l, y]]], [[a.r, y], [b.l, y], [b.r, y], [c.l, y, "y"]]);
   },
   "biz-roadmap"(fig) {
     const c = [...fig.querySelectorAll(".grid .card")].map((e) => rel(e, fig)), lines = [], dots = [];
