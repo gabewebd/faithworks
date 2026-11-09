@@ -1,0 +1,51 @@
+# Faith Works
+
+> Faith Works (Faith Works PH) helps founders, professionals and teams work better with AI, without becoming tech experts, through practical workshops, guided programs, corporate training and business support. Founded by Faith Natividad, AI strategist, entrepreneur, international keynote speaker and content creator.
+
+Faith Works teaches AI in plain language and focuses on applying it to the work people already do: choosing one useful workflow, testing a first version and keeping a person in charge. Motto: Learn. Implement. Scale.
+
+Contact: ibelieve@faithph.ai
+
+## Main pages
+
+- [Home](https://faithph.ai/): Practical workshops, guided programs and business support that help founders, professionals and teams turn AI learning into work they can use.
+- [About](https://faithph.ai/about): Faith Natividad and the Faith Works ecosystem: Faith Works, Faith AI, Faith Talks, Faith Works Community and Faith Studio.
+- [Learn AI](https://faithph.ai/learn): Hands-on AI programs and workshops, with who each program is for, what you leave with, the format, requirements and status.
+- [Workshops and events](https://faithph.ai/workshops): Upcoming and past workshops, masterclasses and community events, with a calendar and how to register.
+- [For Professionals](https://faithph.ai/professionals): Practical AI skills for professionals, freelancers, consultants, creators, team leaders and career changers.
+- [For Business](https://faithph.ai/business): Customized AI training and adoption support for non-technical leaders and teams.
+- [Speaking and partnerships](https://faithph.ai/speaking): Invite Faith Natividad to speak, run a workshop for your audience, or partner with Faith Works on AI education.
+- [Build with AI](https://faithph.ai/build): Practical AI use cases for small businesses and teams, and how to request a Faith AI demo.
+- [Free AI Workflow Starter Kit](https://faithph.ai/start-your-ai-journey): A free kit to choose one task, organize your inputs and plan a first AI workflow you can test.
+- [Community](https://faithph.ai/community): The Faith Works Community, a Facebook group for people who want to keep learning and applying AI between sessions.
+- [Contact](https://faithph.ai/contact): Inquiries about programs, corporate training, speaking, Faith AI or anything else.
+
+## Programs
+
+- [AI Workforce Masterclass & Accelerator](https://faithph.ai/programs/ai-workforce-accelerator): Find a high-impact process in your work, design a workflow around it and build a first prototype with guidance.
+- [AI + LinkedIn B2B Growth](https://faithph.ai/programs/ai-linkedin-b2b-growth): Connect your positioning, content and AI-assisted workflows with the clients you want to reach.
+- [AI Websites & Workflow Building](https://faithph.ai/programs/ai-websites-workflow-building): Hands-on learning for landing pages, simple lead trackers and workflow prototypes, built with AI tools and guided practice.
+- [AI Agent Builder Bootcamp](https://faithph.ai/programs/ai-agent-builder-bootcamp): A proposed bootcamp for building a simple business assistant, from one clear use case to a tested first version.
+
+## Free guides and articles
+
+- [Resources](https://faithph.ai/resources): Free AI guides, worksheets and short reads in plain language, with real examples.
+- [AI for Beginners: What It Can Do at Work, and What It Can't](https://faithph.ai/resources?ai-for-beginners-what-ai-can-do): A plain-English introduction to AI, everyday use cases, limitations and safe first steps.
+- [AI Agents Explained: From Chatting to Getting Things Done](https://faithph.ai/resources?what-are-ai-agents-beginners-guide): How AI agents differ from chatbots, how they work on a real request, where they help and how to test one safely.
+- [Chatbot, Copilot, or AI Agent: Which Do You Actually Need?](https://faithph.ai/resources?chatbot-vs-copilot-vs-ai-agent): The difference between chatbots, copilots and AI agents, with real examples and a simple way to choose.
+- [How to Set Up Your AI Agent: A Practical Step-by-Step Guide](https://faithph.ai/resources?how-to-set-up-an-ai-agent): Choosing a platform, writing instructions, connecting tools safely, testing and keeping a person in charge.
+- [How to Automate a Repetitive Task Without Coding](https://faithph.ai/resources?no-code-ai-automation-beginners): Map one repetitive task, choose a no-code tool, add an AI step safely, test it and keep a person in charge.
+- [Build Your Own AI Research Assistant With Gemini Notebook (Formerly NotebookLM)](https://faithph.ai/resources?use-notebooklm-ai-research-assistant): Add trusted sources, ask focused questions, check every citation and turn reading into a usable briefing.
+- [What Should You Never Give to AI?](https://faithph.ai/resources?what-not-to-share-with-ai): What never to paste into ChatGPT, Claude or Gemini, how your data is handled and simple ways to redact first.
+- [GitHub for Non-Developers](https://faithph.ai/resources?github-for-beginners): Repositories, commits, branches and collaborating safely on projects, for non-technical people.
+- [AI Is Not Another Niche Skill. It Is Becoming a Foundational One.](https://faithph.ai/resources?ai-is-not-another-niche-skill): Combining existing expertise with better tools, workflows and judgment.
+- [Purpose Before Productivity](https://faithph.ai/resources?purpose-before-productivity): Better tools make it easier to do more; purpose helps you decide what's worth doing.
+- [A Learning Rhythm That Fits Real Life](https://faithph.ai/resources?a-learning-rhythm-that-fits-real-life): Short, regular learning sessions tied to real work.
+
+## Optional
+
+- [Privacy Notice](https://faithph.ai/privacy): How Faith Works PH collects, uses and protects personal information submitted through faithph.ai.
+- [Terms of use](https://faithph.ai/terms): Terms for using faithph.ai, and registration, cancellation and refund information for programs.
+- [Facebook](https://www.facebook.com/profile.php?id=61580485384062)
+- [Instagram](https://www.instagram.com/faithworksph_/)
+- [Faith Natividad on LinkedIn](https://www.linkedin.com/in/faithnatividad/)

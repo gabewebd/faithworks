@@ -1,0 +1,19 @@
+# netlify.toml
+
+[[redirects]]
+  from = "/thetop40filipinofounders/*"
+  to = "https://thetop40filipinofounders.netlify.app/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/faithworks-breakthrough2027/*"
+  to = "https://faithworks-breakthrough2027.netlify.app/:splat"
+  status = 200
+  force = true
+
+  [[redirects]]
+  from = "/faithph-breakthrough2027"
+  to = "https://faithworks-breakthrough2027.netlify.app/"
+  status = 200
+  force = true
