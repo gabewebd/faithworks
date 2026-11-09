@@ -657,8 +657,37 @@ window.__fwMainLoaded = true;
       panel.appendChild(el("h4", "cal__date", longDate(sel)));
       if (list.length) {
         var ul = el("ul", "cal__items");
-        list.forEach(function (ev, i) { ul.appendChild(eventItem(ev, i)); });
+        list.forEach(function (ev, i) { ul.appendChild(eventItem(ev, 0)); });
         panel.appendChild(ul);
+        // Two or more events on the day: one at a time, with previous / next buttons and "Event 1 of 2"
+        if (list.length > 1) {
+          var items = Array.prototype.slice.call(ul.children), at = 0;
+          ul.classList.add("cal__items--paged");
+          var pager = el("div", "cal__pager");
+          var count = el("span", "cal__pager-count");
+          count.setAttribute("aria-live", "polite");
+          var navBtn = function (label, glyph, step) {
+            var b = el("button", "cal__nav");
+            b.type = "button";
+            b.setAttribute("aria-label", label);
+            var g = el("span", "", glyph);
+            g.setAttribute("aria-hidden", "true");
+            b.appendChild(g);
+            b.addEventListener("click", function () { show(at + step); });
+            return b;
+          };
+          var prevBtn = navBtn("Previous event", "‹", -1), nextBtn = navBtn("Next event", "›", 1);
+          var show = function (n) {
+            at = (n + items.length) % items.length;
+            items.forEach(function (li, i) { li.hidden = i !== at; });
+            count.textContent = "Event " + (at + 1) + " of " + items.length;
+          };
+          pager.appendChild(prevBtn);
+          pager.appendChild(count);
+          pager.appendChild(nextBtn);
+          panel.insertBefore(pager, ul);
+          show(0);
+        }
       } else {
         panel.appendChild(el("p", "cal__none", calEvents.length ? "Nothing is scheduled on this day." : "No events are scheduled yet. New dates appear here as soon as they are confirmed."));
       }
