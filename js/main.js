@@ -232,17 +232,42 @@ window.__fwMainLoaded = true;
     var scenesBox = $("#journey.section--field .scenes");
     var stepsBox = scenesBox && $("#journey.section--field .steps");
     var introBox = scenesBox && $("#journey.section--field .journey__intro");
-    // Put the tab back at `top` on screen with one instant jump. The two-number scrollTo works in every
-    // browser (the { behavior: "instant" } option does not, older iOS Safari rejects it and the page
-    // jumped up to the section top); the page's smooth scrolling is held off for that one jump.
+    // Put the tab back at `top` on screen with one instant jump. Browsers with smooth-scroll support
+    // get { behavior: "instant" }, which overrides the page's smooth scrolling for that one call (no
+    // style to switch and restore, so GSAP's own save/restore of it can't leave it stuck). One that
+    // rejects "instant" throws and takes the fallback; older iOS Safari, which has no options
+    // object at all (it read it as the top of the page), never tries it. The fallback holds smooth
+    // scrolling off until the jumps are over, not just around the call: a phone can apply the
+    // scroll after the style is back and glide part way instead, so the tapped tab ran up the screen.
+    var htmlEl = doc.documentElement, smoothOff = 0, holds = [];
+    var instantOk = "scrollBehavior" in htmlEl.style;
     var holdTab = function (tab, top) {
       var shift = tab.getBoundingClientRect().top - top;
       if (Math.abs(shift) < 1) return;
-      var root = doc.documentElement, was = root.style.scrollBehavior;
-      root.style.scrollBehavior = "auto";
-      window.scrollTo(window.pageXOffset, window.pageYOffset + shift);
-      root.style.scrollBehavior = was;
+      var y = window.pageYOffset + shift;
+      if (instantOk) {
+        try { window.scrollTo({ top: y, left: window.pageXOffset, behavior: "instant" }); return; }
+        catch (e) { instantOk = false; }
+      }
+      if (!smoothOff) htmlEl.style.scrollBehavior = "auto";
+      clearTimeout(smoothOff);
+      smoothOff = setTimeout(function () { smoothOff = 0; htmlEl.style.scrollBehavior = ""; }, 400);
+      window.scrollTo(window.pageXOffset, y);
     };
+    // Hold the tab right away, after the next frame and three more times while a phone settles its layout
+    // (address bar, late reflow). A touch or wheel cancels the rest, so it never fights the reader.
+    var keepTab = function (tab, top) {
+      holds.forEach(clearTimeout);
+      holdTab(tab, top);
+      requestAnimationFrame(function () { holdTab(tab, top); });
+      holds = [120, 320, 700].map(function (ms) { return setTimeout(function () { holdTab(tab, top); }, ms); });
+    };
+    var stopHolds = function () { holds.forEach(clearTimeout); holds = []; };
+    window.addEventListener("touchstart", stopHolds, { passive: true });
+    window.addEventListener("wheel", stopHolds, { passive: true });
+    // The browser's own scroll anchoring would move the page as the scene leaves its place, on top
+    // of the hold above: the journey opts out, so only the hold moves the page.
+    if (journey) journey.style.overflowAnchor = "none";
     var placeScenes = function (i) {
       if (!stepsBox || !introBox) return;
       if (stackQuery.matches) stepsBox.insertBefore(scenesBox, stepTabs[i].nextSibling);
@@ -259,9 +284,7 @@ window.__fwMainLoaded = true;
       });
       if (stepsBox && stackQuery.matches) {
         placeScenes(i);
-        holdTab(stepTabs[i], tabTop);
-        // and once more after the frame settles (a browser's own scroll anchoring may have moved it meanwhile)
-        requestAnimationFrame(function () { holdTab(stepTabs[i], tabTop); });
+        keepTab(stepTabs[i], tabTop);
       }
       // A click or arrow key moves the page to that stage so scrolling carries on from there
       if (!fromScroll && pinned()) window.scrollTo({ top: stageTop(i), behavior: "smooth" });
@@ -1467,19 +1490,24 @@ window.__fwMainLoaded = true;
     });
     return out;
   };
+  // Blocks without photos (text cards, the calendar) give an empty list: no tween, no GSAP warning
+  var tweenPhotos = function (els, method, vars) {
+    var imgs = photos(els);
+    if (imgs.length) gsap[method](imgs, vars);
+  };
   var reveal = function (els, now) {
     els = els.filter(function (el) { return pending.indexOf(el) > -1; });
     if (!els.length) return;
     pending = pending.filter(function (el) { return els.indexOf(el) < 0; });
     var done = { opacity: 1, y: 0, overwrite: true, clearProps: "opacity,transform,transition" };
-    if (now) { gsap.set(els, done); gsap.set(photos(els), { scale: 1, clearProps: "transform" }); return; }
+    if (now) { gsap.set(els, done); tweenPhotos(els, "set", { scale: 1, clearProps: "transform" }); return; }
     gsap.to(els, Object.assign({ duration: 0.9, ease: "power3.out", stagger: 0.08 }, done));
-    gsap.to(photos(els), { scale: 1, duration: 1.4, ease: "expo.out", overwrite: true, clearProps: "transform" });
+    tweenPhotos(els, "to", { scale: 1, duration: 1.4, ease: "expo.out", overwrite: true, clearProps: "transform" });
   };
   if (blocks.length) {
     // transition: none while hidden, so a block's own hover transition can't drag the tween
     gsap.set(blocks, { opacity: 0, y: window.innerWidth < 760 ? 18 : 28, transition: "none" });
-    gsap.set(photos(blocks), { scale: 1.05 });
+    tweenPhotos(blocks, "set", { scale: 1.05 });
     ScrollTrigger.batch(blocks, {
       start: "top 90%", once: true,
       onEnter: function (els) { reveal(els); },
@@ -1708,15 +1736,20 @@ window.__fwMainLoaded = true;
     var jsteps = $$("[data-journey-step]", journey), jarts = $$("[data-journey-art]", journey);
     var jsegs = $$(".pp-orb__seg", journey);
     var JPARTS = ".pp-disc, .pp-chip, .pp-art__field > .pp-face, .pp-hub__doc, .pp-hub__core";
-    // Each visual's parts pop in a beat apart while its arcs, weeks and traces draw round
+    // Each visual's parts pop in a beat apart while its arcs, weeks and traces draw round. Not
+    // every visual has traces or live bars: an empty list gets no tween (and no GSAP warning).
+    var tweenAll = function (sel, art, from, to) {
+      var els = $$(sel, art);
+      if (els.length) gsap.fromTo(els, from, to);
+    };
     var settleJourney = function (art, delay) {
-      gsap.fromTo($$(JPARTS, art), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.7, ease: "back.out(1.6)", stagger: 0.05, delay: delay, overwrite: true });
+      tweenAll(JPARTS, art, { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.7, ease: "back.out(1.6)", stagger: 0.05, delay: delay, overwrite: true });
       $$(".pp-arc, .pp-week", art).forEach(function (el, n) {
         var dash = getComputedStyle(el).getPropertyValue("--dash").trim(), len = dash.split(/\s+/);
         gsap.fromTo(el, { strokeDasharray: "0 " + (parseFloat(len[0]) + parseFloat(len[1])) }, { strokeDasharray: dash, duration: 0.9, ease: "power2.inOut", delay: delay + 0.15 + n * 0.09, overwrite: true });
       });
-      gsap.fromTo($$(".pp-hub__trace", art), { strokeDasharray: "1 1", strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut", stagger: 0.05, delay: delay + 0.1, overwrite: true });
-      gsap.fromTo($$(".pp-live__bar b", art), { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.inOut", delay: delay + 0.5, overwrite: true });
+      tweenAll(".pp-hub__trace", art, { strokeDasharray: "1 1", strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut", stagger: 0.05, delay: delay + 0.1, overwrite: true });
+      tweenAll(".pp-live__bar b", art, { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.inOut", delay: delay + 0.5, overwrite: true });
     };
     var jmm = gsap.matchMedia();
 
