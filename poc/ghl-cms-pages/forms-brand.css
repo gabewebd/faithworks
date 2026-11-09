@@ -1,0 +1,395 @@
+  /* Faith Works brand CSS for the GHL forms on the pages in poc/ghl-cms-pages (not the newsletter:
+    that one has newsletter-form.css). Paste the same CSS into each form: GHL → Sites → Forms →
+    <form> → Styles → Custom CSS. Forms:
+      Contact (General Inquiry)  R7hcPDBmFdJBEiUyOqpK   contact
+      (Starter kit mhloeEueDRLExO5Ct7Xw: uses kit-form.css instead, its own look)
+      Team training proposal     ftpaEhfFmT2XnE2NrViH   business
+      Build demo                 GTRLqxCYYA2fkVwxrhZU   build
+      Workshops notify           5UInnuA6YOOqEt09Vl7J   workshops
+      Speaking inquiry           sXxldcFIY3RFN6iA71NL   speaking
+      Program registration       AIe91j9ZF3bfizhBoHxX   programs/*
+    They sit on a white card (or Pink Tint on Contact). The look is meant to feel friendly, not
+    official: Charcoal labels, roomy white fields with a faint hairline and 14px corners, a soft
+    Faith Pink glow on focus, dropdowns that open as a soft floating card with rounded rows and a
+    tick on what's picked, and a Charcoal primary button. Every selector starts with #_builder-form#_builder-form so
+    it outranks GHL's own rules (one id) without depending on their exact shape. */
+
+  /* No scrollbar inside the form's frame. When the content outgrew the frame for a moment (an open
+    dropdown, chips wrapping, an error line) a 12px scrollbar appeared on the right and squeezed the
+    whole form narrower. It is hidden, not switched off: the frame can still scroll if it is ever
+    too short, so nothing gets trapped. */
+  html,
+  body {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow-x: hidden !important;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  /* A little space under the last element, so the height the page sizes the frame to covers it */
+  .ghl-form-wrap {
+    padding-bottom: 6px !important;
+  }
+
+  /* Fill the card: GHL caps the form at 800px and centres it */
+  .ghl-form-wrap,
+  #_builder-form#_builder-form {
+    max-width: none !important;
+    margin: 0 !important;
+    font-family: "Inter", Arial, sans-serif !important;
+    color: #1A1A1A !important;
+  }
+  /* 4px of room on each side: the 3px pink focus ring sits outside the field, and the iframe's edge
+    cut it off on the outer fields */
+  #_builder-form#_builder-form {
+    padding: 0 4px !important;
+  }
+  /* GHL caps each field at 900px: on a wider card the full-width fields stopped short */
+  #_builder-form#_builder-form .field-container {
+    max-width: none !important;
+  }
+
+  /* Rows: a little more air between them so the form doesn't feel crowded */
+  #_builder-form#_builder-form .fields-container {
+    row-gap: 0 !important;
+  }
+  #_builder-form#_builder-form .menu-field-wrap {
+    margin-bottom: 22px !important;
+  }
+
+  /* Labels */
+  #_builder-form#_builder-form label,
+  #_builder-form#_builder-form .field-label {
+    display: block !important;
+    margin-bottom: 8px !important;
+    font-family: "Inter", Arial, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    color: #1A1A1A !important;
+  }
+  #_builder-form#_builder-form label span {
+    color: #1A1A1A !important;
+  }
+
+  /* Text, email, phone, date, textarea and the dropdowns' box: soft and roomy. White, rounded,
+    a faint hairline instead of a hard grey outline, and a whisper of shadow so they read as
+    something to tap. */
+  #_builder-form#_builder-form .form-control,
+  #_builder-form#_builder-form input[type="text"],
+  #_builder-form#_builder-form input[type="email"],
+  #_builder-form#_builder-form input[type="tel"],
+  #_builder-form#_builder-form input[type="number"],
+  #_builder-form#_builder-form textarea,
+  #_builder-form#_builder-form .vdpInput,
+  #_builder-form#_builder-form .multiselect__tags {
+    min-height: 52px !important;
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
+    padding-right: 16px !important;
+    border: 1.5px solid rgba(26, 26, 26, 0.12) !important;
+    border-radius: 14px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 2px rgba(26, 26, 26, 0.04) !important;
+    font-family: "Inter", Arial, sans-serif !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    color: #1A1A1A !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  /* (the dropdowns' hidden search box is a text input too: back to GHL's own) */
+  #_builder-form#_builder-form input.multiselect__input[type] {
+    min-height: 0 !important;
+    border: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  /* Plain fields get 16px inner space; fields with an icon keep GHL's own left space */
+  #_builder-form#_builder-form .form-control:not([style*="padding-left"]),
+  #_builder-form#_builder-form textarea {
+    padding-left: 16px !important;
+  }
+  #_builder-form#_builder-form textarea.form-control,
+  #_builder-form#_builder-form textarea {
+    min-height: 120px !important;
+    resize: vertical !important;
+  }
+  #_builder-form#_builder-form ::placeholder,
+  #_builder-form#_builder-form .multiselect__placeholder {
+    color: rgba(26, 26, 26, 0.55) !important;
+    opacity: 1 !important;
+    font-size: 16px !important;
+  }
+  #_builder-form#_builder-form .input-icon,
+  #_builder-form#_builder-form .vdpComponent svg {
+    color: #1A1A1A !important;
+    opacity: 0.6;
+  }
+
+  /* Hover: the hairline darkens a touch. Focus: a soft Faith Pink glow, no black outline. */
+  #_builder-form#_builder-form .form-control:hover,
+  #_builder-form#_builder-form textarea:hover,
+  #_builder-form#_builder-form .vdpInput:hover,
+  #_builder-form#_builder-form .multiselect:hover .multiselect__tags {
+    border-color: rgba(26, 26, 26, 0.28) !important;
+  }
+  #_builder-form#_builder-form .form-control:focus,
+  #_builder-form#_builder-form textarea:focus,
+  #_builder-form#_builder-form .vdpInput:focus,
+  #_builder-form#_builder-form .multiselect--active .multiselect__tags {
+    outline: none !important;
+    border-color: #EFACBA !important;
+    box-shadow: 0 0 0 4px rgba(239, 172, 186, 0.4) !important;
+  }
+
+  /* Dropdowns (single and multi select) */
+  #_builder-form#_builder-form .multiselect__tags {
+    padding-left: 16px !important;
+    padding-right: 52px !important;
+  }
+  #_builder-form#_builder-form .multiselect {
+    min-height: 52px !important;
+  }
+  /* The arrow: a rounded chevron in a small Pink Tint circle (instead of the hard black triangle);
+    GHL turns this box upside down when the list is open, so the chevron flips up */
+  #_builder-form#_builder-form .multiselect__select {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    right: 8px !important;
+    width: 36px !important;
+    height: 52px !important;
+    padding: 0 !important;
+    transition: transform 0.2s ease !important;
+  }
+  #_builder-form#_builder-form .multiselect__select::before {
+    position: static !important;
+    top: auto !important;
+    display: block !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #F7E5E6 url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%231A1A1A'%20stroke-width%3D'2.25'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M7%2010l5%205%205-5'%2F%3E%3C%2Fsvg%3E") center / 16px 16px no-repeat !important;
+    content: "" !important;
+  }
+  /* (block, so a dropdown with no placeholder text is the same 52px as the others, not 58px) */
+  #_builder-form#_builder-form .multiselect__single,
+  #_builder-form#_builder-form .multiselect__placeholder {
+    display: block !important;
+    min-height: 24px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+  #_builder-form#_builder-form .multiselect__single {
+    color: #1A1A1A !important;
+  }
+  /* The open list: a soft floating card (no black border), options as rounded rows inside it */
+  #_builder-form#_builder-form .multiselect__content-wrapper {
+    margin-top: 8px !important;
+    padding: 6px !important;
+    border: 1px solid rgba(26, 26, 26, 0.08) !important;
+    border-radius: 16px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 24px 48px -20px rgba(26, 26, 26, 0.28), 0 4px 12px -6px rgba(26, 26, 26, 0.08) !important;
+  }
+  #_builder-form#_builder-form .multiselect--above .multiselect__content-wrapper {
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+  }
+  #_builder-form#_builder-form .multiselect__option {
+    min-height: 44px !important;
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+    color: #1A1A1A !important;
+    background-color: #FFFFFF !important;
+    white-space: normal !important;
+  }
+  #_builder-form#_builder-form .multiselect__option::after {
+    display: none !important;
+  }
+  #_builder-form#_builder-form .multiselect__option--highlight {
+    background-color: #F7E5E6 !important;
+    color: #1A1A1A !important;
+  }
+  /* Picked: stays Pink Tint, bold, with a tick on the right */
+  #_builder-form#_builder-form .multiselect__option--selected {
+    padding-right: 42px !important;
+    background-color: #F7E5E6 !important;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%231A1A1A'%20stroke-width%3D'2.5'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5.5%2012.5l4%204%209-9'%2F%3E%3C%2Fsvg%3E") !important;
+    background-position: right 14px center !important;
+    background-size: 16px 16px !important;
+    background-repeat: no-repeat !important;
+    color: #1A1A1A !important;
+    font-weight: 600 !important;
+  }
+  /* Chosen items in a multi select: Pink Tint chips */
+  #_builder-form#_builder-form .multiselect__tag {
+    margin: 2px 6px 2px 0 !important;
+    padding: 6px 30px 6px 12px !important;
+    border-radius: 999px !important;
+    background: #F7E5E6 !important;
+    color: #1A1A1A !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+  }
+  #_builder-form#_builder-form .multiselect__tag-icon {
+    border-radius: 999px !important;
+  }
+  #_builder-form#_builder-form .multiselect__tag-icon::after {
+    color: #1A1A1A !important;
+  }
+  #_builder-form#_builder-form .multiselect__tag-icon:hover {
+    background: #EFACBA !important;
+  }
+
+  /* Consent checkboxes: one per row, full width, box at the top of the text */
+  #_builder-form#_builder-form .menu-field-wrap:has(.standard-checkbox-container),
+  #_builder-form#_builder-form .menu-field-wrap[id*="_pS6xbem2xFUhqkwV90SF_"],
+  #_builder-form#_builder-form .menu-field-wrap[id*="_OwtxqPQTSj1e72WPW3Cx_"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  /* Their group headings ("Data Privacy Consent *", "Marketing Updates Consent"): hidden on screen,
+    still read by screen readers (as the Starter Kit form). Only the label right under the field: the
+    checkbox's own text, deeper inside, stays. */
+  #_builder-form#_builder-form .form-field-wrapper:has(.standard-checkbox-container) .form-builder--item > label {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 1px 0 0 !important;
+    border: 1.5px solid rgba(26, 26, 26, 0.25) !important;
+    border-radius: 7px !important;
+    background-color: #FFFFFF !important;
+    accent-color: #1A1A1A;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:hover {
+    border-color: rgba(26, 26, 26, 0.5) !important;
+  }
+  /* Ticked: Charcoal box with our own centred white tick. GHL's tick (a rotated border in ::after) is
+    drawn for its 16px box and sat off-centre and heavy in this 22px one, so it is hidden. */
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]::before,
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]::after {
+    display: none !important;
+    content: none !important;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:checked {
+    border-color: #1A1A1A !important;
+    background-color: #1A1A1A !important;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%23FFFFFF'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5.5%2012.5l4%204%209-9'%2F%3E%3C%2Fsvg%3E") !important;
+    background-position: center !important;
+    background-size: 15px 15px !important;
+    background-repeat: no-repeat !important;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 3px #EFACBA !important;
+  }
+  #_builder-form#_builder-form .standard-checkbox-container label {
+    display: inline !important;
+    margin: 0 !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    cursor: pointer;
+  }
+
+  /* The submit button: the site's primary button */
+  #_builder-form#_builder-form .form-builder--btn-submit {
+    margin-top: 6px !important;
+  }
+  #_builder-form#_builder-form .button-element {
+    min-height: 54px !important;
+    padding: 15px 24px !important;
+    border: 1.5px solid #1A1A1A !important;
+    border-radius: 8px !important; /* the site's buttons: --r-sm (css/style.css .btn) */
+    background: #1A1A1A !important;
+    box-shadow: none !important;
+    color: #FFFFFF !important;
+    font-family: Arial, Helvetica, sans-serif !important; /* buttons are always Arial (user) */
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    transition: transform 0.18s cubic-bezier(0.215, 0.61, 0.355, 1), background-color 0.18s, color 0.18s;
+  }
+  #_builder-form#_builder-form .button-element * {
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+  }
+  #_builder-form#_builder-form .button-element:hover {
+    transform: translateY(-2px);
+    background: #000000 !important;
+  }
+  #_builder-form#_builder-form .button-element:active {
+    transform: translateY(1px) scale(0.98);
+  }
+  #_builder-form#_builder-form .button-element:focus-visible {
+    outline: 3px solid #EFACBA !important;
+    outline-offset: 3px;
+  }
+
+  /* Errors: the site's error colour, bold */
+  #_builder-form#_builder-form .error {
+    margin-top: 6px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #9B2245 !important;
+  }
+  #_builder-form#_builder-form .input-error .form-control,
+  #_builder-form#_builder-form .form-control.input-error,
+  #_builder-form#_builder-form .form-control[aria-invalid="true"] {
+    border-color: rgba(155, 34, 69, 0.6) !important;
+  }
+
+  /* The text under the button (privacy note and link) */
+  #_builder-form#_builder-form .text-element,
+  #_builder-form#_builder-form .text-element * {
+    font-family: "Inter", Arial, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #1A1A1A !important;
+  }
+  #_builder-form#_builder-form .text-element a {
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+  }
+
+  /* Phones (the form is narrower than 560px): side-by-side fields stack */
+  @media (max-width: 560px) {
+    #_builder-form#_builder-form .menu-field-wrap {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }

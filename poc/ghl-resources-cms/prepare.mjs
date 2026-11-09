@@ -7,6 +7,8 @@ import { checkSnapshot } from "../../cms/shared/public.mjs";
 import { toRenderData, currentUrl } from "../../tools/content.mjs";
 import { cleanPath, layout } from "../../tools/layout.mjs";
 import * as R from "../../tools/render.mjs";
+import * as SEO from "../ghl-cms-pages/seo.mjs";
+import { withNewsletter } from "../ghl-cms-pages/newsletter.mjs";
 export { checkSnapshot };
 export { mapSelectorList } from "./shadow-css.mjs";
 
@@ -74,7 +76,7 @@ export function prepare(snap, { template, cdn }) {
   // Resources item marked as the current section.
   const page = layout({ title: "", description: "", path: "/resources/", nav: "resources", body: "", site: data.site });
   const cut = (re) => { const m = page.match(re); if (!m) throw new Error(`tools/layout.mjs no longer renders ${re}`); return publish(m[0]); };
-  const headerHtml = cut(/<header class="site-header"[\s\S]*?<\/header>/), footerHtml = cut(/<footer class="site-footer"[\s\S]*?<\/footer>/);
+  const headerHtml = cut(/<header class="site-header"[\s\S]*?<\/header>/), footerHtml = withNewsletter(cut(/<footer class="site-footer"[\s\S]*?<\/footer>/)); // + the newsletter sign-up (GHL pages only)
   // The Resources page's own title, description and share tags (its <!--meta--> header, laid out
   // by tools/layout.mjs with the site's default share image), for build.mjs to write into the
   // embed's HTML: link-preview crawlers read only the HTML GHL sends. Canonical and og:url are
@@ -82,7 +84,16 @@ export function prepare(snap, { template, cdn }) {
   const meta = JSON.parse((template.match(/^<!--meta\s*([\s\S]*?)-->/) || [, "{}"])[1]);
   const head = layout({ title: meta.title || "Resources · Faith Works", description: meta.description || "", path: "/resources/", nav: "resources", body: "", site: data.site }).match(/<head>[\s\S]*?<\/head>/)[0];
   const headHtml = (head.match(/<title>[^<]*<\/title>|<meta (?:name="(?:description|twitter:[a-z]+)"|property="og:(?:type|site_name|title|description|image)")[^>]*>/g) || [])
-    .map((t) => t.replace(/^<(title|meta)/, "<$1 data-fw-head")).join("\n");
+    .map((t) => t.replace(/^<(title|meta)/, "<$1 data-fw-head")).join("\n")
+    // Schema.org (seo.mjs, as the other GHL pages): Organization, WebSite, the Resources page as a
+    // CollectionPage and its breadcrumb. runtime.js swaps the page and breadcrumb for an article's
+    // while one is open, keeping the same Organization and WebSite @ids.
+    + "\n" + SEO.ldScript(SEO.graph([
+      SEO.organization({ ...data.site, logo: data.site.logo || "/assets/icons/wordmark.svg" }, origin, cdn, { withFounder: true }),
+      SEO.website(data.site, origin),
+      SEO.webPage({ origin, url: `${origin}/resources`, title: meta.title || "Resources · Faith Works", description: meta.description || undefined, type: "CollectionPage", trail: SEO.PAGE_TRAILS.resources }),
+      SEO.breadcrumb(origin, `${origin}/resources`, SEO.PAGE_TRAILS.resources),
+    ]), "data-fw-head data-fw-ld");
   // siteCards: the cards as the site renders them, so build.mjs knows which CSS they need
   return { origin, listingHtml, articles, resources, headerHtml, footerHtml, headHtml, siteCards: R.resourceCards(), generatedAt: snap.generated_at };
 }

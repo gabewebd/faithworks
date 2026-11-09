@@ -1,0 +1,268 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+/* Newsletter form (GHL form DTFz2Yw3qZ7iWFVB1zBi): paste into GHL → Sites → Forms → Newsletter →
+   Styles → Custom CSS. Shown inside the footer's newsletter card (poc/ghl-cms-pages/newsletter.mjs)
+   on Soft Charcoal. The Starter Kit form's build (kit-form.css) in the dark footer's colours:
+     52px fields with 12px corners, see-through with a hairline, pink ring on focus,
+     no labels on screen (the placeholders say what goes where; screen readers still read them),
+     consent options (when the form has them) as compact rows in one see-through box, their
+       group headings ("Data Privacy Consent *", "Marketing Updates Consent") hidden on screen,
+     a 52px Faith Pink button in Arial (buttons are always Arial), no drop shadows,
+     no privacy links (removed from the card at the user's request; the footer's bottom bar has them).
+   Wide: First name and Email side by side, the rest full width. Phones: one per row.
+   The @import must stay the first line. Every rule starts with #_builder-form#_builder-form so it
+   outranks GHL's own. */
+
+/* No scrollbar inside the form's frame. When the content outgrew the frame for a moment (an open
+   dropdown, chips wrapping, an error line) a 12px scrollbar appeared on the right and squeezed the
+   whole form narrower. It is hidden, not switched off: the frame can still scroll if it is ever
+   too short, so nothing gets trapped. (Same block as forms-brand.css.) */
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overflow-x: hidden !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+/* A little space under the last element, so the height the page sizes the frame to covers it */
+.ghl-form-wrap {
+  padding-bottom: 6px !important;
+}
+
+/* Fill the card; 4px each side so the focus ring isn't cut off at the iframe's edge */
+.ghl-form-wrap,
+#_builder-form#_builder-form {
+  max-width: none !important;
+  margin: 0 !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  color: #FFFFFF !important;
+}
+#_builder-form#_builder-form {
+  padding: 0 4px !important;
+}
+#_builder-form#_builder-form .form-side {
+  min-height: 0 !important;
+}
+
+/* Layout: rows 12px apart (margins, not a flex gap, so the two consent rows can join up) */
+#_builder-form#_builder-form .fields-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  margin: 0 !important;
+}
+#_builder-form#_builder-form .form-field-wrapper {
+  flex: 1 1 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+}
+#_builder-form#_builder-form .form-field-container,
+#_builder-form#_builder-form .field-container,
+#_builder-form#_builder-form .form-builder--item {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#_builder-form#_builder-form #el_DTFz2Yw3qZ7iWFVB1zBi_first_name_0,
+#_builder-form#_builder-form #el_DTFz2Yw3qZ7iWFVB1zBi_email_1 {
+  flex: 1 1 220px !important;
+  width: auto !important;
+}
+
+/* Field and group headings: hidden on screen, still read by screen readers. Only the label right
+   under each field: a consent checkbox's own text (deeper inside) stays. */
+#_builder-form#_builder-form .form-builder--item > label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+
+/* Fields: see-through on the dark card, white text, pink ring on focus */
+#_builder-form#_builder-form .form-control,
+#_builder-form#_builder-form input[type="text"],
+#_builder-form#_builder-form input[type="email"],
+#_builder-form#_builder-form input[type="tel"],
+#_builder-form#_builder-form textarea,
+#_builder-form#_builder-form .multiselect__tags {
+  height: auto !important;
+  min-height: 52px !important;
+  padding-top: 13px !important;
+  padding-bottom: 13px !important;
+  padding-right: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: #FFFFFF !important;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+#_builder-form#_builder-form input.multiselect__input[type] {
+  min-height: 0 !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+#_builder-form#_builder-form .form-control:not([style*="padding-left"]) {
+  padding-left: 16px !important;
+}
+#_builder-form#_builder-form ::placeholder,
+#_builder-form#_builder-form .multiselect__placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1 !important;
+}
+#_builder-form#_builder-form .input-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+#_builder-form#_builder-form .form-control:hover {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+#_builder-form#_builder-form .form-control:focus {
+  outline: none !important;
+  border-color: #EFACBA !important;
+  background: rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 0 0 3px rgba(239, 172, 186, 0.25) !important;
+}
+/* Browser autofill keeps the dark field instead of its own pale fill */
+#_builder-form#_builder-form .form-control:-webkit-autofill {
+  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 1000px #1A1A1A inset !important;
+  caret-color: #FFFFFF;
+}
+
+/* Consent (when the form has it): both options in one see-through box, as compact rows */
+#_builder-form#_builder-form .form-field-wrapper[id*="_pS6xbem2xFUhqkwV90SF_"],
+#_builder-form#_builder-form .form-field-wrapper[id*="_OwtxqPQTSj1e72WPW3Cx_"] {
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+#_builder-form#_builder-form .form-field-wrapper[id*="_pS6xbem2xFUhqkwV90SF_"] {
+  padding-top: 14px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+#_builder-form#_builder-form .form-field-wrapper[id*="_OwtxqPQTSj1e72WPW3Cx_"] {
+  margin-bottom: 12px !important;
+  padding-bottom: 14px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 0 12px 12px !important;
+}
+#_builder-form#_builder-form .standard-checkbox-container {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px;
+}
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 1px 0 0 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 6px !important;
+  background-color: transparent !important;
+  cursor: pointer;
+}
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:hover {
+  border-color: #FFFFFF !important;
+}
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]::before,
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]::after {
+  display: none !important;
+  content: none !important;
+}
+/* Ticked: Faith Pink box, Charcoal tick */
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:checked {
+  border-color: #EFACBA !important;
+  background-color: #EFACBA !important;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'%231A1A1A'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5.5%2012.5l4%204%209-9'%2F%3E%3C%2Fsvg%3E") !important;
+  background-position: center !important;
+  background-size: 14px 14px !important;
+  background-repeat: no-repeat !important;
+}
+#_builder-form#_builder-form .standard-checkbox-container input[type="checkbox"]:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(239, 172, 186, 0.45) !important;
+}
+#_builder-form#_builder-form .standard-checkbox-container label {
+  display: inline !important;
+  margin: 0 !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #FFFFFF !important;
+  cursor: pointer;
+}
+
+/* Button: full width, Faith Pink, Charcoal text in Arial, no shadow */
+#_builder-form#_builder-form .form-builder--btn-submit {
+  margin-top: 0 !important;
+}
+#_builder-form#_builder-form .button-element {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 52px !important;
+  padding: 14px 20px !important;
+  border: 0 !important;
+  border-radius: 8px !important; /* the site's buttons: --r-sm (css/style.css .btn) */
+  background: #EFACBA !important;
+  box-shadow: none !important;
+  color: #1A1A1A !important;
+  transition: background-color 0.15s, transform 0.18s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+#_builder-form#_builder-form .button-element * {
+  color: #1A1A1A !important;
+  font-family: Arial, Helvetica, sans-serif !important; /* buttons are always Arial (user) */
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+#_builder-form#_builder-form .button-element:hover {
+  background: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+#_builder-form#_builder-form .button-element:active {
+  transform: translateY(1px) scale(0.98);
+}
+#_builder-form#_builder-form .button-element:focus-visible {
+  outline: 3px solid #EFACBA !important;
+  outline-offset: 3px;
+}
+
+/* Error messages in Faith Pink: GHL's red is hard to read on Soft Charcoal */
+#_builder-form#_builder-form .error {
+  margin-top: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #EFACBA !important;
+}
+
+/* A text element in the form, if one is added: small, white */
+#_builder-form#_builder-form .text-element,
+#_builder-form#_builder-form .text-element * {
+  font-family: "Inter", Arial, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #FFFFFF !important;
+}
+#_builder-form#_builder-form .text-element a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}

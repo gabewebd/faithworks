@@ -16,8 +16,8 @@
   // into <head>, unless the GHL page's own settings already set that tag (those win).
   [].slice.call(document.querySelectorAll("[data-fw-head]")).forEach(function (el) {
     if (el.parentNode === document.head) return;
-    var key = el.getAttribute("property") ? "meta[property=\"" + el.getAttribute("property") + "\"]" : el.getAttribute("name") ? "meta[name=\"" + el.getAttribute("name") + "\"]" : "title";
-    var own = document.head.querySelector(key);
+    var key = el.getAttribute("property") ? "meta[property=\"" + el.getAttribute("property") + "\"]" : el.getAttribute("name") ? "meta[name=\"" + el.getAttribute("name") + "\"]" : el.tagName === "TITLE" ? "title" : null;
+    var own = key && document.head.querySelector(key);
     if (own && !own.hasAttribute("data-fw-head")) el.parentNode.removeChild(el);
     else document.head.appendChild(el);
   });
@@ -33,6 +33,25 @@
   var root = host.attachShadow({ mode: "open" });
   var main, cleanup = [];
   var on = function (target, type, fn, opts) { target.addEventListener(type, fn, opts); cleanup.push(function () { target.removeEventListener(type, fn, opts); }); };
+  // GHL forms in the shadow root (the footer's newsletter sign-up). GHL's form_embed.js sizes
+  // forms through iframe-resizer, which finds each iframe with document.getElementById and so
+  // never sees these. Its handshake is done here instead: when a form says it has loaded, it is
+  // sent iframe-resizer's init message (the fields form_embed.js sends: margin 8, no width, no
+  // log, 32 ms, public methods, auto-resize, offset height), and then reports its height.
+  var FORMS = "https://api.faithph.ai";
+  var formFrame = function (win) { return [].filter.call(root.querySelectorAll("iframe"), function (f) { return f.contentWindow === win; })[0]; };
+  window.addEventListener("message", function (e) {
+    if (e.origin !== FORMS) return;
+    var frame = formFrame(e.source);
+    if (!frame) return;
+    if (Array.isArray(e.data) && e.data[0] === "iframeLoaded") {
+      e.source.postMessage("[iFrameSizer]" + frame.id + ":8:false:false:32:true:true:null:offset:null:null:0", FORMS);
+      return;
+    }
+    // "[iFrameSizer]<id>:<height>:<width>:<type>"
+    var m = typeof e.data === "string" && /^\[iFrameSizer\][^:]*:(\d+(?:\.\d+)?):[^:]*:(\w+)/.exec(e.data);
+    if (m && !/^(message|scrollTo|scrollToOffset|pageInfo|pageInfoStop|inPageLink|close)$/.test(m[2])) frame.style.height = Math.ceil(+m[1]) + "px";
+  });
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
 
   /* ---- Live: content from the CMS, styles from the site ---- */
@@ -363,19 +382,41 @@
       } else if (el && el.hasAttribute("data-fw-seo")) el.parentNode.removeChild(el);
       else if (el && was) el.setAttribute(attr, was.value);
     });
-    var ld = document.head.querySelector("script[data-fw-seo]");
+    // The page's JSON-LD (data-fw-ld: Organization, WebSite, the Resources page) becomes the
+    // article's while one is open, and comes back for the listing
+    var ld = document.head.querySelector("script[data-fw-ld]") || document.head.querySelector("script[data-fw-seo]");
     if (seo && seo.ld) {
       if (!ld) { ld = document.createElement("script"); ld.type = "application/ld+json"; ld.setAttribute("data-fw-seo", ""); document.head.appendChild(ld); }
       ld.textContent = JSON.stringify(seo.ld);
-    } else if (ld) ld.parentNode.removeChild(ld);
+    } else if (ld && ld.hasAttribute("data-fw-ld")) ld.textContent = baseLdText;
+    else if (ld) ld.parentNode.removeChild(ld);
+  }
+  var baseLdEl = document.head.querySelector("script[data-fw-ld]"), baseLdText = baseLdEl ? baseLdEl.textContent : "";
+  var baseNodes = (function () { try { return JSON.parse(baseLdText)["@graph"] || []; } catch (e) { return []; } })();
+  // An article's graph: the page's Organization and WebSite (same @ids), the article's WebPage and
+  // Article, and its breadcrumb (Home > Resources > the article)
+  function articleLd(r, s, url, title, desc) {
+    var org = baseNodes.filter(function (n) { return n["@type"] === "Organization"; })[0];
+    var site = baseNodes.filter(function (n) { return n["@type"] === "WebSite"; })[0];
+    var home = org ? org.url : location.origin + "/", list = location.origin + hrefOf("");
+    var author = !s.author ? undefined : org && (s.author === org.name || s.author === org.alternateName) ? { "@id": org["@id"] } : { "@type": "Organization", name: s.author };
+    var article = { "@type": "Article", "@id": url + "#article", headline: r.title, description: desc || undefined, image: s.image ? [s.image] : undefined,
+      datePublished: s.published || undefined, author: author, publisher: org ? { "@id": org["@id"] } : undefined,
+      mainEntityOfPage: { "@id": url + "#webpage" }, isPartOf: { "@id": url + "#webpage" }, inLanguage: "en" };
+    var page = { "@type": "WebPage", "@id": url + "#webpage", url: url, name: title, description: desc || undefined, inLanguage: "en",
+      isPartOf: site ? { "@id": site["@id"] } : undefined, primaryImageOfPage: s.image ? { "@type": "ImageObject", url: s.image } : undefined,
+      breadcrumb: { "@id": url + "#breadcrumb" }, mainEntity: { "@id": url + "#article" } };
+    var crumbs = { "@type": "BreadcrumbList", "@id": url + "#breadcrumb", itemListElement: [["Home", home], ["Resources", list], [r.title, url]].map(function (c, i) {
+      return { "@type": "ListItem", position: i + 1, name: c[0], item: c[1] };
+    }) };
+    return { "@context": "https://schema.org", "@graph": [org, site, page, article, crumbs].filter(Boolean) };
   }
   function articleHead(r, slug) {
     var s = r.seo || {}, url = location.origin + hrefOf(slug), title = s.title || r.title + " · Faith Works", desc = s.description || r.summary || "";
     return {
       title: title, description: desc, canonical: url, "og:title": title, "og:description": desc, "og:url": url, "og:image": s.image, "og:type": "article",
       "twitter:title": title, "twitter:description": desc, "twitter:image": s.image,
-      ld: { "@context": "https://schema.org", "@type": "Article", headline: r.title, description: desc, image: s.image || undefined, datePublished: s.published || undefined,
-        author: s.author ? { "@type": "Organization", name: s.author } : undefined, mainEntityOfPage: url },
+      ld: articleLd(r, s, url, title, desc),
     };
   }
 
