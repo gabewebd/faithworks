@@ -495,34 +495,32 @@ async function ghkit() {
   return doc("The GitHub Toolkit", "The GitHub mark joined by straight lines to five kinds of project (agent skills, component libraries, MCP servers, ready-to-use tools, APIs and SDKs), which all lead to your AI agent. Around the edges, tilted, softly blurred logos: shadcn/ui, Three.js, Remotion, Motion, Groq, OpenAI, Playwright and Magic UI.", await defs(bg, extra), body);
 }
 
-/* ---- 17. 7 business processes you can automate — radial gradient from the left edge: seven everyday
-   processes feed one workflow, which runs on everyday apps, with a person reviewing what matters ---- */
+/* ---- 17. 7 business processes you can automate — radial gradient from the left edge: four everyday
+   processes (a calm sample of the seven) feed one workflow, which runs on everyday apps ---- */
 async function processes() {
   const bg = `<radialGradient id="bg" cx="0" cy="540" r="2050" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3BFCA"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE19C"/></radialGradient>`;
   const blurs = [3, 4, 5];
   const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
-  const leftK = [["chat", "pink", "Customer inquiries", "Logged and routed"], ["week", "yellow", "Appointments", "Booked and reminded"], ["target", "pink", "Leads", "Captured and sorted"], ["mail", "yellow", "Follow-ups", "Sent on time"]];
-  const rightK = [["megaphone", "yellow", "Social content", "Drafted for review"], ["doc", "pink", "Documents", "Summarized and filed"], ["chart", "yellow", "Reports", "Ready every week"]];
-  const ly = [250, 430, 610, 790], ry = [340, 520, 700], hs = 230, hc = 430, hx = 960 - hs / 2, hy = hc - hs / 2;
-  const lw = leftK.map((k) => chip(0, 0, ...k).w), rw = rightK.map((k) => chip(0, 0, ...k).w);
-  const lr = 640, rl = 1290; // left column's right edge, right column's left edge
-  const L = leftK.map((k, i) => chip(lr - lw[i] / 2, ly[i], ...k)), Rc = rightK.map((k, i) => chip(rl + rw[i] / 2, ry[i], ...k));
-  const bl = 735, br = 1195, ls = 100, gy = 600, lxs = [960 - ls * 1.5 - 30, 960 - ls / 2, 960 + ls / 2 + 30];
-  const p = chip(960, 870, "person", "pink", "You stay in charge", "A person reviews what matters");
+  const leftK = [["chat", "pink", "Customer inquiries", "Logged and routed"], ["week", "yellow", "Appointments", "Booked and reminded"]];
+  const rightK = [["mail", "pink", "Follow-ups", "Sent on time"], ["chart", "yellow", "Reports", "Ready every week"]];
+  const hs = 230, hc = 440, hx = 960 - hs / 2, hy = hc - hs / 2, ys = [hc - 100, hc + 100];
+  const lr = 640, rl = 1280; // left column's right edge, right column's left edge
+  const L = leftK.map((k) => chip(0, 0, ...k).w).map((w, i) => chip(lr - w / 2, ys[i], ...leftK[i]));
+  const R = rightK.map((k) => chip(0, 0, ...k).w).map((w, i) => chip(rl + w / 2, ys[i], ...rightK[i]));
+  const bl = 740, br = 1180, ls = 100, gap = 36, gy = 700, lxs = [960 - ls * 1.5 - gap, 960 - ls / 2, 960 + ls / 2 + gap];
   const wires = [
-    ...L.map((c, i) => [[c.right, ly[i]], [bl, ly[i]]]), [[bl, ly[0]], [bl, ly[3]]], [[bl, hc], [hx, hc]],
-    ...Rc.map((c, i) => [[c.left, ry[i]], [br, ry[i]]]), [[br, ry[0]], [br, ry[2]]], [[br, hc], [hx + hs, hc]],
-    [[960, hy + hs], [960, gy]], [[lxs[0] + ls, gy + ls / 2], [lxs[1], gy + ls / 2]], [[lxs[1] + ls, gy + ls / 2], [lxs[2], gy + ls / 2]], [[960, gy + ls], [960, p.top]],
+    ...L.map((c, i) => [[c.right, ys[i]], [bl, ys[i]]]), [[bl, ys[0]], [bl, ys[1]]], [[bl, hc], [hx, hc]],
+    ...R.map((c, i) => [[c.left, ys[i]], [br, ys[i]]]), [[br, ys[0]], [br, ys[1]]], [[br, hc], [hx + hs, hc]],
+    [[960, hy + hs], [960, gy]],
   ];
   const apps = ["google-calendar", "gmail", "google-sheets"].map((n, i) => logo(lxs[i], gy, ls, n)).join("");
-  const nodes = [...L.map((c, i) => node(c.right, ly[i])), ...Rc.map((c, i) => node(c.left, ry[i])), node(hx, hc, C.yellow), node(hx + hs, hc, C.yellow), node(960, hy + hs), node(960, gy, C.yellow), node(960, gy + ls), node(960, p.top),
-    node(lxs[0] + ls, gy + ls / 2, C.yellow, 7), node(lxs[1], gy + ls / 2, C.yellow, 7), node(lxs[1] + ls, gy + ls / 2, C.yellow, 7), node(lxs[2], gy + ls / 2, C.yellow, 7)].join("");
+  const nodes = [...L.map((c, i) => node(c.right, ys[i])), ...R.map((c, i) => node(c.left, ys[i])), node(hx, hc, C.yellow), node(hx + hs, hc, C.yellow), node(960, gy, C.yellow)].join("");
   // [centre x, centre y, size, logo, tilt, blur, opacity]
   const soft = [[120, 110, 150, "zapier", -14, 4, 0.8], [110, 990, 160, "canva", 12, 4, 0.8], [700, 70, 120, "chatgpt", 10, 3, 0.75], [1260, 75, 120, "claude-color", -10, 3, 0.75],
     [1800, 120, 160, "microsoft-copilot", 14, 4, 0.85], [1810, 960, 170, "google-drive", -14, 5, 0.8], [1450, 1010, 120, "gemini", 9, 3, 0.75], [470, 1020, 120, "google-docs", -9, 3, 0.75]];
   const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) + layer("connectors", wires.map(wire).join("")) +
-    layer("processes", [...L, ...Rc].map((c) => c.svg).join("")) + layer("workflow", iconCard(hx, hy, hs, "process", "yellow")) + layer("everyday-apps", apps) + layer("people", p.svg) + layer("nodes", nodes);
-  return doc("7 Business Processes You Can Automate Without Hiring a Developer", "Seven everyday business processes (customer inquiries, appointments, leads, follow-ups, social content, documents and reports) joined by straight lines to one workflow running on Google Calendar, Gmail and Google Sheets, with a person reviewing what matters.", await defs(bg, extra), body);
+    layer("processes", [...L, ...R].map((c) => c.svg).join("")) + layer("workflow", iconCard(hx, hy, hs, "process", "yellow")) + layer("everyday-apps", apps) + layer("nodes", nodes);
+  return doc("7 Business Processes You Can Automate Without Hiring a Developer", "Four everyday business processes (customer inquiries, appointments, follow-ups and reports) joined by straight lines to one workflow, which runs on Google Calendar, Gmail and Google Sheets.", await defs(bg, extra), body);
 }
 
 const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles, ghkit, processes };
