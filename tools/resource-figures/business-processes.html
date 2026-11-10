@@ -1,0 +1,151 @@
+<!doctype html>
+<!-- In-article diagrams for "7 Business Processes You Can Automate Without Hiring a Developer"
+     (business-processes-to-automate-without-a-developer). Same house style as figures.html: brand
+     palette only, Poppins 600 headings, Inter text, solid Charcoal text, white cards, real logos from
+     assets/icons/tools. Kept in its own file so other articles' figures are never re-rendered.
+     Serve the repository root (python -m http.server 8775), then:
+       PAGE=business-processes.html node tools/resource-figures/render.mjs three-ways five-box-test -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=block">
+<style>
+  :root { --pink: #EFACBA; --pink-tint: #F7E5E6; --yellow: #FBC522; --yellow-pastel: #FAEBC0; --ink: #1A1A1A; --paper: #FAF8F4; --stone-2: #F1EFEB; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccc; font-family: Inter, Arial, sans-serif; color: var(--ink); }
+  .fig { position: relative; width: 1600px; margin: 0 0 40px; padding: 80px 88px; overflow: hidden; background: var(--paper); }
+  .fig--pink { background: radial-gradient(1200px 700px at 15% 0%, #F6D3DA 0%, rgb(246 211 218 / 0) 70%), var(--paper); }
+  .fig--yellow { background: radial-gradient(1200px 700px at 85% 0%, #FCE6A6 0%, rgb(252 230 166 / 0) 70%), var(--paper); }
+  .kicker { margin: 0 0 14px; font-size: 26px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .kicker::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 50%; background: var(--pink); vertical-align: 2px; }
+  .fig--yellow .kicker::before { background: var(--yellow); }
+  h2 { margin: 0 0 56px; max-width: 1300px; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 58px; line-height: 1.08; letter-spacing: -0.035em; }
+  .card { position: relative; z-index: 2; border-radius: 28px; background: #fff; box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  .tile { display: grid; place-items: center; flex: none; width: 84px; height: 84px; border-radius: 20px; background: var(--pink); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.45); }
+  .tile--y { background: var(--yellow); }
+  .tile--w { background: var(--stone-2); }
+  .tile svg { width: 52px; height: 52px; overflow: visible; }
+  .tile--sm { width: 60px; height: 60px; border-radius: 15px; }
+  .tile--sm svg { width: 36px; height: 36px; }
+  .logo { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.1), 0 10px 20px -12px rgb(26 26 26 / 0.3); }
+  .logo img { width: 38px; height: 38px; }
+  .t { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 38px; line-height: 1.12; letter-spacing: -0.02em; }
+  .s { margin: 8px 0 0; font-size: 26px; line-height: 1.35; color: var(--ink); }
+
+  /* ---- bp-modes: one customer inquiry, three ways ---- */
+  #bp-modes .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  #bp-modes .col { display: flex; flex-direction: column; padding: 36px 34px 34px; }
+  #bp-modes .col--manual { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #bp-modes .head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+  #bp-modes .step { display: flex; align-items: center; gap: 18px; padding: 16px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 26px; line-height: 1.3; font-weight: 500; }
+  #bp-modes .step .who { margin-left: auto; flex: none; padding: 5px 12px; border-radius: 999px; font-size: 18px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--stone-2); }
+  #bp-modes .step .who--ai { background: var(--yellow-pastel); }
+  #bp-modes .step .who--auto { background: var(--pink-tint); }
+  #bp-modes .col--manual .who { background: #fff; }
+  #bp-modes .logos { display: flex; gap: 12px; margin-top: auto; padding-top: 26px; }
+  #bp-modes .res { margin: 22px 0 0; padding: 18px 20px; border-radius: 18px; background: var(--paper); font-size: 24px; line-height: 1.35; }
+  #bp-modes .col--manual .res { background: #fff; }
+  #bp-modes .res b { display: block; margin-bottom: 4px; font-size: 18px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ---- bp-score: the five-box test ---- */
+  #bp-score .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  #bp-score .task { padding: 38px 38px 34px; }
+  #bp-score .task--no { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #bp-score .task .head { display: flex; align-items: center; gap: 22px; margin-bottom: 28px; }
+  #bp-score .box { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 28px; font-weight: 500; }
+  #bp-score .mark { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 10px; border: 2.5px solid var(--ink); background: #fff; }
+  #bp-score .mark svg { width: 26px; height: 26px; }
+  #bp-score .mark--on { background: var(--yellow); }
+  #bp-score .box .why { margin-left: auto; font-size: 22px; font-weight: 500; text-align: right; }
+  #bp-score .verdict { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 24px; padding: 20px 24px; border-radius: 18px; background: var(--yellow-pastel); font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 30px; }
+  #bp-score .task--no .verdict { background: #fff; }
+  #bp-score .verdict .n { font-family: Inter, Arial, sans-serif; font-size: 24px; font-weight: 700; padding: 6px 14px; border-radius: 999px; background: #fff; }
+  #bp-score .task--no .verdict .n { background: var(--pink-tint); }
+</style>
+</head>
+<body>
+
+<section class="fig fig--pink" id="bp-modes" data-out="business-processes-to-automate-without-a-developer/three-ways">
+  <p class="kicker">One customer inquiry, three ways</p>
+  <h2>Manual, AI-assisted or automated: who does each step</h2>
+  <div class="cols">
+    <div class="card col col--manual">
+      <div class="head"><div class="tile tile--w" data-i="person"></div><p class="t">Manual work</p></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="mail"></div>Read the inquiry<span class="who">You</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="copy"></div>Copy details to a sheet<span class="who">You</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="doc"></div>Write the reply<span class="who">You</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="week"></div>Remember to follow up<span class="who">You</span></div>
+      <p class="res"><b>Good for</b>Rare, sensitive or one-off requests.</p>
+    </div>
+    <div class="card col">
+      <div class="head"><div class="tile tile--y" data-i="idea"></div><p class="t">AI-assisted</p></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="mail"></div>Read the inquiry<span class="who">You</span></div>
+      <div class="step"><div class="tile tile--y tile--sm" data-i="idea"></div>Summarize and draft<span class="who who--ai">AI</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="doc"></div>Check and edit the draft<span class="who">You</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="send"></div>Send the reply<span class="who">You</span></div>
+      <div class="logos"><span class="logo"><img src="/assets/icons/tools/chatgpt.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/claude-color.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gemini.svg" alt=""></span></div>
+      <p class="res"><b>Good for</b>Writing and summarizing that needs judgment.</p>
+    </div>
+    <div class="card col">
+      <div class="head"><div class="tile" data-i="process"></div><p class="t">Automated</p></div>
+      <div class="step"><div class="tile tile--sm" data-i="form"></div>Log the inquiry<span class="who who--auto">Rule</span></div>
+      <div class="step"><div class="tile tile--sm" data-i="mail"></div>Send “we got it”<span class="who who--auto">Rule</span></div>
+      <div class="step"><div class="tile tile--sm" data-i="bell"></div>Notify the right person<span class="who who--auto">Rule</span></div>
+      <div class="step"><div class="tile tile--w tile--sm" data-i="person"></div>Reply and decide<span class="who">You</span></div>
+      <div class="logos"><span class="logo"><img src="/assets/icons/tools/zapier.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/google-sheets.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span></div>
+      <p class="res"><b>Good for</b>The same steps, every time, at any hour.</p>
+    </div>
+  </div>
+</section>
+
+<section class="fig fig--yellow" id="bp-score" data-out="business-processes-to-automate-without-a-developer/five-box-test">
+  <p class="kicker">The five-box test</p>
+  <h2>Two tasks from the same week: which one to automate first?</h2>
+  <div class="grid">
+    <div class="card task">
+      <div class="head"><div class="tile tile--y" data-i="mail"></div><div><p class="t">Inquiry acknowledgments</p><p class="s">“Thanks, we got your message”</p></div></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Repetitive<span class="why">Every inquiry</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Time-consuming<span class="why">Adds up weekly</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Rule-based<span class="why">Same reply each time</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Low-risk<span class="why">Easy to fix</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Easy to measure<span class="why">Reply time</span></div>
+      <div class="verdict">Automate it first<span class="n">5 of 5</span></div>
+    </div>
+    <div class="card task task--no">
+      <div class="head"><div class="tile" data-i="chat"></div><div><p class="t">Customer complaints</p><p class="s">An unhappy client writes in</p></div></div>
+      <div class="box"><span class="mark"></span>Repetitive<span class="why">Every case differs</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Time-consuming<span class="why">Yes</span></div>
+      <div class="box"><span class="mark"></span>Rule-based<span class="why">Needs judgment</span></div>
+      <div class="box"><span class="mark"></span>Low-risk<span class="why">Trust is at stake</span></div>
+      <div class="box"><span class="mark mark--on" data-tick></span>Easy to measure<span class="why">Yes</span></div>
+      <div class="verdict">Keep a person on it<span class="n">2 of 5</span></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const I = (() => {
+  const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
+  const L = 'fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+  const K = 'fill="#1A1A1A"';
+  return {
+    chat: `<path ${N} d="M6 8h36v24H20l-9 8v-8H6Z"/><path ${L} d="M13 17h22M13 24h13"/><circle ${K} cx="34" cy="24" r="3"/>`,
+    person: `<circle ${N} cx="24" cy="15" r="9"/><path ${N} d="M7 43c1-10 8-16 17-16s16 6 17 16Z"/><circle ${K} cx="24" cy="15" r="3"/>`,
+    mail: `<rect ${N} x="5" y="10" width="38" height="28" rx="3"/><path ${L} d="M6 12l18 14 18-14"/>`,
+    doc: `<path ${N} d="M10 4h20l8 8v32H10Z"/><path ${L} d="M30 4v8h8M16 21h16M16 28h16M16 35h9"/><rect ${K} x="16" y="13" width="8" height="3"/>`,
+    copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
+    week: `<rect ${N} x="6" y="9" width="36" height="33" rx="3"/><path ${L} d="M6 18h36M16 5v8M32 5v8M17 30l5 5 9-10"/>`,
+    idea: `<path ${K} d="M22 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4Z"/><path ${N} d="M37 29l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
+    process: `<rect ${N} x="5" y="18" width="12" height="12" rx="2"/><rect ${K} x="31" y="5" width="12" height="12" rx="2"/><rect ${N} x="31" y="31" width="12" height="12" rx="2"/><path ${L} d="M17 24h7V11h7M24 24v13h7"/>`,
+    form: `<rect ${N} x="8" y="4" width="32" height="40" rx="3"/><path ${L} d="M15 14h18M15 24h18M15 34h10"/><circle ${K} cx="33" cy="34" r="3.5"/>`,
+    send: `<path ${N} d="M5 22L43 6 33 42l-9-13Z"/><path ${L} d="M24 29L43 6"/>`,
+    bell: `<path ${N} d="M12 34V22a12 12 0 0 1 24 0v12l4 4H8Z"/><path ${L} d="M20 42a4 4 0 0 0 8 0"/><circle ${K} cx="24" cy="8" r="3"/>`,
+  };
+})();
+document.querySelectorAll("[data-i]").forEach((t) => (t.innerHTML = `<svg viewBox="0 0 48 48">${I[t.dataset.i]}</svg>`));
+document.querySelectorAll("[data-tick]").forEach((t) => (t.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'));
+window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))))).then(() =>
+  [...document.querySelectorAll(".fig")].map((f) => { const r = f.getBoundingClientRect(); return { out: f.dataset.out, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }));
+</script>
+</body>
+</html>

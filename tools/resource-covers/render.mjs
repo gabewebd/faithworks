@@ -37,6 +37,7 @@ const SCENES = {
   deploy: "build-and-deploy-landing-page-with-grok-and-netlify",
   roles: "goodbye-prompt-engineering-hello-role-engineering",
   ghkit: "github-toolkit-ai-skills-tools-creative-workflows",
+  processes: "business-processes-to-automate-without-a-developer",
 };
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
 for (const k of Object.keys(SCENES)) if (only.length && !only.includes(k)) delete SCENES[k];

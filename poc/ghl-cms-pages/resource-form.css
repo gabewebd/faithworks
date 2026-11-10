@@ -1,0 +1,234 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+/* Resource download form (GHL form 6tevJJiALsUG7VexbHDT, the one global "get this resource" form):
+   paste into GHL → Sites → Forms → (this form) → Styles → Custom CSS.
+   It sits straight on the article's download card, so the form has no box of its own:
+     transparent form, no padding; solid white fields with a white hairline and Charcoal text;
+     labels hidden on screen (still read out by screen readers; the placeholders show instead);
+     First name + Email side by side; a full-width button in Arial with 8px corners.
+   Selectors match the form's real markup (fetched from the live embed):
+     #_builder-form          = .form-builder--wrap (the id and the class are on ONE element)
+     .form-field-wrapper     = each field's column (#el_6tevJJiALsUG7VexbHDT_<field>_<n>)
+     .form-builder--item     = label + input; the Email label has no .field-label class
+     .email-input-wrapper    = the envelope icon + email input (inline padding-left:35px !important)
+     .d-none.field-container = the hidden resource title / link / copy fields
+     .button-element > .button-content > .button-text > div (inline colour + size) and an svg arrow
+   The @import must stay the first line. Every rule starts with #_builder-form#_builder-form so it
+   outranks GHL's own (its inline styles are not !important, so these win). */
+
+/* No box: the frame, wrap and form are transparent with no padding */
+html,
+body,
+.hl-app,
+.ghl-form-wrap,
+.hl_form-builder--main,
+#_builder-form#_builder-form,
+#_builder-form#_builder-form .form-side,
+#_builder-form#_builder-form .fields-container {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overflow-x: hidden !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.ghl-form-wrap,
+.hl_form-builder--main,
+#_builder-form#_builder-form,
+#_builder-form#_builder-form .form-side {
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  color: #1a1a1a !important;
+}
+
+/* 4px inset on every side so the 3px pink focus ring isn't cut off at the frame's edge */
+#_builder-form#_builder-form {
+  padding: 4px !important;
+}
+
+/* Layout: one row for First name + Email, the button full width below */
+#_builder-form#_builder-form .fields-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#_builder-form#_builder-form .form-field-wrapper {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+}
+#_builder-form#_builder-form #el_6tevJJiALsUG7VexbHDT_first_name_0,
+#_builder-form#_builder-form #el_6tevJJiALsUG7VexbHDT_email_1 {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+@media (max-width: 279px) {
+  #_builder-form#_builder-form #el_6tevJJiALsUG7VexbHDT_first_name_0,
+  #_builder-form#_builder-form #el_6tevJJiALsUG7VexbHDT_email_1 {
+    flex: 1 1 100% !important;
+  }
+}
+#_builder-form#_builder-form .form-field-container,
+#_builder-form#_builder-form .field-container,
+#_builder-form#_builder-form .form-builder--item {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+/* Hidden fields (resource title, link, copy) take no space */
+#_builder-form#_builder-form .form-field-wrapper:has(.d-none) {
+  display: none !important;
+}
+
+/* Labels: hidden on screen, still read out (placeholders show instead) */
+#_builder-form#_builder-form .form-builder--item > label,
+#_builder-form#_builder-form .field-label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Fields: solid white on the light card, white hairline (grey edge on hover), Charcoal text,
+   no blur or see-through fill (user);
+   Charcoal edge + solid pink ring on focus (like the Starter Kit form) */
+#_builder-form#_builder-form .form-control,
+#_builder-form#_builder-form input[type="text"].form-control,
+#_builder-form#_builder-form input[type="email"].form-control {
+  height: auto !important;
+  min-height: 52px !important;
+  padding-top: 13px !important;
+  padding-bottom: 13px !important;
+  padding-right: 16px !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  font-family: "Inter", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: #1a1a1a !important;
+  caret-color: #1a1a1a;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+/* First name gets 16px on the left; Email keeps GHL's inline 35px (room for the envelope) */
+#_builder-form#_builder-form .form-control:not([style*="padding-left"]) {
+  padding-left: 16px !important;
+}
+#_builder-form#_builder-form .form-control::placeholder {
+  color: #1a1a1a !important;
+  opacity: 1 !important;
+  font-size: 16px !important;
+}
+#_builder-form#_builder-form .email-input-wrapper svg,
+#_builder-form#_builder-form .input-icon {
+  color: #1a1a1a !important;
+  opacity: 1 !important;
+}
+#_builder-form#_builder-form .form-control:hover {
+  border-color: #b5b3af !important;
+  background: #ffffff !important;
+}
+#_builder-form#_builder-form .form-control:focus {
+  outline: none !important;
+  border-color: #1a1a1a !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px #efacba !important;
+}
+/* Browser autofill: keep the white fill and Charcoal text instead of its own pale blue */
+#_builder-form#_builder-form .form-control:-webkit-autofill,
+#_builder-form#_builder-form .form-control:-webkit-autofill:hover,
+#_builder-form#_builder-form .form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a1a1a !important;
+  caret-color: #1a1a1a;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+/* Button: full width, Arial, 8px corners like the site's .btn */
+#_builder-form#_builder-form .form-builder--btn-submit {
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+}
+#_builder-form#_builder-form .button-element {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 56px !important;
+  padding: 16px 24px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #1a1a1a !important;
+  box-shadow: none !important;
+  transition: transform 0.18s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+#_builder-form#_builder-form .button-element .button-text,
+#_builder-form#_builder-form .button-element .button-text * {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+#_builder-form#_builder-form .button-element svg,
+#_builder-form#_builder-form .button-element svg path {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: none !important;
+}
+#_builder-form#_builder-form .button-element:hover {
+  transform: translateY(-2px);
+  background: #1a1a1a !important;
+}
+#_builder-form#_builder-form .button-element:active {
+  transform: translateY(1px) scale(0.98);
+}
+#_builder-form#_builder-form .button-element:focus-visible {
+  outline: 3px solid #1a1a1a !important;
+  outline-offset: 3px;
+}
+
+/* Errors */
+#_builder-form#_builder-form .error {
+  margin-top: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #9b2245 !important;
+}
+
+/* A text element in the form, if one is added: small, Charcoal, links underlined */
+#_builder-form#_builder-form .text-element,
+#_builder-form#_builder-form .text-element * {
+  font-family: "Inter", Arial, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #1a1a1a !important;
+}
+#_builder-form#_builder-form .text-element a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}

@@ -1,0 +1,22 @@
+<!-- Resource download form (GHL form 6tevJJiALsUG7VexbHDT). Paste right below the form's embed code.
+     The page sends ONLY a short resource ID. The real title, copy and download link live in GHL
+     (a workflow on this form), so they never reach the browser and can't be found with Inspect.
+     Needs a hidden field in the form with the query key "resource_id" (see the setup notes). -->
+<script>
+(function () {
+  var RESOURCE_ID = "business-automation-checklist"; // the only thing to change per page
+
+  var FORM_ID = "6tevJJiALsUG7VexbHDT", KEY = "resource_id";
+  var tries = 0;
+  function run() {
+    var frames = document.querySelectorAll('iframe[src*="/widget/form/' + FORM_ID + '"]');
+    frames.forEach(function (frame) {
+      var url = new URL(frame.getAttribute("src"), location.href);
+      if (url.searchParams.get(KEY) !== RESOURCE_ID) { url.searchParams.set(KEY, RESOURCE_ID); frame.setAttribute("src", url.toString()); }
+    });
+    if (!frames.length && ++tries < 40) setTimeout(run, 250); // form not on the page yet: retry for 10 s
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run);
+  else run();
+})();
+</script>

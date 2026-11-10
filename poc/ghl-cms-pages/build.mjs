@@ -92,10 +92,20 @@ const VERSION = layout({ title: "", description: "", path: "/", nav: "", body: "
 // The article is real HTML in what GHL sends, so search engines and AI crawlers read it without
 // running scripts, and each page has its own title, description and share image.
 const ARTICLES = Object.fromEntries(data.articles.filter((a) => a.href && a.doc).map((a) => [`resources/${a.slug}`, a]));
+// A GHL form inside an article (e.g. the global resource download form in a .getkit card): the CMS
+// only allows api.leadconnectorhq.com frames and strips data-fw-* attributes, so here it moves to
+// api.faithph.ai (the origin FORM_SIZER listens to), gets an id, data-fw-size and scrolling="no",
+// and loads eagerly (no form_embed.js on these pages). Its query string (?resource_id=…) is kept.
+function sizedArticleForms(html) {
+  return html.replace(/<iframe\b([^>]*?)\ssrc="https:\/\/api\.(?:leadconnectorhq\.com|faithph\.ai)\/widget\/form\/([A-Za-z0-9]+)([^"]*)"([^>]*)>/g, (all, before, formId, query, after) => {
+    const rest = `${before}${after}`.replace(/\s(?:id|loading|scrolling|data-fw-size)(?:="[^"]*")?/g, "");
+    return `<iframe${rest} src="https://api.faithph.ai/widget/form/${formId}${query}" id="inline-${formId}" data-fw-size scrolling="no" loading="eager">`;
+  });
+}
 function articleSource(a) {
   const pg = R.articlePage(a);
   if (!pg) return null;
-  return R.dropEmptySections(layout({ ...pg, site: data.site }))
+  return sizedArticleForms(R.dropEmptySections(layout({ ...pg, site: data.site })))
     .replace(/(\shref)="(\/[^"]*)"/g, (all, attr, url) => `${attr}="${currentUrl(url)}"`)
     .replace(/<!--[\s\S]*?-->\n?/g, "").replace(/\sdata-cms-[\w-]+(?:="[^"]*")?/g, "")
     .replace(/(\s(?:href|data-redirect))="(\/[^"?#]*)([^"]*)"/g, (all, attr, path, rest) => `${attr}="${cleanPath(path)}${rest}"`)
