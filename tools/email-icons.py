@@ -52,6 +52,13 @@ def video(d):
     d.rounded_rectangle([p(36, 58), p(106, 112)], radius=12 * K, outline=INK, width=W)
     d.polygon([p(114, 78), p(136, 62), p(136, 108), p(114, 92)], fill=INK)
 
-for name, color, fn in [("icon-video-pink.png", "pink", video), ("icon-clock-pink.png", "pink", clock), ("icon-pin-yellow.png", "yellow", pin), ("icon-book-yellow.png", "yellow", book)]:
+def calendar_line(d):
+    # simple outline calendar: no white fill, no inner square
+    d.rounded_rectangle([p(38, 46), p(130, 128)], radius=14 * K, outline=INK, width=W)
+    d.line([p(38, 76), p(130, 76)], fill=INK, width=W)
+    for x in (62, 106):
+        d.line([p(x, 34), p(x, 58)], fill=INK, width=W)
+
+for name, color, fn in [("icon-calendar-line-pink.png", "pink", calendar_line), ("icon-video-pink.png", "pink", video), ("icon-clock-pink.png", "pink", clock), ("icon-pin-yellow.png", "yellow", pin), ("icon-book-yellow.png", "yellow", book)]:
     im = tile(color); d = ImageDraw.Draw(im)
     fn(d, TILES[color]) if fn is pin else fn(d); save(im, name)

@@ -23,12 +23,11 @@ const details = (rows) => `<table role="presentation" width="100%" cellpadding="
 // "What's included" rows with yellow tick bars
 const list = (items) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px 0;">${items.map((t, i) => `<tr><td width="6" valign="top" style="width:6px;padding:0 0 ${i < items.length - 1 ? 14 : 0}px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="6" height="26" bgcolor="#FBC522" style="width:6px;height:26px;background-color:#FBC522;border-radius:3px;font-size:0;line-height:0;">&nbsp;</td></tr></table></td><td width="16" style="width:16px;font-size:0;line-height:0;">&nbsp;</td><td class="fw-text" valign="top" style="padding:0 0 ${i < items.length - 1 ? 14 : 0}px 0;${I}font-size:16px;line-height:26px;color:#1A1A1A;">${t}</td></tr>`).join("")}</table>`;
 
-// Header: black logo bar, then the event details on the page (no card): headline, 2027 chip, three outlined tiles
-const tile = (icon, label, v1, v2) => `<td class="fw-tile" width="32%" valign="top" align="center" style="width:32%;border:2px solid #EFACBA;border-radius:12px;padding:16px 8px;text-align:center;"><img src="${ASSET}${icon}" width="44" height="44" alt="" style="display:block;width:44px;height:44px;margin:0 auto 10px auto;"><p class="fw-text" style="margin:0 0 6px 0;${I}font-size:11px;line-height:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1A1A1A;">${label}</p><p class="fw-text" style="margin:0;${P}font-size:15px;line-height:21px;font-weight:600;color:#1A1A1A;">${v1}<br>${v2}</p></td>`;
-const gap = `<td class="fw-gap" width="10" style="width:10px;font-size:0;line-height:0;">&nbsp;</td>`;
+// Header: black logo bar, then a simple title and one row of date / time / where with small icons
+const item = (icon, txt) => `<td class="fw-tile" valign="middle" align="center" style="padding:0 12px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="28" valign="middle" style="width:28px;"><img src="${ASSET}${icon}" width="28" height="28" alt="" style="display:block;width:28px;height:28px;"></td><td width="10" style="width:10px;font-size:0;line-height:0;">&nbsp;</td><td valign="middle" class="fw-text" style="${I}font-size:15px;line-height:22px;font-weight:600;color:#1A1A1A;white-space:nowrap;">${txt}</td></tr></table></td>`;
 const header = `
           <tr>
-            <td style="padding:0 0 34px 0;">
+            <td style="padding:0 0 30px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#1A1A1A" style="border-collapse:separate;border-radius:16px;background-color:#1A1A1A;">
                 <tr><td align="center" bgcolor="#1A1A1A" style="padding:26px 24px;background-color:#1A1A1A;border-radius:16px;">
                   <a href="${SITE}" target="_blank" style="text-decoration:none;"><img src="${ASSET}wordmark-reversed.png" width="168" height="34" alt="Faith Works" style="display:block;width:168px;height:auto;"></a>
@@ -37,12 +36,11 @@ const header = `
             </td>
           </tr>
           <tr>
-            <td align="center" style="padding:0 0 34px 0;">
-              <p class="fw-text" style="margin:0 0 14px 0;${I}font-size:12px;line-height:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1A1A1A;">Stop collecting prompts. Start applying AI.</p>
-              <h2 class="fw-greet fw-hdtitle" style="margin:0;${P}font-size:36px;line-height:52px;font-weight:600;letter-spacing:-0.5px;color:#1A1A1A;">Build Your Breakthrough<br><span style="background-color:#FBC522;color:#1A1A1A;padding:2px 18px;border-radius:999px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">2027</span></h2>
-              <p class="fw-text" style="margin:16px 0 22px 0;${I}font-size:16px;line-height:24px;color:#1A1A1A;">5 Practical Steps to Grow with AI &middot; with Coach Faith Natividad</p>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr>
-                ${tile("icon-calendar-pink.png", "Date", "Nov 16, 2026", "Monday")}${gap}${tile("icon-clock-pink.png", "Time", "7:00 &ndash; 10:00 PM", "PHT")}${gap}${tile("icon-video-pink.png", "Where", "Live via", "Zoom")}
+            <td align="center" style="padding:0 0 32px 0;">
+              <h2 class="fw-greet fw-hdtitle" style="margin:0 0 8px 0;${P}font-size:32px;line-height:48px;font-weight:600;letter-spacing:-0.5px;color:#1A1A1A;">Build Your Breakthrough <span style="background-color:#FBC522;color:#1A1A1A;padding:2px 14px;border-radius:999px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">2027</span></h2>
+              <p class="fw-text" style="margin:0 0 22px 0;${I}font-size:16px;line-height:24px;color:#1A1A1A;">5 Practical Steps to Grow with AI</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr>
+                ${item("icon-calendar-line-pink.png", "Nov 16, 2026")}${item("icon-clock-pink.png", "7:00 &ndash; 10:00 PM PHT")}${item("icon-video-pink.png", "Live via Zoom")}
               </tr></table>
             </td>
           </tr>`;
@@ -92,8 +90,8 @@ const page = (title, h, body) => `<!DOCTYPE html>
     @media only screen and (max-width:620px) {
       .fw-main { padding:32px 22px 40px 22px !important; }
       .fw-greet { font-size:26px !important; line-height:38px !important; }
-      .fw-hdtitle { font-size:28px !important; line-height:42px !important; }
-      .fw-tile { display:block !important; width:100% !important; box-sizing:border-box; margin-bottom:10px; }
+      .fw-hdtitle { font-size:26px !important; line-height:40px !important; }
+      .fw-tile { display:block !important; width:100% !important; box-sizing:border-box; padding:6px 0 !important; }
       .fw-gap { display:none !important; }
       .fw-foot { padding:32px 20px !important; }
       .fw-footwrap { padding:0 22px 32px 22px !important; }
