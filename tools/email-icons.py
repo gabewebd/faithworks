@@ -62,3 +62,18 @@ def calendar_line(d):
 for name, color, fn in [("icon-calendar-line-pink.png", "pink", calendar_line), ("icon-video-pink.png", "pink", video), ("icon-clock-pink.png", "pink", clock), ("icon-pin-yellow.png", "yellow", pin), ("icon-book-yellow.png", "yellow", book)]:
     im = tile(color); d = ImageDraw.Draw(im)
     fn(d, TILES[color]) if fn is pin else fn(d); save(im, name)
+
+# Poster-style burst of three dashes (Build Your Breakthrough 2027 emails): transparent 88x88, pink strokes
+def sparkle():
+    n, k = 88, 4
+    im = Image.new("RGBA", (n * k, n * k), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    ox, oy = 14, 74                      # burst origin (lower left)
+    for ang, r0, r1 in [(8, 26, 62), (42, 24, 58), (76, 22, 52)]:
+        a = math.radians(ang)
+        d.line([((ox + r0 * math.cos(a)) * k, (oy - r0 * math.sin(a)) * k), ((ox + r1 * math.cos(a)) * k, (oy - r1 * math.sin(a)) * k)],
+               fill=TILES["pink"], width=9 * k)
+        for r in (r0, r1):
+            x, y = (ox + r * math.cos(a)) * k, (oy - r * math.sin(a)) * k
+            d.ellipse([x - 4.5 * k, y - 4.5 * k, x + 4.5 * k, y + 4.5 * k], fill=TILES["pink"])
+    im.resize((n, n), Image.LANCZOS).save(os.path.join(OUT, "bbyb-sparkle-pink.png")); print("wrote bbyb-sparkle-pink.png")
+sparkle()

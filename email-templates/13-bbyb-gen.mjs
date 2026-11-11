@@ -11,10 +11,10 @@ const P = "font-family:Poppins,'Helvetica Neue',Helvetica,Arial,sans-serif;";
 const I = "font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;";
 
 const p = (html, mb = 18) => `<p class="fw-text" style="margin:0 0 ${mb}px 0;${I}font-size:16px;line-height:26px;color:#1A1A1A;">${html}</p>`;
-const greet = (h) => `<h1 class="fw-greet" style="margin:0 0 26px 0;${P}font-size:30px;line-height:44px;font-weight:600;letter-spacing:-0.5px;color:#1A1A1A;"><span style="background-color:#EFACBA;padding:2px 10px;border-radius:6px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">${h}</span></h1>`;
+const greet = (h) => `<h1 class="fw-greet" style="margin:0 0 26px 0;${P}font-size:30px;line-height:46px;font-weight:700;font-style:italic;letter-spacing:-0.5px;color:#1A1A1A;"><span style="background-color:#EFACBA;padding:2px 16px;border-radius:22px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">${h}</span></h1>`;
 const b = (t) => `<strong style="${P}font-weight:600;">${t}</strong>`;
 const btn = (href, txt) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 26px 0;"><tr><td align="center">
-<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${href}" style="height:52px;v-text-anchor:middle;width:320px;" arcsize="15%" stroke="f" fillcolor="#FBC522"><w:anchorlock/><center style="color:#1A1A1A;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">${txt}</center></v:roundrect><![endif]--><!--[if !mso]><!-- --><a class="fw-btn" href="${href}" target="_blank" style="display:inline-block;background-color:#FBC522;color:#1A1A1A;${P}font-size:16px;font-weight:600;line-height:20px;text-decoration:none;padding:16px 32px;border-radius:8px;mso-hide:all;">${txt}</a><!--<![endif]-->
+<!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${href}" style="height:52px;v-text-anchor:middle;width:320px;" arcsize="50%" stroke="f" fillcolor="#FBC522"><w:anchorlock/><center style="color:#1A1A1A;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">${txt}</center></v:roundrect><![endif]--><!--[if !mso]><!-- --><a class="fw-btn" href="${href}" target="_blank" style="display:inline-block;background-color:#FBC522;color:#1A1A1A;${P}font-size:17px;font-weight:700;font-style:italic;line-height:20px;text-decoration:none;padding:17px 38px;border-radius:999px;mso-hide:all;">${txt}</a><!--<![endif]-->
 </td></tr></table>`;
 const contact = `<a href="mailto:${MAIL}" style="color:#1A1A1A;text-decoration:underline;">${MAIL}</a>`;
 const sign = `<p class="fw-text" style="margin:8px 0 0 0;${I}font-size:16px;line-height:26px;color:#1A1A1A;"><span style="${P}font-weight:600;">Faith Works PH</span></p>`;
@@ -23,8 +23,10 @@ const details = (rows) => `<table role="presentation" width="100%" cellpadding="
 // "What's included" rows with yellow tick bars
 const list = (items) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px 0;">${items.map((t, i) => `<tr><td width="6" valign="top" style="width:6px;padding:0 0 ${i < items.length - 1 ? 14 : 0}px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="6" height="26" bgcolor="#FBC522" style="width:6px;height:26px;background-color:#FBC522;border-radius:3px;font-size:0;line-height:0;">&nbsp;</td></tr></table></td><td width="16" style="width:16px;font-size:0;line-height:0;">&nbsp;</td><td class="fw-text" valign="top" style="padding:0 0 ${i < items.length - 1 ? 14 : 0}px 0;${I}font-size:16px;line-height:26px;color:#1A1A1A;">${t}</td></tr>`).join("")}</table>`;
 
-// Header: black logo bar, then a simple title and one row of date / time / where with small icons
-const item = (icon, txt) => `<td class="fw-tile" valign="middle" align="center" style="padding:0 12px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="28" valign="middle" style="width:28px;"><img src="${ASSET}${icon}" width="28" height="28" alt="" style="display:block;width:28px;height:28px;"></td><td width="10" style="width:10px;font-size:0;line-height:0;">&nbsp;</td><td valign="middle" class="fw-text" style="${I}font-size:15px;line-height:22px;font-weight:600;color:#1A1A1A;white-space:nowrap;">${txt}</td></tr></table></td>`;
+// Header: black logo bar, then the poster lockup (pink tagline pill, bold italic caps title, yellow 2027 pill + dash burst,
+// pink underline, date / time / where row, yellow coach pill)
+const item = (icon, txt, first) => `<td class="fw-tile" valign="middle" align="center" style="padding:2px 14px;${first ? "" : "border-left:2px solid #EFACBA;"}"><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="28" valign="middle" style="width:28px;"><img src="${ASSET}${icon}" width="28" height="28" alt="" style="display:block;width:28px;height:28px;"></td><td width="10" style="width:10px;font-size:0;line-height:0;">&nbsp;</td><td valign="middle" class="fw-text" style="${I}font-size:15px;line-height:22px;font-weight:600;color:#1A1A1A;white-space:nowrap;">${txt}</td></tr></table></td>`;
+const pill = (bg, txt, size, pad) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td bgcolor="${bg}" style="background-color:${bg};border-radius:999px;padding:${pad};${P}font-size:${size}px;line-height:${size + 8}px;font-weight:600;font-style:italic;color:#1A1A1A;text-align:center;">${txt}</td></tr></table>`;
 const header = `
           <tr>
             <td style="padding:0 0 30px 0;">
@@ -36,12 +38,20 @@ const header = `
             </td>
           </tr>
           <tr>
-            <td align="center" style="padding:0 0 32px 0;">
-              <h2 class="fw-greet fw-hdtitle" style="margin:0 0 8px 0;${P}font-size:32px;line-height:48px;font-weight:600;letter-spacing:-0.5px;color:#1A1A1A;">Build Your Breakthrough <span style="background-color:#FBC522;color:#1A1A1A;padding:2px 14px;border-radius:999px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">2027</span></h2>
-              <p class="fw-text" style="margin:0 0 22px 0;${I}font-size:16px;line-height:24px;color:#1A1A1A;">5 Practical Steps to Grow with AI</p>
+            <td align="center" style="padding:0 0 34px 0;">
+              ${pill("#EFACBA", "Stop collecting prompts. Start applying AI.", 14, "7px 20px")}
+              <h2 class="fw-greet fw-hdtitle" style="margin:22px 0 6px 0;${P}font-size:38px;line-height:44px;font-weight:800;font-style:italic;text-transform:uppercase;letter-spacing:-1px;color:#1A1A1A;">Build Your<br>Breakthrough</h2>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr>
-                ${item("icon-calendar-line-pink.png", "Nov 16, 2026")}${item("icon-clock-pink.png", "7:00 &ndash; 10:00 PM PHT")}${item("icon-video-pink.png", "Live via Zoom")}
+                <td width="44" style="width:44px;font-size:0;line-height:0;">&nbsp;</td>
+                <td bgcolor="#FBC522" style="background-color:#FBC522;border-radius:999px;padding:2px 30px;${P}font-size:48px;line-height:60px;font-weight:800;font-style:italic;letter-spacing:-1px;color:#1A1A1A;text-align:center;">2027</td>
+                <td width="44" valign="top" style="width:44px;"><img src="${ASSET}bbyb-sparkle-pink.png" width="44" height="44" alt="" style="display:block;width:44px;height:44px;"></td>
               </tr></table>
+              <p class="fw-text" style="margin:18px 0 8px 0;${P}font-size:17px;line-height:24px;font-weight:600;font-style:italic;color:#1A1A1A;">5 Practical Steps to Grow with AI</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 26px auto;"><tr><td width="190" height="4" bgcolor="#EFACBA" style="width:190px;height:4px;background-color:#EFACBA;border-radius:2px;font-size:0;line-height:0;">&nbsp;</td></tr></table>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 24px auto;"><tr>
+                ${item("icon-calendar-line-pink.png", "Nov 16, 2026", true)}${item("icon-clock-pink.png", "7:00 &ndash; 10:00 PM PHT", false)}${item("icon-video-pink.png", "Live via Zoom", false)}
+              </tr></table>
+              ${pill("#FBC522", "with Coach Faith Natividad", 15, "8px 22px")}
             </td>
           </tr>`;
 
@@ -72,7 +82,7 @@ const page = (title, h, body) => `<!DOCTYPE html>
   <meta name="supported-color-schemes" content="light dark">
   <title>${title}</title>
   <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:ital,wght@0,600;1,600;1,700;1,800&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: light dark; supported-color-schemes: light dark; }
     body, .fw-bg { margin:0; padding:0; width:100% !important; background-color:#FFFFFF !important; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
@@ -90,8 +100,8 @@ const page = (title, h, body) => `<!DOCTYPE html>
     @media only screen and (max-width:620px) {
       .fw-main { padding:32px 22px 40px 22px !important; }
       .fw-greet { font-size:26px !important; line-height:38px !important; }
-      .fw-hdtitle { font-size:26px !important; line-height:40px !important; }
-      .fw-tile { display:block !important; width:100% !important; box-sizing:border-box; padding:6px 0 !important; }
+      .fw-hdtitle { font-size:30px !important; line-height:36px !important; }
+      .fw-tile { display:block !important; width:100% !important; box-sizing:border-box; padding:6px 0 !important; border-left:0 !important; }
       .fw-gap { display:none !important; }
       .fw-foot { padding:32px 20px !important; }
       .fw-footwrap { padding:0 22px 32px 22px !important; }
