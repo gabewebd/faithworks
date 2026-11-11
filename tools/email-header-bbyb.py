@@ -36,7 +36,6 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
     <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FDF0F4"/></linearGradient>
     <!-- background: the card's white-to-blush gradient, a touch stronger and on the diagonal so the frame isn't flat -->
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FCE8EF"/><stop offset="0.5" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FBE2EA"/></linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="{INK}" flood-opacity="0.08"/></filter>
     <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
   </defs>
   <g clip-path="url(#frame)">
@@ -49,7 +48,7 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
     <text x="{W / 2}" y="190" text-anchor="middle" style="{F}font-weight:600;font-size:28px;" fill="{INK}">Stop collecting AI prompts. Start applying AI to real work.</text>
 
     <!-- title card -->
-    <rect x="110" y="262" width="980" height="498" rx="44" fill="url(#card)" stroke="#F6C9D7" stroke-width="3" filter="url(#shadow)"/>
+    <rect x="110" y="262" width="980" height="498" rx="44" fill="url(#card)" stroke="#F6C9D7" stroke-width="3"/>
     <!-- coach pill straddling the card's top edge -->
     <rect x="{W / 2 - 236}" y="234" width="472" height="56" rx="28" fill="{HOT}"/>
     <text x="{W / 2}" y="272" text-anchor="middle" style="{F}font-weight:700;font-size:25px;letter-spacing:0.3px;" fill="#FFFFFF">with Coach Faith Natividad</text>
