@@ -47,6 +47,11 @@ def book(d):
         d.line([p(52, y - 6), p(72, y - 2)], fill=INK, width=6 * K)
         d.line([p(96, y - 2), p(116, y - 6)], fill=INK, width=6 * K)
 
-for name, color, fn in [("icon-clock-pink.png", "pink", clock), ("icon-pin-yellow.png", "yellow", pin), ("icon-book-yellow.png", "yellow", book)]:
+def video(d):
+    # camera: rounded body + lens triangle
+    d.rounded_rectangle([p(36, 58), p(106, 112)], radius=12 * K, outline=INK, width=W)
+    d.polygon([p(114, 78), p(136, 62), p(136, 108), p(114, 92)], fill=INK)
+
+for name, color, fn in [("icon-video-pink.png", "pink", video), ("icon-clock-pink.png", "pink", clock), ("icon-pin-yellow.png", "yellow", pin), ("icon-book-yellow.png", "yellow", book)]:
     im = tile(color); d = ImageDraw.Draw(im)
     fn(d, TILES[color]) if fn is pin else fn(d); save(im, name)
