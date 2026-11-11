@@ -9,7 +9,10 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SVG_OUT = os.path.join(ROOT, "email-templates", "headers", "13-bbyb-header.svg")
 PNG_OUT = os.path.join(ROOT, "assets", "email", "bbyb-header.png")
 
-W, H = 1200, 800
+W = 1200
+# Lockup is laid out in design units (content spans y 44..760, card x 110..1090), then scaled by S
+S, TOP = 1.15, 34
+H = round(TOP + 716 * S + 46)
 HOT, PINK, YEL, INK = "#E8157F", "#EFACBA", "#FBC522", "#1A1A1A"
 
 # Official wordmark paths (assets/icons/wordmark.svg), nested so it keeps its own viewBox
@@ -18,8 +21,6 @@ wm_paths = "\n".join(re.findall(r"<(?:path|rect)[^>]*/>", wm))
 WM_W = 330
 WM_H = round(WM_W * 385 / 1906)
 
-def arcs(cx, cy, r0, n, step, op):
-    return "\n".join(f'<circle cx="{cx}" cy="{cy}" r="{r0 + i * step}" fill="none" stroke="{PINK}" stroke-width="2" opacity="{op}"/>' for i in range(n))
 
 def burst(x, y, rot, scale=1.0):
     # three rounded dashes fanning out, like the poster's pink accents
@@ -32,23 +33,13 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
   <title>Build Your Breakthrough 2027</title>
   <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,600;1,700;1,800;1,900&amp;display=swap');</style>
   <defs>
-    <linearGradient id="blobA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7B6CB"/><stop offset="1" stop-color="#FCE3EB"/></linearGradient>
-    <linearGradient id="blobB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9C4D5"/><stop offset="1" stop-color="#FDEDF2"/></linearGradient>
     <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FDF0F4"/></linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="{INK}" flood-opacity="0.08"/></filter>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
     <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
   </defs>
   <g clip-path="url(#frame)">
     <rect width="{W}" height="{H}" fill="#FFFFFF"/>
-    <!-- soft pink blobs, as on the poster -->
-    <path d="M-80 -60 C 160 -40 260 60 230 190 C 200 320 60 330 -80 420 Z" fill="url(#blobA)" opacity="0.85"/>
-    <path d="M1280 330 C 1080 330 960 430 990 560 C 1020 690 1120 720 1280 840 Z" fill="url(#blobB)" opacity="0.9"/>
-    <path d="M-60 640 C 80 600 200 650 240 720 C 260 760 250 800 240 820 L -60 820 Z" fill="url(#blobB)" opacity="0.7"/>
-    <!-- thin concentric arcs, top right and bottom left -->
-    <g>{arcs(1210, -30, 70, 9, 22, 0.55)}</g>
-    <g>{arcs(-20, 840, 60, 7, 22, 0.45)}</g>
-
+    <g transform="translate({W / 2} {TOP}) scale({S}) translate({-W / 2} -44)">
     <!-- wordmark -->
     <svg x="{(W - WM_W) / 2}" y="44" width="{WM_W}" height="{WM_H}" viewBox="0 70 1906 385">{wm_paths}</svg>
 
@@ -71,6 +62,7 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
     <!-- subtitle + pink swoosh -->
     <text x="{W / 2}" y="690" text-anchor="middle" style="{F}font-weight:600;font-size:34px;" fill="{INK}">5 Practical Steps to Grow with AI</text>
     <path d="M410 726 Q 600 706 800 720" fill="none" stroke="{HOT}" stroke-width="7" stroke-linecap="round"/>
+    </g>
   </g>
 </svg>
 '''
