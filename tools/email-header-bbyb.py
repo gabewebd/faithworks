@@ -34,11 +34,13 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
   <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,600;1,700;1,800;1,900&amp;display=swap');</style>
   <defs>
     <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FDF0F4"/></linearGradient>
+    <!-- background: the card's white-to-blush gradient, a touch stronger and on the diagonal so the frame isn't flat -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FCE8EF"/><stop offset="0.5" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FBE2EA"/></linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="{INK}" flood-opacity="0.08"/></filter>
     <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
   </defs>
   <g clip-path="url(#frame)">
-    <rect width="{W}" height="{H}" fill="#FFFFFF"/>
+    <rect width="{W}" height="{H}" fill="url(#bg)"/>
     <g transform="translate({W / 2} {TOP}) scale({S}) translate({-W / 2} -44)">
     <!-- wordmark -->
     <svg x="{(W - WM_W) / 2}" y="44" width="{WM_W}" height="{WM_H}" viewBox="0 70 1906 385">{wm_paths}</svg>
