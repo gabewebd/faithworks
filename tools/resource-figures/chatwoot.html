@@ -1,0 +1,160 @@
+<!doctype html>
+<!-- In-article diagrams for "Chatwoot Review: Is This Free Intercom Alternative Right for Your
+     Business?" (chatwoot-review-free-intercom-alternative). Same house style as figures.html: brand
+     palette only, Poppins 600 headings, Inter text, solid Charcoal text, white cards, real logos from
+     assets/icons/tools. Kept in its own file so other articles' figures are never re-rendered.
+     Serve the repository root (python -m http.server 8775), then:
+       PAGE=chatwoot.html node tools/resource-figures/render.mjs shared-inbox which-inbox -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=block">
+<style>
+  :root { --pink: #EFACBA; --pink-tint: #F7E5E6; --yellow: #FBC522; --yellow-pastel: #FAEBC0; --ink: #1A1A1A; --paper: #FAF8F4; --stone-2: #F1EFEB; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccc; font-family: Inter, Arial, sans-serif; color: var(--ink); }
+  .fig { position: relative; width: 1600px; margin: 0 0 40px; padding: 80px 88px; overflow: hidden; background: var(--paper); }
+  .fig--pink { background: radial-gradient(1200px 700px at 15% 0%, #F6D3DA 0%, rgb(246 211 218 / 0) 70%), var(--paper); }
+  .fig--yellow { background: radial-gradient(1200px 700px at 85% 0%, #FCE6A6 0%, rgb(252 230 166 / 0) 70%), var(--paper); }
+  .kicker { margin: 0 0 14px; font-size: 26px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .kicker::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 50%; background: var(--pink); vertical-align: 2px; }
+  .fig--yellow .kicker::before { background: var(--yellow); }
+  h2 { margin: 0 0 56px; max-width: 1300px; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 58px; line-height: 1.08; letter-spacing: -0.035em; }
+  .card { position: relative; z-index: 2; border-radius: 28px; background: #fff; box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  .tile { display: grid; place-items: center; flex: none; width: 84px; height: 84px; border-radius: 20px; background: var(--pink); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.45); }
+  .tile--y { background: var(--yellow); }
+  .tile--w { background: var(--stone-2); }
+  .tile--white { background: #fff; }
+  .tile svg { width: 52px; height: 52px; overflow: visible; }
+  .tile--sm { width: 60px; height: 60px; border-radius: 15px; }
+  .tile--sm svg { width: 36px; height: 36px; }
+  .logo { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.1), 0 10px 20px -12px rgb(26 26 26 / 0.3); }
+  .logo img { width: 38px; height: 38px; }
+  .t { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 36px; line-height: 1.12; letter-spacing: -0.02em; }
+  .s { margin: 8px 0 0; font-size: 25px; line-height: 1.35; color: var(--ink); }
+  .tag { flex: none; margin-left: auto; padding: 6px 14px; border-radius: 999px; font-size: 18px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--stone-2); white-space: nowrap; }
+  .tag--free { background: var(--yellow-pastel); }
+  .tag--paid { background: var(--pink-tint); }
+  .wire { position: absolute; z-index: 1; background: rgb(26 26 26 / 0.22); }
+  .dot { position: absolute; z-index: 3; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--pink); border: 5px solid #fff; }
+  .dot--y { background: var(--yellow); }
+
+  /* ---- shared-inbox: every channel into one Chatwoot inbox, then the team ---- */
+  #cw-inbox .stage { position: relative; display: grid; grid-template-columns: 440px 1fr 370px; gap: 0 72px; align-items: center; }
+  #cw-inbox .channels { display: grid; gap: 16px; }
+  #cw-inbox .ch { display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: 20px; font-size: 26px; font-weight: 600; }
+  #cw-inbox .ch .logo { width: 56px; height: 56px; border-radius: 14px; }
+  #cw-inbox .ch .logo img { width: 32px; height: 32px; }
+  #cw-inbox .ch .pair { display: flex; gap: 8px; }
+  #cw-inbox .hub { padding: 36px 34px 30px; }
+  #cw-inbox .hub__head { display: flex; align-items: center; gap: 22px; margin-bottom: 22px; }
+  #cw-inbox .hub__head img { width: 84px; height: 84px; }
+  #cw-inbox .feat { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-top: 1px solid rgb(26 26 26 / 0.1); font-size: 25px; font-weight: 500; line-height: 1.3; }
+  #cw-inbox .team { display: grid; gap: 22px; }
+  #cw-inbox .agent { display: flex; align-items: center; gap: 20px; padding: 24px 26px; }
+  #cw-inbox .agent .t { font-size: 31px; }
+  #cw-inbox .agent .s { font-size: 22px; }
+  #cw-inbox .agent--ai { background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #cw-inbox .note { margin: 34px 0 0; font-size: 24px; line-height: 1.4; }
+
+  /* ---- which-inbox: four situations, four answers ---- */
+  #cw-choose .rows { display: grid; gap: 22px; }
+  #cw-choose .row { position: relative; display: grid; grid-template-columns: 640px 1fr; gap: 0 96px; align-items: center; }
+  #cw-choose .q { display: flex; align-items: center; gap: 22px; padding: 26px 28px; background: var(--stone-2); box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5); }
+  #cw-choose .q p { margin: 0; font-size: 28px; font-weight: 600; line-height: 1.3; }
+  #cw-choose .a { display: flex; align-items: center; gap: 22px; padding: 22px 28px; }
+  #cw-choose .a .logos { display: flex; gap: 10px; }
+  #cw-choose .a .t { font-size: 32px; }
+  #cw-choose .a .s { margin-top: 4px; font-size: 23px; }
+  #cw-choose .row .wire { left: 640px; top: 50%; width: 96px; height: 3px; margin-top: -1.5px; }
+  #cw-choose .row .dot { top: 50%; margin-top: -11px; }
+  #cw-choose .row--best .a { box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 0 0 13px var(--yellow), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  #cw-choose .note { margin: 36px 0 0; font-size: 24px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<section class="fig fig--pink" id="cw-inbox" data-out="chatwoot-review-free-intercom-alternative/shared-inbox">
+  <p class="kicker">How a shared inbox works</p>
+  <h2>Every channel lands in one inbox your whole team can answer</h2>
+  <div class="stage">
+    <div class="channels">
+      <div class="card ch"><div class="tile tile--y tile--sm" data-i="globe"></div>Website live chat<span class="tag tag--free">Free</span></div>
+      <div class="card ch"><span class="logo"><img src="/assets/icons/tools/whatsapp.svg" alt=""></span>WhatsApp</div>
+      <div class="card ch"><span class="logo"><img src="/assets/icons/tools/telegram.svg" alt=""></span>Telegram, SMS, Line</div>
+      <div class="card ch"><span class="logo"><img src="/assets/icons/tools/gmail.svg" alt=""></span>Email<span class="tag tag--paid">Paid</span></div>
+      <div class="card ch"><span class="pair"><span class="logo"><img src="/assets/icons/tools/facebook.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/instagram.svg" alt=""></span></span>Facebook, Instagram<span class="tag tag--paid">Paid</span></div>
+    </div>
+    <div class="card hub">
+      <div class="hub__head"><img src="/assets/icons/tools/chatwoot.svg" alt=""><div><p class="t">One shared inbox</p><p class="s">Chatwoot</p></div></div>
+      <div class="feat"><div class="tile tile--sm" data-i="person"></div>Each chat assigned to a person</div>
+      <div class="feat"><div class="tile tile--y tile--sm" data-i="lock"></div>Private notes only your team sees</div>
+      <div class="feat"><div class="tile tile--sm" data-i="copy"></div>Saved replies for common questions</div>
+      <div class="feat"><div class="tile tile--y tile--sm" data-i="mail"></div>Bot asks for an email to follow up</div>
+    </div>
+    <div class="team">
+      <div class="card agent"><div class="tile" data-i="person"></div><div><p class="t">You reply</p><p class="s">Under your own name</p></div></div>
+      <div class="card agent"><div class="tile tile--y" data-i="people"></div><div><p class="t">A teammate</p><p class="s">Picks up where you left off</p></div></div>
+      <div class="card agent agent--ai"><div class="tile tile--white" data-i="idea"></div><div><p class="t">Captain AI</p><p class="s">Drafts and answers (paid)</p></div></div>
+    </div>
+  </div>
+  <p class="note">Free and paid labels follow what we saw in our free Chatwoot Cloud account. Plans change, so check Chatwoot’s pricing page.</p>
+</section>
+
+<section class="fig fig--yellow" id="cw-choose" data-out="chatwoot-review-free-intercom-alternative/which-inbox">
+  <p class="kicker">Which inbox fits you?</p>
+  <h2>Start with what you already pay for, then how many channels you need</h2>
+  <div class="rows">
+    <div class="row"><div class="card q"><div class="tile tile--sm" data-i="card"></div><p>You already pay for an all-in-one CRM such as GoHighLevel</p></div><span class="wire"></span><span class="dot" style="left:640px"></span><span class="dot dot--y" style="left:736px"></span>
+      <div class="card a"><span class="logo"><img src="/assets/icons/tools/highlevel.png" alt=""></span><div><p class="t">Use the inbox you have</p><p class="s">No second inbox to check every day</p></div></div></div>
+    <div class="row row--best"><div class="card q"><div class="tile tile--y tile--sm" data-i="globe"></div><p>You only need website chat, answered by one or two people</p></div><span class="wire"></span><span class="dot" style="left:640px"></span><span class="dot dot--y" style="left:736px"></span>
+      <div class="card a"><span class="logo"><img src="/assets/icons/tools/chatwoot.svg" alt=""></span><div><p class="t">Chatwoot free plan</p><p class="s">$0 for up to 2 agents, 500 chats a month</p></div></div></div>
+    <div class="row"><div class="card q"><div class="tile tile--sm" data-i="chat"></div><p>You need email, Facebook or Instagram, and AI help, on a small budget</p></div><span class="wire"></span><span class="dot" style="left:640px"></span><span class="dot dot--y" style="left:736px"></span>
+      <div class="card a"><span class="logo"><img src="/assets/icons/tools/chatwoot.svg" alt=""></span><div><p class="t">Chatwoot Startups</p><p class="s">$19 per agent a month, all channels</p></div></div></div>
+    <div class="row"><div class="card q"><div class="tile tile--y tile--sm" data-i="people"></div><p>A larger support team that wants advanced AI and automation built in</p></div><span class="wire"></span><span class="dot" style="left:640px"></span><span class="dot dot--y" style="left:736px"></span>
+      <div class="card a"><span class="logos"><span class="logo"><img src="/assets/icons/tools/intercom.svg" alt=""></span><span class="logo"><img src="/assets/icons/tools/zendesk.svg" alt=""></span></span><div><p class="t">Intercom or Zendesk</p><p class="s">Per-seat plans, plus AI charges</p></div></div></div>
+  </div>
+  <p class="note">Prices are monthly list prices from each company’s pricing page. Plans change, so check before you sign up.</p>
+</section>
+
+<script>
+const I = (() => {
+  const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
+  const L = 'fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+  const K = 'fill="#1A1A1A"';
+  return {
+    chat: `<path ${N} d="M6 8h36v24H20l-9 8v-8H6Z"/><path ${L} d="M13 17h22M13 24h13"/><circle ${K} cx="34" cy="24" r="3"/>`,
+    person: `<circle ${N} cx="24" cy="15" r="9"/><path ${N} d="M7 43c1-10 8-16 17-16s16 6 17 16Z"/><circle ${K} cx="24" cy="15" r="3"/>`,
+    people: `<circle ${N} cx="17" cy="15" r="6"/><circle ${N} cx="33" cy="17" r="5"/><path ${N} d="M6 40l3-14h16l3 14Z"/><path ${K} d="M27 40l2-11h10l3 11Z"/>`,
+    mail: `<rect ${N} x="5" y="10" width="38" height="28" rx="3"/><path ${L} d="M6 12l18 14 18-14"/>`,
+    copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
+    idea: `<path ${K} d="M22 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4Z"/><path ${N} d="M37 29l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>`,
+    globe: `<circle ${N} cx="24" cy="24" r="19"/><path ${L} d="M5 24h38M24 5c-6 6-8 12-8 19s2 13 8 19M24 5c6 6 8 12 8 19s-2 13-8 19"/><circle ${K} cx="24" cy="24" r="3.5"/>`,
+    lock: `<rect ${N} x="9" y="21" width="30" height="22" rx="3"/><path ${L} d="M16 21v-6a8 8 0 0 1 16 0v6"/><circle ${K} cx="24" cy="32" r="3.5"/>`,
+    card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
+  };
+})();
+document.querySelectorAll("[data-i]").forEach((t) => (t.innerHTML = `<svg viewBox="0 0 48 48">${I[t.dataset.i]}</svg>`));
+
+// cw-inbox connectors: straight wires from each channel to a bus, into the hub, then out to the team
+function wires() {
+  const fig = document.getElementById("cw-inbox"), stage = fig.querySelector(".stage"), base = stage.getBoundingClientRect();
+  const hub = stage.querySelector(".hub").getBoundingClientRect(), add = (x, y, w, h, cls = "wire") => { const e = document.createElement("span"); e.className = cls; Object.assign(e.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` }); stage.appendChild(e); };
+  const dot = (x, y, y2) => { const e = document.createElement("span"); e.className = y2 ? "dot dot--y" : "dot"; Object.assign(e.style, { left: `${x}px`, top: `${y}px` }); stage.appendChild(e); };
+  const chs = [...stage.querySelectorAll(".ch")].map((c) => c.getBoundingClientRect());
+  const busL = hub.left - base.left - 36, hubY = hub.top - base.top + hub.height / 2;
+  chs.forEach((c) => { const y = c.top - base.top + c.height / 2, x = c.right - base.left; add(x, y - 1.5, busL - x, 3); dot(x, y); });
+  const ys = chs.map((c) => c.top - base.top + c.height / 2);
+  add(busL - 1.5, Math.min(...ys), 3, Math.max(...ys) - Math.min(...ys));
+  add(busL, hubY - 1.5, hub.left - base.left - busL, 3); dot(hub.left - base.left, hubY, true);
+  const ags = [...stage.querySelectorAll(".agent")].map((c) => c.getBoundingClientRect());
+  const busR = hub.right - base.left + 36;
+  add(hub.right - base.left, hubY - 1.5, 36, 3); dot(hub.right - base.left, hubY, true);
+  const ays = ags.map((a) => a.top - base.top + a.height / 2);
+  add(busR - 1.5, Math.min(...ays), 3, Math.max(...ays) - Math.min(...ays));
+  ags.forEach((a) => { const y = a.top - base.top + a.height / 2, x = a.left - base.left; add(busR, y - 1.5, x - busR, 3); dot(x, y); });
+}
+window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))))).then(() => { wires(); return [...document.querySelectorAll(".fig")].map((f) => { const r = f.getBoundingClientRect(); return { out: f.dataset.out, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }); });
+</script>
+</body>
+</html>

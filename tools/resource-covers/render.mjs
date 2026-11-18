@@ -38,6 +38,8 @@ const SCENES = {
   roles: "goodbye-prompt-engineering-hello-role-engineering",
   ghkit: "github-toolkit-ai-skills-tools-creative-workflows",
   processes: "business-processes-to-automate-without-a-developer",
+  inbox: "chatwoot-review-free-intercom-alternative",
+  opensource: "free-open-source-alternatives-to-paid-tools",
 };
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
 for (const k of Object.keys(SCENES)) if (only.length && !only.includes(k)) delete SCENES[k];

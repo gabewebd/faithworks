@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- In-article diagrams for "6 Free Open-Source Alternatives to Paid Tools, Tested"
+     (free-open-source-alternatives-to-paid-tools). Same house style as figures.html: brand palette
+     only, Poppins 600 headings, Inter text, solid Charcoal text, white cards, real logos from
+     assets/icons/tools. Kept in its own file so other articles' figures are never re-rendered.
+     Serve the repository root (python -m http.server 8775), then:
+       PAGE=open-source-alternatives.html node tools/resource-figures/render.mjs six-swaps hidden-costs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=block">
+<style>
+  :root { --pink: #EFACBA; --pink-tint: #F7E5E6; --yellow: #FBC522; --yellow-pastel: #FAEBC0; --ink: #1A1A1A; --paper: #FAF8F4; --stone-2: #F1EFEB; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccc; font-family: Inter, Arial, sans-serif; color: var(--ink); }
+  .fig { position: relative; width: 1600px; margin: 0 0 40px; padding: 80px 88px; overflow: hidden; background: var(--paper); }
+  .fig--pink { background: radial-gradient(1200px 700px at 15% 0%, #F6D3DA 0%, rgb(246 211 218 / 0) 70%), var(--paper); }
+  .fig--yellow { background: radial-gradient(1200px 700px at 85% 0%, #FCE6A6 0%, rgb(252 230 166 / 0) 70%), var(--paper); }
+  .kicker { margin: 0 0 14px; font-size: 26px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .kicker::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 50%; background: var(--pink); vertical-align: 2px; }
+  .fig--yellow .kicker::before { background: var(--yellow); }
+  h2 { margin: 0 0 52px; max-width: 1300px; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 58px; line-height: 1.08; letter-spacing: -0.035em; }
+  .card { position: relative; z-index: 2; border-radius: 26px; background: #fff; box-shadow: 0 0 0 10px rgb(255 255 255 / 0.5), 0 28px 50px -24px rgb(26 26 26 / 0.28); }
+  .tile { display: grid; place-items: center; flex: none; width: 84px; height: 84px; border-radius: 20px; background: var(--pink); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.45); }
+  .tile--y { background: var(--yellow); }
+  .tile svg { width: 52px; height: 52px; overflow: visible; }
+  .tile--sm { width: 64px; height: 64px; border-radius: 16px; }
+  .tile--sm svg { width: 40px; height: 40px; }
+  .logo { display: grid; place-items: center; flex: none; width: 72px; height: 72px; border-radius: 18px; background: #fff; box-shadow: 0 0 0 1px rgb(26 26 26 / 0.1), 0 10px 20px -12px rgb(26 26 26 / 0.3); }
+  .logo img { width: 44px; height: 44px; }
+  .logo img.full { width: 72px; height: 72px; border-radius: 18px; }
+  .logo--sm { width: 52px; height: 52px; border-radius: 13px; }
+  .logo--sm img { width: 32px; height: 32px; }
+  .logo--sm img.full { width: 52px; height: 52px; border-radius: 13px; }
+  .t { margin: 0; font-family: Poppins, Arial, sans-serif; font-weight: 600; font-size: 32px; line-height: 1.12; letter-spacing: -0.02em; }
+  .s { margin: 6px 0 0; font-size: 22px; line-height: 1.35; color: var(--ink); }
+  .tag { display: inline-block; padding: 7px 14px; border-radius: 999px; font-size: 18px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; background: var(--stone-2); }
+  .tag--go { background: var(--yellow); }
+  .tag--some { background: var(--yellow-pastel); }
+  .tag--care { background: var(--pink-tint); }
+
+  /* ---- six-swaps: paid tool → open-source swap → one reminder ---- */
+  #oss-swaps .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px 30px; }
+  #oss-swaps .tag { font-size: 16px; padding: 6px 12px; }
+  #oss-swaps .swap { display: grid; grid-template-columns: auto 1fr; gap: 6px 22px; align-items: center; padding: 26px 28px; }
+  #oss-swaps .pair { display: flex; align-items: center; gap: 10px; grid-row: span 2; }
+  #oss-swaps .arrow { width: 34px; height: 3px; background: rgb(26 26 26 / 0.3); position: relative; }
+  #oss-swaps .arrow::after { content: ""; position: absolute; right: -2px; top: -6px; border: 7.5px solid transparent; border-left: 10px solid rgb(26 26 26 / 0.45); border-right: 0; }
+  #oss-swaps .t { font-size: 28px; }
+  #oss-swaps .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  #oss-swaps .s { margin: 0; font-size: 21px; }
+  #oss-swaps .legend { margin: 34px 0 0; font-size: 23px; }
+  
+  /* ---- hidden-costs: where "free" software still costs you ---- */
+  #oss-costs .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  #oss-costs .cost { display: flex; flex-direction: column; padding: 34px 30px 30px; }
+  #oss-costs .cost .t { margin-top: 24px; font-size: 29px; }
+  #oss-costs .cost .s { margin-top: 10px; font-size: 22px; }
+  #oss-costs .ex { margin-top: auto; padding-top: 24px; border-top: 1px solid rgb(26 26 26 / 0.1); }
+  #oss-costs .ex .logos { display: flex; gap: 10px; margin: 16px 0 12px; }
+  #oss-costs .ex p { margin: 0; font-size: 21px; line-height: 1.35; font-weight: 500; }
+  #oss-costs .note { margin: 34px 0 0; font-size: 23px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<section class="fig fig--pink" id="oss-swaps" data-out="free-open-source-alternatives-to-paid-tools/six-swaps">
+  <p class="kicker">Six swaps we tested</p>
+  <h2>Six paid tools, their open-source alternatives, and one thing to remember</h2>
+  <div class="grid">
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img src="/assets/icons/tools/loom.svg" alt=""></span><span class="arrow"></span><span class="logo"><img class="full" src="/assets/icons/tools/cap.png" alt=""></span></div>
+      <div class="row"><p class="t">Cap</p><span class="tag tag--care">Free: personal use</span></div><p class="s">Screen recording with instant share links</p></div>
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img src="/assets/icons/tools/intercom.svg" alt=""></span><span class="arrow"></span><span class="logo"><img src="/assets/icons/tools/chatwoot.svg" alt=""></span></div>
+      <div class="row"><p class="t">Chatwoot</p><span class="tag tag--some">Free: 2 agents</span></div><p class="s">Website chat and a shared support inbox</p></div>
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img src="/assets/icons/tools/notion.svg" alt=""></span><span class="arrow"></span><span class="logo"><img src="/assets/icons/tools/appflowy.svg" alt=""></span></div>
+      <div class="row"><p class="t">AppFlowy</p><span class="tag tag--some">Free: 100 MB</span></div><p class="s">Notes, docs and task boards you own</p></div>
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img class="full" src="/assets/icons/tools/wispr-flow.png" alt=""></span><span class="arrow"></span><span class="logo"><img class="full" src="/assets/icons/tools/openwhispr.svg" alt=""></span></div>
+      <div class="row"><p class="t">OpenWhispr</p><span class="tag tag--some">Runs on your laptop</span></div><p class="s">Talk, and it types into any app</p></div>
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img src="/assets/icons/tools/elevenlabs.svg" alt=""></span><span class="arrow"></span><span class="logo"><img class="full" src="/assets/icons/tools/voicestudio.png" alt=""></span></div>
+      <div class="row"><p class="t">VoiceStudio</p><span class="tag tag--care">Non-commercial voice</span></div><p class="s">AI voiceovers and transcription on your laptop</p></div>
+    <div class="card swap"><div class="pair"><span class="logo logo--sm paid"><img class="full" src="/assets/icons/tools/higgsfield.png" alt=""></span><span class="arrow"></span><span class="tile tile--y" data-i="film" style="width:72px;height:72px;border-radius:18px"></span></div>
+      <div class="row"><p class="t">Open Higgsfield</p><span class="tag tag--care">Pay per result</span></div><p class="s">AI images and video, paid per generation</p></div>
+  </div>
+  <p class="legend">Small logo: the paid tool. Large logo: the free, open-source alternative we tested. Tags: one thing to keep in mind.</p>
+</section>
+
+<section class="fig fig--yellow" id="oss-costs" data-out="free-open-source-alternatives-to-paid-tools/hidden-costs">
+  <p class="kicker">Free to download is not always free</p>
+  <h2>Four ways open-source tools can still cost you</h2>
+  <div class="grid">
+    <div class="card cost"><div class="tile" data-i="clock"></div><p class="t">Your laptop’s time</p><p class="s">AI that runs on your own computer is free, but slower on an everyday laptop.</p>
+      <div class="ex"><div class="logos"><span class="logo logo--sm"><img class="full" src="/assets/icons/tools/voicestudio.png" alt=""></span><span class="logo logo--sm"><img class="full" src="/assets/icons/tools/openwhispr.svg" alt=""></span></div><p>VoiceStudio took 3–7 seconds to make each second of audio.</p></div></div>
+    <div class="card cost"><div class="tile tile--y" data-i="coins"></div><p class="t">Pay per use</p><p class="s">Some apps are free, but every result runs on a paid AI service.</p>
+      <div class="ex"><div class="logos"><span class="tile tile--y tile--sm" data-i="film"></span></div><p>Open Higgsfield: about $0.25 for one 5-second video clip.</p></div></div>
+    <div class="card cost"><div class="tile" data-i="server"></div><p class="t">Your own server</p><p class="s">Self-hosting is free software, but someone pays for and looks after the server.</p>
+      <div class="ex"><div class="logos"><span class="logo logo--sm"><img src="/assets/icons/tools/chatwoot.svg" alt=""></span><span class="logo logo--sm"><img class="full" src="/assets/icons/tools/cap.png" alt=""></span><span class="logo logo--sm"><img src="/assets/icons/tools/appflowy.svg" alt=""></span></div><p>Chatwoot asks for at least 2 CPU cores and 4 GB of RAM.</p></div></div>
+    <div class="card cost"><div class="tile tile--y" data-i="licence"></div><p class="t">Licence limits</p><p class="s">Free for you doesn’t always mean free for client or company work.</p>
+      <div class="ex"><div class="logos"><span class="logo logo--sm"><img class="full" src="/assets/icons/tools/voicestudio.png" alt=""></span><span class="logo logo--sm"><img class="full" src="/assets/icons/tools/cap.png" alt=""></span></div><p>VoiceStudio’s main voice model is non-commercial; Cap Free is personal use.</p></div></div>
+  </div>
+  <p class="note">Examples from our own tests and each project’s official pages. Plans change, so check before you rely on them.</p>
+</section>
+
+<script>
+const I = (() => {
+  const N = 'fill="#FAF8F4" stroke="#1A1A1A" stroke-width="2.4" stroke-linejoin="round"';
+  const L = 'fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+  const K = 'fill="#1A1A1A"';
+  return {
+    film: `<rect ${N} x="5" y="9" width="38" height="30" rx="3"/><path ${L} d="M5 17h38M5 31h38M13 9v8M24 9v8M35 9v8M13 31v8M24 31v8M35 31v8"/><path ${K} d="M20 20v8l7-4Z"/>`,
+    clock: `<circle ${N} cx="24" cy="24" r="19"/><path ${L} d="M24 13v11l8 5"/><circle ${K} cx="24" cy="24" r="3"/>`,
+    coins: `<circle ${N} cx="18" cy="28" r="13"/><circle ${N} cx="30" cy="20" r="13"/><path ${L} d="M30 13v14M34 15.5h-5.5a2.75 2.75 0 0 0 0 5.5h3a2.75 2.75 0 0 1 0 5.5H26"/>`,
+    server: `<rect ${N} x="7" y="6" width="34" height="14" rx="3"/><rect ${N} x="7" y="28" width="34" height="14" rx="3"/><path ${L} d="M24 20v8"/><circle ${K} cx="15" cy="13" r="2.5"/><circle ${K} cx="15" cy="35" r="2.5"/><path ${L} d="M24 13h10M24 35h10"/>`,
+    licence: `<path ${N} d="M10 4h20l8 8v32H10Z"/><path ${L} d="M30 4v8h8M16 20h16M16 27h10"/><circle ${N} cx="30" cy="34" r="6"/><path ${K} d="M27 39l-2 6 5-2 5 2-2-6Z"/>`,
+  };
+})();
+document.querySelectorAll("[data-i]").forEach((t) => (t.innerHTML = `<svg viewBox="0 0 48 48">${I[t.dataset.i]}</svg>`));
+window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r))))).then(() =>
+  [...document.querySelectorAll(".fig")].map((f) => { const r = f.getBoundingClientRect(); return { out: f.dataset.out, x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; }));
+</script>
+</body>
+</html>

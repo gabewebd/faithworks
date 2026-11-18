@@ -20,7 +20,9 @@
 <svg width="0" height="0" style="position:absolute"><text id="m" font-family="Inter"></text></svg>
 <script>
 const C = { pink: "#EFACBA", yellow: "#FBC522", white: "#FAF8F4", ink: "#1A1A1A" };
-const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier", "netlify", "shadcn", "magicui", "motion", "threejs", "remotion", "groq", "openai", "playwright"];
+const LOGOS = ["chatgpt", "claude-color", "gemini", "grok", "codex-color", "openclaw", "hermes-agent", "obsidian", "claude-code-color", "perplexity", "notebooklm", "gamma", "gmail", "google-calendar", "google-sheets", "google-drive", "google-docs", "github", "microsoft-copilot", "canva", "zapier", "netlify", "shadcn", "magicui", "motion", "threejs", "remotion", "groq", "openai", "playwright", "chatwoot", "intercom", "zendesk", "whatsapp", "telegram", "slack", "notion", "loom", "elevenlabs", "appflowy", "openwhispr"];
+// Official marks that only exist as PNG app icons: embedded as data URIs inside a <symbol>
+const PNG_LOGOS = ["cap", "voicestudio", "wispr-flow", "higgsfield"];
 const FONTS = "https://fonts.googleapis.com/css2?family=Inter:wght@500;600&amp;display=block";
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -52,6 +54,7 @@ const ICONS = {
   card: `<rect ${N} x="4" y="10" width="40" height="28" rx="4"/><path ${L} d="M4 18h40"/><rect ${K} x="10" y="26" width="10" height="5" rx="1"/>`,
   copy: `<rect ${N} x="14" y="4" width="26" height="30" rx="3"/><rect ${N} x="8" y="14" width="26" height="30" rx="3"/><path ${L} d="M14 24h14M14 32h10"/>`,
   globe: `<circle ${N} cx="24" cy="24" r="19"/><path ${L} d="M5 24h38M24 5c-6 6-8 12-8 19s2 13 8 19M24 5c6 6 8 12 8 19s-2 13-8 19"/><circle ${K} cx="24" cy="24" r="3.5"/>`,
+  spark: `<path ${K} d="M22 5l4 11 11 4-11 4-4 11-4-11-11-4 11-4Z"/><rect ${N} x="30" y="30" width="14" height="12" rx="2"/><path ${K} d="M35 33v6l4.5-3Z"/>`,
   id: `<rect ${N} x="4" y="8" width="40" height="32" rx="4"/><circle ${N} cx="16" cy="22" r="5"/><path ${L} d="M8 34c1-5 4-7 8-7s7 2 8 7M28 18h10M28 25h10"/><rect ${K} x="28" y="30" width="7" height="3"/>`,
 };
 
@@ -94,6 +97,12 @@ async function defs(bg, extra = "") {
     const inner = src.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").replace(/\sid="([^"]*)"/g, ` id="logo-${n}-$1"`).replace(/url\(#([^)]+)\)/g, `url(#logo-${n}-$1)`).replace(/\s+/g, " ").trim(); // ids kept (gradients), made unique per logo
     return `<symbol id="logo-${n}" viewBox="${vb}"${paint}>${inner}</symbol>`;
   }));
+  const pngs = await Promise.all(PNG_LOGOS.map(async (n) => {
+    const b = await (await fetch(`/assets/icons/tools/${n}.png`)).blob();
+    const uri = await new Promise((r) => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(b); });
+    return `<symbol id="logo-${n}" viewBox="0 0 100 100"><clipPath id="logo-${n}-clip"><rect width="100" height="100" rx="22"/></clipPath><image href="${uri}" width="100" height="100" clip-path="url(#logo-${n}-clip)"/></symbol>`;
+  }));
+  symbols.push(...pngs);
   return `<defs>
 <style>@import url("${FONTS}");</style>
 ${bg}
@@ -523,7 +532,48 @@ async function processes() {
   return doc("7 Business Processes You Can Automate Without Hiring a Developer", "Four everyday business processes (customer inquiries, appointments, follow-ups and reports) joined by straight lines to one workflow, which runs on Google Calendar, Gmail and Google Sheets.", await defs(bg, extra), body);
 }
 
-const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles, ghkit, processes };
+/* ---- Chatwoot review — radial from the bottom-left corner: four channels → one Chatwoot inbox → the team ---- */
+async function inbox() {
+  const bg = `<radialGradient id="bg" cx="0" cy="1080" r="2200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3BFCA"/><stop offset="0.5" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE19C"/></radialGradient>`;
+  const blurs = [3, 4, 5];
+  const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
+  const ts = 124, tx = 330, ys = [300, 460, 620, 780], busL = 560, hs = 280, hx = 700, hy = 540 - hs / 2, busR = hx + hs + 110;
+  const channels = iconCard(tx, ys[0] - ts / 2, ts, "globe", "yellow") + ["whatsapp", "telegram", "gmail"].map((n, i) => logo(tx, ys[i + 1] - ts / 2, ts, n)).join("");
+  const cys = [420, 660], cl = busR + 90;
+  const K = [["chat", "pink", "One shared inbox", "Every chat in one place"], ["people", "yellow", "Your team replies", "Notes stay private"]];
+  const R = K.map((k) => chip(0, 0, ...k).w).map((w, i) => chip(cl + w / 2, cys[i], ...K[i]));
+  const wires = [
+    ...ys.map((y) => [[tx + ts, y], [busL, y]]), [[busL, ys[0]], [busL, ys[3]]], [[busL, 540], [hx, 540]],
+    [[hx + hs, 540], [busR, 540]], [[busR, cys[0]], [busR, cys[1]]], ...R.map((c, i) => [[busR, cys[i]], [c.left, cys[i]]]),
+  ];
+  const nodes = [...ys.map((y) => node(tx + ts, y)), node(hx, 540, C.yellow), node(hx + hs, 540, C.yellow), ...R.map((c, i) => node(c.left, cys[i]))].join("");
+  // [centre x, centre y, size, logo, tilt, blur, opacity]
+  const soft = [[1790, 130, 170, "intercom", 14, 4, 0.8], [1800, 960, 170, "zendesk", -12, 4, 0.8], [120, 110, 140, "slack", -12, 4, 0.75],
+    [760, 70, 120, "chatgpt", 10, 3, 0.75], [1330, 1015, 120, "claude-color", -9, 3, 0.75], [120, 1000, 130, "gemini", 11, 4, 0.75]];
+  const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) + layer("connectors", wires.map(wire).join("")) +
+    layer("channels", channels) + layer("chatwoot", logo(hx, hy, hs, "chatwoot")) + layer("team", R.map((c) => c.svg).join("")) + layer("nodes", nodes);
+  return doc("Chatwoot Review: Is This Free Intercom Alternative Right for Your Business?", "Website chat, WhatsApp, Telegram and email joined by straight lines to one Chatwoot inbox, which leads to one shared inbox and your team, with Intercom and Zendesk drifting at the edges.", await defs(bg, extra), body);
+}
+/* ---- Open-source alternatives roundup — radial from the top centre: six open-source tools → one "open source" chip; the paid tools drift at the edges ---- */
+async function opensource() {
+  const bg = `<radialGradient id="bg" cx="960" cy="0" r="1500" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F3BFCA"/><stop offset="0.55" stop-color="${C.white}"/><stop offset="1" stop-color="#FCE19C"/></radialGradient>`;
+  const blurs = [3, 4, 5];
+  const extra = blurs.map((b) => `<filter id="feather${b}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="${b}"/></filter>`).join("");
+  const ts = 150, ys = [330, 540, 750], lx = 400, rx = 1520 - ts, busL = 660, busR = 1260;
+  const hub = chip(960, 540, "idea", "yellow", "Free and open source", "Six swaps, tested");
+  const left = ["cap", "appflowy", "chatwoot"].map((n, i) => logo(lx, ys[i] - ts / 2, ts, n)).join("");
+  const right = logo(rx, ys[0] - ts / 2, ts, "openwhispr") + logo(rx, ys[1] - ts / 2, ts, "voicestudio") + iconCard(rx, ys[2] - ts / 2, ts, "spark", "pink");
+  const wires = [...ys.map((y) => [[lx + ts, y], [busL, y]]), [[busL, ys[0]], [busL, ys[2]]], [[busL, 540], [hub.left, 540]],
+    ...ys.map((y) => [[busR, y], [rx, y]]), [[busR, ys[0]], [busR, ys[2]]], [[hub.right, 540], [busR, 540]]];
+  const nodes = [...ys.map((y) => node(lx + ts, y)), ...ys.map((y) => node(rx, y)), node(hub.left, 540, C.yellow), node(hub.right, 540, C.yellow)].join("");
+  // [centre x, centre y, size, logo, tilt, blur, opacity]: the paid tools, feathered at the edges
+  const soft = [[130, 130, 150, "notion", -13, 4, 0.8], [1790, 130, 150, "loom", 12, 4, 0.8], [120, 960, 150, "elevenlabs", 11, 4, 0.8],
+    [1800, 950, 160, "intercom", -12, 4, 0.8], [700, 990, 120, "wispr-flow", -9, 3, 0.75], [1230, 1000, 120, "higgsfield", 9, 3, 0.75]];
+  const body = layer("drifting-logos", soft.map((e) => drift(...e)).join("")) + layer("connectors", wires.map(wire).join("")) +
+    layer("open-source-tools", left + right) + layer("hub", hub.svg) + layer("nodes", nodes);
+  return doc("6 Free Open-Source Alternatives to Paid Tools, Tested", "Cap, AppFlowy, Chatwoot, OpenWhispr, VoiceStudio and an AI image and video studio joined to one free and open-source chip, with Notion, Loom, ElevenLabs, Intercom, Wispr Flow and Higgsfield drifting at the edges.", await defs(bg, extra), body);
+}
+const SCENES = { niche, agents, beginners, purpose, github, setup, modes, automate, research, billboard, promptpack, toolkit, business, deploy, roles, ghkit, processes, inbox, opensource };
 window.compose = async (name) => { await Promise.all([document.fonts.load("600 29px Inter"), document.fonts.load("500 23px Inter")]); await document.fonts.ready; return SCENES[name](); };
 </script>
 </body>
