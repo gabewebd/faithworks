@@ -872,9 +872,10 @@ function rcard(a, lead, attrs = "") {
 export function resourceCards() {
   const items = D.articles.filter((a) => a.href).sort((a, b) => (b.featured - a.featured) || newest(a, b));
   if (!items.length) return EMPTY_SECTION;
-  const types = [...new Set(items.map((a) => a.type))];
-  const chips = types.length > 1 ? `<div class="rcards__filters" role="group" aria-label="Filter by type">
-            <button type="button" class="rcards__chip" aria-pressed="true" data-type="">All</button>${types.map((t) => `<button type="button" class="rcards__chip" aria-pressed="false" data-type="${esc(t)}">${esc(items.find((a) => a.type === t).typeLabel)}</button>`).join("")}
+  // One chip per type in use; a card's data-type lists every chip it shows under (content.mjs filters)
+  const types = new Map(items.flatMap((a) => a.filters).map((f) => [f.type, f.label]));
+  const chips = types.size > 1 ? `<div class="rcards__filters" role="group" aria-label="Filter by type">
+            <button type="button" class="rcards__chip" aria-pressed="true" data-type="">All</button>${[...types].map(([t, label]) => `<button type="button" class="rcards__chip" aria-pressed="false" data-type="${esc(t)}">${esc(label)}</button>`).join("")}
           </div>` : "";
   return `<div class="rcards__tools" data-rcards-tools hidden>
           <label class="rcards__search"><span class="sr-only">Search resources</span><input type="search" placeholder="Search resources" autocomplete="off" data-rcards-search></label>
@@ -882,7 +883,7 @@ export function resourceCards() {
         </div>
       <ul class="rcards" data-rcards-list>${items.map((a, i) => {
     const words = [a.title, a.excerpt, a.category, a.typeLabel, ...a.topics].filter(Boolean).join(" ").toLowerCase();
-    return rcard(a, i === 0 && a.featured, ` data-type="${esc(a.type)}" data-search="${esc(words)}"`);
+    return rcard(a, i === 0 && a.featured, ` data-type="${esc(a.filters.map((f) => f.type).join(" "))}" data-search="${esc(words)}"`);
   }).join("")}
       </ul>
       <p class="rcards__none small" data-rcards-none hidden>No resources match your search.</p>`;

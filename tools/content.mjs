@@ -189,11 +189,15 @@ export function toRenderData(snap) {
   snap = { ...snap, resources: snap.resources.map(covered) };
   // Each resource's card opens its page. A guide or worksheet saved without page content
   // keeps its older link instead (a file, or a page such as Start Your AI Journey).
+  // Filters: the Type chips a card answers to. A resource with something to download (the
+  // .getlist download card in its page, or a file as its card link) is also under Playbook.
   const articles = snap.resources.map((a) => {
     const doc = pageDoc("resources", a), type = typeOf(a);
     const link = doc ? null : nz(currentUrl(String(a.file_url || "").trim()));
+    const downloadable = (!!link && isFile(link)) || (!!doc && /class="getlist[\s"]/.test(doc.html));
+    const filters = [type, ...(downloadable && type !== "playbook" ? ["playbook"] : [])].map((t) => ({ type: t, label: TYPE_LABELS[t] }));
     return {
-      id: a.slug, rid: a.id, slug: a.slug, title: a.title, type, typeLabel: TYPE_LABELS[type], category: a.category, topics: list(a.tags),
+      id: a.slug, rid: a.id, slug: a.slug, title: a.title, type, typeLabel: TYPE_LABELS[type], filters, category: a.category, topics: list(a.tags),
       date: a.publish_date, author: bylineOf(a), readTime: readingTime(a.body_html) || a.read_time || "", featured: !!a.featured, excerpt: a.summary,
       href: doc ? `/resources/${a.slug}/` : link, external: !!link && /^https?:\/\//i.test(link), download: !!link && isFile(link),
       image: resolveImage(featuredImage("resources", a)), doc, hasPage: !!doc, rec: a, status: a.status, ...seo(a),

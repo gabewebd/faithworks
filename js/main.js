@@ -1160,7 +1160,8 @@ window.__fwMainLoaded = true;
       var words = rSearch.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
       rCards.forEach(function (card) {
         var text = card.getAttribute("data-search") || "";
-        var match = (!rType || card.getAttribute("data-type") === rType) && words.every(function (w) { return text.indexOf(w) >= 0; });
+        // data-type lists every chip the card is under (a guide with a download is also a playbook)
+        var match = (!rType || (" " + card.getAttribute("data-type") + " ").indexOf(" " + rType + " ") >= 0) && words.every(function (w) { return text.indexOf(w) >= 0; });
         card.hidden = !match;
         if (match) shown++;
       });
