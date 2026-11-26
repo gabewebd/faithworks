@@ -2658,6 +2658,8 @@ p.event__date b { font-size: clamp(36px, 3vw, 46px); letter-spacing: -0.03em; }
   .cal__num { margin: 0; width: 28px; height: 28px; font-size: 13px; }
   .cal__chip, .cal__more { display: none; }
   .cal__dots { display: flex; }
+  /* The chosen day's events sit straight on the white calendar card, under a hairline */
+  .cal__panel { padding: 18px 2px 4px; border-top: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; }
 }
 
 /* 13. Responsive ------------------------------------------------------------ */
